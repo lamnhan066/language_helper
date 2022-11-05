@@ -1,0 +1,24 @@
+name: language_helper
+description: Make it easier for you to implement multiple languages into your app.
+version: 0.0.1
+homepage: https://github.com/vursin/language_helper
+
+environment:
+  sdk: '>=2.17.0 <3.0.0'
+  flutter: ">=2.5.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
