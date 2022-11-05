@@ -52,7 +52,7 @@ Use builder to rebuild the widgets automatically on change:
       return MaterialApp(
         home: Scaffold(
           appBar: AppBar(
-            title: Text(LanguageHelper.instance.translate('Hello')),
+            title: Text('Hello'.tr),
           ),
           body: Center(
             child: Column(
@@ -83,8 +83,9 @@ LanguageNotifier(
 ),
 ```
 
+*No matter how many `LanguageNotifier` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageNotifier`, so it improves a lot performance. And all `LanguageNotifier` widgets will be rebuilt at the same time.*
+
 ## Additional Information
 
-- All the widgets that you wrapped with `LanguageNotifier` will be rebuilt at the same time.
-- The `LanguageCodes` contains all the languages with additional information like name in English and name in native language.
+- The `LanguageCodes` contains all the languages with additional information like name in English (name) and name in native language (nativeName).
 - This is the very first state so it may contain issues.

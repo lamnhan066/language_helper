@@ -79,10 +79,11 @@ class LanguageHelper {
       _print('language does not contain the code => Cannot set currentCode');
     }
 
+    _print('Change language to $code for ${_states.length} states');
     for (var state in _states) {
-      _print('Change language to $code for $state');
       state._updateLanguage();
     }
+    _print('Changing completed!');
   }
 
   /// Internal function, print debug log

@@ -6,10 +6,16 @@ LanguageData data = {
   LanguageCodes.en: {
     'Hello': 'Hello',
     'Change language': 'Change language',
+    'Other Page': 'Other Page',
+    'Text will be changed': 'Text will be changed',
+    'Text will be not changed': 'Text will be not changed',
   },
   LanguageCodes.vi: {
     'Hello': 'Xin Chào',
     'Change language': 'Thay đổi ngôn ngữ',
+    'Other Page': 'Trang Khác',
+    'Text will be changed': 'Chữ sẽ thay đổi',
+    'Text will be not changed': 'Chữ không thay đổi',
   }
 };
 
@@ -20,7 +26,7 @@ void main() {
     isDebug: true,
   );
 
-  runApp(const MyApp());
+  runApp(const MaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -38,31 +44,82 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return LanguageNotifier(builder: (context) {
-      return MaterialApp(
-        home: Scaffold(
-          appBar: AppBar(
-            title: LanguageNotifier(
-              builder: (context) {
+    return LanguageNotifier(builder: (_) {
+      return Scaffold(
+        appBar: AppBar(
+          title: LanguageNotifier(
+            builder: (context) {
+              return Text('Hello'.tr);
+            },
+          ),
+        ),
+        body: Center(
+          child: Column(
+            children: [
+              LanguageNotifier(builder: (context) {
                 return Text('Hello'.tr);
-              },
-            ),
-          ),
-          body: Center(
-            child: Column(
-              children: [
-                Text('Hello'.tr),
-                ElevatedButton(
-                  onPressed: () {
+              }),
+              ElevatedButton(
+                onPressed: () {
+                  if (LanguageHelper.instance.currentCode == LanguageCodes.vi) {
+                    LanguageHelper.instance.change(LanguageCodes.en);
+                  } else {
                     LanguageHelper.instance.change(LanguageCodes.vi);
-                  },
-                  child: Text('Change language'.tr),
-                ),
-              ],
-            ),
+                  }
+                },
+                child: Text('Change language'.tr),
+              ),
+            ],
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.navigate_next_rounded),
+          onPressed: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => const OtherPage()));
+          },
         ),
       );
     });
+  }
+}
+
+class OtherPage extends StatefulWidget {
+  const OtherPage({Key? key}) : super(key: key);
+
+  @override
+  State<OtherPage> createState() => _OtherPageState();
+}
+
+class _OtherPageState extends State<OtherPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: LanguageNotifier(builder: (context) {
+          return Text('Other Page'.tr);
+        }),
+      ),
+      body: Column(
+        children: [
+          LanguageNotifier(builder: (context) {
+            return Text('Text will be changed'.tr);
+          }),
+          Text('Text will be not changed'.tr),
+          ElevatedButton(
+            onPressed: () {
+              if (LanguageHelper.instance.currentCode == LanguageCodes.vi) {
+                LanguageHelper.instance.change(LanguageCodes.en);
+              } else {
+                LanguageHelper.instance.change(LanguageCodes.vi);
+              }
+            },
+            child: LanguageNotifier(builder: (context) {
+              return Text('Change language'.tr);
+            }),
+          ),
+        ],
+      ),
+    );
   }
 }
