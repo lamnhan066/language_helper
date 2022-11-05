@@ -86,6 +86,48 @@ class LanguageHelper {
     _print('Changing completed!');
   }
 
+  /// Analyze the [data] so you can know which ones are missing what text.
+  /// The results will be print in the console log with the below format:
+  ///
+  /// Result:
+  ///   LanguageCodes.en:
+  ///     some thing 1
+  ///     some thing 2
+  ///   LanguageCodes.vi:
+  ///     some thing 3
+  ///     some thing 4
+  void analyze() {
+    final List<String> keys = [];
+
+    _print('\n');
+    _print('==================================================');
+    _print('\n');
+    _print('Analyze all languages to find the missing texts...');
+
+    // Add all keys to [keys]
+    for (final code in codes) {
+      for (final key in data[code]!.keys) {
+        if (!keys.contains(key)) keys.add(key);
+      }
+    }
+
+    _print('Results:\n');
+
+    // Analyze the results
+    for (final code in codes) {
+      _print('  $code:\n');
+      for (final key in keys) {
+        if (!data[code]!.keys.contains(key)) {
+          _print('    $key\n');
+        }
+      }
+      _print('\n');
+    }
+
+    _print('==================================================');
+    _print('\n');
+  }
+
   /// Internal function, print debug log
   void _print(Object? object) =>
       // ignore: avoid_print

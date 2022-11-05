@@ -46,31 +46,31 @@ Use builder to rebuild the widgets automatically on change:
 - For all widget in your app:
 
 ``` dart
-  @override
-  Widget build(BuildContext context) {
-    return LanguageNotifier(builder: (context) {
-      return MaterialApp(
-        home: Scaffold(
-          appBar: AppBar(
-            title: Text('Hello'.tr),
-          ),
-          body: Center(
-            child: Column(
-              children: [
-                Text('Hello'.tr),
-                ElevatedButton(
-                  onPressed: () {
-                    LanguageHelper.instance.change(LanguageCodes.vi);
-                  },
-                  child: Text('Change language'.tr),
-                ),
-              ],
-            ),
+@override
+Widget build(BuildContext context) {
+  return LanguageNotifier(builder: (context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Hello'.tr),
+        ),
+        body: Center(
+          child: Column(
+            children: [
+              Text('Hello'.tr),
+              ElevatedButton(
+                onPressed: () {
+                  LanguageHelper.instance.change(LanguageCodes.vi);
+                },
+                child: Text('Change language'.tr),
+              ),
+            ],
           ),
         ),
-      );
-    });
-  }
+      ),
+    );
+  });
+}
 ```
 
 - For specific widget:
@@ -83,9 +83,32 @@ LanguageNotifier(
 ),
 ```
 
-*No matter how many `LanguageNotifier` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageNotifier`, so it improves a lot performance. And all `LanguageNotifier` widgets will be rebuilt at the same time.*
+You can analyze the missing texts for all language with this function:
+
+``` dart
+LanguageHelper.instance.analyze();
+```
+
+Here is the result from the Example:
+
+``` cmd
+flutter: [Language Helper]
+flutter: [Language Helper] ==================================================
+flutter: [Language Helper]
+flutter: [Language Helper] Analyze all languages to find the missing texts...
+flutter: [Language Helper] Results:
+flutter: [Language Helper]   LanguageCodes.en:
+flutter: [Language Helper]     This text is missing in `en`
+flutter: [Language Helper]
+flutter: [Language Helper]   LanguageCodes.vi:
+flutter: [Language Helper]     This text is missing in `vi`
+flutter: [Language Helper]
+flutter: [Language Helper] ==================================================
+flutter: [Language Helper]
+```
 
 ## Additional Information
 
+- No matter how many `LanguageNotifier` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageNotifier`, so it improves a lot performance. And all `LanguageNotifier` widgets will be rebuilt at the same time.
 - The `LanguageCodes` contains all the languages with additional information like name in English (name) and name in native language (nativeName).
-- This is the very first state so it may contain issues.
+- This is the very first state so it may contain bugs or issues.

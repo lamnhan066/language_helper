@@ -2,11 +2,13 @@ part of '../language_helper.dart';
 
 /// @Source https://hillel.dev/2018/08/15/flutter-how-to-rebuild-the-entire-app-to-change-the-theme-or-locale/
 class LanguageNotifier extends StatefulWidget {
+  /// Wrap the widget that you want to change when changing language
   const LanguageNotifier({
     Key? key,
     required this.builder,
   }) : super(key: key);
 
+  /// Add you builder
   final Widget Function(BuildContext) builder;
 
   @override

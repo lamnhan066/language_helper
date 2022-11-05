@@ -9,6 +9,7 @@ LanguageData data = {
     'Other Page': 'Other Page',
     'Text will be changed': 'Text will be changed',
     'Text will be not changed': 'Text will be not changed',
+    'This text is missing in `vi`': 'This text is missing in `vi`',
   },
   LanguageCodes.vi: {
     'Hello': 'Xin Chào',
@@ -16,6 +17,7 @@ LanguageData data = {
     'Other Page': 'Trang Khác',
     'Text will be changed': 'Chữ sẽ thay đổi',
     'Text will be not changed': 'Chữ không thay đổi',
+    'This text is missing in `en`': 'Chữ này sẽ thiếu ở ngôn ngữ `en`',
   }
 };
 
@@ -68,6 +70,12 @@ class _MyAppState extends State<MyApp> {
                   }
                 },
                 child: Text('Change language'.tr),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  LanguageHelper.instance.analyze();
+                },
+                child: Text('Analyze languages'.tr),
               ),
             ],
           ),
