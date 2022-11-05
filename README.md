@@ -25,6 +25,7 @@ Initialize the data:
 LanguageHelper.instance.initial(
     data: data,
     defaultCode: LanguageCodes.en, // Optional. Default is set to the first language of [data]
+    forceRebuild: true, // Rebuild all the widgets instead of only root widgets
     isDebug: true, // Print debug log. Default is set to false
 );
 ```
@@ -109,6 +110,6 @@ flutter: [Language Helper]
 
 ## Additional Information
 
-- No matter how many `LanguageNotifier` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageNotifier`, so it improves a lot performance. And all `LanguageNotifier` widgets will be rebuilt at the same time.
+- No matter how many `LanguageNotifier` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageNotifier`, so it improves a lot performance. And all `LanguageNotifier` widgets will be rebuilt at the same time. This setting can be changed with `forceRebuild` parameter in both `initial` for global setting and `LanguageNotifier` for local setting.
 - The `LanguageCodes` contains all the languages with additional information like name in English (name) and name in native language (nativeName).
 - This is the very first state so it may contain bugs or issues.

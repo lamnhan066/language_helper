@@ -21,6 +21,10 @@ class LanguageHelper {
   LanguageCodes? get currentCode => _currentCode;
   LanguageCodes? _currentCode;
 
+  /// Force rebuilds all widgets instead of only root widget. You can try to use
+  /// this value if the widgets don't rebuild as your wish.
+  bool forceRebuild = false;
+
   /// Print debug log
   bool _isDebug = false;
 
@@ -30,9 +34,11 @@ class LanguageHelper {
   void initial({
     required LanguageData data,
     LanguageCodes? defaultCode,
+    bool forceRebuild = false,
     bool isDebug = false,
   }) {
     this.data = data;
+    this.forceRebuild = forceRebuild;
     _isDebug = isDebug;
 
     if (defaultCode == null) {

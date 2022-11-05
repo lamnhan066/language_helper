@@ -6,10 +6,15 @@ class LanguageNotifier extends StatefulWidget {
   const LanguageNotifier({
     Key? key,
     required this.builder,
+    this.forceRebuild,
   }) : super(key: key);
 
   /// Add you builder
   final Widget Function(BuildContext) builder;
+
+  /// Force rebuild this widget when the language is changed. Use the default value
+  /// from LanguageHelper.initial() if this value is null.
+  final bool? forceRebuild;
 
   @override
   State<LanguageNotifier> createState() => _LanguageNotifierState();
@@ -20,14 +25,20 @@ class _LanguageNotifierState extends State<LanguageNotifier> {
   void _updateLanguage() => mounted ? setState(() {}) : null;
 
   /// Get the root state
-  static _LanguageNotifierState? _of(BuildContext context) {
+  static _LanguageNotifierState? _of(BuildContext context, bool forceRebuild) {
+    if (forceRebuild) return null;
     return context.findRootAncestorStateOfType<_LanguageNotifierState>();
   }
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      final getRoot = _of(context);
+      final getRoot = _of(
+        context,
+        widget.forceRebuild == true ||
+            (widget.forceRebuild == null &&
+                LanguageHelper.instance.forceRebuild),
+      );
 
       if (getRoot == null) {
         LanguageHelper.instance._print(
