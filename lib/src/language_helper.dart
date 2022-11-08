@@ -57,6 +57,10 @@ class LanguageHelper {
             'language does not contain the $defaultCode => Cannot set currentCode');
       }
     }
+
+    if (_isDebug) {
+      analyze();
+    }
   }
 
   /// Translate this [text] to the destination language

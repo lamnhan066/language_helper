@@ -4,7 +4,7 @@ Make it easier for you to implement multiple languages into your app.
 
 ## Usage
 
-Create the data:
+**Create the data:**
 
 ``` dart
 LanguageData data = {
@@ -19,10 +19,10 @@ LanguageData data = {
 };
 ```
 
-Initialize the data:
+**Initialize the data:**
 
 ``` dart
-LanguageHelper.instance.initial(
+LanguageHelper.instance.initialize(
     data: data,
     defaultCode: LanguageCodes.en, // Optional. Default is set to the first language of [data]
     forceRebuild: true, // Rebuild all the widgets instead of only root widgets
@@ -30,19 +30,19 @@ LanguageHelper.instance.initial(
 );
 ```
 
-Translate text:
+**Get text:**
 
 ``` dart
 final text = LanguageHelper.instance.translate('Hello');
 ```
 
-Use extension:
+**Use extension:**
 
 ``` dart
 final text = 'Hello'.tr;
 ```
 
-Use builder to rebuild the widgets automatically on change:
+**Use builder to rebuild the widgets automatically on change:**
 
 - For all widget in your app:
 
@@ -84,11 +84,13 @@ LanguageNotifier(
 ),
 ```
 
-You can analyze the missing texts for all language with this function:
+**You can analyze the missing texts for all language with this function:**
 
 ``` dart
 LanguageHelper.instance.analyze();
 ```
+
+This function will be automatically called in `initial` when the `isDebug` is `true`.
 
 Here is the result from the Example:
 

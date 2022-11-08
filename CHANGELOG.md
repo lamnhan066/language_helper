@@ -1,3 +1,7 @@
+## 0.0.4
+
+* `analyze` will be automatically called in `initial` when `isDebug` is `true`.
+
 ## 0.0.3
 
 * [LanguageHelper] add `forceRebuild` to allow the plugin to force rebuild all the widgets intead of only root widgets.
