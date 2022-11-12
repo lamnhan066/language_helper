@@ -24,8 +24,9 @@ LanguageData data = {
 ``` dart
 LanguageHelper.instance.initialize(
     data: data,
-    defaultCode: LanguageCodes.en, // Optional. Default is set to the first language of [data]
+    initialCode: LanguageCodes.en, // Optional. Default is set to the first language of [data]
     forceRebuild: true, // Rebuild all the widgets instead of only root widgets
+    onChanged: (code) => print(code), // Call this function if the language is changed
     isDebug: true, // Print debug log. Default is set to false
 );
 ```

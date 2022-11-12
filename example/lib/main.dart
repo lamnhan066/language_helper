@@ -24,7 +24,7 @@ LanguageData data = {
 void main() {
   LanguageHelper.instance.initial(
     data: data,
-    defaultCode: LanguageCodes.en,
+    initialCode: LanguageCodes.en,
     isDebug: true,
   );
 

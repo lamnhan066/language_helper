@@ -12,10 +12,10 @@ class LanguageHelper {
   LanguageHelper._();
 
   /// Get all languages
-  LanguageData data = {};
+  LanguageData _data = {};
 
   /// Get list of [LanguageCodes]
-  List<LanguageCodes> get codes => data.keys.toList();
+  List<LanguageCodes> get codes => _data.keys.toList();
 
   /// Get current code
   LanguageCodes? get currentCode => _currentCode;
@@ -23,25 +23,29 @@ class LanguageHelper {
 
   /// Force rebuilds all widgets instead of only root widget. You can try to use
   /// this value if the widgets don't rebuild as your wish.
-  bool forceRebuild = false;
+  bool _forceRebuild = false;
+
+  Function(LanguageCodes code)? _onChanged;
 
   /// Print debug log
   bool _isDebug = false;
 
   /// Initialize the plugin with the List of [data] that you have created,
-  /// you can set the [defaultCode] for this app or it will get the first
+  /// you can set the [initialCode] for this app or it will get the first
   /// language in [data]. Enable [isDebug] to show debug log.
   void initial({
     required LanguageData data,
-    LanguageCodes? defaultCode,
+    LanguageCodes? initialCode,
     bool forceRebuild = false,
     bool isDebug = false,
+    Function(LanguageCodes code)? onChanged,
   }) {
-    this.data = data;
-    this.forceRebuild = forceRebuild;
+    _data = data;
+    _forceRebuild = forceRebuild;
+    _onChanged = onChanged;
     _isDebug = isDebug;
 
-    if (defaultCode == null) {
+    if (initialCode == null) {
       if (data.isNotEmpty) {
         _currentCode = data.keys.first;
         _print('Set current language code to $_currentCode');
@@ -49,12 +53,12 @@ class LanguageHelper {
         _print('languages is empty => cannot set currentCode');
       }
     } else {
-      if (data.containsKey(defaultCode)) {
-        _print('Set currentCode to $defaultCode');
-        _currentCode = defaultCode;
+      if (data.containsKey(initialCode)) {
+        _print('Set currentCode to $initialCode');
+        _currentCode = initialCode;
       } else {
         _print(
-            'language does not contain the $defaultCode => Cannot set currentCode');
+            'language does not contain the $initialCode => Cannot set currentCode');
       }
     }
 
@@ -71,7 +75,7 @@ class LanguageHelper {
       return text;
     }
 
-    final translated = data[_currentCode]![text];
+    final translated = _data[_currentCode]![text];
     if (translated == null) {
       _print('This text is not contained in current language ($text)');
       return text;
@@ -82,21 +86,24 @@ class LanguageHelper {
 
   /// Change the [currentCode] to this [code]
   void change(LanguageCodes code) {
-    if (data.containsKey(code)) {
-      _print('Set currentCode to the code');
+    if (_data.containsKey(code)) {
+      _print('Set currentCode to $code');
       _currentCode = code;
     } else {
       _print('language does not contain the code => Cannot set currentCode');
+
+      return;
     }
 
     _print('Change language to $code for ${_states.length} states');
     for (var state in _states) {
       state._updateLanguage();
     }
+    _onChanged != null ? _onChanged!(code) : null;
     _print('Changing completed!');
   }
 
-  /// Analyze the [data] so you can know which ones are missing what text.
+  /// Analyze the [_data] so you can know which ones are missing what text.
   /// The results will be print in the console log with the below format:
   ///
   /// Result:
@@ -116,7 +123,7 @@ class LanguageHelper {
 
     // Add all keys to [keys]
     for (final code in codes) {
-      for (final key in data[code]!.keys) {
+      for (final key in _data[code]!.keys) {
         if (!keys.contains(key)) keys.add(key);
       }
     }
@@ -127,7 +134,7 @@ class LanguageHelper {
     for (final code in codes) {
       _print('  $code:\n');
       for (final key in keys) {
-        if (!data[code]!.keys.contains(key)) {
+        if (!_data[code]!.keys.contains(key)) {
           _print('    $key\n');
         }
       }

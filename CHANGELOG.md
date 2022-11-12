@@ -1,3 +1,8 @@
+## 0.1.0
+
+* [BREAK] Rename the param from `defaultCode` to `initialCode`.
+* [FEAT] Add a param `onChanged` to notify when the language is changed.
+
 ## 0.0.4
 
 * `analyze` will be automatically called in `initial` when `isDebug` is `true`.

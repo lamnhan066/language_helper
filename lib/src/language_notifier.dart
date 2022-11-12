@@ -37,7 +37,7 @@ class _LanguageNotifierState extends State<LanguageNotifier> {
         context,
         widget.forceRebuild == true ||
             (widget.forceRebuild == null &&
-                LanguageHelper.instance.forceRebuild),
+                LanguageHelper.instance._forceRebuild),
       );
 
       if (getRoot == null) {
