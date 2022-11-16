@@ -32,13 +32,17 @@ class LanguageHelper {
 
   /// Initialize the plugin with the List of [data] that you have created,
   /// you can set the [initialCode] for this app or it will get the first
-  /// language in [data]. Enable [isDebug] to show debug log.
+  /// language in [data]. You can also set the [forceRebuild] to `true` if
+  /// you want to rebuild all the [LanguageNotifier] widgets, not only the
+  /// root widget (it will decreases the performance of the app).
+  /// The [onChanged] callback will be called when the language is changed.
+  /// Set the [isDebug] to `true` to show debug log.
   void initial({
     required LanguageData data,
     LanguageCodes? initialCode,
     bool forceRebuild = false,
-    bool isDebug = false,
     Function(LanguageCodes code)? onChanged,
+    bool isDebug = false,
   }) {
     _data = data;
     _forceRebuild = forceRebuild;
@@ -99,6 +103,7 @@ class LanguageHelper {
     for (var state in _states) {
       state._updateLanguage();
     }
+
     _onChanged != null ? _onChanged!(code) : null;
     _print('Changing completed!');
   }
@@ -148,5 +153,5 @@ class LanguageHelper {
   /// Internal function, print debug log
   void _print(Object? object) =>
       // ignore: avoid_print
-      _isDebug ? print('[Language Helper] $object') : null;
+      _isDebug ? debugPrint('[Language Helper] $object') : null;
 }

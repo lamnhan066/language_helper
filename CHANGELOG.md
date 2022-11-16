@@ -1,3 +1,8 @@
+# 0.1.0+1
+
+* Improved function headers.
+* Changed to use `debugPrint`.
+
 ## 0.1.0
 
 * [BREAK] Rename the param from `defaultCode` to `initialCode`.
