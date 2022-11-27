@@ -104,7 +104,10 @@ class LanguageHelper {
       state._updateLanguage();
     }
 
-    _onChanged != null ? _onChanged!(code) : null;
+    if (_onChanged != null) {
+      _onChanged!(code);
+    }
+
     _print('Changing completed!');
   }
 

@@ -1,4 +1,8 @@
-# 0.1.0+1
+## 0.1.0+2
+
+* Improved the pub score.
+
+## 0.1.0+1
 
 * Improved function headers.
 * Changed to use `debugPrint`.
