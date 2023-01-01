@@ -2,12 +2,29 @@ library languages_helper;
 
 import 'package:flutter/material.dart';
 
-part 'src/language_helper.dart';
 part 'src/language_codes.dart';
+part 'src/language_helper.dart';
 part 'src/language_notifier.dart';
 
 typedef LanguageData = Map<LanguageCodes, Map<String, String>>;
 
 extension LanguageHelperEx on String {
+  /// Translate
   String get tr => LanguageHelper.instance.translate(this);
+
+  /// Translate with parammeters
+  /// ``` dart
+  /// final text = 'result is @param'.trP({'param' : 'zero'});
+  /// print(text); // -> 'result is zero'
+  String trP([Map<String, String> params = const {}]) {
+    String text = tr;
+
+    if (params.isNotEmpty) {
+      params.forEach((key, value) {
+        text = text.replaceAll('@$key', value);
+      });
+    }
+
+    return text;
+  }
 }

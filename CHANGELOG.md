@@ -1,3 +1,14 @@
+## 0.1.1
+
+* Added `useInitialCodeWhenUnavailable` parameter to control the `LanguageCodes` when you change to unavailable code.
+* Added `trP()` extension to allow replacing specific texts by values. Ex:
+  
+  ``` dart
+  final text = 'Hello @user'.trP({'user' : 'Vursin'}); // => Hello Vursin
+  ```
+
+* Added test.
+
 ## 0.1.0+2
 
 * Improved the pub score.

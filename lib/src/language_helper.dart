@@ -21,6 +21,14 @@ class LanguageHelper {
   LanguageCodes? get currentCode => _currentCode;
   LanguageCodes? _currentCode;
 
+  /// Initial code
+  LanguageCodes? _initialCode;
+
+  /// When you change the [LanguageCodes] by using [change] method, the app will
+  /// change to the [initialCode] if the code is unavailable. If not, the app
+  /// will use keep using the last code.
+  bool _useInitialCodeWhenUnavailable = false;
+
   /// Force rebuilds all widgets instead of only root widget. You can try to use
   /// this value if the widgets don't rebuild as your wish.
   bool _forceRebuild = false;
@@ -37,9 +45,14 @@ class LanguageHelper {
   /// root widget (it will decreases the performance of the app).
   /// The [onChanged] callback will be called when the language is changed.
   /// Set the [isDebug] to `true` to show debug log.
+  ///
+  /// [useInitialCodeWhenUnavailable]: If `true`, when you change the [LanguageCodes] by
+  /// using [change] method, the app will change to the [initialCode] if
+  /// the new code is unavailable. If `false`, the app will use keep using the last code.
   void initial({
     required LanguageData data,
     LanguageCodes? initialCode,
+    bool useInitialCodeWhenUnavailable = false,
     bool forceRebuild = false,
     Function(LanguageCodes code)? onChanged,
     bool isDebug = false,
@@ -48,6 +61,8 @@ class LanguageHelper {
     _forceRebuild = forceRebuild;
     _onChanged = onChanged;
     _isDebug = isDebug;
+    _initialCode = initialCode;
+    _useInitialCodeWhenUnavailable = useInitialCodeWhenUnavailable;
 
     if (initialCode == null) {
       if (data.isNotEmpty) {
@@ -63,6 +78,7 @@ class LanguageHelper {
       } else {
         _print(
             'language does not contain the $initialCode => Cannot set currentCode');
+        _initialCode = null;
       }
     }
 
@@ -94,8 +110,12 @@ class LanguageHelper {
       _print('Set currentCode to $code');
       _currentCode = code;
     } else {
-      _print('language does not contain the code => Cannot set currentCode');
-
+      if (_initialCode != null && _useInitialCodeWhenUnavailable) {
+        _print('language does not contain the code => Use the initialCode');
+        _currentCode = _initialCode;
+      } else {
+        _print('language does not contain the code => Cannot set currentCode');
+      }
       return;
     }
 
@@ -109,6 +129,11 @@ class LanguageHelper {
     }
 
     _print('Changing completed!');
+  }
+
+  /// Change the [useInitialCodeWhenUnavailable] value
+  void setUseInitialCodeWhenUnavailable(bool newValue) {
+    _useInitialCodeWhenUnavailable = newValue;
   }
 
   /// Analyze the [_data] so you can know which ones are missing what text.
