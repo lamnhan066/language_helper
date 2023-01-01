@@ -68,24 +68,25 @@ class LanguageHelper {
       // Try to set by the default code from device
       final locale = await Devicelocale.currentAsLocale;
       if (locale != null) {
-        _currentCode = LanguageCodes.fromLocale(locale);
-        _print('Set current language code to $_currentCode by device locale');
+        _initialCode = LanguageCodes.fromLocale(locale);
+        _print('Set current language code to $_initialCode by device locale');
       } else if (data.isNotEmpty) {
-        _currentCode = data.keys.first;
-        _print('Set current language code to $_currentCode');
+        _initialCode = data.keys.first;
+        _print('Set current language code to $_initialCode');
       } else {
         _print('languages is empty => cannot set currentCode');
       }
-      _initialCode = _currentCode;
     } else {
-      if (data.containsKey(initialCode)) {
-        _print('Set currentCode to $initialCode');
-        _currentCode = initialCode;
-      } else {
-        _print(
-            'language does not contain the $initialCode => Cannot set currentCode');
-        _initialCode = null;
-      }
+      _initialCode = initialCode;
+    }
+
+    if (data.containsKey(_initialCode)) {
+      _print('Set currentCode to $_initialCode');
+      _currentCode = _initialCode;
+    } else {
+      _print(
+          'language does not contain the $_initialCode => Cannot set currentCode');
+      _initialCode = null;
     }
 
     if (_isDebug) {

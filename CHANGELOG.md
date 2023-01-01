@@ -1,4 +1,4 @@
-## 0.2.0
+## 0.2.0+1
 
 * [BREAKING CHANGE] the `initial` method will return `Future`, so you need to use `await` to make it equal to before.
 * The app will try use `Devicelocale` as the default language code if the `initialCode` is not set.
