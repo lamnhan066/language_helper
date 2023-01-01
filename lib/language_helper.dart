@@ -1,5 +1,6 @@
 library languages_helper;
 
+import 'package:devicelocale/devicelocale.dart';
 import 'package:flutter/material.dart';
 
 part 'src/language_codes.dart';
@@ -16,12 +17,12 @@ extension LanguageHelperEx on String {
   /// ``` dart
   /// final text = 'result is @param'.trP({'param' : 'zero'});
   /// print(text); // -> 'result is zero'
-  String trP([Map<String, String> params = const {}]) {
+  String trP([Map<String, dynamic> params = const {}]) {
     String text = tr;
 
     if (params.isNotEmpty) {
       params.forEach((key, value) {
-        text = text.replaceAll('@$key', value);
+        text = text.replaceAll('@$key', '$value');
       });
     }
 

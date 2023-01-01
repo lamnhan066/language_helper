@@ -49,14 +49,14 @@ class LanguageHelper {
   /// [useInitialCodeWhenUnavailable]: If `true`, when you change the [LanguageCodes] by
   /// using [change] method, the app will change to the [initialCode] if
   /// the new code is unavailable. If `false`, the app will use keep using the last code.
-  void initial({
+  Future<void> initial({
     required LanguageData data,
     LanguageCodes? initialCode,
     bool useInitialCodeWhenUnavailable = false,
     bool forceRebuild = false,
     Function(LanguageCodes code)? onChanged,
     bool isDebug = false,
-  }) {
+  }) async {
     _data = data;
     _forceRebuild = forceRebuild;
     _onChanged = onChanged;
@@ -65,12 +65,18 @@ class LanguageHelper {
     _useInitialCodeWhenUnavailable = useInitialCodeWhenUnavailable;
 
     if (initialCode == null) {
-      if (data.isNotEmpty) {
+      // Try to set by the default code from device
+      final locale = await Devicelocale.currentAsLocale;
+      if (locale != null) {
+        _currentCode = LanguageCodes.fromLocale(locale);
+        _print('Set current language code to $_currentCode by device locale');
+      } else if (data.isNotEmpty) {
         _currentCode = data.keys.first;
         _print('Set current language code to $_currentCode');
       } else {
         _print('languages is empty => cannot set currentCode');
       }
+      _initialCode = _currentCode;
     } else {
       if (data.containsKey(initialCode)) {
         _print('Set currentCode to $initialCode');

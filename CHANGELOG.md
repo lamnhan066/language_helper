@@ -1,5 +1,7 @@
-## 0.1.1
+## 0.2.0
 
+* [BREAKING CHANGE] the `initial` method will return `Future`, so you need to use `await` to make it equal to before.
+* The app will try use `Devicelocale` as the default language code if the `initialCode` is not set.
 * Added `useInitialCodeWhenUnavailable` parameter to control the `LanguageCodes` when you change to unavailable code.
 * Added `trP()` extension to allow replacing specific texts by values. Ex:
   
