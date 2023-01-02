@@ -1,3 +1,7 @@
+## 0.2.0+3
+
+* Added `isAutoSave` parameter to `initial` to allow the plugin auto save and reload the language when changed and opened in the next time.
+
 ## 0.2.0+2
 
 * You can use `@{param}` instead of `@param` to translate text with parameters.

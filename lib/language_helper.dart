@@ -2,6 +2,7 @@ library languages_helper;
 
 import 'package:devicelocale/devicelocale.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'src/language_codes.dart';
 part 'src/language_helper.dart';

@@ -27,6 +27,7 @@ LanguageHelper.instance.initialize(
     initialCode: LanguageCodes.en, // Optional. Default is set to the device locale (if available) or the first language of [data]
     useInitialCodeWhenUnavailable: false, // Optional. Default is set to false
     forceRebuild: true, // Rebuild all the widgets instead of only root widgets
+    isAutoSave: true, // Auto save and reload the changed language
     onChanged: (code) => print(code), // Call this function if the language is changed
     isDebug: true, // Print debug log. Default is set to false
 );

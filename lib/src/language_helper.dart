@@ -29,6 +29,9 @@ class LanguageHelper {
   /// will use keep using the last code.
   bool _useInitialCodeWhenUnavailable = false;
 
+  /// Auto save and load [LanguageCodes] from memory
+  bool _isAutoSave = false;
+
   /// Force rebuilds all widgets instead of only root widget. You can try to use
   /// this value if the widgets don't rebuild as your wish.
   bool _forceRebuild = false;
@@ -37,6 +40,9 @@ class LanguageHelper {
 
   /// Print debug log
   bool _isDebug = false;
+
+  /// Language code preferences key
+  final _codeKey = 'LanguageHelper.AutoSaveCode';
 
   /// Initialize the plugin with the List of [data] that you have created,
   /// you can set the [initialCode] for this app or it will get the first
@@ -49,11 +55,15 @@ class LanguageHelper {
   /// [useInitialCodeWhenUnavailable]: If `true`, when you change the [LanguageCodes] by
   /// using [change] method, the app will change to the [initialCode] if
   /// the new code is unavailable. If `false`, the app will use keep using the last code.
+  ///
+  /// The plugin also supports auto save the [LanguageCodes] when changed and
+  /// reload it from memory in the next opening.
   Future<void> initial({
     required LanguageData data,
     LanguageCodes? initialCode,
     bool useInitialCodeWhenUnavailable = false,
     bool forceRebuild = false,
+    bool isAutoSave = true,
     Function(LanguageCodes code)? onChanged,
     bool isDebug = false,
   }) async {
@@ -61,8 +71,21 @@ class LanguageHelper {
     _forceRebuild = forceRebuild;
     _onChanged = onChanged;
     _isDebug = isDebug;
-    _initialCode = initialCode;
     _useInitialCodeWhenUnavailable = useInitialCodeWhenUnavailable;
+    _isAutoSave = isAutoSave;
+
+    // Try to reload from memory if `isAutoSave` is `true`
+    if (_isAutoSave) {
+      final prefs = await SharedPreferences.getInstance();
+
+      if (prefs.containsKey(_codeKey)) {
+        final code = prefs.getString(_codeKey);
+
+        if (code != null && code.isNotEmpty) {
+          initialCode = LanguageCodes.fromCode(code);
+        }
+      }
+    }
 
     if (initialCode == null) {
       // Try to set by the default code from device
@@ -133,6 +156,14 @@ class LanguageHelper {
 
     if (_onChanged != null) {
       _onChanged!(code);
+    }
+
+    // Save to local memory
+    if (_isAutoSave) {
+      _print('Save this code to local memory');
+      SharedPreferences.getInstance().then((pref) {
+        pref.setString(_codeKey, code.code);
+      });
     }
 
     _print('Changing completed!');
