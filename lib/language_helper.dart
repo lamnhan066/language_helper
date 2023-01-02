@@ -15,17 +15,9 @@ extension LanguageHelperEx on String {
 
   /// Translate with parammeters
   /// ``` dart
-  /// final text = 'result is @param'.trP({'param' : 'zero'});
+  /// final text = 'result is @{param}'.trP({'param' : 'zero'});
   /// print(text); // -> 'result is zero'
   String trP([Map<String, dynamic> params = const {}]) {
-    String text = tr;
-
-    if (params.isNotEmpty) {
-      params.forEach((key, value) {
-        text = text.replaceAll('@$key', '$value');
-      });
-    }
-
-    return text;
+    return LanguageHelper.instance.translate(this, params: params);
   }
 }

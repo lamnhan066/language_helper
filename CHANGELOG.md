@@ -1,3 +1,8 @@
+## 0.2.0+2
+
+* You can use `@{param}` instead of `@param` to translate text with parameters.
+* Added `params` parateters to the `translate` method.
+
 ## 0.2.0+1
 
 * [BREAKING CHANGE] the `initial` method will return `Future`, so you need to use `await` to make it equal to before.

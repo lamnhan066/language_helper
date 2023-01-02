@@ -58,5 +58,22 @@ void main() {
       expect('You have @number dollars'.trP({'number': '100'}),
           equals('You have 100 dollars'));
     });
+
+    test('Translate with parameters in multiple cases of text', () {
+      expect('@number is a started text'.trP({'number': 100}),
+          equals('100 is a started text'));
+      expect('@{number} is a started text'.trP({'number': 100}),
+          equals('100 is a started text'));
+
+      expect(
+          'The @number @{number}, @number is a middle text'
+              .trP({'number': 100}),
+          equals('The 100 100, 100 is a middle text'));
+
+      expect('This text will end with @number'.trP({'number': 100}),
+          equals('This text will end with 100'));
+      expect('This text will end with @{number}'.trP({'number': 100}),
+          equals('This text will end with 100'));
+    });
   });
 }

@@ -95,20 +95,20 @@ class LanguageHelper {
   }
 
   /// Translate this [text] to the destination language
-  String translate(String text) {
+  String translate(String text, {Map<String, dynamic> params = const {}}) {
     if (_currentCode == null) {
       _print(
           'Cannot translate this text because the currentLanguage is not set ($text)');
-      return text;
+      return _replaceParams(text, params);
     }
 
     final translated = _data[_currentCode]![text];
     if (translated == null) {
       _print('This text is not contained in current language ($text)');
-      return text;
+      return _replaceParams(text, params);
     }
 
-    return translated;
+    return _replaceParams(translated, params);
   }
 
   /// Change the [currentCode] to this [code]
@@ -183,6 +183,19 @@ class LanguageHelper {
 
     _print('==================================================');
     _print('\n');
+  }
+
+  /// Replace @{param} or @param with the real text
+  String _replaceParams(String input, Map<String, dynamic> params) {
+    if (params.isEmpty) return input;
+
+    params.forEach((key, value) {
+      // @param and end with space, end of line, new line.
+      input = input.replaceAll('@{$key}', '$value');
+      input = input.replaceAll(RegExp('@$key(?=\\s|\$|\\n)'), '$value');
+    });
+
+    return input;
   }
 
   /// Internal function, print debug log

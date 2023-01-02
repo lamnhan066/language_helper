@@ -35,7 +35,15 @@ LanguageHelper.instance.initialize(
 **Get text:**
 
 ``` dart
-final text = LanguageHelper.instance.translate('Hello');
+final text = LanguageHelper.instance.translate('Hello @name', params {'name', 'World'});
+// Hello World
+```
+
+or
+
+``` dart
+final text = LanguageHelper.instance.translate('Hello @{name}', params {'name', 'World'});
+// Hello World
 ```
 
 **Use extension:**
@@ -43,6 +51,15 @@ final text = LanguageHelper.instance.translate('Hello');
 ``` dart
 final text = 'Hello'.tr;
 ```
+
+or
+
+``` dart
+final text = 'Hello @{name}, @name'.trP({'name' : 'World'});
+// Hello World, World
+```
+
+**Note:** The `${param}` work in any case, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
 
 **Use builder to rebuild the widgets automatically on change:**
 
@@ -118,3 +135,8 @@ flutter: [Language Helper]
 - No matter how many `LanguageNotifier` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageNotifier`, so it improves a lot performance. And all `LanguageNotifier` widgets will be rebuilt at the same time. This setting can be changed with `forceRebuild` parameter in both `initial` for global setting and `LanguageNotifier` for local setting.
 - The `LanguageCodes` contains all the languages with additional information like name in English (name) and name in native language (nativeName).
 - This is the very first state so it may contain bugs or issues.
+
+## Note
+
+- The `${param}` work in any case, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
+
