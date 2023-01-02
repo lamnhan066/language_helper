@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:language_helper/language_helper.dart';
 
 LanguageData data = {
@@ -21,10 +20,13 @@ LanguageData data = {
   }
 };
 
-void main() {
-  LanguageHelper.instance.initial(
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await LanguageHelper.instance.initial(
     data: data,
     initialCode: LanguageCodes.en,
+    isAutoSave: true,
     isDebug: true,
   );
 
