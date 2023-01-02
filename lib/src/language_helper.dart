@@ -89,9 +89,9 @@ class LanguageHelper {
 
     if (initialCode == null) {
       // Try to set by the default code from device
-      final locale = await Devicelocale.currentAsLocale;
-      if (locale != null) {
-        _initialCode = LanguageCodes.fromLocale(locale);
+      final currentCode = LanguageCodes.fromCode(LanguageCode.code);
+      if (data.containsKey(currentCode)) {
+        _initialCode = currentCode;
         _print('Set current language code to $_initialCode by device locale');
       } else if (data.isNotEmpty) {
         _initialCode = data.keys.first;

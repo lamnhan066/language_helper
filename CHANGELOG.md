@@ -1,3 +1,7 @@
+# 0.2.1
+
+* Use the `language_code` plugin instead of the `devicelocale`.
+
 ## 0.2.0+3
 
 * Added `isAutoSave` parameter to `initial` to allow the plugin auto save and reload the language when changed and opened in the next time.
