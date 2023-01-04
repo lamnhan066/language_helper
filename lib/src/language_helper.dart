@@ -5,8 +5,8 @@ class LanguageHelper {
   // Get LanguageHelper instance
   static LanguageHelper instance = LanguageHelper._();
 
-  /// To control [LanguageNotifier]
-  final List<_LanguageNotifierState> _states = [];
+  /// To control [LanguageBuilder]
+  final List<_LanguageBuilderState> _states = [];
 
   /// Private instance
   LanguageHelper._();
@@ -47,7 +47,7 @@ class LanguageHelper {
   /// Initialize the plugin with the List of [data] that you have created,
   /// you can set the [initialCode] for this app or it will get the first
   /// language in [data]. You can also set the [forceRebuild] to `true` if
-  /// you want to rebuild all the [LanguageNotifier] widgets, not only the
+  /// you want to rebuild all the [LanguageBuilder] widgets, not only the
   /// root widget (it will decreases the performance of the app).
   /// The [onChanged] callback will be called when the language is changed.
   /// Set the [isDebug] to `true` to show debug log.
