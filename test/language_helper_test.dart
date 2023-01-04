@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:language_helper/language_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 LanguageData data = {
   LanguageCodes.en: {
@@ -17,6 +18,7 @@ void main() {
   final languageHelper = LanguageHelper.instance;
 
   // Use en as default language
+  SharedPreferences.setMockInitialValues({});
   languageHelper.initial(data: data, initialCode: LanguageCodes.en);
 
   group('', () {
