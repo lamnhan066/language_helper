@@ -30,7 +30,18 @@ void main() async {
     isDebug: true,
   );
 
-  runApp(const MaterialApp(home: MyApp()));
+  runApp(const App());
+}
+
+class App extends StatelessWidget {
+  const App({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: MyApp(),
+    );
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -48,10 +59,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return LanguageNotifier(builder: (_) {
+    return LanguageBuilder(builder: (_) {
       return Scaffold(
         appBar: AppBar(
-          title: LanguageNotifier(
+          title: LanguageBuilder(
             builder: (context) {
               return Text('Hello'.tr);
             },
@@ -60,9 +71,12 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: Column(
             children: [
-              LanguageNotifier(builder: (context) {
-                return Text('Hello'.tr);
+              LanguageBuilder(builder: (context) {
+                return LanguageBuilder(builder: (context) {
+                  return Text('Hello'.tr);
+                });
               }),
+              Text('Hello'.tr),
               ElevatedButton(
                 onPressed: () {
                   if (LanguageHelper.instance.currentCode == LanguageCodes.vi) {
@@ -78,6 +92,10 @@ class _MyAppState extends State<MyApp> {
                   LanguageHelper.instance.analyze();
                 },
                 child: Text('Analyze languages'.tr),
+              ),
+              Builder(builder: (_) => Text('Hello'.tr)),
+              Dialog(
+                child: Text('Hello'.tr),
               ),
             ],
           ),
@@ -106,15 +124,17 @@ class _OtherPageState extends State<OtherPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: LanguageNotifier(builder: (context) {
+        title: LanguageBuilder(builder: (context) {
           return Text('Other Page'.tr);
         }),
       ),
       body: Column(
         children: [
-          LanguageNotifier(builder: (context) {
-            return Text('Text will be changed'.tr);
-          }),
+          LanguageBuilder(
+            builder: (context) {
+              return Text('Text will be changed'.tr);
+            },
+          ),
           Text('Text will be not changed'.tr),
           ElevatedButton(
             onPressed: () {
@@ -124,9 +144,11 @@ class _OtherPageState extends State<OtherPage> {
                 LanguageHelper.instance.change(LanguageCodes.vi);
               }
             },
-            child: LanguageNotifier(builder: (context) {
-              return Text('Change language'.tr);
-            }),
+            child: LanguageBuilder(
+              builder: (context) {
+                return Text('Change language'.tr);
+              },
+            ),
           ),
         ],
       ),

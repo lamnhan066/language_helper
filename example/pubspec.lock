@@ -43,13 +43,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
-  devicelocale:
-    dependency: transitive
-    description:
-      name: devicelocale
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.5.5"
   fake_async:
     dependency: transitive
     description:
@@ -100,13 +93,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.4"
+  language_code:
+    dependency: transitive
+    description:
+      name: language_code
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1"
   language_helper:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.2.0+2"
+    version: "0.2.1"
   lints:
     dependency: transitive
     description:
