@@ -1,4 +1,9 @@
-# 0.2.1
+## 0.2.2
+
+* Renamed from `LanguageNotifier` to `LanguageBuilder` and marked it as Deprecated.
+* Improved `LanguageBuilder` behavior.
+
+## 0.2.1
 
 * Use the `language_code` plugin instead of the `devicelocale`.
 

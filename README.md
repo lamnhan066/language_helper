@@ -26,7 +26,7 @@ LanguageHelper.instance.initialize(
     data: data,
     initialCode: LanguageCodes.en, // Optional. Default is set to the device locale (if available) or the first language of [data]
     useInitialCodeWhenUnavailable: false, // Optional. Default is set to false
-    forceRebuild: true, // Rebuild all the widgets instead of only root widgets
+    forceRebuild: true, // Rebuild all the widgets instead of only root widgets. It will decrease the app performances.
     isAutoSave: true, // Auto save and reload the changed language
     onChanged: (code) => print(code), // Call this function if the language is changed
     isDebug: true, // Print debug log. Default is set to false
@@ -69,7 +69,7 @@ final text = 'Hello @{name}, @name'.trP({'name' : 'World'});
 ``` dart
 @override
 Widget build(BuildContext context) {
-  return LanguageNotifier(builder: (context) {
+  return LanguageBuilder(builder: (context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -97,7 +97,7 @@ Widget build(BuildContext context) {
 - For specific widget:
 
 ``` dart
-LanguageNotifier(
+LanguageBuilder(
     builder: (context) {
         return Text('Hello'.tr);
     },
@@ -133,11 +133,10 @@ flutter: [Language Helper]
 ## Additional Information
 
 - The app will try to use the `Devicelocale` to set the `initialCode` if it is not set, if the `Devicelocale` is unavailable, it will use the first language in `data` insteads.
-- No matter how many `LanguageNotifier` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageNotifier`, so it improves a lot performance. And all `LanguageNotifier` widgets will be rebuilt at the same time. This setting can be changed with `forceRebuild` parameter in both `initial` for global setting and `LanguageNotifier` for local setting.
+- No matter how many `LanguageBuilder` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageBuilder`, so it improves a lot performance. And all `LanguageBuilder` widgets will be rebuilt at the same time. This setting can be changed with `forceRebuild` parameter in both `initial` for global setting and `LanguageBuilder` for local setting.
 - The `LanguageCodes` contains all the languages with additional information like name in English (name) and name in native language (nativeName).
 - This is the very first state so it may contain bugs or issues.
 
 ## Note
 
 - The `${param}` work in any case, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
-
