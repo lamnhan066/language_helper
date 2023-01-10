@@ -21,4 +21,10 @@ extension LanguageHelperEx on String {
   String trP([Map<String, dynamic> params = const {}]) {
     return LanguageHelper.instance.translate(this, params: params);
   }
+
+  /// Full version of the translation, includes all parameters.
+  String trF({Map<String, dynamic> params = const {}, LanguageCodes? toCode}) {
+    return LanguageHelper.instance
+        .translate(this, params: params, toCode: toCode);
+  }
 }

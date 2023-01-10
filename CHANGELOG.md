@@ -1,3 +1,9 @@
+## 0.2.3
+
+* Add `toCode` parameter to `translate` method to translate the current text to a specific code instead of the currentCode.
+* Add `.trF` extension to use full version of `translate`.
+* Update README.
+
 ## 0.2.2
 
 * Renamed from `LanguageNotifier` to `LanguageBuilder` and marked it as Deprecated.

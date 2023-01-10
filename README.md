@@ -22,7 +22,9 @@ LanguageData data = {
 **Initialize the data:**
 
 ``` dart
-LanguageHelper.instance.initialize(
+final languageHelper = LanguageHelper.instance;
+
+languageHelper.initialize(
     data: data,
     initialCode: LanguageCodes.en, // Optional. Default is set to the device locale (if available) or the first language of [data]
     useInitialCodeWhenUnavailable: false, // Optional. Default is set to false
@@ -36,15 +38,21 @@ LanguageHelper.instance.initialize(
 **Get text:**
 
 ``` dart
-final text = LanguageHelper.instance.translate('Hello @name', params {'name', 'World'});
+final text = languageHelper.translate('Hello @name', params {'name', 'World'});
 // Hello World
 ```
 
 or
 
 ``` dart
-final text = LanguageHelper.instance.translate('Hello @{name}', params {'name', 'World'});
+final text = languageHelper.translate('Hello @{name}', params {'name', 'World'});
 // Hello World
+```
+
+You can also translate to specific language with `toCode` parameter:
+
+``` dart
+final text = languageHelper.translate('Hello', toCode: LanguageCodes.en);
 ```
 
 **Use extension:**
@@ -58,6 +66,12 @@ or
 ``` dart
 final text = 'Hello @{name}, @name'.trP({'name' : 'World'});
 // Hello World, World
+```
+
+or use full version:
+
+``` dart
+final text = 'Hello @{name}, @name'.trF(params: {'name' : 'World'}, toCode: LanguageCodes.en);
 ```
 
 **Note:** The `${param}` work in any case, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
@@ -81,7 +95,7 @@ Widget build(BuildContext context) {
               Text('Hello'.tr),
               ElevatedButton(
                 onPressed: () {
-                  LanguageHelper.instance.change(LanguageCodes.vi);
+                  languageHelper.change(LanguageCodes.vi);
                 },
                 child: Text('Change language'.tr),
               ),
@@ -107,7 +121,7 @@ LanguageBuilder(
 **You can analyze the missing texts for all language with this function:**
 
 ``` dart
-LanguageHelper.instance.analyze();
+languageHelper.analyze();
 ```
 
 This function will be automatically called in `initial` when the `isDebug` is `true`.

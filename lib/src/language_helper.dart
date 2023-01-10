@@ -118,14 +118,29 @@ class LanguageHelper {
   }
 
   /// Translate this [text] to the destination language
-  String translate(String text, {Map<String, dynamic> params = const {}}) {
-    if (_currentCode == null) {
+  String translate(
+    /// Text that you want to translate
+    String text, {
+
+    /// Translate with parameters
+    ///
+    /// Ex: Your translated text is "Current number is @currentNumber"
+    ///
+    /// Your params = {'currentNumber' : '3'}
+    ///
+    /// => Result: "Current number is 3"
+    Map<String, dynamic> params = const {},
+
+    /// To specific [LanguageCodes] instead of [currentCode]
+    LanguageCodes? toCode,
+  }) {
+    if (_currentCode == null && toCode == null) {
       _print(
-          'Cannot translate this text because the currentLanguage is not set ($text)');
+          'Cannot translate this text because the currentLanguage or toCode is not set ($text)');
       return _replaceParams(text, params);
     }
 
-    final translated = _data[_currentCode]![text];
+    final translated = _data[toCode ?? _currentCode]![text];
     if (translated == null) {
       _print('This text is not contained in current language ($text)');
       return _replaceParams(text, params);

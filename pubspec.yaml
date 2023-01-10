@@ -1,6 +1,6 @@
 name: language_helper
 description: Make it easier for you to implement multiple languages into your app.
-version: 0.2.2
+version: 0.2.3
 homepage: https://github.com/vursin/language_helper
 
 environment:
