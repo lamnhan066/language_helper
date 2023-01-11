@@ -34,7 +34,8 @@ class LanguageBuilder extends StatefulWidget {
 }
 
 class _LanguageBuilderState extends State<LanguageBuilder> {
-  GlobalKey _key = GlobalKey();
+  var _key = GlobalKey();
+  final _languageHelper = LanguageHelper.instance;
 
   /// Update the language
   void _updateLanguage() {
@@ -56,34 +57,32 @@ class _LanguageBuilderState extends State<LanguageBuilder> {
     final getRoot = _of(
       context,
       widget.forceRebuild == true ||
-          (widget.forceRebuild == null &&
-              LanguageHelper.instance._forceRebuild),
+          (widget.forceRebuild == null && _languageHelper._forceRebuild),
     );
 
     if (getRoot == null) {
-      LanguageHelper.instance._print(
+      _languageHelper._print(
           'Cannot find the root context of this context. Add $this to states');
-      LanguageHelper.instance._states.add(this);
-    } else if (!LanguageHelper.instance._states.contains(getRoot)) {
-      LanguageHelper.instance
+      _languageHelper._states.add(this);
+    } else if (!_languageHelper._states.contains(getRoot)) {
+      _languageHelper
           ._print('Added root context $getRoot to LanguageHelper states');
-      LanguageHelper.instance._states.add(getRoot);
+      _languageHelper._states.add(getRoot);
     } else {
-      LanguageHelper.instance
+      _languageHelper
           ._print('This root context $this was already contained in states');
     }
 
-    LanguageHelper.instance._print(
-        'Length of the states: ${LanguageHelper.instance._states.length}');
+    _languageHelper
+        ._print('Length of the states: ${_languageHelper._states.length}');
 
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    LanguageHelper.instance
-        ._print('Removed ${this} from LanguageHelper states');
-    LanguageHelper.instance._states.remove(this);
+    _languageHelper._print('Removed ${this} from LanguageHelper states');
+    _languageHelper._states.remove(this);
     super.dispose();
   }
 

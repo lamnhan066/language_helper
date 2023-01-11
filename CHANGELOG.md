@@ -1,3 +1,13 @@
+## 0.2.5
+
+* Add `.trT` extension to use only `toCode` parameter.
+* Refactor internal code.
+
+## 0.2.4
+
+* Add `LanguageCodes.fromName` and `LanguageCodes.fromNativeName`.
+* Add `orElse` parameter to `LanguageCodes.fromCode`, `.fromName` and `.fromNativeName`.
+
 ## 0.2.3
 
 * Add `toCode` parameter to `translate` method to translate the current text to a specific code instead of the currentCode.

@@ -59,12 +59,30 @@ class LanguageHelper {
   /// The plugin also supports auto save the [LanguageCodes] when changed and
   /// reload it from memory in the next opening.
   Future<void> initial({
+    /// Data of languages
     required LanguageData data,
+
+    /// Firstly, the app will try to use this [initialCode]. If [initialCode] is null,
+    /// the plugin will try to get the current device language. If both of them are
+    /// null, the plugin will use the first language in the [data].
     LanguageCodes? initialCode,
+
+    /// If this value is `true`, the plugin will use the [initialCode] if you [change]
+    /// to the language that is not in the [data], otherwise it will do nothing
+    /// (keeps the last language).
     bool useInitialCodeWhenUnavailable = false,
+
+    /// Use this value as default for all [LanguageBuilder].
     bool forceRebuild = false,
+
+    /// Auto save the current change of the language. The app will use the new
+    /// language in the next open instead of [initialCode].
     bool isAutoSave = true,
+
+    /// Callback on language changed.
     Function(LanguageCodes code)? onChanged,
+
+    /// Print the debug log.
     bool isDebug = false,
   }) async {
     _data = data;
@@ -89,7 +107,7 @@ class LanguageHelper {
 
     if (initialCode == null) {
       // Try to set by the default code from device
-      final currentCode = LanguageCodes.fromCode(LanguageCode.code);
+      final currentCode = LanguageCode.code;
       if (data.containsKey(currentCode)) {
         _initialCode = currentCode;
         _print('Set current language code to $_initialCode by device locale');
