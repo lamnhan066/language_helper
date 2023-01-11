@@ -99,14 +99,14 @@ packages:
       name: language_code
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1"
+    version: "0.1.0"
   language_helper:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.2.1"
+    version: "0.2.5"
   lints:
     dependency: transitive
     description:
