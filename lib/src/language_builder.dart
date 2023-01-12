@@ -33,15 +33,16 @@ class LanguageBuilder extends StatefulWidget {
   State<LanguageBuilder> createState() => _LanguageBuilderState();
 }
 
-class _LanguageBuilderState extends State<LanguageBuilder> {
-  var _key = GlobalKey();
+class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
+  var _key = UniqueKey();
   final _languageHelper = LanguageHelper.instance;
 
   /// Update the language
-  void _updateLanguage() {
+  @override
+  void updateLanguage() {
     if (mounted) {
       setState(() {
-        _key = GlobalKey();
+        _key = UniqueKey();
       });
     }
   }
@@ -88,11 +89,9 @@ class _LanguageBuilderState extends State<LanguageBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(
+    return KeyedSubtree(
       key: _key,
-      builder: (context) {
-        return widget.builder(context);
-      },
+      child: widget.builder(context),
     );
   }
 }

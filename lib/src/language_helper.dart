@@ -6,7 +6,7 @@ class LanguageHelper {
   static LanguageHelper instance = LanguageHelper._();
 
   /// To control [LanguageBuilder]
-  final List<_LanguageBuilderState> _states = [];
+  final List<UpdateLanguage> _states = [];
 
   /// Private instance
   LanguageHelper._();
@@ -184,7 +184,7 @@ class LanguageHelper {
 
     _print('Change language to $code for ${_states.length} states');
     for (var state in _states) {
-      state._updateLanguage();
+      state.updateLanguage();
     }
 
     if (_onChanged != null) {
