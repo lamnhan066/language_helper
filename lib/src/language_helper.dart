@@ -139,7 +139,6 @@ class LanguageHelper {
   String translate(
     /// Text that you want to translate
     String text, {
-
     /// Translate with parameters
     ///
     /// Ex: Your translated text is "Current number is @currentNumber"

@@ -1,3 +1,7 @@
+## 0.2.5+1
+
+* Improve pub scores.
+
 ## 0.2.5
 
 * Add `.trT` extension to use only `toCode` parameter.

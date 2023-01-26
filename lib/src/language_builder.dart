@@ -82,7 +82,7 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
 
   @override
   void dispose() {
-    _languageHelper._print('Removed ${this} from LanguageHelper states');
+    _languageHelper._print('Removed $this from LanguageHelper states');
     _languageHelper._states.remove(this);
     super.dispose();
   }
