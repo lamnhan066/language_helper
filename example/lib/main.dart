@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
+
+import 'resources/language_helper/language_data.dart';
 
 LanguageData data = {
   LanguageCodes.en: {
@@ -25,9 +28,9 @@ void main() async {
 
   await LanguageHelper.instance.initial(
     data: data,
+    analysisKeys: analysisLanguageData.keys,
     initialCode: LanguageCodes.en,
-    isAutoSave: true,
-    isDebug: true,
+    isDebug: !kReleaseMode,
   );
 
   runApp(const App());
