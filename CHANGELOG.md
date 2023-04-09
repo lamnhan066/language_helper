@@ -1,3 +1,11 @@
+## 0.2.6-rc.1
+
+* Supports early state of [language_helper_generator](https://pub.dev/packages/language_helper_generator).
+* Improves `onChanged` return type.
+* Add `analysisKeys` parameter to `initial` (mostly used for `language_helper_generator` I think).
+* Improves description for the result of `analyze` method.
+* Update README.
+
 ## 0.2.5+1
 
 * Improve pub scores.
