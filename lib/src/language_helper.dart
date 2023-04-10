@@ -43,7 +43,14 @@ class LanguageHelper {
   /// this value if the widgets don't rebuild as your wish.
   bool _forceRebuild = false;
 
+  /// On changed callback
   void Function(LanguageCodes code)? _onChanged;
+
+  /// Stream on changed. Please remember to close this stream subscription
+  /// when you are done to avoid memory leaks.
+  Stream<LanguageCodes> get stream => _streamController.stream;
+  final StreamController<LanguageCodes> _streamController =
+      StreamController.broadcast();
 
   /// Print debug log
   bool _isDebug = false;
@@ -153,6 +160,11 @@ class LanguageHelper {
     }
   }
 
+  /// Dispose all the controllers
+  void dispose() {
+    _streamController.close();
+  }
+
   /// Translate this [text] to the destination language
   String translate(
     /// Text that you want to translate
@@ -206,6 +218,7 @@ class LanguageHelper {
 
     if (_onChanged != null) {
       _onChanged!(code);
+      _streamController.sink.add(code);
     }
 
     // Save to local memory

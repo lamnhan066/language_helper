@@ -118,14 +118,14 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.2.6-rc.1"
+    version: "0.2.6-rc.2"
   language_helper_generator:
     dependency: "direct dev"
     description:
       path: "/Users/thanhnhan/Documents/Development/Projects/Flutter Plugin/language_helper_generator"
       relative: false
     source: path
-    version: "0.0.1-rc.1"
+    version: "0.0.1-rc.4"
   lints:
     dependency: transitive
     description:

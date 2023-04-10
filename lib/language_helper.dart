@@ -1,5 +1,7 @@
 library languages_helper;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:language_code/language_code.dart';
 import 'package:shared_preferences/shared_preferences.dart';

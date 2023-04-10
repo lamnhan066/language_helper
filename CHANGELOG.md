@@ -1,3 +1,7 @@
+## 0.2.6-rc.2
+
+* Add `stream` to LanguageHelper, you can listen for language change events.
+
 ## 0.2.6-rc.1
 
 * Supports early state of [language_helper_generator](https://pub.dev/packages/language_helper_generator).

@@ -85,6 +85,14 @@ final text = 'Hello @{name}, @name'.trF(params: {'name' : 'World'}, toCode: Lang
 
 **Note:** The `${param}` work in any case, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
 
+Beside the `onChanged` method, you can listen for language change events by using `stream`:
+
+``` dart
+final sub = languageHelper.stream.listen((code) => print(code));
+```
+
+**Note:** Remember to `sub.cancel()` when it's not in use to avoid memory leaks.
+
 **Use builder to rebuild the widgets automatically on change:**
 
 - For all widget in your app:
@@ -165,7 +173,7 @@ flutter: [Language Helper]
 
 ## Contributions
 
-- This is the very first state so it may contain bugs or issues. 
+- This is the very first state so it may contain bugs or issues.
 
 ## Note
 
