@@ -1,3 +1,7 @@
+## 0.2.6-rc.3
+
+* `stream` now will works even when the `onChanged` is not set.
+
 ## 0.2.6-rc.2
 
 * Add `stream` to LanguageHelper, you can listen for language change events.

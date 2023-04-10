@@ -216,9 +216,9 @@ class LanguageHelper {
       state.updateLanguage();
     }
 
+    _streamController.sink.add(code);
     if (_onChanged != null) {
       _onChanged!(code);
-      _streamController.sink.add(code);
     }
 
     // Save to local memory
