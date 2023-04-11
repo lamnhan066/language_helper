@@ -125,7 +125,7 @@ packages:
       path: "/Users/thanhnhan/Documents/Development/Projects/Flutter Plugin/language_helper_generator"
       relative: false
     source: path
-    version: "0.0.1-rc.4"
+    version: "0.0.1-rc.5"
   lints:
     dependency: transitive
     description:

@@ -11,14 +11,14 @@ const analysisLanguageData = {
   /// Path: main.dart
   ///==============================================
   'Hello': 'Hello',
-  // 'Hello': 'Hello',
-  // 'Hello': 'Hello',
+  // 'Hello': 'Hello',  // Duplicated
+  // 'Hello': 'Hello',  // Duplicated
   'Change language': 'Change language',
   'Analyze languages': 'Analyze languages',
-  // 'Hello': 'Hello',
-  // 'Hello': 'Hello',
+  // 'Hello': 'Hello',  // Duplicated
+  // 'Hello': 'Hello',  // Duplicated
   'Other Page': 'Other Page',
   'Text will be changed': 'Text will be changed',
   'Text will be not changed': 'Text will be not changed',
-  // 'Change language': 'Change language',
+  // 'Change language': 'Change language',  // Duplicated
 };

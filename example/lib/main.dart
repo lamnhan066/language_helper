@@ -4,30 +4,11 @@ import 'package:language_helper/language_helper.dart';
 
 import 'resources/language_helper/language_data.dart';
 
-LanguageData data = {
-  LanguageCodes.en: {
-    'Hello': 'Hello',
-    'Change language': 'Change language',
-    'Other Page': 'Other Page',
-    'Text will be changed': 'Text will be changed',
-    'Text will be not changed': 'Text will be not changed',
-    'This text is missing in `vi`': 'This text is missing in `vi`',
-  },
-  LanguageCodes.vi: {
-    'Hello': 'Xin Chào',
-    'Change language': 'Thay đổi ngôn ngữ',
-    'Other Page': 'Trang Khác',
-    'Text will be changed': 'Chữ sẽ thay đổi',
-    'Text will be not changed': 'Chữ không thay đổi',
-    'This text is missing in `en`': 'Chữ này sẽ thiếu ở ngôn ngữ `en`',
-  }
-};
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await LanguageHelper.instance.initial(
-    data: data,
+    data: languageData,
     analysisKeys: analysisLanguageData.keys,
     initialCode: LanguageCodes.en,
     isDebug: !kReleaseMode,
