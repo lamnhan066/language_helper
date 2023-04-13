@@ -20,8 +20,8 @@ class LanguageBuilder extends StatefulWidget {
     this.forceRebuild,
   }) : super(key: key);
 
-  /// Add you builder
-  final Widget Function(BuildContext) builder;
+  /// Add your builder
+  final Widget Function(BuildContext _) builder;
 
   /// The plugin only rebuilds the root widget even when you use multiple [LanguageBuilder],
   /// So, you can set this value to `true` if you want to force rebuild
@@ -92,6 +92,31 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
     return KeyedSubtree(
       key: _key,
       child: widget.builder(context),
+    );
+  }
+}
+
+class Lhb extends StatelessWidget {
+  /// This is a short version of [LanguageBuilder] which means `LanguageHelperBuilder`.
+  ///
+  /// Wrap the widget that you want to change when changing language
+  const Lhb(this.builder, {super.key, this.forceRebuild = false});
+
+  /// Add your builder
+  final Widget Function(BuildContext _) builder;
+
+  /// The plugin only rebuilds the root widget even when you use multiple [LanguageBuilder],
+  /// So, you can set this value to `true` if you want to force rebuild
+  /// this widget when the language is changed. Use the default value
+  /// from LanguageHelper.initial() if this value is null.
+  final bool forceRebuild;
+
+  @override
+  Widget build(BuildContext context) {
+    return LanguageBuilder(
+      key: key,
+      builder: builder,
+      forceRebuild: forceRebuild,
     );
   }
 }
