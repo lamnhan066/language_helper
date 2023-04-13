@@ -1,3 +1,14 @@
+## 0.2.6-rc.4
+
+* Change from `currentCode` to `code`, add `locale` to get the current Locale.
+* Add `locales` to get the current list of language as Locale.
+* The `data` is now asserted as must be not empty.
+* `initial()` must be run before calling `code` or `locale`, so `code` and `locale` are non-null.
+* Add `Lhb` as a short version of `LanguageBuilder`.
+* `trP` and `trT`'s parameter are now required.
+* Add more tests.
+* Update example.
+
 ## 0.2.6-rc.3
 
 * `stream` now will works even when the `onChanged` is not set.

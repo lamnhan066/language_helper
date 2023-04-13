@@ -1,6 +1,6 @@
 # Language Helper
 
-Make it easier for you to implement multiple languages into your app.
+Make it easier for you to implement multiple languages into your app with minimal effort.
 
 ## Usage
 
@@ -9,7 +9,7 @@ Make it easier for you to implement multiple languages into your app.
 ``` dart
 LanguageData data = {
   LanguageCodes.en: {
-    'Hello': 'Hello',
+    'Hello @{text}, @number': 'Hello @{text}, @number',
     'Change language': 'Change language',
   },
   LanguageCodes.vi: {
@@ -24,41 +24,47 @@ LanguageData data = {
 ``` dart
 final languageHelper = LanguageHelper.instance;
 
-languageHelper.initial(
-    data: data,
-    /// Optional. This is the list of all available keys that your project are using.
-    /// You can maintain it by yourself or using [language_helper_generator](https://pub.dev/packages/language_helper_generator) to maintain it.
-    analysis: analysisLanguageData.keys, 
-    /// Optional. Default is set to the device locale (if available) or the first language of [data]
-    initialCode: LanguageCodes.en,
-    /// Optional. Default is set to false (doesn't change the language if unavailable)
-    useInitialCodeWhenUnavailable: false, 
-    /// Rebuild all the widgets instead of only root widgets. It will decrease the app performances.
-    forceRebuild: true, 
-    /// Auto save and reload the changed language
-    isAutoSave: true, 
-    /// Call this function if the language is changed
-    onChanged: (code) => print(code), 
-    // Print debug log. Default is set to false
-    isDebug: true, 
-);
+main() async {
+  // LanguageHelper should be initialized before calling `runApp`.
+  await languageHelper.initial(
+      /// This is [LanguageData] and it must be not empty.
+      data: data,
+
+      /// Optional. This is the list of all available keys that your project are using.
+      /// You can maintain it by yourself or using [language_helper_generator](https://pub.dev/packages/language_helper_generator) to maintain it.
+      analysisKeys: analysisLanguageData.keys, 
+
+      /// Optional. Default is set to the device locale (if available) or the first language of [data]
+      initialCode: LanguageCodes.en,
+
+      /// Optional. Default is set to false (doesn't change the language if unavailable)
+      useInitialCodeWhenUnavailable: false, 
+
+      /// Rebuild all the widgets instead of only root widgets. It will decrease the app performances.
+      forceRebuild: true, 
+
+      /// Auto save and reload the changed language
+      isAutoSave: true, 
+
+      /// Call this function if the language is changed
+      onChanged: (code) => print(code), 
+
+      // Print debug log. Default is set to false
+      isDebug: true, 
+  );
+
+  runApp(const MyApp());
+}
 ```
 
 **Get text:**
 
 ``` dart
-final text = languageHelper.translate('Hello @name', params {'name', 'World'});
-// Hello World
+final text = languageHelper.translate('Hello @{text}, @number', params {'text' : 'World', 'number', '10'});
+// Hello World, 10
 ```
 
-or
-
-``` dart
-final text = languageHelper.translate('Hello @{name}', params {'name', 'World'});
-// Hello World
-```
-
-You can also translate to specific language with `toCode` parameter:
+**Translate to specific language:**
 
 ``` dart
 final text = languageHelper.translate('Hello', toCode: LanguageCodes.en);
@@ -73,14 +79,20 @@ final text = 'Hello'.tr;
 or
 
 ``` dart
-final text = 'Hello @{name}, @name'.trP({'name' : 'World'});
+final text = 'Hello @{text}, @number'.trP({'text' : 'World', 'number', '10'});
 // Hello World, World
+```
+
+or
+
+``` dart
+final text = 'Hello @{text}, @number'.trT(LanguageCodes.en);
 ```
 
 or use full version:
 
 ``` dart
-final text = 'Hello @{name}, @name'.trF(params: {'name' : 'World'}, toCode: LanguageCodes.en);
+final text = 'Hello @{text}, @number'.trF(params: {'text' : 'World', 'number', '10'}, toCode: LanguageCodes.en);
 ```
 
 **Note:** The `${param}` work in any case, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
@@ -135,6 +147,12 @@ LanguageBuilder(
 ),
 ```
 
+- There is a short version of `LanguageBuilder` is `Lhb` (means `LanguageHelperBuilder`):
+
+``` dart
+Lhb((_) => Text('Hello'.tr)),
+```
+
 **You can analyze the missing texts for all language with this function:**
 
 ``` dart
@@ -173,7 +191,7 @@ flutter: [Language Helper]
 
 ## Contributions
 
-- This is the very first state so it may contain bugs or issues.
+As the project is currently in its early stages, it may contain bugs or other issues. Should you experience any problems, we kindly ask that you file an issue to let us know. Additionally, we welcome contributions in the form of pull requests (PRs) to help enhance the project.
 
 ## Note
 
