@@ -22,8 +22,9 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: MyApp(),
+    return MaterialApp(
+      supportedLocales: LanguageHelper.instance.locales,
+      home: const MyApp(),
     );
   }
 }
@@ -46,11 +47,7 @@ class _MyAppState extends State<MyApp> {
     return LanguageBuilder(builder: (_) {
       return Scaffold(
         appBar: AppBar(
-          title: LanguageBuilder(
-            builder: (context) {
-              return Text('Hello'.tr);
-            },
-          ),
+          title: Lhb((_) => Text('Hello'.tr)),
         ),
         body: Center(
           child: Column(
@@ -63,7 +60,7 @@ class _MyAppState extends State<MyApp> {
               Text('Hello'.tr),
               ElevatedButton(
                 onPressed: () {
-                  if (LanguageHelper.instance.currentCode == LanguageCodes.vi) {
+                  if (LanguageHelper.instance.code == LanguageCodes.vi) {
                     LanguageHelper.instance.change(LanguageCodes.en);
                   } else {
                     LanguageHelper.instance.change(LanguageCodes.vi);
@@ -114,25 +111,21 @@ class _OtherPageState extends State<OtherPage> {
       ),
       body: Column(
         children: [
-          LanguageBuilder(
-            builder: (context) {
+          Lhb(
+            (context) {
               return Text('Text will be changed'.tr);
             },
           ),
           Text('Text will be not changed'.tr),
           ElevatedButton(
             onPressed: () {
-              if (LanguageHelper.instance.currentCode == LanguageCodes.vi) {
+              if (LanguageHelper.instance.code == LanguageCodes.vi) {
                 LanguageHelper.instance.change(LanguageCodes.en);
               } else {
                 LanguageHelper.instance.change(LanguageCodes.vi);
               }
             },
-            child: LanguageBuilder(
-              builder: (context) {
-                return Text('Change language'.tr);
-              },
-            ),
+            child: Lhb((_) => Text('Change language'.tr)),
           ),
         ],
       ),
