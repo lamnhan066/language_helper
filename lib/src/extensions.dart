@@ -9,7 +9,7 @@ extension LanguageHelperEx on String {
   /// final text = 'result is @{param}'.trP({'param' : 'zero'});
   /// print(text); // -> 'result is zero'
   /// ```
-  String trP([Map<String, dynamic> params = const {}]) {
+  String trP(Map<String, dynamic> params) {
     return LanguageHelper.instance.translate(this, params: params);
   }
 
@@ -17,7 +17,7 @@ extension LanguageHelperEx on String {
   /// ``` dart
   /// final text = 'result is something'.trT(LanguageCodes.en);
   /// ```
-  String trT([LanguageCodes? toCode]) {
+  String trT(LanguageCodes toCode) {
     return LanguageHelper.instance.translate(this, toCode: toCode);
   }
 
