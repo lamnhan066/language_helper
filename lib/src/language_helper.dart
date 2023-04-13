@@ -24,15 +24,29 @@ class LanguageHelper {
   /// Get list of [LanguageCodes]
   List<LanguageCodes> get codes => _data.keys.toList();
 
+  /// Get list of language as [Locale]
+  List<Locale> get locales => _data.keys.map((e) => e.locale).toList();
+
+  /// Get current language as [LanguageCodes]
+  ///
+  /// You must be `await initial()` before using this variable.
+  LanguageCodes get code => _currentCode!;
+
   /// Get current code
+  @Deprecated('Use [code] insteads')
   LanguageCodes? get currentCode => _currentCode;
   LanguageCodes? _currentCode;
+
+  /// Get current language as [Locale]
+  ///
+  /// You must be `await initial()` before using this variable.
+  Locale get locale => code.locale;
 
   /// Initial code
   LanguageCodes? _initialCode;
 
   /// When you change the [LanguageCodes] by using [change] method, the app will
-  /// change to the [initialCode] if the code is unavailable. If not, the app
+  /// change to the [_initialCode] if the code is unavailable. If not, the app
   /// will use keep using the last code.
   bool _useInitialCodeWhenUnavailable = false;
 
@@ -60,9 +74,9 @@ class LanguageHelper {
 
   /// Initialize the plugin with the List of [data] that you have created,
   /// you can set the [initialCode] for this app or it will get the first
-  /// language in [data]. You can also set the [forceRebuild] to `true` if
-  /// you want to rebuild all the [LanguageBuilder] widgets, not only the
-  /// root widget (it will decreases the performance of the app).
+  /// language in [data], so **[data] must be not empty**. You can also set
+  /// the [forceRebuild] to `true` if you want to rebuild all the [LanguageBuilder]
+  /// widgets, not only the root widget (it will decreases the performance of the app).
   /// The [onChanged] callback will be called when the language is changed.
   /// Set the [isDebug] to `true` to show debug log.
   ///
@@ -76,7 +90,7 @@ class LanguageHelper {
   /// The plugin also supports auto save the [LanguageCodes] when changed and
   /// reload it from memory in the next opening.
   Future<void> initial({
-    /// Data of languages
+    /// Data of languages. The [data] must be not empty.
     required LanguageData data,
 
     /// List of all the keys of text in your project.
@@ -109,6 +123,8 @@ class LanguageHelper {
     /// Print the debug log.
     bool isDebug = false,
   }) async {
+    assert(data.isNotEmpty, 'Data must be not empty');
+
     _data = data;
     _forceRebuild = forceRebuild;
     _onChanged = onChanged;
@@ -139,8 +155,6 @@ class LanguageHelper {
       } else if (data.isNotEmpty) {
         _initialCode = data.keys.first;
         _print('Set current language code to $_initialCode');
-      } else {
-        _print('languages is empty => cannot set currentCode');
       }
     } else {
       _initialCode = initialCode;
@@ -148,11 +162,11 @@ class LanguageHelper {
 
     if (data.containsKey(_initialCode)) {
       _print('Set currentCode to $_initialCode');
-      _currentCode = _initialCode;
+      _currentCode = _initialCode!;
     } else {
+      _currentCode = data.keys.first;
       _print(
-          'language does not contain the $_initialCode => Cannot set currentCode');
-      _initialCode = null;
+          'language does not contain the $_initialCode => Change the code to $_currentCode');
     }
 
     if (_isDebug) {
@@ -178,54 +192,56 @@ class LanguageHelper {
     /// => Result: "Current number is 3"
     Map<String, dynamic> params = const {},
 
-    /// To specific [LanguageCodes] instead of [currentCode]
+    /// To specific [LanguageCodes] instead of the current [code]
     LanguageCodes? toCode,
   }) {
-    if (_currentCode == null && toCode == null) {
+    toCode ??= _currentCode;
+
+    if (!codes.contains(toCode)) {
       _print(
-          'Cannot translate this text because the currentLanguage or toCode is not set ($text)');
+          'Cannot translate this text because $toCode is not available in `data` ($text)');
       return _replaceParams(text, params);
     }
 
-    final translated = _data[toCode ?? _currentCode]![text];
+    final translated = _data[toCode]![text];
     if (translated == null) {
-      _print('This text is not contained in current language ($text)');
+      _print('This text is not contained in current $toCode ($text)');
       return _replaceParams(text, params);
     }
 
     return _replaceParams(translated, params);
   }
 
-  /// Change the [currentCode] to this [code]
-  void change(LanguageCodes code) {
-    if (_data.containsKey(code)) {
-      _print('Set currentCode to $code');
-      _currentCode = code;
-    } else {
-      if (_initialCode != null && _useInitialCodeWhenUnavailable) {
-        _print('language does not contain the code => Use the initialCode');
-        _currentCode = _initialCode;
-      } else {
-        _print('language does not contain the code => Cannot set currentCode');
+  /// Change the language to this [code]
+  void change(LanguageCodes toCode) {
+    if (!codes.contains(toCode)) {
+      _print(
+          'Cannot translate this text because $toCode is not available in `data`');
+
+      if (!_useInitialCodeWhenUnavailable) {
+        _print('Does not allow using initial code => Cannot change language.');
+        return;
       }
-      return;
     }
 
-    _print('Change language to $code for ${_states.length} states');
+    _print('Set currentCode to $toCode');
+    _currentCode = toCode;
+
+    _print('Change language to $toCode for ${_states.length} states');
     for (var state in _states) {
       state.updateLanguage();
     }
 
-    _streamController.sink.add(code);
+    _streamController.sink.add(toCode);
     if (_onChanged != null) {
-      _onChanged!(code);
+      _onChanged!(toCode);
     }
 
     // Save to local memory
     if (_isAutoSave) {
-      _print('Save this code to local memory');
+      _print('Save this $toCode to local memory');
       SharedPreferences.getInstance().then((pref) {
-        pref.setString(_codeKey, code.code);
+        pref.setString(_codeKey, toCode.code);
       });
     }
 
