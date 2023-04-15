@@ -1,3 +1,7 @@
+## 0.2.6
+
+* Bring the release candidate to stable.
+
 ## 0.2.6-rc.4
 
 * Change from `currentCode` to `code`, add `locale` to get the current Locale.

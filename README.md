@@ -1,6 +1,10 @@
 # Language Helper
 
-Make it easier for you to implement multiple languages into your app with minimal effort.
+## Features
+
+- Make it easier for you to implement multiple languages into your app with minimal effort.
+
+- Using [language_helper_generator](https://pub.dev/packages/language_helper_generator) (still in the early stages) will make it easier to maintain the translations in your project.
 
 ## Usage
 
@@ -180,8 +184,6 @@ flutter: [Language Helper]
 ```
 
 ## Additional Information
-
-- Using [language_helper_generator](https://pub.dev/packages/language_helper_generator) (Still in the early stages) will make it easier to maintain the translations in your project.
 
 - The app will try to use the `Devicelocale` to set the `initialCode` if it is not set, if the `Devicelocale` is unavailable, it will use the first language in `data` insteads.
 
