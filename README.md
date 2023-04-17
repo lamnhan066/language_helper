@@ -173,7 +173,7 @@ You can also create a base `LanguageData` by using command:
 flutter pub run language_helper:generate
 ```
 
-This runner will get all the texts that using language_helper extensions (`.tr`, `.trP`, `.trT`, `.trF`) and `.translate` method then creating a base structure for `LanguageData`. You can see the generated data in the example.
+This runner will get all the texts that using language_helper extensions (`.tr`, `.trP`, `.trT`, `.trF`) and `.translate` method then creating a base structure for `LanguageData`. You can see the generated data in the [example](https://github.com/vnniz/language_helper/tree/main/example/lib/resources/language_helper).
 
 The data will be generated with this format:
 
@@ -185,9 +185,9 @@ The data will be generated with this format:
 |   |    |    |--- language_data.dart
 ```
 
-- `_language_data_abstract.g.dart`: Contains your base language from your all `.dart` files. This file will be re-generated when you run the command.
+- [_language_data_abstract.g.dart](https://github.com/vnniz/language_helper/tree/main/example/lib/resources/language_helper/_language_data_abstract.g.dart): Contains your base language from your all `.dart` files. This file will be re-generated when you run the command.
 
-- `language_data.dart`: Modifiable language data because it's only generated 1 time.
+- [language_data.dart](https://github.com/vnniz/language_helper/tree/main/example/lib/resources/language_helper/language_data.dart): Modifiable language data because it's only generated 1 time.
 
 ## Additional Information
 
