@@ -31,29 +31,29 @@ final languageHelper = LanguageHelper.instance;
 main() async {
   // LanguageHelper should be initialized before calling `runApp`.
   await languageHelper.initial(
-      /// This is [LanguageData] and it must be not empty.
+      // This is [LanguageData] and it must be not empty.
       data: data,
 
-      /// [Optional] This is the list of all available keys that your project are using.
-      /// You can maintain it by yourself or using [language_helper_generator](https://pub.dev/packages/language_helper_generator) to maintain it.
+      // [Optional] This is the list of all available keys that your project are using.
+      // You can maintain it by yourself or using `language_helper_generator` to maintain it.
       analysisKeys: analysisLanguageData.keys, 
 
-      /// Optional. Default is set to the device locale (if available) or the first language of [data]
+      // [Optional] Default is set to the device locale (if available) or the first language of [data]
       initialCode: LanguageCodes.en,
 
-      /// Optional. Default is set to false (doesn't change the language if unavailable)
+      // [Optional] Default is set to false (doesn't change the language if unavailable)
       useInitialCodeWhenUnavailable: false, 
 
-      /// Rebuild all the widgets instead of only root widgets. It will decrease the app performances.
+      // [Optional] Rebuild all the widgets instead of only root widgets. It will decrease the app performances.
       forceRebuild: true, 
 
-      /// Auto save and reload the changed language
+      // [Optional] Auto save and reload the changed language
       isAutoSave: true, 
 
-      /// Call this function if the language is changed
+      // [Optional] Call this function if the language is changed
       onChanged: (code) => print(code), 
 
-      // Print debug log. Default is set to false
+      // [Optional] Print debug log. Default is set to false
       isDebug: true, 
   );
 

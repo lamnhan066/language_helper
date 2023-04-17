@@ -1,3 +1,7 @@
+## 0.2.7-rc.2
+
+* Add more details to README.
+
 ## 0.2.7-rc.1
 
 * Add `language_helper_generator` as a build-in function. Using by command `flutter pub run language_helper:generate`.
