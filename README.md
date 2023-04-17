@@ -4,7 +4,7 @@
 
 - Make it easier for you to implement multiple languages into your app with minimal effort.
 
-- Using [language_helper_generator](https://pub.dev/packages/language_helper_generator) (still in the early stages) will make it easier to maintain the translations in your project. You can also run `flutter pub run language_helper:generate` to generate it.
+- Using [language_helper_generator](https://pub.dev/packages/language_helper_generator) (still in the early stages) will make it easier to maintain the translations in your project. You can also run `flutter pub run language_helper:generate` to generate it with this package.
 
 ## Usage
 
@@ -51,7 +51,7 @@ main() async {
       /// This is [LanguageData] and it must be not empty.
       data: data,
 
-      /// Optional. This is the list of all available keys that your project are using.
+      /// [Optional] This is the list of all available keys that your project are using.
       /// You can maintain it by yourself or using [language_helper_generator](https://pub.dev/packages/language_helper_generator) to maintain it.
       analysisKeys: analysisLanguageData.keys, 
 
@@ -81,39 +81,21 @@ main() async {
 **Get text:**
 
 ``` dart
-final text = languageHelper.translate('Hello @{text}, @number', params {'text' : 'World', 'number', '10'});
+final translated = languageHelper.translate(
+    'Hello @{text}, @number', 
+    toCode: LanguageCodes.en, // [Optional] Translate to specific language code
+    params {'text' : 'World', 'number': '10'}, // [Optional] Translate with parameters
+);
 // Hello World, 10
-```
-
-**Translate to specific language:**
-
-``` dart
-final text = languageHelper.translate('Hello', toCode: LanguageCodes.en);
 ```
 
 **Use extension:**
 
 ``` dart
-final text = 'Hello'.tr;
-```
-
-or
-
-``` dart
-final text = 'Hello @{text}, @number'.trP({'text' : 'World', 'number', '10'});
-// Hello World, World
-```
-
-or
-
-``` dart
-final text = 'Hello @{text}, @number'.trT(LanguageCodes.en);
-```
-
-or use full version:
-
-``` dart
-final text = 'Hello @{text}, @number'.trF(params: {'text' : 'World', 'number', '10'}, toCode: LanguageCodes.en);
+final translated = 'Hello'.tr;
+final translatedParam = 'Hello @{text}, @number'.trP({'text': 'World', 'number': '10'});
+final translatedTo = 'Hello @{text}, @number'.trT(LanguageCodes.en);
+final translatedFull = 'Hello @{text}, @number'.trF(toCode: LanguageCodes.en, params: {'text': 'World', 'number': '10'});
 ```
 
 **Note:** The `${param}` work in any case, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
