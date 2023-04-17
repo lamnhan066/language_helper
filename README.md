@@ -4,7 +4,7 @@
 
 - Make it easier for you to implement multiple languages into your app with minimal effort.
 
-- Using [language_helper_generator](https://pub.dev/packages/language_helper_generator) (still in the early stages) will make it easier to maintain the translations in your project.
+- Using [language_helper_generator](https://pub.dev/packages/language_helper_generator) (still in the early stages) will make it easier to maintain the translations in your project. You can also run `flutter pub run language_helper:generate` to generate it.
 
 ## Usage
 
@@ -17,11 +17,28 @@ LanguageData data = {
     'Change language': 'Change language',
   },
   LanguageCodes.vi: {
-    'Hello': 'Xin Chào',
+    'Hello @{text}, @number': 'Xin Chào @{text}, @number',
     'Change language': 'Thay đổi ngôn ngữ',
   }
 };
 ```
+
+**OPTIONAL:**
+
+You can also create a base `LanguageData` by using command `flutter pub run language_helper:generate`. This runner will get all the texts that using language_helper extensions (`.tr`, `.trP`, `.trT`, `.trF`) and `.translate` method then creating a base structure for `LanguageData`.
+
+The data will be generated with this format:
+
+``` txt
+|-- .lib
+|   |--- resources
+|   |    |--- language_helper
+|   |    |    |--- _language_data_abstract.g.dart
+|   |    |    |--- language_data.dart
+```
+
+- `_language_data_abstract.g.dart`: Contains your base language from your all `.dart` files. This file will be re-generated when you run the command.
+- `language_data.dart`: Modifiable language data because it's only generated 1 time.
 
 **Initialize the data:**
 
