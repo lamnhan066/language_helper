@@ -1,3 +1,8 @@
+## 0.2.7-rc.3
+
+* Mark `Lhb` as deprecated, use `Tr` instead.
+* Improve README.
+
 ## 0.2.7-rc.2
 
 * Add more details to README.

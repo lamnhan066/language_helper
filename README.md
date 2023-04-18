@@ -1,10 +1,14 @@
 # Language Helper
 
+Make it easier for you to implement multiple languages into your app with minimal effort.
+
 ## Features
 
-- Make it easier for you to implement multiple languages into your app with minimal effort.
+- Easy to control the language translation in your application.
 
-- Using [language_helper_generator](https://pub.dev/packages/language_helper_generator) (still in the early stages) will make it easier to maintain the translations in your project. You can also run `flutter pub run language_helper:generate` to generate it in this package.
+- Supports analyzing which text is missing in specific language.
+
+- Supports extracting the text needed for translation from all the `.dart` files in your project with a single command `flutter pub run language_helper:generate` (still in the early stages).
 
 ## Usage
 
@@ -35,7 +39,9 @@ main() async {
       data: data,
 
       // [Optional] This is the list of all available keys that your project are using.
-      // You can maintain it by yourself or using `language_helper_generator` to maintain it.
+      //
+      // You can maintain it by yourself or using command `flutter pub run language_helper:generate` 
+      // to maintain it.
       analysisKeys: analysisLanguageData.keys, 
 
       // [Optional] Default is set to the device locale (if available) or the first language of [data]
@@ -133,10 +139,10 @@ LanguageBuilder(
 ),
 ```
 
-- There is a short version of `LanguageBuilder` is `Lhb` (means `LanguageHelperBuilder`):
+- There is a short version of `LanguageBuilder` is `Tr`:
 
 ``` dart
-Lhb((_) => Text('Hello'.tr)),
+Tr((_) => Text('Hello'.tr)),
 ```
 
 **You can analyze the missing texts for all language with this function:**
