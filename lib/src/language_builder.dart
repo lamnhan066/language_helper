@@ -96,11 +96,16 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   }
 }
 
-class Lhb extends StatelessWidget {
-  /// This is a short version of [LanguageBuilder] which means `LanguageHelperBuilder`.
+class Lhb extends Tr {
+  @Deprecated('Use [Tr] instead')
+  const Lhb(super.builder, {super.key});
+}
+
+class Tr extends StatelessWidget {
+  /// This is a short version of [LanguageBuilder].
   ///
   /// Wrap the widget that you want to change when changing language
-  const Lhb(this.builder, {super.key, this.forceRebuild = false});
+  const Tr(this.builder, {super.key, this.forceRebuild = false});
 
   /// Add your builder
   final Widget Function(BuildContext _) builder;
