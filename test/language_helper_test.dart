@@ -105,7 +105,7 @@ void main() async {
       SharedPreferences.setMockInitialValues({});
       await languageHelper.initial(data: data, initialCode: LanguageCodes.en);
 
-      await tester.pumpWidget(const LhbWidget());
+      await tester.pumpWidget(const TrWidget());
       await tester.pumpAndSettle();
 
       // initial language is English

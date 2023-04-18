@@ -30,8 +30,8 @@ class LanguageHelperWidget extends StatelessWidget {
   }
 }
 
-class LhbWidget extends StatelessWidget {
-  const LhbWidget({super.key});
+class TrWidget extends StatelessWidget {
+  const TrWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class LhbWidget extends StatelessWidget {
         body: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Lhb((_) => Text('Hello'.tr)),
+            Tr((_) => Text('Hello'.tr)),
             Text('Hello'.tr),
             LanguageBuilder(
               builder: (_) => Text(

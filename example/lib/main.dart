@@ -47,7 +47,7 @@ class _MyAppState extends State<MyApp> {
     return LanguageBuilder(builder: (_) {
       return Scaffold(
         appBar: AppBar(
-          title: Lhb((_) => Text('Hello'.tr)),
+          title: Tr((_) => Text('Hello'.tr)),
         ),
         body: Center(
           child: Column(
@@ -111,7 +111,7 @@ class _OtherPageState extends State<OtherPage> {
       ),
       body: Column(
         children: [
-          Lhb(
+          Tr(
             (context) {
               return Text('Text will be changed'.tr);
             },
@@ -125,7 +125,7 @@ class _OtherPageState extends State<OtherPage> {
                 LanguageHelper.instance.change(LanguageCodes.vi);
               }
             },
-            child: Lhb((_) => Text('Change language'.tr)),
+            child: Tr((_) => Text('Change language'.tr)),
           ),
         ],
       ),
