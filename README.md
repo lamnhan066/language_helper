@@ -4,11 +4,13 @@ Make it easier for you to implement multiple languages into your app with minima
 
 ## Features
 
-- Easy to control the language translation in your application.
+- Easy to control the language translation in your application. Automatically use the current device locale in the first open if possible.
 
 - Supports analyzing which text is missing in specific language.
 
-- Supports extracting the text needed for translation from all the `.dart` files in your project with a single command `flutter pub run language_helper:generate` (still in the early stages).
+- Supports analyzing which text is in your app but not in your language data and vice versa.
+
+- Supports extracting the text needed for translation from all the `.dart` files in your project with a single command `flutter pub run language_helper:generate` (still in the early stages). Original package is [language_helper_generator](https://pub.dev/packages/language_helper_generator).
 
 ## Usage
 
