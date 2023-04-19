@@ -1,6 +1,5 @@
-part of '../language_helper.dart';
+part of 'language_helper.dart';
 
-// ignore: deprecated_member_use_from_same_package
 @Deprecated('Use `LanguageBuilder` insteads')
 class LanguageNotifier extends LanguageBuilder {
   const LanguageNotifier({
@@ -62,27 +61,24 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
     );
 
     if (getRoot == null) {
-      _languageHelper._print(
+      printDebug(
           'Cannot find the root context of this context. Add $this to states');
       _languageHelper._states.add(this);
     } else if (!_languageHelper._states.contains(getRoot)) {
-      _languageHelper
-          ._print('Added root context $getRoot to LanguageHelper states');
+      printDebug('Added root context $getRoot to LanguageHelper states');
       _languageHelper._states.add(getRoot);
     } else {
-      _languageHelper
-          ._print('This root context $this was already contained in states');
+      printDebug('This root context $this was already contained in states');
     }
 
-    _languageHelper
-        ._print('Length of the states: ${_languageHelper._states.length}');
+    printDebug('Length of the states: ${_languageHelper._states.length}');
 
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    _languageHelper._print('Removed $this from LanguageHelper states');
+    printDebug('Removed $this from LanguageHelper states');
     _languageHelper._states.remove(this);
     super.dispose();
   }

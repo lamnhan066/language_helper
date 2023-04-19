@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:language_helper/language_helper.dart';
+import 'package:language_helper/src/utils/serializer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'language_data.dart';

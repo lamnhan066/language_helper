@@ -1,4 +1,14 @@
-part of '../language_helper.dart';
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:language_code/language_code.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../language_helper.dart';
+import 'mixins/update_language.dart';
+import 'utils/print_debug.dart';
+
+part 'language_builder.dart';
 
 /// Make it easier for you to control multiple languages in your app
 class LanguageHelper {
@@ -67,6 +77,7 @@ class LanguageHelper {
       StreamController.broadcast();
 
   /// Print debug log
+  bool get isDebug => _isDebug;
   bool _isDebug = false;
 
   /// Language code preferences key
@@ -151,21 +162,22 @@ class LanguageHelper {
       final currentCode = LanguageCode.code;
       if (data.containsKey(currentCode)) {
         _initialCode = currentCode;
-        _print('Set current language code to $_initialCode by device locale');
+        printDebug(
+            'Set current language code to $_initialCode by device locale');
       } else if (data.isNotEmpty) {
         _initialCode = data.keys.first;
-        _print('Set current language code to $_initialCode');
+        printDebug('Set current language code to $_initialCode');
       }
     } else {
       _initialCode = initialCode;
     }
 
     if (data.containsKey(_initialCode)) {
-      _print('Set currentCode to $_initialCode');
+      printDebug('Set currentCode to $_initialCode');
       _currentCode = _initialCode!;
     } else {
       _currentCode = data.keys.first;
-      _print(
+      printDebug(
           'language does not contain the $_initialCode => Change the code to $_currentCode');
     }
 
@@ -204,14 +216,14 @@ class LanguageHelper {
     final stringParams = params.map((key, value) => MapEntry(key, '$value'));
 
     if (!codes.contains(toCode)) {
-      _print(
+      printDebug(
           'Cannot translate this text because $toCode is not available in `data` ($text)');
       return _replaceParams(text, stringParams);
     }
 
     final translated = _data[toCode]![text];
     if (translated == null) {
-      _print('This text is not contained in current $toCode ($text)');
+      printDebug('This text is not contained in current $toCode ($text)');
       return _replaceParams(text, stringParams);
     }
 
@@ -225,19 +237,20 @@ class LanguageHelper {
   /// Change the language to this [code]
   void change(LanguageCodes toCode) {
     if (!codes.contains(toCode)) {
-      _print(
+      printDebug(
           'Cannot translate this text because $toCode is not available in `data`');
 
       if (!_useInitialCodeWhenUnavailable) {
-        _print('Does not allow using initial code => Cannot change language.');
+        printDebug(
+            'Does not allow using initial code => Cannot change language.');
         return;
       }
     }
 
-    _print('Set currentCode to $toCode');
+    printDebug('Set currentCode to $toCode');
     _currentCode = toCode;
 
-    _print('Change language to $toCode for ${_states.length} states');
+    printDebug('Change language to $toCode for ${_states.length} states');
     for (var state in _states) {
       state.updateLanguage();
     }
@@ -249,13 +262,13 @@ class LanguageHelper {
 
     // Save to local memory
     if (_isAutoSave) {
-      _print('Save this $toCode to local memory');
+      printDebug('Save this $toCode to local memory');
       SharedPreferences.getInstance().then((pref) {
         pref.setString(_codeKey, toCode.code);
       });
     }
 
-    _print('Changing completed!');
+    printDebug('Changing completed!');
   }
 
   /// Change the [useInitialCodeWhenUnavailable] value
@@ -276,11 +289,11 @@ class LanguageHelper {
   void analyze() {
     final List<String> keys = [];
 
-    _print('\n');
-    _print('==================================================');
-    _print('\n');
-    _print('Analyze all languages...');
-    _print('\n');
+    printDebug('\n');
+    printDebug('==================================================');
+    printDebug('\n');
+    printDebug('Analyze all languages...');
+    printDebug('\n');
 
     // Add all keys to [keys]
     for (final code in codes) {
@@ -308,37 +321,38 @@ class LanguageHelper {
     }
 
     if (removedKeys.isNotEmpty) {
-      _print('The below keys were missing ([analysisKeys]: yes, [data]: no):');
+      printDebug(
+          'The below keys were missing ([analysisKeys]: yes, [data]: no):');
       for (final key in removedKeys) {
-        _print('    $key');
+        printDebug('    $key');
       }
-      _print('\n');
+      printDebug('\n');
     }
 
     if (missingKeys.isNotEmpty) {
-      _print(
+      printDebug(
           'The below keys were deprecated ([analysisKeys]: no, [data]: yes):');
       for (final key in missingKeys) {
-        _print('    $key');
+        printDebug('    $key');
       }
-      _print('\n');
+      printDebug('\n');
     }
 
-    _print('Specific text missing results:\n');
+    printDebug('Specific text missing results:\n');
 
     // Analyze the results
     for (final code in codes) {
-      _print('  $code:\n');
+      printDebug('  $code:\n');
       for (final key in keys) {
         if (!_data[code]!.keys.contains(key)) {
-          _print('    $key\n');
+          printDebug('    $key\n');
         }
       }
-      _print('\n');
+      printDebug('\n');
     }
 
-    _print('==================================================');
-    _print('\n');
+    printDebug('==================================================');
+    printDebug('\n');
   }
 
   /// Replace @{param} or @param with the real text
@@ -361,7 +375,7 @@ class LanguageHelper {
     String fallback,
   ) {
     if (!params.containsKey(translateCondition.param)) {
-      _print(
+      printDebug(
           'The params does not contain the condition param: ${translateCondition.param}');
       return _replaceParams(fallback, params);
     }
@@ -371,16 +385,11 @@ class LanguageHelper {
     final translated = conditions[param] ?? conditions['default'];
 
     if (translated == null) {
-      _print(
+      printDebug(
           'There is no result for key $param of condition ${translateCondition.param}');
       return _replaceParams(fallback, params);
     }
 
     return _replaceParams(translated, params);
   }
-
-  /// Internal function, print debug log
-  void _print(Object? object) =>
-      // ignore: avoid_print
-      _isDebug ? debugPrint('[Language Helper] $object') : null;
 }

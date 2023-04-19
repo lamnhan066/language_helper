@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import '../../language_helper.dart';
-import '../models/translate_condition.dart';
 
 String languageDataToJson(LanguageData data) {
   return jsonEncode(data.map((key, value) {

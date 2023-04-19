@@ -1,4 +1,4 @@
-part of '../language_helper.dart';
+import '../../language_helper.dart';
 
 extension LanguageHelperEx on String {
   /// Translate the current text wih default parameters.
