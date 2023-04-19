@@ -209,6 +209,10 @@ class LanguageHelper {
       return _replaceParams(text, params);
     }
 
+    if (translated is LanguageCondition) {
+      return _replaceParamsCondition(translated, params);
+    }
+
     return _replaceParams(translated, params);
   }
 
@@ -332,16 +336,27 @@ class LanguageHelper {
   }
 
   /// Replace @{param} or @param with the real text
-  String _replaceParams(String input, Map<String, dynamic> params) {
-    if (params.isEmpty) return input;
+  String _replaceParams(dynamic input, Map<String, dynamic> params) {
+    if (params.isEmpty) return '$input';
 
     params.forEach((key, value) {
       // @param and end with space, end of line, new line.
-      input = input.replaceAll('@{$key}', '$value');
-      input = input.replaceAll(RegExp('@$key(?=\\s|\$|\\n)'), '$value');
+      input = '$input'.replaceAll('@{$key}', '$value');
+      input = '$input'.replaceAll(RegExp('@$key(?=\\s|\$|\\n)'), '$value');
     });
 
-    return input;
+    return input as String;
+  }
+
+  /// Replace @{param} or @param with the real text with [LanguageCondition]
+  String _replaceParamsCondition(
+    LanguageCondition translateCondition,
+    Map<String, dynamic> params,
+  ) {
+    final condition = translateCondition.condition;
+    final translated = condition(params);
+
+    return _replaceParams(translated, params);
   }
 
   /// Internal function, print debug log

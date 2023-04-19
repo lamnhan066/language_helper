@@ -54,6 +54,9 @@ void main() async {
     });
 
     test('Translate with parameters in multiple cases of text', () {
+      languageHelper.setUseInitialCodeWhenUnavailable(true);
+      languageHelper.change(LanguageCodes.en);
+
       expect('@number is a started text'.trP({'number': 100}),
           equals('100 is a started text'));
       expect('@{number} is a started text'.trP({'number': 100}),
@@ -68,6 +71,30 @@ void main() async {
           equals('This text will end with 100'));
       expect('This text will end with @{number}'.trP({'number': 100}),
           equals('This text will end with 100'));
+    });
+
+    test('Translate with condition', () {
+      languageHelper.setUseInitialCodeWhenUnavailable(true);
+      languageHelper.change(LanguageCodes.en);
+
+      expect('You have @{number} dollar'.trP({'number': 0}),
+          equals('You have zero dollar'));
+      expect('You have @{number} dollar'.trP({'number': 1}),
+          equals('You have 1 dollar'));
+      expect('You have @{number} dollar'.trP({'number': 2}),
+          equals('You have 2 dollars'));
+      expect('You have @{number} dollar'.trP({'number': 100}),
+          equals('You have 100 dollars'));
+
+      languageHelper.change(LanguageCodes.vi);
+      expect('You have @{number} dollar'.trP({'number': 0}),
+          equals('Bạn có 0 đô-la'));
+      expect('You have @{number} dollar'.trP({'number': 1}),
+          equals('Bạn có 1 đô-la'));
+      expect('You have @{number} dollar'.trP({'number': 2}),
+          equals('Bạn có 2 đô-la'));
+      expect('You have @{number} dollar'.trP({'number': 100}),
+          equals('Bạn có 100 đô-la'));
     });
   });
 

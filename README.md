@@ -6,6 +6,8 @@ Make it easier for you to implement multiple languages into your app with minima
 
 - Easy to control the language translation in your application. Automatically use the current device locale in the first open if possible.
 
+- You can completely control the translated text with your custom parameters.
+
 - Supports analyzing which text is missing in specific language.
 
 - Supports analyzing which text is in your app but not in your language data and vice versa.
@@ -21,13 +23,30 @@ LanguageData data = {
   LanguageCodes.en: {
     'Hello @{text}, @number': 'Hello @{text}, @number',
     'Change language': 'Change language',
+    'You have @{number} dollar': LanguageCondition((params) {
+      // Get the value from the specified parameter
+      final number = params['number'];
+
+      // Condition
+      switch (number) {
+        case 0:
+          return 'You have zero dollar';
+        case 1:
+          return 'You have @{number} dollar';
+        default:
+          return 'You have @{number} dollars';
+      }
+    }),
   },
   LanguageCodes.vi: {
     'Hello @{text}, @number': 'Xin Chào @{text}, @number',
     'Change language': 'Thay đổi ngôn ngữ',
+    'You have @{number} dollar': 'Bạn có @{number} đô-la',
   }
 };
 ```
+
+With the `LanguageCondition`, you can completely control which text is returned according to the condition of the parameters.
 
 **Initialize the data:**
 
