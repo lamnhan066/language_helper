@@ -174,6 +174,11 @@ class LanguageHelper {
     }
   }
 
+  @visibleForTesting
+  void changeData(LanguageData newData) {
+    _data = newData;
+  }
+
   /// Dispose all the controllers
   void dispose() {
     _streamController.close();
@@ -196,24 +201,25 @@ class LanguageHelper {
     LanguageCodes? toCode,
   }) {
     toCode ??= _currentCode;
+    final stringParams = params.map((key, value) => MapEntry(key, '$value'));
 
     if (!codes.contains(toCode)) {
       _print(
           'Cannot translate this text because $toCode is not available in `data` ($text)');
-      return _replaceParams(text, params);
+      return _replaceParams(text, stringParams);
     }
 
     final translated = _data[toCode]![text];
     if (translated == null) {
       _print('This text is not contained in current $toCode ($text)');
-      return _replaceParams(text, params);
+      return _replaceParams(text, stringParams);
     }
 
     if (translated is LanguageCondition) {
-      return _replaceParamsCondition(translated, params);
+      return _replaceParamsCondition(translated, stringParams, text);
     }
 
-    return _replaceParams(translated, params);
+    return _replaceParams(translated, stringParams);
   }
 
   /// Change the language to this [code]
@@ -352,9 +358,23 @@ class LanguageHelper {
   String _replaceParamsCondition(
     LanguageCondition translateCondition,
     Map<String, dynamic> params,
+    String fallback,
   ) {
-    final condition = translateCondition.condition;
-    final translated = condition(params);
+    if (!params.containsKey(translateCondition.param)) {
+      _print(
+          'The params does not contain the condition param: ${translateCondition.param}');
+      return _replaceParams(fallback, params);
+    }
+
+    final param = params[translateCondition.param];
+    final conditions = translateCondition.conditions;
+    final translated = conditions[param] ?? conditions['default'];
+
+    if (translated == null) {
+      _print(
+          'There is no result for key $param of condition ${translateCondition.param}');
+      return _replaceParams(fallback, params);
+    }
 
     return _replaceParams(translated, params);
   }
