@@ -1,7 +1,7 @@
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper/src/utils/serializer.dart';
 
-extension LanguageDataSerializerEx on LanguageData {
+extension LanguageDataSerializer on LanguageData {
   /// Convert this [LanguageData] to JSON
   String toJson() => languageDataToJson(this);
 
