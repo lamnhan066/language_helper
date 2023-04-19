@@ -1,12 +1,11 @@
 import 'package:language_helper/language_helper.dart';
-import 'package:language_helper/src/models/translate_condition.dart';
 
 LanguageData data = {
   LanguageCodes.en: {
     'Hello': 'Hello',
     'You have @number dollars': 'You have @number dollars',
     'You have @{number}, dollars': 'You have @{number}, dollars',
-    'You have @{number} dollar': LanguageCondition(
+    'You have @{number} dollar': LanguageConditions(
       param: 'number',
       conditions: {
         '0': 'You have zero dollar',
