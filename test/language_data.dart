@@ -6,17 +6,15 @@ LanguageData data = {
     'Hello': 'Hello',
     'You have @number dollars': 'You have @number dollars',
     'You have @{number}, dollars': 'You have @{number}, dollars',
-    'You have @{number} dollar': LanguageCondition((params) {
-      final param = params['number'];
-      switch (param) {
-        case 0:
-          return 'You have zero dollar';
-        case 1:
-          return 'You have @{number} dollar';
-        default:
-          return 'You have @{number} dollars';
-      }
-    }),
+    'You have @{number} dollar': LanguageCondition(
+      param: 'number',
+      conditions: {
+        '0': 'You have zero dollar',
+        '1': 'You have @{number} dollar',
+        '2': 'You have @{number} dollars',
+        'default': 'You have @{number} dollars',
+      },
+    ),
   },
   LanguageCodes.vi: {
     'Hello': 'Xin Chào',

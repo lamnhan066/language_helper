@@ -5,15 +5,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'language_data.dart';
 import 'widgets.dart';
 
-void main() async {
-  // Initial
-  final languageHelper = LanguageHelper.instance;
+// Initial
+final languageHelper = LanguageHelper.instance;
 
+void main() async {
   // Use en as default language
   SharedPreferences.setMockInitialValues({});
-  await languageHelper.initial(data: data, initialCode: LanguageCodes.en);
+  await languageHelper.initial(
+    data: data,
+    initialCode: LanguageCodes.en,
+    useInitialCodeWhenUnavailable: false,
+  );
 
   group('Test base translation', () {
+    setUp(() {
+      languageHelper.setUseInitialCodeWhenUnavailable(false);
+      languageHelper.change(LanguageCodes.en);
+    });
+
     test('Test with default language', () {
       expect('Hello'.tr, equals('Hello'));
 
@@ -33,6 +42,8 @@ void main() async {
     test(
         'Test with undefined language when useInitialCodeWhenUnavailable = false',
         () {
+      languageHelper.change(LanguageCodes.vi);
+      languageHelper.setUseInitialCodeWhenUnavailable(false);
       languageHelper.change(LanguageCodes.cu);
 
       expect('Hello'.tr, equals('Xin Chào'));
@@ -95,6 +106,26 @@ void main() async {
           equals('Bạn có 2 đô-la'));
       expect('You have @{number} dollar'.trP({'number': 100}),
           equals('Bạn có 100 đô-la'));
+    });
+  });
+
+  group('Language Data serializer', () {
+    languageHelper.setUseInitialCodeWhenUnavailable(true);
+    languageHelper.change(LanguageCodes.en);
+
+    final toJson = languageDataToJson(data);
+    final fromJson = languageDataFromJson(toJson);
+
+    test('LanguageData ToJson and FromJson', () {
+      expect(toJson, isA<String>());
+
+      expect(fromJson, equals(data));
+    });
+
+    test('LanguageData ToJson and FromJson', () {
+      expect(toJson, isA<String>());
+
+      expect(fromJson, equals(data));
     });
   });
 
