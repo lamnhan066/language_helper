@@ -12,7 +12,7 @@ Make it easier for you to implement multiple languages into your app with minima
 
 - Supports analyzing which text is in your app but not in your language data and vice versa.
 
-- Supports extracting the text needed for translation from all the `.dart` files in your project with a single command `flutter pub run language_helper:generate` (still in the early stages). Original package is [language_helper_generator](https://pub.dev/packages/language_helper_generator).
+- Supports extracting the text needed for translation from all the `.dart` files in your project with a single command `dart run language_helper:generate` (still in the early stages). Original package is [language_helper_generator](https://pub.dev/packages/language_helper_generator).
 
 ## Usage
 
@@ -197,7 +197,7 @@ flutter: [Language Helper]
 You can also create a base `LanguageData` by using command:
 
 ``` cmd
-flutter pub run language_helper:generate
+dart run language_helper:generate
 ```
 
 This runner will get all the texts that using language_helper extensions (`.tr`, `.trP`, `.trT`, `.trF`) and `.translate` method then creating a base structure for `LanguageData`. You can see the generated data in the [example](https://github.com/vnniz/language_helper/tree/main/example/lib/resources/language_helper).
