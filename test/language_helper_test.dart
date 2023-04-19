@@ -158,7 +158,7 @@ void main() async {
       expect(dollar10, findsNothing);
     });
 
-    testWidgets('Lhb', (tester) async {
+    testWidgets('Tr', (tester) async {
       // Use en as default language
       SharedPreferences.setMockInitialValues({});
       await languageHelper.initial(data: data, initialCode: LanguageCodes.en);
