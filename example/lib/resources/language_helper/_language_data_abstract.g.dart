@@ -10,6 +10,9 @@ const analysisLanguageData = {
   ///==============================================
   /// Path: main.dart
   ///==============================================
+  'This is @number dollar': 'This is @number dollar',
+  // 'This is @number dollar': 'This is @number dollar',  // Duplicated
+  // 'This is @number dollar': 'This is @number dollar',  // Duplicated
   'Hello': 'Hello',
   // 'Hello': 'Hello',  // Duplicated
   // 'Hello': 'Hello',  // Duplicated

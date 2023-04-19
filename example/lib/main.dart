@@ -78,6 +78,9 @@ class _MyAppState extends State<MyApp> {
               Dialog(
                 child: Text('Hello'.tr),
               ),
+              Text('This is @number dollar'.trP({'number': 0})),
+              Text('This is @number dollar'.trP({'number': 1})),
+              Text('This is @number dollar'.trP({'number': 100})),
             ],
           ),
         ),
