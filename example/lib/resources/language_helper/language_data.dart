@@ -8,7 +8,7 @@ LanguageData languageData = {
     ///==============================================
     /// Path: main.dart
     ///==============================================
-    'This is @number dollar': LanguageCondition(param: 'number', conditions: {
+    'This is @number dollar': LanguageConditions(param: 'number', conditions: {
       '0': 'This is zero dollar',
       '1': 'This is one dollar',
       'default': 'This is @number dollars',

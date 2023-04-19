@@ -227,7 +227,7 @@ class LanguageHelper {
       return _replaceParams(text, stringParams);
     }
 
-    if (translated is LanguageCondition) {
+    if (translated is LanguageConditions) {
       return _replaceParamsCondition(translated, stringParams, text);
     }
 
@@ -368,9 +368,9 @@ class LanguageHelper {
     return input as String;
   }
 
-  /// Replace @{param} or @param with the real text with [LanguageCondition]
+  /// Replace @{param} or @param with the real text with [LanguageConditions]
   String _replaceParamsCondition(
-    LanguageCondition translateCondition,
+    LanguageConditions translateCondition,
     Map<String, dynamic> params,
     String fallback,
   ) {

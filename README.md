@@ -23,20 +23,18 @@ LanguageData data = {
   LanguageCodes.en: {
     'Hello @{text}, @number': 'Hello @{text}, @number',
     'Change language': 'Change language',
-    'You have @{number} dollar': LanguageCondition((params) {
-      // Get the value from the specified parameter
-      final number = params['number'];
+    'You have @{number} dollar': LanguageConditions(
+      // Specify the param to use the conditions
+      param: 'number',
+      conditions: {
+        '0': 'You have zero dollar',
+        '1': 'You have @{number} dollar',
+        '2': 'You have @{number} dollars',
 
-      // Condition
-      switch (number) {
-        case 0:
-          return 'You have zero dollar';
-        case 1:
-          return 'You have @{number} dollar';
-        default:
-          return 'You have @{number} dollars';
-      }
-    }),
+        // Return this when the is no condition satisfied
+        'default': 'You have @{number} dollars',
+      },
+    ),
   },
   LanguageCodes.vi: {
     'Hello @{text}, @number': 'Xin Chào @{text}, @number',
@@ -46,7 +44,7 @@ LanguageData data = {
 };
 ```
 
-With the `LanguageCondition`, you can completely control which text is returned according to the condition of the parameters.
+With the `LanguageConditions`, you can completely control which text is returned according to the condition of the parameters.
 
 **Initialize the data:**
 
@@ -215,6 +213,21 @@ The data will be generated with this format:
 - [_language_data_abstract.g.dart](https://github.com/vnniz/language_helper/tree/main/example/lib/resources/language_helper/_language_data_abstract.g.dart): Contains your base language from your all `.dart` files. This file will be re-generated when you run the command.
 
 - [language_data.dart](https://github.com/vnniz/language_helper/tree/main/example/lib/resources/language_helper/language_data.dart): Modifiable language data because it's only generated 1 time.
+
+
+## LanguageData Serialization
+
+Convert `LanguageData` to JSON:
+
+``` dart
+final json = data.toJson();
+```
+
+Convert JSON to `LanguageData`:
+
+``` dart
+final data = LanguageDataSerializer.fromJson(json);
+```
 
 ## Additional Information
 
