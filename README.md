@@ -6,13 +6,13 @@ Make it easier for you to implement multiple languages into your app with minima
 
 - Easy to control the language translation in your application. Automatically use the current device locale in the first open if possible.
 
-- You can completely control the translated text with your custom parameters.
+- You can completely control the translated text with `LanguageConditions`.
 
 - Supports analyzing which text is missing in specific language.
 
 - Supports analyzing which text is in your app but not in your language data and vice versa.
 
-- Supports extracting the text needed for translation from all the `.dart` files in your project with a single command `dart run language_helper:generate` (still in the early stages). Original package is [language_helper_generator](https://pub.dev/packages/language_helper_generator).
+- Supports extracting the needed text for translation from all the `.dart` files in your project with a single command `dart run language_helper:generate` (still in the early stages). Original package is [language_helper_generator](https://pub.dev/packages/language_helper_generator).
 
 ## Usage
 
@@ -213,7 +213,6 @@ The data will be generated with this format:
 - [_language_data_abstract.g.dart](https://github.com/vnniz/language_helper/tree/main/example/lib/resources/language_helper/_language_data_abstract.g.dart): Contains your base language from your all `.dart` files. This file will be re-generated when you run the command.
 
 - [language_data.dart](https://github.com/vnniz/language_helper/tree/main/example/lib/resources/language_helper/language_data.dart): Modifiable language data because it's only generated 1 time.
-
 
 ## LanguageData Serialization
 

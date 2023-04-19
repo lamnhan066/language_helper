@@ -1,3 +1,13 @@
+## 0.2.7-rc.4
+
+* Add `LanguageConditions` to be able to use the plural translation in `LanguageData`.
+* Add serialization for `LanguageData`:
+  * Use `data.toJson()` to convert the data to JSON.
+  * Use `LanguageDataSerializer.fromJson(json)` to convert the JSON data back to the `LanguageData`.
+* Update command to `dart run language_helper:generate`.
+* Update test for `LanguageConditions` and `LanguageDataSerializer`.
+* Update README.
+
 ## 0.2.7-rc.3
 
 * Mark `Lhb` as deprecated, use `Tr` instead.
