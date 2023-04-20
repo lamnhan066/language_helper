@@ -80,8 +80,11 @@ class LanguageHelper {
   bool get isDebug => _isDebug;
   bool _isDebug = false;
 
+  @visibleForTesting
+  String get codeKey => _codeKey;
+
   /// Language code preferences key
-  final _codeKey = 'LanguageHelper.AutoSaveCode';
+  static const _codeKey = 'LanguageHelper.AutoSaveCode';
 
   /// Initialize the plugin with the List of [data] that you have created,
   /// you can set the [initialCode] for this app or it will get the first
@@ -186,11 +189,6 @@ class LanguageHelper {
     }
   }
 
-  @visibleForTesting
-  void changeData(LanguageData newData) {
-    _data = newData;
-  }
-
   /// Dispose all the controllers
   void dispose() {
     _streamController.close();
@@ -286,14 +284,15 @@ class LanguageHelper {
   ///   LanguageCodes.vi:
   ///     some thing 3
   ///     some thing 4
-  void analyze() {
+  String analyze() {
     final List<String> keys = [];
+    StringBuffer buffer = StringBuffer('');
 
-    printDebug('\n');
-    printDebug('==================================================');
-    printDebug('\n');
-    printDebug('Analyze all languages...');
-    printDebug('\n');
+    buffer.write('\n');
+    buffer.write('==================================================');
+    buffer.write('\n');
+    buffer.write('Analyze all languages...');
+    buffer.write('\n');
 
     // Add all keys to [keys]
     for (final code in codes) {
@@ -302,57 +301,61 @@ class LanguageHelper {
       }
     }
 
+    final List<String> missedKeys = [];
     final List<String> removedKeys = [];
-    final List<String> missingKeys = [];
     if (_analysisKeys.isNotEmpty) {
       // Analyze which keys are in [analysisKeys] but not in [data].
       for (final key in _analysisKeys) {
         if (!keys.contains(key)) {
-          removedKeys.add(key);
+          missedKeys.add(key);
         }
       }
 
       // Analyze which keys are in [data] but not in [analysisKeys]
       for (final key in keys) {
         if (!_analysisKeys.contains(key)) {
-          missingKeys.add(key);
+          removedKeys.add(key);
         }
       }
+    }
+
+    if (missedKeys.isNotEmpty) {
+      buffer.write(
+          'The below keys were missing ([analysisKeys]: yes, [data]: no):');
+      for (final key in missedKeys) {
+        buffer.write('    $key');
+      }
+      buffer.write('\n');
     }
 
     if (removedKeys.isNotEmpty) {
-      printDebug(
-          'The below keys were missing ([analysisKeys]: yes, [data]: no):');
-      for (final key in removedKeys) {
-        printDebug('    $key');
-      }
-      printDebug('\n');
-    }
-
-    if (missingKeys.isNotEmpty) {
-      printDebug(
+      buffer.write(
           'The below keys were deprecated ([analysisKeys]: no, [data]: yes):');
-      for (final key in missingKeys) {
-        printDebug('    $key');
+      for (final key in removedKeys) {
+        buffer.write('    $key');
       }
-      printDebug('\n');
+      buffer.write('\n');
     }
 
-    printDebug('Specific text missing results:\n');
+    buffer.write('Specific text missing results:\n');
 
     // Analyze the results
     for (final code in codes) {
-      printDebug('  $code:\n');
+      buffer.write('  $code:\n');
       for (final key in keys) {
         if (!_data[code]!.keys.contains(key)) {
-          printDebug('    $key\n');
+          buffer.write('    $key\n');
         }
       }
-      printDebug('\n');
+      buffer.write('\n');
     }
 
-    printDebug('==================================================');
-    printDebug('\n');
+    buffer.write('==================================================');
+    buffer.write('\n');
+
+    printDebug(buffer.toString());
+
+    return buffer.toString();
   }
 
   /// Replace @{param} or @param with the real text

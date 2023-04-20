@@ -4,9 +4,14 @@ import '../../language_helper.dart';
 
 String languageDataToJson(LanguageData data) {
   return jsonEncode(data.map((key, value) {
-    if (value is LanguageConditions) {
-      return MapEntry(key.code, (value as LanguageConditions).toMap());
-    }
+    value = value.map((key, value) {
+      if (value is LanguageConditions) {
+        return MapEntry(key, value.toMap());
+      }
+
+      return MapEntry(key, value);
+    });
+
     return MapEntry(key.code, value);
   }));
 }
@@ -16,15 +21,14 @@ LanguageData languageDataFromJson(String data) {
 
   return decoded.map((key, value) {
     // Reorganize the `value` back to String and LanguageCondition
-    value = value.map((key, value) {
+    value = (value as Map<String, dynamic>).map((key, value) {
       //  Try to decode the data back to the LanguageCondition
-      try {
-        final decoded = jsonDecode(value);
-        if (decoded is Map) {
-          return MapEntry(
-              key, LanguageConditions.fromMap(decoded.cast<String, dynamic>()));
-        }
-      } catch (_) {}
+      if (value is Map) {
+        return MapEntry(
+          key,
+          LanguageConditions.fromMap(value.cast<String, dynamic>()),
+        );
+      }
 
       return MapEntry(key, value);
     });

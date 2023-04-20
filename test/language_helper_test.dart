@@ -1,26 +1,169 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:language_helper/language_helper.dart';
+import 'package:language_helper/src/mixins/update_language.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'language_data.dart';
+import 'mocks.dart';
 import 'widgets.dart';
 
-// Initial
-final languageHelper = LanguageHelper.instance;
-
 void main() async {
+  // Initial
+  final languageHelper = LanguageHelper.instance;
   // Use en as default language
   SharedPreferences.setMockInitialValues({});
-  await languageHelper.initial(
-    data: data,
-    initialCode: LanguageCodes.en,
-    useInitialCodeWhenUnavailable: false,
-  );
+
+  StreamSubscription? languageSub;
+
+  setUpAll(() async {
+    await languageHelper.initial(
+      data: data,
+      initialCode: LanguageCodes.en,
+      useInitialCodeWhenUnavailable: false,
+      isDebug: true,
+      onChanged: (value) {
+        expect(value, isA<LanguageCodes>());
+      },
+    );
+
+    languageSub = languageHelper.stream.listen((code) {
+      print('Language changed to: $code');
+    });
+  });
+
+  tearDownAll(() {
+    languageHelper.dispose();
+    languageSub?.cancel();
+  });
+
+  group('Test with SharedPreferences', () {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({
+        languageHelper.codeKey: LanguageCodes.vi.code,
+      });
+      await languageHelper.initial(
+        data: data,
+        analysisKeys: data.entries.first.value.keys,
+        useInitialCodeWhenUnavailable: false,
+        isDebug: true,
+        onChanged: (value) {
+          expect(value, isA<LanguageCodes>());
+        },
+      );
+    });
+    test('Get language from prefs', () {
+      expect(languageHelper.code, equals(LanguageCodes.vi));
+    });
+  });
+
+  group('Test without SharedPreferences', () {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      await languageHelper.initial(
+        data: data,
+        useInitialCodeWhenUnavailable: false,
+        isDebug: true,
+        isAutoSave: false,
+        onChanged: (value) {
+          expect(value, isA<LanguageCodes>());
+        },
+      );
+    });
+    test('Get language from prefs and is available in LanguageData', () {
+      expect(languageHelper.code, equals(LanguageCodes.en));
+    });
+  });
+
+  group('Test without SharedPreferences', () {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      await languageHelper.initial(
+        data: data,
+        initialCode: LanguageCodes.cu,
+        useInitialCodeWhenUnavailable: false,
+        isAutoSave: false,
+        isDebug: true,
+        onChanged: (value) {
+          expect(value, isA<LanguageCodes>());
+        },
+      );
+    });
+    test('Get language from prefs and is unavailable in LanguageData', () {
+      expect(languageHelper.code, equals(LanguageCodes.en));
+    });
+  });
+
+  group('Test for analyzing missed key', () {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      await languageHelper.initial(
+        data: data,
+        analysisKeys: analysisMissedKeys,
+        initialCode: LanguageCodes.cu,
+        useInitialCodeWhenUnavailable: false,
+        isAutoSave: false,
+        isDebug: true,
+        onChanged: (value) {
+          expect(value, isA<LanguageCodes>());
+        },
+      );
+    });
+
+    test('', () {
+      expect(languageHelper.analyze(), contains('The below keys were missing'));
+    });
+  });
+
+  group('Test for analyzing deprecated key', () {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      await languageHelper.initial(
+        data: data,
+        analysisKeys: analysisRemovedKeys,
+        initialCode: LanguageCodes.cu,
+        useInitialCodeWhenUnavailable: false,
+        isAutoSave: false,
+        isDebug: true,
+        onChanged: (value) {
+          expect(value, isA<LanguageCodes>());
+        },
+      );
+    });
+
+    test('', () {
+      expect(
+          languageHelper.analyze(), contains('The below keys were deprecated'));
+    });
+  });
+
+  group('Test for mixins', () {
+    late UpdateLanguage updateLanguageMixin;
+    setUp(() {
+      updateLanguageMixin = UpdateLanguageMixinMock();
+    });
+
+    test('UpdateLanguage Mixin', () {
+      expect(updateLanguageMixin.updateLanguage(), isA<void>());
+    });
+  });
 
   group('Test base translation', () {
     setUp(() {
       languageHelper.setUseInitialCodeWhenUnavailable(false);
       languageHelper.change(LanguageCodes.en);
+    });
+
+    test('Get variables', () {
+      expect(languageHelper.currentCode, equals(LanguageCodes.en));
+      expect(languageHelper.code, equals(LanguageCodes.en));
+      expect(languageHelper.locale, equals(LanguageCodes.en.locale));
+      expect(
+        languageHelper.locales,
+        containsAll(<Locale>[LanguageCodes.en.locale, LanguageCodes.vi.locale]),
+      );
     });
 
     test('Test with default language', () {
@@ -107,25 +250,54 @@ void main() async {
       expect('You have @{number} dollar'.trP({'number': 100}),
           equals('Bạn có 100 đô-la'));
     });
+
+    test('Test trT', () {
+      languageHelper.change(LanguageCodes.en);
+
+      expect('Hello'.trT(LanguageCodes.vi), equals('Xin Chào'));
+    });
+  });
+
+  group('Test LanguageConditions', () {
+    late LanguageConditions conditions;
+    setUp(() {
+      conditions = LanguageConditions(param: 'number', conditions: {
+        '0': '0 dollar',
+        '1': '1 dollar',
+        'default': '@number dollars',
+      });
+    });
+
+    test('toJson and fromJson', () {
+      final toJson = conditions.toJson();
+      expect(toJson, isA<String>());
+
+      final fromJson = LanguageConditions.fromJson(toJson);
+      expect(fromJson, conditions);
+      expect(fromJson.toJson(), toJson);
+
+      expect(conditions.toString(), isA<String>());
+      expect(data.hashCode, isNot(fromJson.hashCode));
+    });
   });
 
   group('Language Data serializer', () {
-    languageHelper.setUseInitialCodeWhenUnavailable(true);
-    languageHelper.change(LanguageCodes.en);
-
-    final toJson = data.toJson();
-    final fromJson = LanguageDataSerializer.fromJson(toJson);
-
-    test('LanguageData ToJson and FromJson', () {
-      expect(toJson, isA<String>());
-
-      expect(fromJson, equals(data));
+    late String toJson;
+    late LanguageData fromJson;
+    setUp(() {
+      languageHelper.setUseInitialCodeWhenUnavailable(true);
+      languageHelper.change(LanguageCodes.en);
     });
 
     test('LanguageData ToJson and FromJson', () {
+      toJson = data.toJson();
       expect(toJson, isA<String>());
 
-      expect(fromJson, equals(data));
+      fromJson = LanguageDataSerializer.fromJson(toJson);
+      for (final key in data.keys) {
+        expect(data[key], equals(fromJson[key]));
+      }
+      expect(fromJson.toJson(), equals(toJson));
     });
   });
 
