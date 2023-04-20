@@ -1,3 +1,8 @@
+## 0.2.7-rc.5
+
+* Fixes issues of the `LanguageData` serializer.
+* Improves test coverage.
+
 ## 0.2.7-rc.4
 
 * Add `LanguageConditions` to be able to use the plural translation in `LanguageData`.

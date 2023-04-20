@@ -30,7 +30,7 @@ void main() async {
     );
 
     languageSub = languageHelper.stream.listen((code) {
-      print('Language changed to: $code');
+      expect(code, isA<LanguageCodes>());
     });
   });
 
