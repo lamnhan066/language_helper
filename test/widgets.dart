@@ -42,14 +42,43 @@ class TrWidget extends StatelessWidget {
           children: [
             Lhb((_) => Text('Hello'.tr)),
             Text('Hello'.tr),
-            LanguageBuilder(
-              builder: (_) => Text(
+            Tr(
+              (_) => Text(
                 'You have @number dollars'.trF(params: {'number': 100}),
               ),
             ),
-            LanguageBuilder(
-              builder: (_) => Text(
-                'You have @{number}, dollars'.trF(params: {'number': 10}),
+            Tr(
+              (_) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Tr(
+                    (_) => Text(
+                      'You have @{number}, dollars'.trF(params: {'number': 10}),
+                    ),
+                  ),
+                  Tr(
+                    (_) => Text(
+                      'You have @{number}, dollars'.trF(params: {'number': 10}),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Tr(
+              (_) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Tr(
+                    (_) => Text(
+                      'You have @{number}'.trF(params: {'number': 10}),
+                    ),
+                  ),
+                  Tr(
+                    (_) => Text(
+                      'You have @{number}'.trF(params: {'number': 10}),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

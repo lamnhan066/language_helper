@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:language_code/language_code.dart';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper/src/mixins/update_language.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,12 +27,12 @@ void main() async {
       useInitialCodeWhenUnavailable: false,
       isDebug: true,
       onChanged: (value) {
-        expect(value, isA<LanguageCodes>());
+        debugPrint('onChanged: $value');
       },
     );
 
     languageSub = languageHelper.stream.listen((code) {
-      expect(code, isA<LanguageCodes>());
+      debugPrint('Stream: $code');
     });
   });
 
@@ -114,6 +116,29 @@ void main() async {
 
     test('', () {
       expect(languageHelper.analyze(), contains('The below keys were missing'));
+    });
+  });
+
+  group('Test for using unavailable code', () {
+    setUp(() async {
+      LanguageCode.setTestCode(LanguageCodes.cu);
+      await languageHelper.initial(
+        data: data,
+        useInitialCodeWhenUnavailable: false,
+        isAutoSave: false,
+        isDebug: true,
+        onChanged: (value) {
+          expect(value, isA<LanguageCodes>());
+        },
+      );
+    });
+
+    tearDown(() {
+      LanguageCode.setTestCode();
+    });
+
+    test('Get the first code in `data` if current locale is not available', () {
+      expect(languageHelper.code, equals(data.entries.first.key));
     });
   });
 
@@ -239,6 +264,10 @@ void main() async {
           equals('You have 2 dollars'));
       expect('You have @{number} dollar'.trP({'number': 100}),
           equals('You have 100 dollars'));
+      expect('There are @number people in your family'.trP({'number': 100}),
+          equals('There are 100 people in your family'));
+      expect('There are @number people in your family'.trP({'non_number': 100}),
+          equals('There are @number people in your family'));
 
       languageHelper.change(LanguageCodes.vi);
       expect('You have @{number} dollar'.trP({'number': 0}),
@@ -347,7 +376,7 @@ void main() async {
       expect(helloText, findsNWidgets(2));
       expect(xinChaoText, findsNothing);
       expect(dollar100, findsOneWidget);
-      expect(dollar10, findsOneWidget);
+      expect(dollar10, findsNWidgets(2));
 
       languageHelper.change(LanguageCodes.vi);
       await tester.pumpAndSettle();

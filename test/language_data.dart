@@ -15,6 +15,14 @@ LanguageData data = {
       },
     ),
     'Text is missed in vi': 'Text is missed in vi',
+    'There are @number people in your family': LanguageConditions(
+      param: 'number',
+      conditions: {
+        '0': 'There is @number people in your family',
+        '1': 'There is @number people in your family',
+        '2': 'There are @number people in your family',
+      },
+    ),
   },
   LanguageCodes.vi: {
     'Hello': 'Xin Chào',
@@ -22,6 +30,8 @@ LanguageData data = {
     'You have @{number}, dollars': 'Bạn có @{number}, đô-la',
     'You have @{number} dollar': 'Bạn có @{number} đô-la',
     'Text is missed in en': 'Text is missed in en',
+    'There are @number people in your family':
+        'Có @number người trong gia đình bạn',
   }
 };
 
