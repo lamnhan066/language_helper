@@ -9,7 +9,7 @@ import 'package:language_helper/src/mixins/update_language.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'language_data.dart';
-import 'mocks.dart';
+import 'update_language_mock.dart';
 import 'widgets.dart';
 
 void main() async {

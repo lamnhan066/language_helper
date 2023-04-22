@@ -1,3 +1,9 @@
+## 0.2.7
+
+* Improve test coverage (reach 99.1%).
+* Set the sdk version: `">=2.17.0 <4.0.0"`
+* Bring the release candidate to stable.
+
 ## 0.2.7-rc.5
 
 * Fixes issues of the `LanguageData` serializer.
