@@ -118,15 +118,15 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.2.7"
+    version: "0.3.0"
   language_helper_generator:
     dependency: transitive
     description:
       name: language_helper_generator
-      sha256: "2cad285338271ca1ac07d0f0555ab1482e5e7ce311a251c52ab7aa4106a25060"
+      sha256: af66dea05257fa1a7b0a5f01e0fc6ab6e13530db71ae33c4f88f921adeb04fe8
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.1+2"
+    version: "0.1.0"
   lints:
     dependency: transitive
     description:
@@ -219,10 +219,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences
-      sha256: "858aaa72d8f61637d64e776aca82e1c67e6d9ee07979123c5d17115031c1b13b"
+      sha256: "16d3fb6b3692ad244a695c0183fca18cf81fd4b821664394a781de42386bf022"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
+    version: "2.1.1"
   shared_preferences_android:
     dependency: transitive
     description:
@@ -350,4 +350,4 @@ packages:
     version: "1.0.0"
 sdks:
   dart: ">=3.0.0-0 <4.0.0"
-  flutter: ">=3.0.0"
+  flutter: ">=3.3.0"
