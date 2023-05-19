@@ -1,3 +1,9 @@
+## 0.3.0
+
+* Bump min sdk to 2.18.0.
+* Bump flutter version to 3.3.0.
+* Update dependencies.
+
 ## 0.2.7
 
 * Improve test coverage (reach 99.1%).
