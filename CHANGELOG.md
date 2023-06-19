@@ -1,3 +1,7 @@
+## 0.4.2
+
+* Improve formatting of the analysis results.
+
 ## 0.4.1
 
 * Remove deprecated methods.

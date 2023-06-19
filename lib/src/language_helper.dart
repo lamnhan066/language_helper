@@ -286,7 +286,7 @@ class LanguageHelper {
     final List<String> keys = [];
     StringBuffer buffer = StringBuffer('');
 
-    buffer.write('\n');
+    buffer.write('\n\n');
     buffer.write('==================================================');
     buffer.write('\n');
     buffer.write('Analyze all languages...');
@@ -319,18 +319,18 @@ class LanguageHelper {
 
     if (missedKeys.isNotEmpty) {
       buffer.write(
-          'The below keys were missing ([analysisKeys]: yes, [data]: no):');
+          'The below keys were missing ([analysisKeys]: yes, [data]: no):\n');
       for (final key in missedKeys) {
-        buffer.write('    $key');
+        buffer.write('  >> ${_removeNewline(key)}\n');
       }
       buffer.write('\n');
     }
 
     if (removedKeys.isNotEmpty) {
       buffer.write(
-          'The below keys were deprecated ([analysisKeys]: no, [data]: yes):');
+          'The below keys were deprecated ([analysisKeys]: no, [data]: yes):\n');
       for (final key in removedKeys) {
-        buffer.write('    $key');
+        buffer.write('  >> ${_removeNewline(key)}\n');
       }
       buffer.write('\n');
     }
@@ -339,13 +339,15 @@ class LanguageHelper {
 
     // Analyze the results
     for (final code in codes) {
-      buffer.write('  $code:\n');
+      buffer.write('  >> $code:\n');
       for (final key in keys) {
         if (!_data[code]!.keys.contains(key)) {
-          buffer.write('    $key\n');
+          buffer.write('      >> ${_removeNewline(key)}\n');
         }
       }
-      buffer.write('\n');
+
+      // Don't need to add \n for the last element
+      if (code != codes.last) buffer.write('\n');
     }
 
     buffer.write('==================================================');
@@ -392,5 +394,9 @@ class LanguageHelper {
     }
 
     return _replaceParams(translated, params);
+  }
+
+  String _removeNewline(String text) {
+    return text.replaceAll('\n', ' ⏎ ');
   }
 }
