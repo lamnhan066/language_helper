@@ -43,8 +43,6 @@ class LanguageHelper {
   LanguageCodes get code => _currentCode!;
 
   /// Get current code
-  @Deprecated('Use [code] insteads')
-  LanguageCodes? get currentCode => _currentCode;
   LanguageCodes? _currentCode;
 
   /// Get current language as [Locale]

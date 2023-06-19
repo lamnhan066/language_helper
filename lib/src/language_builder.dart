@@ -1,14 +1,5 @@
 part of 'language_helper.dart';
 
-@Deprecated('Use `LanguageBuilder` insteads')
-class LanguageNotifier extends LanguageBuilder {
-  const LanguageNotifier({
-    super.key,
-    required super.builder,
-    super.forceRebuild,
-  });
-}
-
 /// @Source https://hillel.dev/2018/08/15/flutter-how-to-rebuild-the-entire-app-to-change-the-theme-or-locale/
 
 class LanguageBuilder extends StatefulWidget {
@@ -92,15 +83,15 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   }
 }
 
-class Lhb extends Tr {
-  @Deprecated('Use [Tr] instead')
-  const Lhb(super.builder, {super.key});
-}
-
 class Tr extends StatelessWidget {
   /// This is a short version of [LanguageBuilder].
   ///
   /// Wrap the widget that you want to change when changing language
+  ///
+  /// Ex:
+  /// ``` dart
+  /// Tr((_) => 'hello world'.tr),
+  /// ```
   const Tr(this.builder, {super.key, this.forceRebuild = false});
 
   /// Add your builder
