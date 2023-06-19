@@ -1,3 +1,8 @@
+## 0.4.1
+
+* Remove deprecated methods.
+* Update `language_helper_generator` to `0.1.1`.
+
 ## 0.3.0
 
 * Bump min sdk to 2.18.0.

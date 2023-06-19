@@ -118,15 +118,15 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.3.0"
+    version: "0.4.1"
   language_helper_generator:
     dependency: transitive
     description:
       name: language_helper_generator
-      sha256: af66dea05257fa1a7b0a5f01e0fc6ab6e13530db71ae33c4f88f921adeb04fe8
+      sha256: "531790c83b9b416bfad8df5425d8ea04262c39015b00ad6ed5d43eba4d0ce7ab"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.0"
+    version: "0.1.1"
   lints:
     dependency: transitive
     description:

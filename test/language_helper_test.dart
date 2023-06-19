@@ -182,7 +182,6 @@ void main() async {
     });
 
     test('Get variables', () {
-      expect(languageHelper.currentCode, equals(LanguageCodes.en));
       expect(languageHelper.code, equals(LanguageCodes.en));
       expect(languageHelper.locale, equals(LanguageCodes.en.locale));
       expect(
