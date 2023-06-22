@@ -59,7 +59,7 @@ main() async {
 
       // [Optional] This is the list of all available keys that your project are using.
       //
-      // You can maintain it by yourself or using command `flutter pub run language_helper:generate` 
+      // You can maintain it by yourself or using command `dart run language_helper:generate` 
       // to maintain it.
       analysisKeys: analysisLanguageData.keys, 
 
