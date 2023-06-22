@@ -4,7 +4,7 @@ Make it easier for you to implement multiple languages into your app with minima
 
 ## Features
 
-- Easy to control the language translation in your application. Automatically use the current device locale in the first open if possible.
+- Easy to control the language translations in your application. Automatically use the current device locale in the first open if possible.
 
 - You can completely control the translated text with `LanguageConditions`.
 
@@ -106,9 +106,9 @@ final translatedTo = 'Hello @{text}, @number'.trT(LanguageCodes.en);
 final translatedFull = 'Hello @{text}, @number'.trF(toCode: LanguageCodes.en, params: {'text': 'World', 'number': '10'});
 ```
 
-**Note:** The `${param}` work in any case, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
+**Note:** The `${param}` works in all cases, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
 
-Beside the `onChanged` method, you can listen for language change events by using `stream`:
+Beside the `onChanged` method, you can listen to the language changed events by using `stream`:
 
 ``` dart
 final sub = languageHelper.stream.listen((code) => print(code));
@@ -198,7 +198,7 @@ You can also create a base `LanguageData` by using command:
 dart run language_helper:generate
 ```
 
-This runner will get all the texts that using language_helper extensions (`.tr`, `.trP`, `.trT`, `.trF`) and `.translate` method then creating a base structure for `LanguageData`. You can see the generated data in the [example](https://github.com/vnniz/language_helper/tree/main/example/lib/resources/language_helper).
+This runner will get all the texts that using language_helper extensions (`.tr`, `.trP`, `.trT`, `.trF`) and `.translate` method then creating a base structure for `LanguageData`. You can see the generated data in the [example](https://github.com/vnniz/language_helper_generator/tree/main/example/lib/resources/language_helper).
 
 The data will be generated with this format:
 
@@ -210,9 +210,9 @@ The data will be generated with this format:
 |   |    |    |--- language_data.dart
 ```
 
-- [_language_data_abstract.g.dart](https://github.com/vnniz/language_helper/tree/main/example/lib/resources/language_helper/_language_data_abstract.g.dart): Contains your base language from your all `.dart` files. This file will be re-generated when you run the command.
+- [_language_data_abstract.g.dart](https://github.com/vnniz/language_helper_generator/tree/main/example/lib/resources/language_helper/_language_data_abstract.g.dart): Contains your base language from your all `.dart` files. This file will be re-generated when you run the command.
 
-- [language_data.dart](https://github.com/vnniz/language_helper/tree/main/example/lib/resources/language_helper/language_data.dart): Modifiable language data because it's only generated 1 time.
+- [language_data.dart](https://github.com/vnniz/language_helper_generator/tree/main/example/lib/resources/language_helper/language_data.dart): Modifiable language data because it's only generated 1 time.
 
 ## LanguageData Serialization
 
@@ -242,4 +242,4 @@ As the project is currently in its early stages, it may contain bugs or other is
 
 ## Note
 
-- The `${param}` work in any case, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
+- The `${param}` works in all cases, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
