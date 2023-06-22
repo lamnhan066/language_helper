@@ -108,17 +108,17 @@ packages:
     dependency: transitive
     description:
       name: language_code
-      sha256: b660a70ed22db647cc8374d4ccc343f24f42679d0946962df86c9a0b61a62050
+      sha256: "54e999a1f209523ee9eae5f857f85688d835d04328601ebb698b1cd7b7930c16"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.1"
+    version: "0.2.0"
   language_helper:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.4.2"
+    version: "0.4.3"
   language_helper_generator:
     dependency: transitive
     description:
@@ -219,10 +219,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences
-      sha256: "16d3fb6b3692ad244a695c0183fca18cf81fd4b821664394a781de42386bf022"
+      sha256: "396f85b8afc6865182610c0a2fc470853d56499f75f7499e2a73a9f0539d23d0"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
   shared_preferences_android:
     dependency: transitive
     description:
