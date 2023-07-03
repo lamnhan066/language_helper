@@ -1,7 +1,7 @@
 name: language_helper
 description: Make it easier for you to implement multiple languages into your app.
-version: 0.4.3
-homepage: https://github.com/vursin/language_helper
+version: 0.4.4
+homepage: https://github.com/vnniz/language_helper
 
 environment:
   sdk: ">=2.18.0 <4.0.0"
@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   language_code: ^0.2.0
   language_helper_generator: ^0.1.1
-  shared_preferences: ^2.1.2
+  shared_preferences: ^2.2.0
 
 dev_dependencies:
   flutter_test:

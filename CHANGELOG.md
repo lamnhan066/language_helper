@@ -1,3 +1,8 @@
+## 0.4.4
+
+* Update dependencies.
+* Update README.
+
 ## 0.4.3
 
 * Update dependencies.
