@@ -24,6 +24,9 @@ class LanguageHelper {
   /// Get all languages
   LanguageData _data = {};
 
+  /// Get all languages
+  LanguageData _dataOverrides = {};
+
   /// List of all the keys of text in your project.
   ///
   /// You can maintain it by yourself or using [language_helper_generator](https://pub.dev/packages/language_helper_generator).
@@ -31,8 +34,11 @@ class LanguageHelper {
   /// text is missing in your language data.
   Iterable<String> _analysisKeys = const [];
 
-  /// Get list of [LanguageCodes]
+  /// Get list of [LanguageCodes] of the [data]
   List<LanguageCodes> get codes => _data.keys.toList();
+
+  /// Get list of [LanguageCodes] of the [dataOverrides]
+  List<LanguageCodes> get codesOverrides => _dataOverrides.keys.toList();
 
   /// Get list of language as [Locale]
   List<Locale> get locales => _data.keys.map((e) => e.locale).toList();
@@ -105,6 +111,14 @@ class LanguageHelper {
     /// Data of languages. The [data] must be not empty.
     required LanguageData data,
 
+    /// Data of the languages that you want to override the [data]. This feature
+    /// will helpful when you want to change just some translations of the language
+    /// that are already available in the [data].
+    ///
+    /// Common case is that you're using the generated [languageData] as your [data]
+    /// but you want to change some translations (mostly with [LanguageConditions]).
+    LanguageData dataOverrides = const {},
+
     /// List of all the keys of text in your project.
     ///
     /// You can maintain it by yourself or using [language_helper_generator](https://pub.dev/packages/language_helper_generator).
@@ -138,6 +152,7 @@ class LanguageHelper {
     assert(data.isNotEmpty, 'Data must be not empty');
 
     _data = data;
+    _dataOverrides = dataOverrides;
     _forceRebuild = forceRebuild;
     _onChanged = onChanged;
     _isDebug = isDebug;
@@ -211,13 +226,13 @@ class LanguageHelper {
     toCode ??= _currentCode;
     final stringParams = params.map((key, value) => MapEntry(key, '$value'));
 
-    if (!codes.contains(toCode)) {
+    if (!codes.contains(toCode) && !codesOverrides.contains(toCode)) {
       printDebug(
-          'Cannot translate this text because $toCode is not available in `data` ($text)');
+          'Cannot translate this text because $toCode is not available in `data` and `dataOverrides` ($text)');
       return _replaceParams(text, stringParams);
     }
 
-    final translated = _data[toCode]![text];
+    final translated = _dataOverrides[toCode]?[text] ?? _data[toCode]![text];
     if (translated == null) {
       printDebug('This text is not contained in current $toCode ($text)');
       return _replaceParams(text, stringParams);
