@@ -1,3 +1,7 @@
+## 0.4.5
+
+* Add `dataOverrides` to `initial` to help you override some translations that are already available in the `data`.
+
 ## 0.4.4
 
 * Update dependencies.

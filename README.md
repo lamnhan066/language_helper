@@ -29,18 +29,40 @@ LanguageData data = {
       conditions: {
         '0': 'You have zero dollar',
         '1': 'You have @{number} dollar',
-        '2': 'You have @{number} dollars',
 
         // Return this when the is no condition satisfied
         'default': 'You have @{number} dollars',
       },
     ),
+
+    // This translation is wrong with the plural number so we need to override.
+    'You have @{number} dollar in your wallet':
+        'You have @{number} dollar in your wallet',
   },
   LanguageCodes.vi: {
     'Hello @{text}, @number': 'Xin Chào @{text}, @number',
     'Change language': 'Thay đổi ngôn ngữ',
     'You have @{number} dollar': 'Bạn có @{number} đô-la',
+
+    // This translation is right so we don't need to override.
+    'You have @{number} dollar in your wallet':
+        'Bạn có @{number} đô-la trong ví của bạn',
   }
+};
+
+// To overrides the translations in the above `data`
+LanguageData dataOverrides = {
+  LanguageCodes.en: {
+    'You have @{number} dollar in your wallet': LanguageConditions(
+      param: 'number',
+      conditions: {
+        '0': 'You have zero dollar in your wallet',
+        '1': 'You have @{number} dollar in your wallet',
+
+        'default': 'You have @{number} dollars in your wallet',
+      },
+    ),
+  },
 };
 ```
 
@@ -56,6 +78,14 @@ main() async {
   await languageHelper.initial(
       // This is [LanguageData] and it must be not empty.
       data: data,
+
+      // [Optional] Data of the languages that you want to override the [data]. This feature
+      // will helpful when you want to change just some translations of the language
+      // that are already available in the [data].
+      //
+      // Common case is that you're using the generated [languageData] as your [data]
+      // but you want to change some translations (mostly with [LanguageConditions]).
+      dataOverrides: dataOverrides,
 
       // [Optional] This is the list of all available keys that your project are using.
       //
