@@ -309,6 +309,25 @@ void main() async {
     });
   });
 
+  group('dataOverrides', () {
+    test('not using dataOverrides', () async {
+      await languageHelper.initial(data: data);
+      languageHelper.change(LanguageCodes.en);
+
+      final errorTranslated =
+          'You have @{number} dollar in your wallet'.trP({'number': 2});
+      expect(errorTranslated, 'You have 2 dollar in your wallet');
+    });
+    test('using dataOverrides', () async {
+      await languageHelper.initial(data: data, dataOverrides: dataOverrides);
+      languageHelper.change(LanguageCodes.en);
+
+      final translated =
+          'You have @{number} dollar in your wallet'.trP({'number': 2});
+      expect(translated, 'You have 2 dollars in your wallet');
+    });
+  });
+
   group('Language Data serializer', () {
     late String toJson;
     late LanguageData fromJson;

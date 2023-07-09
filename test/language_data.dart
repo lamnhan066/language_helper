@@ -23,6 +23,8 @@ LanguageData data = {
         '2': 'There are @number people in your family',
       },
     ),
+    'You have @{number} dollar in your wallet':
+        'You have @{number} dollar in your wallet',
   },
   LanguageCodes.vi: {
     'Hello': 'Xin Chào',
@@ -32,7 +34,23 @@ LanguageData data = {
     'Text is missed in en': 'Text is missed in en',
     'There are @number people in your family':
         'Có @number người trong gia đình bạn',
+    'You have @{number} dollar in your wallet':
+        'Bạn có @{number} đô-la trong ví của bạn',
   }
+};
+
+LanguageData dataOverrides = {
+  LanguageCodes.en: {
+    'You have @{number} dollar in your wallet': LanguageConditions(
+      param: 'number',
+      conditions: {
+        '0': 'You have zero dollar in your wallet',
+        '1': 'You have @{number} dollar in your wallet',
+        '2': 'You have @{number} dollars in your wallet',
+        'default': 'You have @{number} dollars in your wallet',
+      },
+    ),
+  },
 };
 
 List<String> analysisMissedKeys = [
