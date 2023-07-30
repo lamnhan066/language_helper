@@ -34,6 +34,19 @@ class LanguageHelper {
   /// text is missing in your language data.
   Iterable<String> _analysisKeys = const [];
 
+  /// We cannot change the data directly so the [codes] is completely immutable,
+  /// so we can store the list of [LanguageCodes] here to avoid re-computing the
+  /// data.
+  List<LanguageCodes>? _codesBoth;
+
+  /// Get list of [LanguageCodes] from both [data] and [dataOverrides]
+  List<LanguageCodes> get codesBoth {
+    if (_codesBoth != null) return _codesBoth!;
+    _codesBoth =
+        (_data.keys.toSet()..addAll(_dataOverrides.keys.toSet())).toList();
+    return _codesBoth!;
+  }
+
   /// Get list of [LanguageCodes] of the [data]
   List<LanguageCodes> get codes => _data.keys.toList();
 
