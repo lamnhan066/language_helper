@@ -142,6 +142,63 @@ void main() async {
     });
   });
 
+  group('Test for [codesBoth]', () {
+    tearDown(() {
+      LanguageCode.setTestCode();
+    });
+
+    test('[data] has more LanguageCodes than [dataOverrides]', () async {
+      final LanguageData dataOverrides = {
+        LanguageCodes.vi: {},
+        LanguageCodes.en: {},
+        LanguageCodes.cu: {},
+      };
+      final LanguageData data = {
+        LanguageCodes.vi: {},
+        LanguageCodes.en: {},
+      };
+
+      await languageHelper.initial(
+        data: data,
+        dataOverrides: dataOverrides,
+        useInitialCodeWhenUnavailable: false,
+        isAutoSave: false,
+        isDebug: true,
+        onChanged: (value) {
+          expect(value, isA<LanguageCodes>());
+        },
+      );
+      expect(languageHelper.codesBoth, equals(dataOverrides.keys));
+      expect(languageHelper.codesBoth, equals(dataOverrides.keys));
+    });
+
+    test('[dataOverrides] has more LanguageCodes than [data]', () async {
+      final LanguageData data = {
+        LanguageCodes.vi: {},
+        LanguageCodes.en: {},
+        LanguageCodes.cu: {},
+      };
+      final LanguageData dataOverrides = {
+        LanguageCodes.vi: {},
+        LanguageCodes.en: {},
+      };
+
+      await languageHelper.initial(
+        data: data,
+        dataOverrides: dataOverrides,
+        useInitialCodeWhenUnavailable: false,
+        isAutoSave: false,
+        isDebug: true,
+        onChanged: (value) {
+          expect(value, isA<LanguageCodes>());
+        },
+      );
+
+      expect(languageHelper.codesBoth, equals(data.keys));
+      expect(languageHelper.codesBoth, equals(data.keys));
+    });
+  });
+
   group('Test for analyzing deprecated key', () {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
