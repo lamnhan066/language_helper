@@ -1,3 +1,12 @@
+## 0.4.6
+
+* Add `codesBoth` to `LanguageHelper` in order to get the `LanguageCodes`s from both `data` and `dataOverrides` (No duplicated).
+* Update dependencies.
+* `language_helper_generator`:
+  
+  * Improve the commented text.
+  * Improve TODO text.
+
 ## 0.4.5
 
 * Add `dataOverrides` to `initial` to help you override some translations that are already available in the `data`.

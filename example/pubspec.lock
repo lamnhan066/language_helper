@@ -96,14 +96,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  js:
-    dependency: transitive
-    description:
-      name: js
-      sha256: f2c445dce49627136094980615a031419f7f3eb393237e4ecd97ac15dea343f3
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.7"
   language_code:
     dependency: transitive
     description:
@@ -118,15 +110,15 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.4.5"
+    version: "0.4.6"
   language_helper_generator:
     dependency: transitive
     description:
       name: language_helper_generator
-      sha256: "531790c83b9b416bfad8df5425d8ea04262c39015b00ad6ed5d43eba4d0ce7ab"
+      sha256: dadfeba85c3d8be80c27b144d79251df0bfe172454634c7850fb5bbd0d93eb1e
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.1"
+    version: "0.1.2"
   lints:
     dependency: transitive
     description:
@@ -332,6 +324,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
+  web:
+    dependency: transitive
+    description:
+      name: web
+      sha256: dc8ccd225a2005c1be616fe02951e2e342092edf968cf0844220383757ef8f10
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.4-beta"
   win32:
     dependency: transitive
     description:
@@ -349,5 +349,5 @@ packages:
     source: hosted
     version: "1.0.0"
 sdks:
-  dart: ">=3.0.0-0 <4.0.0"
+  dart: ">=3.1.0-185.0.dev <4.0.0"
   flutter: ">=3.3.0"

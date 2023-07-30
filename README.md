@@ -116,6 +116,19 @@ main() async {
 }
 ```
 
+**Get list of implemented `LanguageCodes`s:**
+
+``` dart
+// List of [LanguageCodes] from the [data]
+final codes = languageHelper.codes;
+
+// List of [LanguageCodes] from the [dataOverrides]
+final codesOverrides = languageHelper.codesOverrides;
+
+// List of [LanguageCodes] from both of the [data] and [dataOverrides] without duplicated
+final codesBoth = languageHelper.codesBoth;
+```
+
 **Get text:**
 
 ``` dart
