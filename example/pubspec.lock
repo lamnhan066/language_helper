@@ -100,17 +100,17 @@ packages:
     dependency: transitive
     description:
       name: language_code
-      sha256: "54e999a1f209523ee9eae5f857f85688d835d04328601ebb698b1cd7b7930c16"
+      sha256: "0b4d06587207f9a4cf9ef2e3677cc0a2d1785c7fdcbd37325ab0ae3744f4c691"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.0"
+    version: "0.3.0"
   language_helper:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.4.6"
+    version: "0.5.0"
   language_helper_generator:
     dependency: transitive
     description:

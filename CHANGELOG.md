@@ -1,3 +1,7 @@
+## 0.5.0
+
+* Bump dependencies
+
 ## 0.4.6
 
 * Add `codesBoth` to `LanguageHelper` in order to get the `LanguageCodes`s from both `data` and `dataOverrides` (No duplicated).
