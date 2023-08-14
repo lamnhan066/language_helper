@@ -22,13 +22,13 @@ class LanguageHelper {
   LanguageHelper._();
 
   /// Get all languages
-  LanguageData _data = {};
+  final LanguageData _data = {};
 
   @visibleForTesting
   LanguageData get data => _data;
 
   /// Get all languages
-  LanguageData _dataOverrides = {};
+  final LanguageData _dataOverrides = {};
 
   @visibleForTesting
   LanguageData get dataOverrides => _dataOverrides;
@@ -161,8 +161,11 @@ class LanguageHelper {
   }) async {
     assert(data.isNotEmpty, 'Data must be not empty');
 
-    _data = data;
-    _dataOverrides = dataOverrides;
+    _data.clear();
+    _dataOverrides.clear();
+
+    _data.addAll(data);
+    _dataOverrides.addAll(dataOverrides);
     _forceRebuild = forceRebuild;
     _onChanged = onChanged;
     _isDebug = isDebug;
@@ -450,24 +453,26 @@ class LanguageHelper {
       final data = element.value;
 
       /// If the code isn't in the database -> just add it
-      if (!_data.containsKey(code)) {
+      if (!database.containsKey(code)) {
         database[code] = data;
         continue;
       }
 
+      final copy = {...database[code]!};
       final current = database[code]!;
       for (final adding in data.entries) {
         // If the adding key isn't in the language data -> just add it
         if (!current.containsKey(adding.key)) {
-          database[code]!.addEntries([adding]);
+          copy[adding.key] = adding.value;
           continue;
         }
 
         // If it's duplicated, only adds when overwrite is true
         if (overwrite) {
-          database[code]![adding.key] = adding.value;
+          copy[adding.key] = adding.value;
         }
       }
+      database[code] = copy;
     }
   }
 
