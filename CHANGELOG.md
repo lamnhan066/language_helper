@@ -1,3 +1,7 @@
+## 0.5.1
+
+* Support changing the generating path when using the generator.
+
 ## 0.5.0
 
 * Bump dependencies

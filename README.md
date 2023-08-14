@@ -241,6 +241,12 @@ You can also create a base `LanguageData` by using command:
 dart run language_helper:generate
 ```
 
+If you want to change the generating path, using this:
+
+``` cmd
+dart run language_helper:generate --path=.example/lib
+```
+
 This runner will get all the texts that using language_helper extensions (`.tr`, `.trP`, `.trT`, `.trF`) and `.translate` method then creating a base structure for `LanguageData`. You can see the generated data in the [example](https://github.com/vnniz/language_helper_generator/tree/main/example/lib/resources/language_helper).
 
 The data will be generated with this format:

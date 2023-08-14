@@ -81,6 +81,7 @@ class _MyAppState extends State<MyApp> {
               Text('This is @number dollar'.trP({'number': 0})),
               Text('This is @number dollar'.trP({'number': 1})),
               Text('This is @number dollar'.trP({'number': 100})),
+              Text('This is a contains variable line $mounted'.tr),
             ],
           ),
         ),
