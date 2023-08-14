@@ -1,3 +1,7 @@
+## 0.5.4
+
+* Fix the error when adding the new language data to the unmodifiable Map.
+
 ## 0.5.3
 
 * Support adding the new language data outside the `initial`.
