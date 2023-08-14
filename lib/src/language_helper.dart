@@ -24,8 +24,14 @@ class LanguageHelper {
   /// Get all languages
   LanguageData _data = {};
 
+  @visibleForTesting
+  LanguageData get data => _data;
+
   /// Get all languages
   LanguageData _dataOverrides = {};
+
+  @visibleForTesting
+  LanguageData get dataOverrides => _dataOverrides;
 
   /// List of all the keys of text in your project.
   ///
@@ -34,18 +40,9 @@ class LanguageHelper {
   /// text is missing in your language data.
   Iterable<String> _analysisKeys = const [];
 
-  /// We cannot change the data directly so the [codes] is completely immutable,
-  /// so we can store the list of [LanguageCodes] here to avoid re-computing the
-  /// data.
-  List<LanguageCodes>? _codesBoth;
-
   /// Get list of [LanguageCodes] from both [data] and [dataOverrides]
-  List<LanguageCodes> get codesBoth {
-    if (_codesBoth != null) return _codesBoth!;
-    _codesBoth =
-        (_data.keys.toSet()..addAll(_dataOverrides.keys.toSet())).toList();
-    return _codesBoth!;
-  }
+  List<LanguageCodes> get codesBoth =>
+      (codes..addAll(codesOverrides)).toSet().toList();
 
   /// Get list of [LanguageCodes] of the [data]
   List<LanguageCodes> get codes => _data.keys.toList();
@@ -218,6 +215,41 @@ class LanguageHelper {
   /// Dispose all the controllers
   void dispose() {
     _streamController.close();
+  }
+
+  /// Add new data to the current [data].
+  ///
+  /// If [overwrite] is `true`, the available translation will be overwritten.
+  ///
+  /// If the [activate] is `true`, all the visible [LanguageBuilder]s will be rebuilt
+  /// automatically.
+  void addData(
+    LanguageData data, {
+    bool overwrite = true,
+    bool activate = true,
+  }) {
+    _addData(data: data, database: _data, overwrite: overwrite);
+    if (activate) change(code);
+    printDebug(
+        'The new `data` is added and activated with overwrite is $overwrite');
+  }
+
+  /// Add new data to the current [dataOverrides].
+  ///
+  /// If [overwrite] is `true`, the available translation will be overwritten.
+  ///
+  /// If the [activate] is `true`, all the visible [LanguageBuilder]s will be rebuilt
+  /// automatically.
+  void addDataOverrides(
+    LanguageData dataOverrides, {
+    bool overwrite = true,
+    bool activate = true,
+  }) {
+    _addData(
+        data: dataOverrides, database: _dataOverrides, overwrite: overwrite);
+    if (activate) change(code);
+    printDebug(
+        'The new `dataOverrides` is added and activated with overwrite is $overwrite');
   }
 
   /// Translate this [text] to the destination language
@@ -397,6 +429,46 @@ class LanguageHelper {
     });
 
     return input as String;
+  }
+
+  @visibleForTesting
+  void addDataTest({
+    required LanguageData data,
+    required LanguageData database,
+    required bool overwrite,
+  }) =>
+      _addData(data: data, database: database, overwrite: overwrite);
+
+  /// Add the [data] to the [database] with [overwrite] option.
+  void _addData({
+    required LanguageData data,
+    required LanguageData database,
+    required bool overwrite,
+  }) {
+    for (final element in data.entries) {
+      final code = element.key;
+      final data = element.value;
+
+      /// If the code isn't in the database -> just add it
+      if (!_data.containsKey(code)) {
+        database[code] = data;
+        continue;
+      }
+
+      final current = database[code]!;
+      for (final adding in data.entries) {
+        // If the adding key isn't in the language data -> just add it
+        if (!current.containsKey(adding.key)) {
+          database[code]!.addEntries([adding]);
+          continue;
+        }
+
+        // If it's duplicated, only adds when overwrite is true
+        if (overwrite) {
+          database[code]![adding.key] = adding.value;
+        }
+      }
+    }
   }
 
   /// Replace @{param} or @param with the real text with [LanguageConditions]
