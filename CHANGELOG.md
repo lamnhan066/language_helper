@@ -1,4 +1,4 @@
-## 0.5.1
+## 0.5.2
 
 * Support changing the generating path when using the generator.
 
