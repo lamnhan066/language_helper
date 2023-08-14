@@ -53,6 +53,10 @@ LanguageData dataOverrides = {
   },
 };
 
+LanguageData dataAdd = {
+  LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'}
+};
+
 List<String> analysisMissedKeys = [
   'Hello',
   'You have @number dollars',

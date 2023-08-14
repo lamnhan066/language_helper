@@ -462,4 +462,33 @@ void main() async {
       expect(dollar10, findsNothing);
     });
   });
+
+  /// This test have to be the last test because it will change the value of the database.
+  group('Unit test for methods', () {
+    test('Add data with overwrite is false', () {
+      languageHelper.addDataTest(
+        data: dataAdd,
+        database: languageHelper.data,
+        overwrite: false,
+      );
+
+      final addedData = languageHelper.data[LanguageCodes.en]!;
+      expect(addedData, contains('Hello add'));
+      expect(addedData['Hello'], equals('Hello'));
+      expect(addedData['Hello'], isNot(equals('HelloOverwrite')));
+    });
+
+    test('Add data with overwrite is true', () {
+      languageHelper.addDataTest(
+        data: dataAdd,
+        database: languageHelper.data,
+        overwrite: true,
+      );
+
+      final addedData = languageHelper.data[LanguageCodes.en]!;
+      expect(addedData, contains('Hello add'));
+      expect(addedData['Hello'], isNot(equals('Hello')));
+      expect(addedData['Hello'], equals('HelloOverwrite'));
+    });
+  });
 }

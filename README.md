@@ -49,21 +49,6 @@ LanguageData data = {
         'Bạn có @{number} đô-la trong ví của bạn',
   }
 };
-
-// To overrides the translations in the above `data`
-LanguageData dataOverrides = {
-  LanguageCodes.en: {
-    'You have @{number} dollar in your wallet': LanguageConditions(
-      param: 'number',
-      conditions: {
-        '0': 'You have zero dollar in your wallet',
-        '1': 'You have @{number} dollar in your wallet',
-
-        'default': 'You have @{number} dollars in your wallet',
-      },
-    ),
-  },
-};
 ```
 
 With the `LanguageConditions`, you can completely control which text is returned according to the condition of the parameters.
@@ -79,41 +64,25 @@ main() async {
       // This is [LanguageData] and it must be not empty.
       data: data,
 
-      // [Optional] Data of the languages that you want to override the [data]. This feature
-      // will helpful when you want to change just some translations of the language
-      // that are already available in the [data].
-      //
-      // Common case is that you're using the generated [languageData] as your [data]
-      // but you want to change some translations (mostly with [LanguageConditions]).
-      dataOverrides: dataOverrides,
-
-      // [Optional] This is the list of all available keys that your project are using.
-      //
-      // You can maintain it by yourself or using command `dart run language_helper:generate` 
-      // to maintain it.
-      analysisKeys: analysisLanguageData.keys, 
-
       // [Optional] Default is set to the device locale (if available) or the first language of [data]
       initialCode: LanguageCodes.en,
-
-      // [Optional] Default is set to false (doesn't change the language if unavailable)
-      useInitialCodeWhenUnavailable: false, 
-
-      // [Optional] Rebuild all the widgets instead of only root widgets. It will decrease the app performances.
-      forceRebuild: true, 
-
-      // [Optional] Auto save and reload the changed language
-      isAutoSave: true, 
-
-      // [Optional] Call this function if the language is changed
-      onChanged: (code) => print(code), 
-
-      // [Optional] Print debug log. Default is set to false
-      isDebug: true, 
   );
 
   runApp(const MyApp());
 }
+```
+
+**Change the language:**
+
+``` dart
+languageHelper.change(LanguageCodes.vi);
+```
+
+**Add language data to the current data:**
+
+``` dart
+languageHelper.addData(newLanguageData);
+languageHelper.addDataOverrides(newLanguageDataOverrides);
 ```
 
 **Get list of implemented `LanguageCodes`s:**
@@ -281,9 +250,9 @@ final data = LanguageDataSerializer.fromJson(json);
 
 - The app will try to use the `Devicelocale` to set the `initialCode` if it is not set, if the `Devicelocale` is unavailable, it will use the first language in `data` insteads.
 
-- No matter how many `LanguageBuilder` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageBuilder`, so it improves a lot performance. And all `LanguageBuilder` widgets will be rebuilt at the same time. This setting can be changed with `forceRebuild` parameter in both `initial` for global setting and `LanguageBuilder` for local setting.
+- No matter how many `LanguageBuilder` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageBuilder`, so it improves a lot of performances. And all `LanguageBuilder` widgets will be rebuilt at the same time. This setting can be changed with `forceRebuild` parameter in both `initial` for global setting and `LanguageBuilder` for local setting.
 
-- The `LanguageCodes` contains all the languages with additional information like name in English (name) and name in native language (nativeName).
+- The `LanguageCodes` contains all the languages with additional information like name in English (englishName) and name in native language (nativeName).
 
 ## Contributions
 

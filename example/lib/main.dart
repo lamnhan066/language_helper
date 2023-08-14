@@ -82,6 +82,12 @@ class _MyAppState extends State<MyApp> {
               Text('This is @number dollar'.trP({'number': 1})),
               Text('This is @number dollar'.trP({'number': 100})),
               Text('This is a contains variable line $mounted'.tr),
+              ElevatedButton(
+                onPressed: () {
+                  LanguageHelper.instance.addData(languageDataAdd);
+                },
+                child: Text('This text will be changed when the data added'.tr),
+              ),
             ],
           ),
         ),

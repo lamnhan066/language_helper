@@ -1,3 +1,7 @@
+## 0.5.3
+
+* Support adding the new language data outside the `initial`.
+
 ## 0.5.2
 
 * Support changing the generating path when using the generator.

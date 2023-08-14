@@ -1,6 +1,6 @@
 name: language_helper
 description: Make it easier for you to implement multiple languages into your app.
-version: 0.5.2
+version: 0.5.3
 homepage: https://github.com/vnniz/language_helper
 
 environment:
