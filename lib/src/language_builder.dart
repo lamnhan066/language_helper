@@ -55,9 +55,14 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
       printDebug(
           'Cannot find the root context of this context. Add $this to states');
       _languageHelper._states.add(this);
-    } else if (!_languageHelper._states.contains(getRoot)) {
-      printDebug('Added root context $getRoot to LanguageHelper states');
-      _languageHelper._states.add(getRoot);
+
+      // Because the Widget trees are built from a higher level to a lower level,
+      // so all the posible `root` widgets have definitely been added to the list
+      // of the states. So this code is redundant.
+      //
+      // } else if (!_languageHelper._states.contains(getRoot)) {
+      //   printDebug('Added root context $getRoot to LanguageHelper states');
+      //   _languageHelper._states.add(getRoot);
     } else {
       printDebug('This root context $this was already contained in states');
     }
