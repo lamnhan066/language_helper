@@ -41,6 +41,7 @@ LanguageData data = {
 
 LanguageData dataOverrides = {
   LanguageCodes.en: {
+    'Hello': 'Hello',
     'You have @{number} dollar in your wallet': LanguageConditions(
       param: 'number',
       conditions: {
@@ -54,7 +55,8 @@ LanguageData dataOverrides = {
 };
 
 LanguageData dataAdd = {
-  LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'}
+  LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'},
+  LanguageCodes.zh: {'Hello': '你好'},
 };
 
 List<String> analysisMissedKeys = [

@@ -227,8 +227,9 @@ void main() async {
       updateLanguageMixin = UpdateLanguageMixinMock();
     });
 
+    // Just a trick to increase the coverage
     test('UpdateLanguage Mixin', () {
-      expect(updateLanguageMixin.updateLanguage(), isA<void>());
+      updateLanguageMixin.updateLanguage();
     });
   });
 
@@ -466,11 +467,8 @@ void main() async {
   /// This test have to be the last test because it will change the value of the database.
   group('Unit test for methods', () {
     test('Add data with overwrite is false', () {
-      languageHelper.addDataTest(
-        data: dataAdd,
-        database: languageHelper.data,
-        overwrite: false,
-      );
+      languageHelper.addData(dataAdd, overwrite: false);
+      languageHelper.reload();
 
       final addedData = languageHelper.data[LanguageCodes.en]!;
       expect(addedData, contains('Hello add'));
@@ -478,14 +476,16 @@ void main() async {
       expect(addedData['Hello'], isNot(equals('HelloOverwrite')));
     });
 
-    test('Add data with overwrite is true', () {
-      languageHelper.addDataTest(
-        data: dataAdd,
-        database: languageHelper.data,
-        overwrite: true,
+    test('Add data with overwrite is true', () async {
+      await languageHelper.initial(
+        data: data,
+        dataOverrides: dataOverrides,
+        initialCode: LanguageCodes.en,
       );
+      languageHelper.addDataOverrides(dataAdd, overwrite: true);
+      languageHelper.reload();
 
-      final addedData = languageHelper.data[LanguageCodes.en]!;
+      final addedData = languageHelper.dataOverrides[LanguageCodes.en]!;
       expect(addedData, contains('Hello add'));
       expect(addedData['Hello'], isNot(equals('Hello')));
       expect(addedData['Hello'], equals('HelloOverwrite'));

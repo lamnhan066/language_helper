@@ -7,6 +7,9 @@ class LanguageHelperWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: LanguageHelper.instance.delegate,
+      supportedLocales: LanguageHelper.instance.locales,
+      locale: LanguageHelper.instance.locale,
       home: Scaffold(
         body: Column(
           mainAxisSize: MainAxisSize.min,
