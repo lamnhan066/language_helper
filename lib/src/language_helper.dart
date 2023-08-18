@@ -225,7 +225,8 @@ class LanguageHelper {
   /// If [overwrite] is `true`, the available translation will be overwritten.
   ///
   /// If the [activate] is `true`, all the visible [LanguageBuilder]s will be rebuilt
-  /// automatically.
+  /// automatically, **notice that you may get the `setState` issue
+  /// because of the rebuilding of the [LanguageBuilder] when it's still building.**
   void addData(
     LanguageData data, {
     bool overwrite = true,
@@ -242,7 +243,8 @@ class LanguageHelper {
   /// If [overwrite] is `true`, the available translation will be overwritten.
   ///
   /// If the [activate] is `true`, all the visible [LanguageBuilder]s will be rebuilt
-  /// automatically.
+  /// automatically, **notice that you may get the `setState` issue
+  /// because of the rebuilding of the [LanguageBuilder] when it's still building.**
   void addDataOverrides(
     LanguageData dataOverrides, {
     bool overwrite = true,
@@ -292,6 +294,9 @@ class LanguageHelper {
 
     return _replaceParams(translated, stringParams);
   }
+
+  /// Reload all the `LanguageBuilder` to apply the new data.
+  void reload() => change(code);
 
   /// Change the language to this [code]
   void change(LanguageCodes toCode) {
@@ -433,14 +438,6 @@ class LanguageHelper {
 
     return input as String;
   }
-
-  @visibleForTesting
-  void addDataTest({
-    required LanguageData data,
-    required LanguageData database,
-    required bool overwrite,
-  }) =>
-      _addData(data: data, database: database, overwrite: overwrite);
 
   /// Add the [data] to the [database] with [overwrite] option.
   void _addData({
