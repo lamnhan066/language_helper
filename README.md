@@ -1,4 +1,5 @@
 # Language Helper
+[![codecov](https://codecov.io/gh/vnniz/language_helper/graph/badge.svg?token=AIGGNCGOVR)](https://codecov.io/gh/vnniz/language_helper)
 
 Make it easier for you to implement multiple languages into your app with minimal effort.
 
