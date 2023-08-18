@@ -1,3 +1,8 @@
+## 0.5.5
+
+* Add the flutter default localizations and how to use it.
+* Increase code coverage to 100.
+
 ## 0.5.4
 
 * Fix the error when adding the new language data to the unmodifiable Map.

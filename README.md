@@ -72,6 +72,28 @@ main() async {
 }
 ```
 
+You can implement flutter localizations to your app like this
+
+``` dart
+class App extends StatelessWidget {
+  const App({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LanguageBuilder(
+      builder: (context) {
+        return MaterialApp(
+          localizationsDelegates: languageHelper.delegate,
+          supportedLocales: languageHelper.locales,
+          locale: languageHelper.locale,
+          home: const HomePage(),
+        );
+      }
+    );
+  }
+}
+```
+
 **Change the language:**
 
 ``` dart
@@ -84,6 +106,8 @@ languageHelper.change(LanguageCodes.vi);
 languageHelper.addData(newLanguageData);
 languageHelper.addDataOverrides(newLanguageDataOverrides);
 ```
+
+That methods have `activate` parameter which automaticaly rebuild all needed `LanguageBuilder`, so notice that you may get the `setState` issue because of the rebuilding of the `LanguageBuilder` when it's still building. If the error occurs, you may need to set it to `false` and activate the new data yourself by using `reload` method.
 
 **Get list of implemented `LanguageCodes`s:**
 
