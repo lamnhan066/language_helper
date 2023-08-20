@@ -1,3 +1,7 @@
+## 0.6.0
+
+* Automatically run `dart format` for the generated files when running `dart run language_helper:generate`.
+
 ## 0.5.5
 
 * Add the flutter default localizations and how to use it.

@@ -241,6 +241,8 @@ If you want to change the generating path, using this:
 dart run language_helper:generate --path=.example/lib
 ```
 
+This command will also run `dart format` for the generated files, so you can easily manage the translations using the version control.
+
 This runner will get all the texts that using language_helper extensions (`.tr`, `.trP`, `.trT`, `.trF`) and `.translate` method then creating a base structure for `LanguageData`. You can see the generated data in the [example](https://github.com/vnniz/language_helper_generator/tree/main/example/lib/resources/language_helper).
 
 The data will be generated with this format:
