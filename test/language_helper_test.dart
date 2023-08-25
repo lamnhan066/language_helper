@@ -121,10 +121,12 @@ void main() async {
 
   group('Test for using unavailable code', () {
     setUp(() async {
+      SharedPreferences.setMockInitialValues({});
       LanguageCode.setTestCode(LanguageCodes.cu);
       await languageHelper.initial(
         data: data,
         useInitialCodeWhenUnavailable: false,
+        syncWithDevice: false,
         isAutoSave: false,
         isDebug: true,
         onChanged: (value) {
