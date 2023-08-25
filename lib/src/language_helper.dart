@@ -229,11 +229,11 @@ class LanguageHelper {
     if (finalCode == null) {
       // Try to set by the default code from device
       final currentCode = LanguageCode.code;
-      if (data.containsKey(currentCode)) {
+      if (codesBoth.contains(currentCode)) {
         finalCode = currentCode;
         printDebug('Set current language code to $finalCode by device locale');
-      } else if (data.isNotEmpty) {
-        finalCode = data.keys.first;
+      } else if (codes.isNotEmpty) {
+        finalCode = codes.first;
         printDebug('Set current language code to $finalCode');
       }
     } else {
@@ -242,8 +242,8 @@ class LanguageHelper {
 
     if (!codesBoth.contains(finalCode)) {
       printDebug(
-          'language does not contain the $finalCode => Change the code to ${data.keys.first}');
-      finalCode = data.keys.first;
+          'language does not contain the $finalCode => Change the code to ${codes.first}');
+      finalCode = codes.first;
     }
 
     printDebug('Set currentCode to $finalCode');
