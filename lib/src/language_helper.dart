@@ -78,7 +78,7 @@ class LanguageHelper {
   bool _isAutoSave = false;
 
   /// Sync with the device language
-  bool _syncWithDevice = false;
+  bool _syncWithDevice = true;
 
   /// Force rebuilds all widgets instead of only root widget. You can try to use
   /// this value if the widgets don't rebuild as your wish.
@@ -165,7 +165,7 @@ class LanguageHelper {
     /// Apply the device language when it's changed.
     /// If this value is `true`, update the app language when the device language changes.
     /// Otherwise, keep the current app language even if the device language changes.
-    bool syncWithDevice = false,
+    bool syncWithDevice = true,
 
     /// Callback on language changed.
     void Function(LanguageCodes code)? onChanged,
