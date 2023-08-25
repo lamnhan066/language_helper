@@ -32,3 +32,5 @@ build/
 .flutter-plugins-dependencies
 .fvm/fvm_config.json
 .fvm/flutter_sdk
+
+coverage
