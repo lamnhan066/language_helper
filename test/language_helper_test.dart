@@ -228,6 +228,7 @@ void main() async {
         data: data,
         initialCode: LanguageCodes.en,
         useInitialCodeWhenUnavailable: true,
+        onChanged: (code) {},
       );
       languageHelper.change(LanguageCodes.vi);
       expect(languageHelper.code, equals(LanguageCodes.vi));
@@ -305,6 +306,10 @@ void main() async {
 
       expect('You have @number dollars'.trP({'number': '100'}),
           equals('Bạn có 100 đô-la'));
+    });
+
+    test('Test with the code that does not in the data', () {
+      expect('Hello There'.trT(LanguageCodes.aa), equals('Hello There'));
     });
 
     test(
