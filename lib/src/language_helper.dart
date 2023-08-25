@@ -340,21 +340,21 @@ class LanguageHelper {
   /// Change the language to this [code]
   void change(LanguageCodes toCode) {
     if (!codesBoth.contains(toCode)) {
-      printDebug('$toCode is not available in `data` or `dataOverrides');
+      printDebug('$toCode is not available in `data` or `dataOverrides`');
 
       if (!_useInitialCodeWhenUnavailable) {
         printDebug(
             'Does not allow using the initial code => Cannot change the language.');
         return;
       } else {
-        if (_initialCode == null) {
-          printDebug(
-              '`useInitialCodeWhenUnavailable` is true but the `initialCode` is null => Cannot change the language');
-          return;
-        } else {
+        if (codesBoth.contains(_initialCode)) {
           printDebug(
               '`useInitialCodeWhenUnavailable` is true => Change the language to $_initialCode');
           _currentCode = _initialCode;
+        } else {
+          printDebug(
+              '`useInitialCodeWhenUnavailable` is true but the `initialCode` is not available in `data` or `dataOverrides` => Cannot change the language');
+          return;
         }
       }
     } else {
