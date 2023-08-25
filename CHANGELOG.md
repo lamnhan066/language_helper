@@ -1,3 +1,10 @@
+## 0.7.0
+
+* Add `syncWithDevice` parameter to sync the language with the device language, auto apply on changed.
+* The `initialCode` will keeps its value correctly. In the past version, the `initialCode` maybe changed to the local code (from SharedPreferences).
+* The `useInitialCodeWhenUnavailable` now works correcly.
+* Add more test cases.
+
 ## 0.6.0
 
 * Automatically run `dart format` for the generated files when running `dart run language_helper:generate`.

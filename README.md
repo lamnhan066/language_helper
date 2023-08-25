@@ -67,6 +67,9 @@ main() async {
 
       // [Optional] Default is set to the device locale (if available) or the first language of [data]
       initialCode: LanguageCodes.en,
+
+      // [Optional] Change the app language when the device language is changed.
+      syncWithDevice: true,
   );
 
   runApp(const MyApp());
@@ -238,7 +241,7 @@ dart run language_helper:generate
 If you want to change the generating path, using this:
 
 ``` cmd
-dart run language_helper:generate --path=.example/lib
+dart run language_helper:generate --path=./example/lib
 ```
 
 This command will also run `dart format` for the generated files, so you can easily manage the translations using the version control.
@@ -284,7 +287,3 @@ final data = LanguageDataSerializer.fromJson(json);
 ## Contributions
 
 As the project is currently in its early stages, it may contain bugs or other issues. Should you experience any problems, we kindly ask that you file an issue to let us know. Additionally, we welcome contributions in the form of pull requests (PRs) to help enhance the project.
-
-## Note
-
-- The `${param}` works in all cases, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
