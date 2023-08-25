@@ -338,18 +338,27 @@ class LanguageHelper {
   /// Change the language to this [code]
   void change(LanguageCodes toCode) {
     if (!codesBoth.contains(toCode)) {
-      printDebug(
-          'Cannot translate this text because $toCode is not available in `data` or `dataOverrides');
+      printDebug('$toCode is not available in `data` or `dataOverrides');
 
       if (!_useInitialCodeWhenUnavailable) {
         printDebug(
-            'Does not allow using the initial code => Cannot change language.');
+            'Does not allow using the initial code => Cannot change the language.');
         return;
+      } else {
+        if (_initialCode == null) {
+          printDebug(
+              '`useInitialCodeWhenUnavailable` is true but the `initialCode` is null => Cannot change the language');
+          return;
+        } else {
+          printDebug(
+              '`useInitialCodeWhenUnavailable` is true => Change the language to $_initialCode');
+          _currentCode = _initialCode;
+        }
       }
+    } else {
+      printDebug('Set currentCode to $toCode');
+      _currentCode = toCode;
     }
-
-    printDebug('Set currentCode to $toCode');
-    _currentCode = toCode;
 
     printDebug('Change language to $toCode for ${_states.length} states');
     for (var state in _states) {

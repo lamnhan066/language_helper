@@ -221,6 +221,49 @@ void main() async {
     });
   });
 
+  group('Test for using initial code when the `toCode` is unavailable', () {
+    test('true', () async {
+      SharedPreferences.setMockInitialValues({});
+      await languageHelper.initial(
+        data: data,
+        initialCode: LanguageCodes.en,
+        useInitialCodeWhenUnavailable: true,
+      );
+      languageHelper.change(LanguageCodes.vi);
+      expect(languageHelper.code, equals(LanguageCodes.vi));
+
+      languageHelper.change(LanguageCodes.cu);
+      expect(languageHelper.code, equals(LanguageCodes.en));
+    });
+
+    test('false', () async {
+      SharedPreferences.setMockInitialValues({});
+      await languageHelper.initial(
+        data: data,
+        initialCode: LanguageCodes.en,
+        useInitialCodeWhenUnavailable: false,
+      );
+      languageHelper.change(LanguageCodes.vi);
+      expect(languageHelper.code, equals(LanguageCodes.vi));
+
+      languageHelper.change(LanguageCodes.cu);
+      expect(languageHelper.code, equals(LanguageCodes.vi));
+    });
+
+    test('true but initial code is null', () async {
+      SharedPreferences.setMockInitialValues({});
+      await languageHelper.initial(
+        data: data,
+        useInitialCodeWhenUnavailable: false,
+      );
+      languageHelper.change(LanguageCodes.vi);
+      expect(languageHelper.code, equals(LanguageCodes.vi));
+
+      languageHelper.change(LanguageCodes.cu);
+      expect(languageHelper.code, equals(LanguageCodes.vi));
+    });
+  });
+
   group('Test for mixins', () {
     late UpdateLanguage updateLanguageMixin;
     setUp(() {
