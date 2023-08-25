@@ -187,6 +187,9 @@ class LanguageHelper {
     _isAutoSave = isAutoSave;
     _syncWithDevice = syncWithDevice;
     _analysisKeys = analysisKeys;
+    _initialCode = initialCode;
+
+    LanguageCodes? finalCode = initialCode;
 
     // Try to reload from memory if `isAutoSave` is `true`
     if (_isAutoSave) {
@@ -196,7 +199,7 @@ class LanguageHelper {
         final code = prefs.getString(_codeKey);
 
         if (code != null && code.isNotEmpty) {
-          initialCode = LanguageCodes.fromCode(code);
+          finalCode = LanguageCodes.fromCode(code);
         }
       }
     }
@@ -214,7 +217,7 @@ class LanguageHelper {
       } else {
         final prefCode = LanguageCodes.fromCode(prefCodeCode);
         if (currentCode != prefCode) {
-          initialCode = currentCode;
+          finalCode = currentCode;
           prefs.setString(_deviceCodeKey, currentCode.code);
           printDebug('Sync with device applied the new device language');
         } else {
@@ -223,29 +226,28 @@ class LanguageHelper {
       }
     }
 
-    if (initialCode == null) {
+    if (finalCode == null) {
       // Try to set by the default code from device
       final currentCode = LanguageCode.code;
       if (data.containsKey(currentCode)) {
-        _initialCode = currentCode;
-        printDebug(
-            'Set current language code to $_initialCode by device locale');
+        finalCode = currentCode;
+        printDebug('Set current language code to $finalCode by device locale');
       } else if (data.isNotEmpty) {
-        _initialCode = data.keys.first;
-        printDebug('Set current language code to $_initialCode');
+        finalCode = data.keys.first;
+        printDebug('Set current language code to $finalCode');
       }
     } else {
-      _initialCode = initialCode;
+      finalCode = finalCode;
     }
 
-    if (data.containsKey(_initialCode)) {
-      printDebug('Set currentCode to $_initialCode');
-      _currentCode = _initialCode!;
-    } else {
-      _currentCode = data.keys.first;
+    if (!codesBoth.contains(finalCode)) {
       printDebug(
-          'language does not contain the $_initialCode => Change the code to $_currentCode');
+          'language does not contain the $finalCode => Change the code to ${data.keys.first}');
+      finalCode = data.keys.first;
     }
+
+    printDebug('Set currentCode to $finalCode');
+    _currentCode = finalCode;
 
     if (_isDebug) {
       analyze();
