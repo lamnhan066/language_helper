@@ -406,6 +406,62 @@ void main() async {
     });
   });
 
+  group('Test `syncWithDevice`', () {
+    test('false', () async {
+      SharedPreferences.setMockInitialValues({
+        languageHelper.deviceCodeKey: LanguageCodes.vi.code,
+      });
+      LanguageCode.setTestCode(LanguageCodes.en);
+      await languageHelper.initial(
+        data: data,
+        initialCode: LanguageCodes.vi,
+        syncWithDevice: false,
+      );
+
+      expect(languageHelper.code, equals(LanguageCodes.vi));
+    });
+
+    test('true and haven\'t local database', () async {
+      SharedPreferences.setMockInitialValues({});
+      LanguageCode.setTestCode(LanguageCodes.en);
+      await languageHelper.initial(
+        data: data,
+        initialCode: LanguageCodes.vi,
+        syncWithDevice: true,
+      );
+
+      expect(languageHelper.code, equals(LanguageCodes.vi));
+    });
+
+    test('true and have local database but with no changed code', () async {
+      SharedPreferences.setMockInitialValues({
+        languageHelper.deviceCodeKey: LanguageCodes.vi.code,
+      });
+      LanguageCode.setTestCode(LanguageCodes.vi);
+      await languageHelper.initial(
+        data: data,
+        initialCode: LanguageCodes.vi,
+        syncWithDevice: true,
+      );
+
+      expect(languageHelper.code, equals(LanguageCodes.vi));
+    });
+
+    test('true and have local database but with changed code', () async {
+      SharedPreferences.setMockInitialValues({
+        languageHelper.deviceCodeKey: LanguageCodes.vi.code,
+      });
+      LanguageCode.setTestCode(LanguageCodes.en);
+      await languageHelper.initial(
+        data: data,
+        initialCode: LanguageCodes.vi,
+        syncWithDevice: true,
+      );
+
+      expect(languageHelper.code, equals(LanguageCodes.en));
+    });
+  });
+
   group('Test widget', () {
     testWidgets('LanguageBuilder', (tester) async {
       // Use en as default language

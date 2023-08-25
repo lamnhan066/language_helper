@@ -77,6 +77,9 @@ class LanguageHelper {
   /// Auto save and load [LanguageCodes] from memory
   bool _isAutoSave = false;
 
+  /// Sync with the device language
+  bool _syncWithDevice = false;
+
   /// Force rebuilds all widgets instead of only root widget. You can try to use
   /// this value if the widgets don't rebuild as your wish.
   bool _forceRebuild = false;
@@ -99,6 +102,12 @@ class LanguageHelper {
 
   /// Language code preferences key
   static const _codeKey = 'LanguageHelper.AutoSaveCode';
+
+  @visibleForTesting
+  String get deviceCodeKey => _deviceCodeKey;
+
+  /// Language code of the device
+  static const _deviceCodeKey = 'LanguageHelper.DeviceCode';
 
   /// Initialize the plugin with the List of [data] that you have created,
   /// you can set the [initialCode] for this app or it will get the first
@@ -153,6 +162,11 @@ class LanguageHelper {
     /// language in the next open instead of [initialCode].
     bool isAutoSave = true,
 
+    /// Apply the device language when it's changed.
+    /// If this value is `true`, update the app language when the device language changes.
+    /// Otherwise, keep the current app language even if the device language changes.
+    bool syncWithDevice = false,
+
     /// Callback on language changed.
     void Function(LanguageCodes code)? onChanged,
 
@@ -171,6 +185,7 @@ class LanguageHelper {
     _isDebug = isDebug;
     _useInitialCodeWhenUnavailable = useInitialCodeWhenUnavailable;
     _isAutoSave = isAutoSave;
+    _syncWithDevice = syncWithDevice;
     _analysisKeys = analysisKeys;
 
     // Try to reload from memory if `isAutoSave` is `true`
@@ -182,6 +197,28 @@ class LanguageHelper {
 
         if (code != null && code.isNotEmpty) {
           initialCode = LanguageCodes.fromCode(code);
+        }
+      }
+    }
+
+    // Sync with device language
+    if (_syncWithDevice) {
+      final prefs = await SharedPreferences.getInstance();
+      final prefCodeCode = prefs.getString(_deviceCodeKey);
+      final currentCode = LanguageCode.code;
+
+      if (prefCodeCode == null) {
+        prefs.setString(_deviceCodeKey, currentCode.code);
+        printDebug(
+            'Sync with device saved the current language to local database.');
+      } else {
+        final prefCode = LanguageCodes.fromCode(prefCodeCode);
+        if (currentCode != prefCode) {
+          initialCode = currentCode;
+          prefs.setString(_deviceCodeKey, currentCode.code);
+          printDebug('Sync with device applied the new device language');
+        } else {
+          printDebug('Sync with device used the current app language');
         }
       }
     }
