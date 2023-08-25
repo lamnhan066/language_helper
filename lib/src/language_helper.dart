@@ -337,13 +337,13 @@ class LanguageHelper {
 
   /// Change the language to this [code]
   void change(LanguageCodes toCode) {
-    if (!codes.contains(toCode)) {
+    if (!codesBoth.contains(toCode)) {
       printDebug(
-          'Cannot translate this text because $toCode is not available in `data`');
+          'Cannot translate this text because $toCode is not available in `data` or `dataOverrides');
 
       if (!_useInitialCodeWhenUnavailable) {
         printDebug(
-            'Does not allow using initial code => Cannot change language.');
+            'Does not allow using the initial code => Cannot change language.');
         return;
       }
     }
