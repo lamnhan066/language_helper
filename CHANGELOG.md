@@ -1,3 +1,8 @@
+## 0.7.1
+
+* Bump dependencies.
+* Update codecov URL.
+
 ## 0.7.0
 
 * Add `syncWithDevice` parameter to sync the language with the device language, auto apply on changed.
