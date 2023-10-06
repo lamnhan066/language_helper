@@ -1,3 +1,7 @@
+## 0.7.2
+
+* Update homepage URL.
+
 ## 0.7.1
 
 * Bump dependencies.
