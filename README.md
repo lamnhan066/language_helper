@@ -32,7 +32,7 @@ LanguageData data = {
         '1': 'You have @{number} dollar',
 
         // Return this when the is no condition satisfied
-        'default': 'You have @{number} dollars',
+        '_': 'You have @{number} dollars',
       },
     ),
 
@@ -52,7 +52,7 @@ LanguageData data = {
 };
 ```
 
-With the `LanguageConditions`, you can completely control which text is returned according to the condition of the parameters.
+With the `LanguageConditions`, you can completely control which text is returned according to the condition of the parameters. You can use `'default'` or `'_'` to set the default value for the condition.
 
 **Initialize the data:**
 

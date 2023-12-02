@@ -1,3 +1,7 @@
+## 0.7.3
+
+* Beside using 'default' in `LanguageCondition` to set the default value, we can use '_' from this version.
+
 ## 0.7.2
 
 * Update homepage URL.
