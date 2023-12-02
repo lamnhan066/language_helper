@@ -535,7 +535,8 @@ class LanguageHelper {
 
     final param = params[translateCondition.param];
     final conditions = translateCondition.conditions;
-    final translated = conditions[param] ?? conditions['default'];
+    final translated =
+        conditions[param] ?? conditions['default'] ?? conditions['_'];
 
     if (translated == null) {
       printDebug(
