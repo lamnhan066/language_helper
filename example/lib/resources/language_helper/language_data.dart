@@ -10,7 +10,7 @@ LanguageData languageData = {
     'This is @number dollar': LanguageConditions(param: 'number', conditions: {
       '0': 'This is zero dollar',
       '1': 'This is one dollar',
-      'default': 'This is @number dollars',
+      '_': 'This is @number dollars',
     }),
     // 'This is @number dollar': 'This is @number dollar',  // Duplicated
     // 'This is @number dollar': 'This is @number dollar',  // Duplicated
