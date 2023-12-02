@@ -12,15 +12,15 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  language_code: ^0.3.0
-  language_helper_generator: ^0.2.2
-  shared_preferences: ^2.2.1
+  language_code: ^0.3.1
+  language_helper_generator: ^0.2.3
+  shared_preferences: ^2.2.2
   args: ^2.4.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.3
+  flutter_lints: ^3.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

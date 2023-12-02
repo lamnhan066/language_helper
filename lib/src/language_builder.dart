@@ -5,10 +5,10 @@ part of 'language_helper.dart';
 class LanguageBuilder extends StatefulWidget {
   /// Wrap the widget that you want to change when changing language
   const LanguageBuilder({
-    Key? key,
+    super.key,
     required this.builder,
     this.forceRebuild,
-  }) : super(key: key);
+  });
 
   /// Add your builder
   final Widget Function(BuildContext _) builder;
