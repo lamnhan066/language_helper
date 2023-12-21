@@ -1,7 +1,8 @@
 # Language Helper
+
 [![codecov](https://codecov.io/gh/lamnhan066/language_helper/graph/badge.svg?token=AIGGNCGOVR)](https://codecov.io/gh/lamnhan066/language_helper)
 
-Make it easier for you to implement multiple languages into your app with minimal effort.
+Easy way to implement multiple languages (localizations) into your app with minimal effort.
 
 ## Features
 
@@ -232,7 +233,7 @@ flutter: [Language Helper]
 
 **Optional:**
 
-You can also create a base `LanguageData` by using command:
+You can also create a base `LanguageData` by using [language_helper_generator](https://pub.dev/packages/language_helper_generator)'s command:
 
 ``` cmd
 dart run language_helper:generate

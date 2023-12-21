@@ -1,3 +1,10 @@
+## 0.8.0
+
+* Update [language_helper_generator](https://pub.dev/packages/language_helper_generator) to `0.3.0`:
+  * Convert to single quote when possible to avoid duplicated text issue.
+  * Able to parse a text with `r` raw text tag.
+* Improve README.
+
 ## 0.7.3
 
 * Beside using 'default' in `LanguageCondition` to set the default value, we can use '_' from this version.
