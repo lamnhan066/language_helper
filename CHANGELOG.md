@@ -1,3 +1,9 @@
+## 0.9.0
+
+* Update [language_helper_generator](https://pub.dev/packages/language_helper_generator) to `0.4.1`:
+  * Completely rewritten using dart analyzer to improve reliability.
+* Improve README.
+
 ## 0.8.0
 
 * Update [language_helper_generator](https://pub.dev/packages/language_helper_generator) to `0.3.0`:
