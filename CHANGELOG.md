@@ -1,3 +1,7 @@
+## 0.9.0+1
+
+* Improve the pub score.
+
 ## 0.9.0
 
 * Update [language_helper_generator](https://pub.dev/packages/language_helper_generator) to `0.4.1`:
