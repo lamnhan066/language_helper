@@ -18,38 +18,31 @@ Easy way to implement multiple languages (localizations) into your app with mini
 
 ## Usage
 
-**Create the data:**
+**Here is your translation (Can be created with `language_helper_generator`):**
 
 ``` dart
-LanguageData data = {
-  LanguageCodes.en: {
-    'Hello @{text}, @number': 'Hello @{text}, @number',
-    'Change language': 'Change language',
-    'You have @{number} dollar': LanguageConditions(
-      // Specify the param to use the conditions
-      param: 'number',
-      conditions: {
-        '0': 'You have zero dollar',
-        '1': 'You have @{number} dollar',
+final en = {
+  'Hello @{name}': 'Hello @{name}',
+  'We have @{number} dollar': LanguageCondition(
+    param: 'number',
+    conditions: {
+      '0': 'We have zero dollar',
+      '1': 'We have one dollar',
 
-        // Return this when the is no condition satisfied
-        '_': 'You have @{number} dollars',
-      },
-    ),
+      // Default value.
+      '_': 'We have @{number} dollars',
+    }
+  ),
+};
 
-    // This translation is wrong with the plural number so we need to override.
-    'You have @{number} dollar in your wallet':
-        'You have @{number} dollar in your wallet',
-  },
-  LanguageCodes.vi: {
-    'Hello @{text}, @number': 'Xin Chào @{text}, @number',
-    'Change language': 'Thay đổi ngôn ngữ',
-    'You have @{number} dollar': 'Bạn có @{number} đô-la',
+const vi = {
+  'Hello @{name}': 'Xin chào @{name}',
+  'We have @{number} dollar': 'Chúng ta có @{number} đô-la', 
+};
 
-    // This translation is right so we don't need to override.
-    'You have @{number} dollar in your wallet':
-        'Bạn có @{number} đô-la trong ví của bạn',
-  }
+LanguageData languageData = {
+  LanguageCodes.en: en,
+  LanguageCodes.vi: vi,
 };
 ```
 
@@ -64,12 +57,12 @@ main() async {
   // LanguageHelper should be initialized before calling `runApp`.
   await languageHelper.initial(
       // This is [LanguageData] and it must be not empty.
-      data: data,
-
-      // [Optional] Default is set to the device locale (if available) or the first language of [data]
+      data: languageData,
+      // Like the `languageData` but with higher priority.
+      dataOverrides: languageDataOverrides,
+      // Default is set to the device locale (if available) or the first language of the `languageData`.
       initialCode: LanguageCodes.en,
-
-      // [Optional] Change the app language when the device language is changed.
+      // Change the app language when the device language is changed. Default is set to `true`.
       syncWithDevice: true,
   );
 
@@ -77,7 +70,7 @@ main() async {
 }
 ```
 
-You can implement flutter localizations to your app like this
+Implement flutter localizations to your app like this
 
 ``` dart
 class App extends StatelessWidget {
@@ -99,20 +92,45 @@ class App extends StatelessWidget {
 }
 ```
 
+**Here is your `Widget`s:**
+
+Using `LanguageBuilder`
+
+``` dart
+LanguageBuilder(
+    builder: (context) {
+        return Scaffold(
+          body: Column(
+            children: [
+              Text('Hello @{name}'.tr),
+              Text('We have @{number} dollar'.tr),
+            ],
+          ),
+        );
+    },
+),
+```
+
+Using `Tr` (A short version of `LanguageBuilder`)
+
+``` dart
+Tr((_) => Text('Hello @{name}'.tr)),
+```
+
 **Change the language:**
 
 ``` dart
 languageHelper.change(LanguageCodes.vi);
 ```
 
-**Add language data to the current data:**
+**Add a new language data:**
 
 ``` dart
 languageHelper.addData(newLanguageData);
 languageHelper.addDataOverrides(newLanguageDataOverrides);
 ```
 
-That methods have `activate` parameter which automaticaly rebuild all needed `LanguageBuilder`, so notice that you may get the `setState` issue because of the rebuilding of the `LanguageBuilder` when it's still building. If the error occurs, you may need to set it to `false` and activate the new data yourself by using `reload` method.
+The `addData` and `addDataOverrides` have `activate` parameter which automaticaly rebuild all needed `LanguageBuilder`, so notice that you may get the `setState` issue because of the rebuilding of the `LanguageBuilder` when it's still building. If the error occurs, you may need to set it to `false` and activate the new data yourself by using `reload` method.
 
 **Get list of implemented `LanguageCodes`s:**
 
@@ -157,54 +175,6 @@ final sub = languageHelper.stream.listen((code) => print(code));
 
 **Note:** Remember to `sub.cancel()` when it's not in use to avoid memory leaks.
 
-**Use builder to rebuild the widgets automatically on change:**
-
-- For all widget in your app:
-
-``` dart
-@override
-Widget build(BuildContext context) {
-  return LanguageBuilder(builder: (context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Hello'.tr),
-        ),
-        body: Center(
-          child: Column(
-            children: [
-              Text('Hello'.tr),
-              ElevatedButton(
-                onPressed: () {
-                  languageHelper.change(LanguageCodes.vi);
-                },
-                child: Text('Change language'.tr),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  });
-}
-```
-
-- For specific widget:
-
-``` dart
-LanguageBuilder(
-    builder: (context) {
-        return Text('Hello'.tr);
-    },
-),
-```
-
-- There is a short version of `LanguageBuilder` is `Tr`:
-
-``` dart
-Tr((_) => Text('Hello'.tr)),
-```
-
 **You can analyze the missing texts for all language with this function:**
 
 ``` dart
@@ -231,7 +201,7 @@ flutter: [Language Helper] ==================================================
 flutter: [Language Helper]
 ```
 
-**Optional:**
+**Language Helper Generator:**
 
 You can also create a base `LanguageData` by using [language_helper_generator](https://pub.dev/packages/language_helper_generator)'s command:
 
