@@ -103,14 +103,9 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class OtherPage extends StatefulWidget {
+class OtherPage extends StatelessWidget {
   const OtherPage({Key? key}) : super(key: key);
 
-  @override
-  State<OtherPage> createState() => _OtherPageState();
-}
-
-class _OtherPageState extends State<OtherPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,11 +116,7 @@ class _OtherPageState extends State<OtherPage> {
       ),
       body: Column(
         children: [
-          Tr(
-            (context) {
-              return Text('Text will be changed'.tr);
-            },
-          ),
+          Tr((_) => Text('Text will be changed'.tr)),
           Text('Text will be not changed'.tr),
           ElevatedButton(
             onPressed: () {
