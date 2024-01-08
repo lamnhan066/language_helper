@@ -1,3 +1,7 @@
+## 0.9.0+2
+
+* Improve README.
+
 ## 0.9.0+1
 
 * Improve the pub score.
