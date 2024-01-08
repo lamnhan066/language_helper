@@ -2,23 +2,23 @@
 
 [![codecov](https://codecov.io/gh/lamnhan066/language_helper/graph/badge.svg?token=AIGGNCGOVR)](https://codecov.io/gh/lamnhan066/language_helper)
 
-Easy way to implement multiple languages (localizations) into your app with minimal effort.
+An easy way to implement multiple languages (localizations) into your app with minimal effort.
 
 ## Features
 
-- Easy to control the language translations in your application. Automatically use the current device locale in the first open if possible.
+- Easy to control the language translations in your application. Automatically uses the current device locale upon first open, if possible.
 
 - You can completely control the translated text with `LanguageConditions`.
 
-- Supports analyzing which text is missing in specific language.
+- Supports analyzing which text is missing in a specific language.
 
-- Supports analyzing which text is in your app but not in your language data and vice versa.
+- Supports analyzing which text is in your app but not in your language data, and vice versa.
 
-- Supports extracting the needed text for translation from all the `.dart` files in your project with a single command `dart run language_helper:generate` (still in the early stages). Original package is [language_helper_generator](https://pub.dev/packages/language_helper_generator).
+- Supports extracting the needed text for translation from all `.dart` files in your project with a single command. `dart run language_helper:generate` (still in the early stages). Original package is [language_helper_generator](https://pub.dev/packages/language_helper_generator).
 
 ## Usage
 
-**Here is your translation (Can be created with `language_helper_generator`):**
+**Here is your translation (can be created with `language_helper_generator`):**
 
 ``` dart
 final en = {
@@ -46,7 +46,7 @@ LanguageData languageData = {
 };
 ```
 
-With the `LanguageConditions`, you can completely control which text is returned according to the condition of the parameters. You can use `'default'` or `'_'` to set the default value for the condition.
+With `LanguageConditions`, you can completely control which text is returned according to the parameters' conditions. You can use `'default'` or `'_'` to set the default value for the condition.
 
 **Initialize the data:**
 
@@ -56,13 +56,13 @@ final languageHelper = LanguageHelper.instance;
 main() async {
   // LanguageHelper should be initialized before calling `runApp`.
   await languageHelper.initial(
-      // This is [LanguageData] and it must be not empty.
+      // This is [LanguageData] and it must not be empty.
       data: languageData,
       // Like the `languageData` but with higher priority.
       dataOverrides: languageDataOverrides,
       // Default is set to the device locale (if available) or the first language of the `languageData`.
       initialCode: LanguageCodes.en,
-      // Change the app language when the device language is changed. Default is set to `true`.
+      // Changes the app language when the device language changes. Default is set to `true`.
       syncWithDevice: true,
   );
 
@@ -181,7 +181,7 @@ final sub = languageHelper.stream.listen((code) => print(code));
 languageHelper.analyze();
 ```
 
-This function will be automatically called in `initial` when the `isDebug` is `true`.
+This function will automatically be called in `initial` when `isDebug` is `true`.
 
 Here is the result from the Example:
 
@@ -249,9 +249,9 @@ final data = LanguageDataSerializer.fromJson(json);
 
 ## Additional Information
 
-- The app will try to use the `Devicelocale` to set the `initialCode` if it is not set, if the `Devicelocale` is unavailable, it will use the first language in `data` insteads.
+- The app will try to use the `Devicelocale` to set the `initialCode` if it is not set, if the `Devicelocale` is unavailable, it will use the first language in `data` instead.
 
-- No matter how many `LanguageBuilder` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageBuilder`, so it improves a lot of performances. And all `LanguageBuilder` widgets will be rebuilt at the same time. This setting can be changed with `forceRebuild` parameter in both `initial` for global setting and `LanguageBuilder` for local setting.
+- No matter how many `LanguageBuilder` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageBuilder`, so it significantly improves performance.. And all `LanguageBuilder` widgets will be rebuilt at the same time. This setting can be changed with `forceRebuild` parameter in both `initial` for global setting and `LanguageBuilder` for local setting.
 
 - The `LanguageCodes` contains all the languages with additional information like name in English (englishName) and name in native language (nativeName).
 
