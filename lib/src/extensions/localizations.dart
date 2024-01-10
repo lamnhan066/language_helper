@@ -9,9 +9,18 @@ extension LanguageLocalizations on LanguageHelper {
   ///     GlobalMaterialLocalizations.delegate
   ///      GlobalWidgetsLocalizations.delegate
   ///      GlobalCupertinoLocalizations.delegate
-  List<LocalizationsDelegate> get delegate => [
+  List<LocalizationsDelegate> get delegates => [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ];
+
+  /// Get the flutter default localizations
+  ///
+  /// Includes:
+  ///     GlobalMaterialLocalizations.delegate
+  ///      GlobalWidgetsLocalizations.delegate
+  ///      GlobalCupertinoLocalizations.delegat
+  @Deprecated('Use the `delegates` insteads')
+  List<LocalizationsDelegate> get delegate => delegates;
 }
