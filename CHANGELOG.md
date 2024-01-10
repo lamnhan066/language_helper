@@ -1,3 +1,12 @@
+## 0.10.0-rc
+
+* Bump `language_code` to 0.4.0 to support country code.
+  * **BREAKING CHANGE NOTE:** The method `.fromEnglishName` and `.fromNativeName` may be broken in this version with this [Changelog](https://pub.dev/packages/language_code/changelog).
+* Add an instruction for the `Language Helper Translator` with custom Chat GPT-4 in README.
+* Add `isOptionalCountryCode` paramenter to the `initial` method to control the country code behavior.
+* Deprecates `LanguageHelper.instance.delegate` -> `LanguageHelper.instance.delegates`.
+* Add tests.
+
 ## 0.9.0+2
 
 * Improve README.
