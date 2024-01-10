@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:language_code/language_code.dart';
 import 'package:language_helper/language_helper.dart';
@@ -481,6 +480,33 @@ void main() async {
       );
 
       expect(languageHelper.code, equals(LanguageCodes.vi));
+    });
+
+    test(
+        'true, the `languageCode_countryCode` not available in local database but the `languageCode` only is available and isOptionalCountryCode is true',
+        () async {
+      SharedPreferences.setMockInitialValues({});
+      LanguageCode.setTestCode(LanguageCodes.zh_TW);
+      await languageHelper.initial(
+        data: dataAdd,
+        syncWithDevice: true,
+      );
+
+      expect(languageHelper.code, equals(LanguageCodes.zh));
+    });
+
+    test(
+        'true, the `languageCode_countryCode` not available in local database but the `languageCode` only is available and isOptionalCountryCode is false',
+        () async {
+      SharedPreferences.setMockInitialValues({});
+      LanguageCode.setTestCode(LanguageCodes.zh_TW);
+      await languageHelper.initial(
+        data: dataAdd,
+        syncWithDevice: true,
+        isOptionalCountryCode: false,
+      );
+
+      expect(languageHelper.code, equals(LanguageCodes.en));
     });
 
     test('true and have local database but with no changed code', () async {
