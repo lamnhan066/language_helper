@@ -2,7 +2,7 @@
 
 [![codecov](https://codecov.io/gh/lamnhan066/language_helper/graph/badge.svg?token=AIGGNCGOVR)](https://codecov.io/gh/lamnhan066/language_helper)
 
-An easy way to implement multiple languages (localizations) into your app with minimal effort.
+Multi-language app tool with an efficient generator and a custom GPT-4 translator for easy localization.
 
 ## Features
 
@@ -10,11 +10,20 @@ An easy way to implement multiple languages (localizations) into your app with m
 
 - You can completely control the translated text with `LanguageConditions`.
 
-- Supports analyzing which text is missing in a specific language.
+- Supports analyzing which text is missing in a specific language or is in your app but not in your language data, and vice versa.
 
-- Supports analyzing which text is in your app but not in your language data, and vice versa.
+- Supports extracting the needed text for translation from all `.dart` files in your project with a single command (Not using `build_runner` nor custom parser so it very fast and reliable).
 
-- Supports extracting the needed text for translation from all `.dart` files in your project with a single command. `dart run language_helper:generate` (still in the early stages). Original package is [language_helper_generator](https://pub.dev/packages/language_helper_generator).
+- A `Language Helper Translator` on Chat GPT-4 that make it easier to translate the language data to a destination language.
+
+## Contents
+
+- [Usage](#usage)
+- [Language Helper Generator](#language-helper-generator)
+- [Language Data Serialization](#language-data-serialization)
+- [Language Helper Translator (A Custom Chat GPT-4)](#language-helper-translator-a-custom-chat-gpt-4)
+- [Additional Information](#additional-information)
+- [Contributions](#contributions)
 
 ## Usage
 
@@ -64,6 +73,9 @@ main() async {
       initialCode: LanguageCodes.en,
       // Changes the app language when the device language changes. Default is set to `true`.
       syncWithDevice: true,
+      // Try to ignore the country code in the Locale when the full code is not available 
+      // in the data.
+      isOptionalCountryCode: true,
   );
 
   runApp(const MyApp());
@@ -149,7 +161,7 @@ final codesBoth = languageHelper.codesBoth;
 
 ``` dart
 final translated = languageHelper.translate(
-    'Hello @{text}, @number', 
+    'Hello @{text}, @{number}', 
     toCode: LanguageCodes.en, // [Optional] Translate to specific language code
     params {'text' : 'World', 'number': '10'}, // [Optional] Translate with parameters
 );
@@ -160,12 +172,12 @@ final translated = languageHelper.translate(
 
 ``` dart
 final translated = 'Hello'.tr;
-final translatedParam = 'Hello @{text}, @number'.trP({'text': 'World', 'number': '10'});
-final translatedTo = 'Hello @{text}, @number'.trT(LanguageCodes.en);
-final translatedFull = 'Hello @{text}, @number'.trF(toCode: LanguageCodes.en, params: {'text': 'World', 'number': '10'});
+final translatedParam = 'Hello @{text}, @{number}'.trP({'text': 'World', 'number': '10'});
+final translatedTo = 'Hello @{text}, @{number}'.trT(LanguageCodes.en);
+final translatedFull = 'Hello @{text}, @{number}'.trF(toCode: LanguageCodes.en, params: {'text': 'World', 'number': '10'});
 ```
 
-**Note:** The `${param}` works in all cases, the `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
+**Note:** The `@{param}` works in all cases (We should use this way to avoid issues when translating). The `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
 
 Beside the `onChanged` method, you can listen to the language changed events by using `stream`:
 
@@ -185,7 +197,7 @@ This function will automatically be called in `initial` when `isDebug` is `true`
 
 Here is the result from the Example:
 
-``` cmd
+``` shell
 flutter: [Language Helper]
 flutter: [Language Helper] ==================================================
 flutter: [Language Helper]
@@ -201,17 +213,17 @@ flutter: [Language Helper] ==================================================
 flutter: [Language Helper]
 ```
 
-**Language Helper Generator:**
+## Language Helper Generator
 
-You can also create a base `LanguageData` by using [language_helper_generator](https://pub.dev/packages/language_helper_generator)'s command:
+You can create a base `LanguageData` by using [language_helper_generator](https://pub.dev/packages/language_helper_generator)'s command:
 
-``` cmd
+``` shell
 dart run language_helper:generate
 ```
 
 If you want to change the generating path, using this:
 
-``` cmd
+``` shell
 dart run language_helper:generate --path=./example/lib
 ```
 
@@ -233,7 +245,7 @@ The data will be generated with this format:
 
 - [language_data.dart](https://github.com/vnniz/language_helper_generator/tree/main/example/lib/resources/language_helper/language_data.dart): Modifiable language data because it's only generated 1 time.
 
-## LanguageData Serialization
+## Language Data Serialization
 
 Convert `LanguageData` to JSON:
 
@@ -247,6 +259,49 @@ Convert JSON to `LanguageData`:
 final data = LanguageDataSerializer.fromJson(json);
 ```
 
+## Language Helper Translator (A Custom Chat GPT-4)
+
+- Assume that here is our language data:
+
+```dart
+final en = {
+  'Hello @{name}': 'Hello @{name}',
+  'We have @{number} dollar': LanguageCondition(
+    param: 'number',
+    conditions: {
+      '0': 'We have zero dollar',
+      '1': 'We have one dollar',
+
+      // Default value.
+      '_': 'We have @{number} dollars',
+    }
+  ),
+};
+```
+
+- Go to [Language Helper Translator](https://chat.openai.com/g/g-qoPMopEAb-language-helper-translator). You should open a New Chat a few times to let the AI read the instructions carefully to improve the translation (just my personal experience).
+- Use this template to translate the data. Be sure to replace `[]` with the appropriate infomation:
+
+```dart
+This is the translation of the [app/game] that [purpose of the app/game to help the AI understand the context]. Translate it into [destination language]:
+
+final en = {
+  'Hello @{name}': 'Hello @{name}',
+  'We have @{number} dollar': LanguageCondition(
+    param: 'number',
+    conditions: {
+      '0': 'We have zero dollar',
+      '1': 'We have one dollar',
+
+      // Default value.
+      '_': 'We have @{number} dollars',
+    }
+  ),
+};
+```
+
+- The GPT will keeps all keys and comments in their original text, positions them exactly as they appear in the source, keeps the @{param} and @param in their appropriate places during the translation.
+
 ## Additional Information
 
 - The app will try to use the `Devicelocale` to set the `initialCode` if it is not set, if the `Devicelocale` is unavailable, it will use the first language in `data` instead.
@@ -254,6 +309,10 @@ final data = LanguageDataSerializer.fromJson(json);
 - No matter how many `LanguageBuilder` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageBuilder`, so it significantly improves performance.. And all `LanguageBuilder` widgets will be rebuilt at the same time. This setting can be changed with `forceRebuild` parameter in both `initial` for global setting and `LanguageBuilder` for local setting.
 
 - The `LanguageCodes` contains all the languages with additional information like name in English (englishName) and name in native language (nativeName).
+
+- The `@{param}` works in all cases (We should use this way to avoid issues when translating). The `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
+
+- The `addData` and `addDataOverrides` have `activate` parameter which automaticaly rebuild all needed `LanguageBuilder`, so notice that you may get the `setState` issue because of the rebuilding of the `LanguageBuilder` when it's still building. If the error occurs, you may need to set it to `false` and activate the new data yourself by using `reload` method.
 
 ## Contributions
 
