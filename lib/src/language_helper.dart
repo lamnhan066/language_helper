@@ -169,11 +169,13 @@ class LanguageHelper {
     /// Otherwise, keep the current app language even if the device language changes.
     bool syncWithDevice = true,
 
-    /// Ignore the country code in the Locale when there is no available code
-    /// in the data.
+    /// Attempts to handle Locale codes with optional country specification.
+    /// When a full Locale code (including country code) is not available in the data,
+    /// this method will fallback to using just the language code.
     ///
-    /// Ex: when the inputted code is `zh_CN` and unavailable in our data, we will
-    /// try using the `zh` to set the language.
+    /// For example, if 'zh_CN' (Chinese, China) is not available,
+    /// it will try using 'zh' (Chinese) to set the language.
+    /// Set 'isOptionalCountryCode' to true to enable this behavior.
     bool isOptionalCountryCode = true,
 
     /// Callback on language changed.
