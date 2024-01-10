@@ -97,12 +97,14 @@ class LanguageHelper {
   bool get isDebug => _isDebug;
   bool _isDebug = false;
 
+  /// Language code preferences key
   @visibleForTesting
   String get codeKey => _codeKey;
 
   /// Language code preferences key
   static const _codeKey = 'LanguageHelper.AutoSaveCode';
 
+  /// Language code of the device
   @visibleForTesting
   String get deviceCodeKey => _deviceCodeKey;
 
@@ -167,6 +169,13 @@ class LanguageHelper {
     /// Otherwise, keep the current app language even if the device language changes.
     bool syncWithDevice = true,
 
+    /// Ignore the country code in the Locale when there is no available code
+    /// in the data.
+    ///
+    /// Ex: when the inputted code is `zh_CN` and unavailable in our data, we will
+    /// try using the `zh` to set the language.
+    bool isOptionalCountryCode = true,
+
     /// Callback on language changed.
     void Function(LanguageCodes code)? onChanged,
 
@@ -189,7 +198,7 @@ class LanguageHelper {
     _analysisKeys = analysisKeys;
     _initialCode = initialCode;
 
-    LanguageCodes? finalCode = initialCode;
+    LanguageCodes finalCode = _initialCode ?? LanguageCode.code;
 
     // Try to reload from memory if `isAutoSave` is `true`
     if (_isAutoSave) {
@@ -204,17 +213,21 @@ class LanguageHelper {
       }
     }
 
-    // Sync with device language
+    // Try to get the device language code if `syncWithDevice` is `true`
     if (_syncWithDevice) {
       final prefs = await SharedPreferences.getInstance();
       final prefCodeCode = prefs.getString(_deviceCodeKey);
       final currentCode = LanguageCode.code;
 
       if (prefCodeCode == null) {
+        // Sync with device only track the changing of the device language,
+        // so it will not use the device language for the app at the first time.
         prefs.setString(_deviceCodeKey, currentCode.code);
         printDebug(
             'Sync with device saved the current language to local database.');
       } else {
+        // We only consider to change the app language when the device language
+        // is changed. So it will not affect the app language that is set by the user.
         final prefCode = LanguageCodes.fromCode(prefCodeCode);
         if (currentCode != prefCode) {
           finalCode = currentCode;
@@ -226,24 +239,30 @@ class LanguageHelper {
       }
     }
 
-    if (finalCode == null) {
-      // Try to set by the default code from device
-      final currentCode = LanguageCode.code;
-      if (codesBoth.contains(currentCode)) {
-        finalCode = currentCode;
-        printDebug('Set current language code to $finalCode by device locale');
-      } else if (codes.isNotEmpty) {
-        finalCode = codes.first;
-        printDebug('Set current language code to $finalCode');
-      }
-    } else {
-      finalCode = finalCode;
-    }
-
     if (!codesBoth.contains(finalCode)) {
-      printDebug(
-          'language does not contain the $finalCode => Change the code to ${codes.first}');
-      finalCode = codes.first;
+      LanguageCodes? tempCode;
+      if (isOptionalCountryCode && finalCode.locale.countryCode != null) {
+        // Try to use the `languageCode` only if the `languageCode_countryCode`
+        // is not available
+        printDebug(
+            'language does not contain the $finalCode => Try to use the `languageCode` only..');
+        try {
+          tempCode = LanguageCodes.fromCode(finalCode.locale.languageCode);
+          if (!codesBoth.contains(tempCode)) {
+            tempCode = null;
+          }
+        } catch (_) {}
+      }
+
+      if (tempCode == null) {
+        printDebug(
+            'Unable to use the `languageCode` only => Change the code to ${codes.first}');
+      } else {
+        printDebug(
+            'Able to use the `languageCode` only => Change the code to $tempCode');
+      }
+
+      finalCode = tempCode ?? codes.first;
     }
 
     printDebug('Set currentCode to $finalCode');
