@@ -73,8 +73,9 @@ main() async {
       initialCode: LanguageCodes.en,
       // Changes the app language when the device language changes. Default is set to `true`.
       syncWithDevice: true,
-      // Try to ignore the country code in the Locale when the full code is not available 
-      // in the data.
+      // Attempts to handle Locale codes with optional country specification.
+      // When a full Locale code (including country code) is not available in the data,
+      // this method will fallback to using just the language code.
       isOptionalCountryCode: true,
   );
 
@@ -177,7 +178,7 @@ final translatedTo = 'Hello @{text}, @{number}'.trT(LanguageCodes.en);
 final translatedFull = 'Hello @{text}, @{number}'.trF(toCode: LanguageCodes.en, params: {'text': 'World', 'number': '10'});
 ```
 
-**Note:** The `@{param}` works in all cases (We should use this way to avoid issues when translating). The `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
+**Note:** The `@{param}` works in all cases (We should use this way to avoid issues when translating with `Language Helper Translator`). The `@param` only work if the text ends with a white space, end of line, or end with a new line.
 
 Beside the `onChanged` method, you can listen to the language changed events by using `stream`:
 
@@ -310,7 +311,7 @@ final en = {
 
 - The `LanguageCodes` contains all the languages with additional information like name in English (englishName) and name in native language (nativeName).
 
-- The `@{param}` works in all cases (We should use this way to avoid issues when translating). The `@param` only work if the text ends with a white space, the end of a line, or the end of a new line.
+- The `@{param}` works in all cases (We should use this way to avoid issues when translating with `Language Helper Translator`). The `@param` only work if the text ends with a white space, end of line, or end with a new line.
 
 - The `addData` and `addDataOverrides` have `activate` parameter which automaticaly rebuild all needed `LanguageBuilder`, so notice that you may get the `setState` issue because of the rebuilding of the `LanguageBuilder` when it's still building. If the error occurs, you may need to set it to `false` and activate the new data yourself by using `reload` method.
 
