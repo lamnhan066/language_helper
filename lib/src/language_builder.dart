@@ -44,37 +44,30 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   }
 
   @override
-  void didChangeDependencies() {
+  void initState() {
     final getRoot = _of(
       context,
       widget.forceRebuild == true ||
           (widget.forceRebuild == null && _languageHelper._forceRebuild),
     );
 
-    if (getRoot == null) {
-      printDebug(
-          'Cannot find the root context of this context. Add $this to states');
-      _languageHelper._states.add(this);
-
-      // Because the Widget trees are built from a higher level to a lower level,
-      // so all the posible `root` widgets have definitely been added to the list
-      // of the states. So this code is redundant.
-      //
-      // } else if (!_languageHelper._states.contains(getRoot)) {
-      //   printDebug('Added root context $getRoot to LanguageHelper states');
-      //   _languageHelper._states.add(getRoot);
+    // Because the Widget trees are built from a higher level to a lower level,
+    // so all the posible `root` widgets have definitely been added to the list
+    // of the states. So we just need to add the state that its' parent is null.
+    if (getRoot == null && _languageHelper._states.add(this)) {
+      printDebug('Added $this to the states');
     } else {
-      printDebug('This root context $this was already contained in states');
+      printDebug('$this was already contained in the states');
     }
 
     printDebug('Length of the states: ${_languageHelper._states.length}');
 
-    super.didChangeDependencies();
+    super.initState();
   }
 
   @override
   void dispose() {
-    printDebug('Removed $this from LanguageHelper states');
+    printDebug('Removed $this from the states');
     _languageHelper._states.remove(this);
     super.dispose();
   }

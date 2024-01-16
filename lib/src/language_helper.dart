@@ -16,7 +16,7 @@ class LanguageHelper {
   static LanguageHelper instance = LanguageHelper._();
 
   /// To control [LanguageBuilder]
-  final List<UpdateLanguage> _states = [];
+  final Set<UpdateLanguage> _states = {};
 
   /// Private instance
   LanguageHelper._();
