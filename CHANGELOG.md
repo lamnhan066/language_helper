@@ -1,3 +1,7 @@
+## 0.10.0-rc.1
+
+* Improve the `LanguageBuilder` behavior to avoid the dupplicated state issue.
+
 ## 0.10.0-rc
 
 * Bump `language_code` to 0.4.0 to support country code.

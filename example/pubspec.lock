@@ -171,7 +171,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.9.0+2"
+    version: "0.10.0-rc"
   language_helper_generator:
     dependency: transitive
     description:
