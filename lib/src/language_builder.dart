@@ -38,31 +38,32 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   }
 
   /// Get the root state
-  static _LanguageBuilderState? _of(BuildContext context, bool forceRebuild) {
-    if (forceRebuild) return null;
+  static _LanguageBuilderState? _of(BuildContext context) {
     return context.findRootAncestorStateOfType<_LanguageBuilderState>();
   }
 
   @override
   void initState() {
-    final getRoot = _of(
-      context,
-      widget.forceRebuild == true ||
-          (widget.forceRebuild == null && _languageHelper._forceRebuild),
-    );
-
-    // Because the Widget trees are built from a higher level to a lower level,
-    // so all the posible `root` widgets have definitely been added to the list
-    // of the states. So we just need to add the state that its' parent is null.
-    if (getRoot == null && _languageHelper._states.add(this)) {
-      printDebug('Added $this to the states');
-    } else {
-      printDebug('$this was already contained in the states');
-    }
-
-    printDebug('Length of the states: ${_languageHelper._states.length}');
-
     super.initState();
+    if ((widget.forceRebuild == true ||
+        (widget.forceRebuild == null && _languageHelper._forceRebuild))) {
+      if (_languageHelper._states.add(this)) {
+        printDebug(
+            'Added $this to the states because the `forceRebuild` is `true`');
+      }
+    } else {
+      final getRoot = _of(context);
+
+      // Because the Widget trees are built from a higher level to a lower level,
+      // so all the posible `root` widgets have definitely been added to the list
+      // of the states. So we just need to add the state that its' parent is null.
+      if (getRoot == null && _languageHelper._states.add(this)) {
+        printDebug('Added $this to the states');
+      } else {
+        printDebug('$this was already contained in the states');
+      }
+    }
+    printDebug('Length of the states: ${_languageHelper._states.length}');
   }
 
   @override

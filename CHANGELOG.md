@@ -1,3 +1,7 @@
+## 0.10.0-rc.2
+
+* Improve the `forceRebuild` logic.
+
 ## 0.10.0-rc.1
 
 * Improve the `LanguageBuilder` behavior to avoid the dupplicated state issue.
