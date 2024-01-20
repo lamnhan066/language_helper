@@ -1,3 +1,8 @@
+## 0.10.0
+
+* Promote to stable.
+* This release includes the **BREAKING CHANGE**.
+
 ## 0.10.0-rc.2
 
 * Improve the `forceRebuild` logic.

@@ -1,6 +1,6 @@
 name: language_helper
 description: Multi-language app tool with an efficient generator and a custom GPT-4 translator for easy localization.
-version: 0.10.0-rc.2
+version: 0.10.0
 homepage: https://github.com/lamnhan066/language_helper
 
 environment:
