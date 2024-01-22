@@ -8,8 +8,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await LanguageHelper.instance.initial(
-    data: languageData,
-    analysisKeys: analysisLanguageData.keys,
+    data: LanguageDataProvider.data(languageData),
+    analysisKeys: analysisLanguageData.keys.toSet(),
     initialCode: LanguageCodes.en,
     isDebug: !kReleaseMode,
   );
@@ -86,9 +86,17 @@ class _MyAppState extends State<MyApp> {
               Text('This is a contains variable line $mounted'.tr),
               ElevatedButton(
                 onPressed: () {
-                  LanguageHelper.instance.addData(languageDataAdd);
+                  LanguageHelper.instance
+                      .addData(LanguageDataProvider.data(languageDataAdd));
                 },
                 child: Text('This text will be changed when the data added'.tr),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  LanguageHelper.instance.data.exportJson(
+                      '/Users/thanhnhan/Documents/Development/Projects/Flutter Plugin/language_helper/example');
+                },
+                child: Text('Export JSON'.tr),
               ),
             ],
           ),
