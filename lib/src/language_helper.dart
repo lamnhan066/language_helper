@@ -12,14 +12,17 @@ part 'language_builder.dart';
 
 /// Make it easier for you to control multiple languages in your app
 class LanguageHelper {
-  // Get LanguageHelper instance
-  static LanguageHelper instance = LanguageHelper._();
+  // Get the LanguageHelper instance
+  static LanguageHelper instance = LanguageHelper('LanguageHelper');
 
   /// To control [LanguageBuilder]
   final Set<UpdateLanguage> _states = {};
 
-  /// Private instance
-  LanguageHelper._();
+  /// Create a new instance with a modified `prefix` for `SharedPreferences`.
+  LanguageHelper(this.prefix);
+
+  /// Prefix of the key to save the data to `SharedPreferences`.
+  final String prefix;
 
   /// Get all languages
   final LanguageData _data = {};
@@ -107,17 +110,17 @@ class LanguageHelper {
 
   /// Language code preferences key
   @visibleForTesting
-  String get codeKey => _codeKey;
+  String get codeKey => _autoSaveCodeKey;
 
   /// Language code preferences key
-  static const _codeKey = 'LanguageHelper.AutoSaveCode';
+  String get _autoSaveCodeKey => '$prefix.AutoSaveCode';
 
   /// Language code of the device
   @visibleForTesting
   String get deviceCodeKey => _deviceCodeKey;
 
   /// Language code of the device
-  static const _deviceCodeKey = 'LanguageHelper.DeviceCode';
+  String get _deviceCodeKey => '$prefix.DeviceCode';
 
   /// Initialize the plugin with the List of [data] that you have created,
   /// you can set the [initialCode] for this app or it will get the first
@@ -216,8 +219,8 @@ class LanguageHelper {
     if (_isAutoSave) {
       final prefs = await SharedPreferences.getInstance();
 
-      if (prefs.containsKey(_codeKey)) {
-        final code = prefs.getString(_codeKey);
+      if (prefs.containsKey(_autoSaveCodeKey)) {
+        final code = prefs.getString(_autoSaveCodeKey);
 
         if (code != null && code.isNotEmpty) {
           finalCode = LanguageCodes.fromCode(code);
@@ -280,12 +283,12 @@ class LanguageHelper {
     printDebug('Set `currentCode` to $finalCode');
     _currentCode = finalCode;
 
-    _data.addAll(await _dataProvider.get(_currentCode!));
-    _dataOverrides.addAll(await _dataOverridesProvider.get(_currentCode!));
+    _data.addAll(await _getData(_currentCode!));
+    _dataOverrides.addAll(await _getDataOverrides(_currentCode!));
 
-    // if (_isDebug) {
-    //   analyze();
-    // }
+    if (_isDebug) {
+      analyze();
+    }
   }
 
   /// Dispose all the controllers
@@ -305,9 +308,10 @@ class LanguageHelper {
     bool overwrite = true,
     bool activate = true,
   }) async {
-    final getData = await data.get(_currentCode!);
+    final getData = await data.getData(_currentCode!);
     _addData(data: getData, database: _data, overwrite: overwrite);
     _codes.addAll(await data.getSupportedCodes());
+    _saveData();
     if (activate) change(code);
     printDebug(
         'The new `data` is added and activated with overwrite is $overwrite');
@@ -325,9 +329,10 @@ class LanguageHelper {
     bool overwrite = true,
     bool activate = true,
   }) async {
-    final getData = await dataOverrides.get(_currentCode!);
+    final getData = await dataOverrides.getData(_currentCode!);
     _addData(data: getData, database: _dataOverrides, overwrite: overwrite);
     _codesOverrides.addAll(await dataOverrides.getSupportedCodes());
+    _saveDataOverrides();
     if (activate) change(code);
     printDebug(
         'The new `dataOverrides` is added and activated with overwrite is $overwrite');
@@ -402,8 +407,8 @@ class LanguageHelper {
     if (!_data.containsKey(_currentCode)) {
       _data.clear();
       _dataOverrides.clear();
-      _data.addAll(await _dataProvider.get(_currentCode!));
-      _dataOverrides.addAll(await _dataOverridesProvider.get(_currentCode!));
+      _data.addAll(await _getData(_currentCode!));
+      _dataOverrides.addAll(await _getDataOverrides(_currentCode!));
     }
 
     printDebug('Change language to $toCode for ${_states.length} states');
@@ -420,7 +425,7 @@ class LanguageHelper {
     if (_isAutoSave) {
       printDebug('Save this $toCode to local memory');
       SharedPreferences.getInstance().then((pref) {
-        pref.setString(_codeKey, toCode.code);
+        pref.setString(_autoSaveCodeKey, toCode.code);
       });
     }
 
@@ -434,6 +439,7 @@ class LanguageHelper {
 
   /// Analyze the [_data] so you can know which ones are missing what text.
   /// The results will be print in the console log with the below format:
+
   ///
   /// Result:
   ///   LanguageCodes.en:
@@ -454,6 +460,9 @@ class LanguageHelper {
 
     // Add all keys to [keys]
     for (final code in codes) {
+      if (!_data.containsKey(code)) {
+        return 'Can analyze the data from `LanguageDataProvider.data` only';
+      }
       for (final key in _data[code]!.keys) {
         if (!keys.contains(key)) keys.add(key);
       }
@@ -516,6 +525,37 @@ class LanguageHelper {
     printDebug(buffer.toString());
 
     return buffer.toString();
+  }
+
+  Future<LanguageData> _getData(LanguageCodes code) async {
+    var data = await _dataProvider.getData(code);
+    if (data.isEmpty) {
+      data = await LanguageDataProvider.getSavedData(code, '$prefix.Data');
+    } else {
+      LanguageDataProvider.saveData(code, '$prefix.Data', data);
+    }
+
+    return data;
+  }
+
+  Future<void> _saveData() async {
+    LanguageDataProvider.saveData(code, '$prefix.Data', data);
+  }
+
+  Future<LanguageData> _getDataOverrides(LanguageCodes code) async {
+    var data = await _dataOverridesProvider.getData(code);
+    if (data.isEmpty) {
+      data = await LanguageDataProvider.getSavedData(
+          code, '$prefix.DataOverrides');
+    } else {
+      LanguageDataProvider.saveData(code, '$prefix.DataOverrides', data);
+    }
+
+    return data;
+  }
+
+  Future<void> _saveDataOverrides() async {
+    LanguageDataProvider.saveData(code, '$prefix.DataOverrides', data);
   }
 
   /// Replace @{param} or @param with the real text

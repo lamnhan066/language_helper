@@ -32,4 +32,10 @@ extension LanguageDataSerializer on LanguageData {
   static LanguageData fromMap(Map<String, dynamic> map) {
     return s.languageDataFromMap(map);
   }
+
+  /// Convert the JSON with values-only to Map<String, dynamic> where `dynamic`
+  /// is `String` or `LanguageConditions`.
+  static Map<String, dynamic> valuesFromJson(String json) {
+    return s.languageDataValuesFromMap(jsonDecode(json));
+  }
 }

@@ -22,18 +22,22 @@ Map<String, dynamic> languageDataToMap(LanguageData data) {
 LanguageData languageDataFromMap(Map<String, dynamic> map) {
   return map.map((key, value) {
     // Reorganize the `value` back to String and LanguageCondition
-    value = (value as Map<String, dynamic>).map((key, value) {
-      //  Try to decode the data back to the LanguageCondition
-      if (value is Map) {
-        return MapEntry(
-          key,
-          LanguageConditions.fromMap(value.cast<String, dynamic>()),
-        );
-      }
-
-      return MapEntry(key, value);
-    });
+    value = languageDataValuesFromMap(value);
     return MapEntry(LanguageCodes.fromCode(key), value.cast<String, dynamic>());
+  });
+}
+
+Map<String, dynamic> languageDataValuesFromMap(Map<String, dynamic> map) {
+  return map.map((key, value) {
+    //  Try to decode the data back to the LanguageCondition
+    if (value is Map) {
+      return MapEntry(
+        key,
+        LanguageConditions.fromMap(value.cast<String, dynamic>()),
+      );
+    }
+
+    return MapEntry(key, value);
   });
 }
 
@@ -49,10 +53,12 @@ void exportJson(LanguageData data, String path) {
 void _exportJsonCodes(LanguageData data, String path) {
   printDebug('Creating codes.json...');
 
+  JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+
   final desFile = File('$path/resources/language_helper/json/codes.json');
   desFile.createSync(recursive: true);
   final codes = data.keys.map((e) => e.code).toList();
-  desFile.writeAsStringSync(jsonEncode(codes));
+  desFile.writeAsStringSync(encoder.convert(codes));
 
   printDebug('Created codes.json');
 }
@@ -60,12 +66,14 @@ void _exportJsonCodes(LanguageData data, String path) {
 void _exportJsonLanguages(LanguageData data, String path) {
   printDebug('Creating languages json files...');
 
+  JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+
   final desPath = '$path/resources/language_helper/json/languages/';
   final map = languageDataToMap(data);
   for (final MapEntry(key: String key, value: dynamic value) in map.entries) {
     final desFile = File('$desPath$key.json');
     desFile.createSync(recursive: true);
-    final data = jsonEncode({key: value});
+    final data = encoder.convert(value);
     desFile.writeAsStringSync(data);
   }
 
