@@ -631,12 +631,12 @@ void main() async {
   group('Language Data Provider from - ', () {
     test('asset', () async {
       exportJson(languageHelper.data, './test');
-      const data =
+      final data =
           LanguageDataProvider.asset('./test/resources/language_helper/json');
 
       final codes = await data.getSupportedCodes();
       expect(codes, equals({LanguageCodes.en, LanguageCodes.vi}));
-      final languages = await data.get(LanguageCodes.en);
+      final languages = await data.getData(LanguageCodes.en);
       final first = languages.entries.first;
       expect(first.key, equals(LanguageCodes.en));
       expect(first.value, equals(isNotEmpty));
@@ -650,7 +650,7 @@ void main() async {
 
       final codes = await data.getSupportedCodes();
       expect(codes, equals({LanguageCodes.en, LanguageCodes.vi}));
-      final languages = await data.get(LanguageCodes.en);
+      final languages = await data.getData(LanguageCodes.en);
       final first = languages.entries.first;
       expect(first.key, equals(LanguageCodes.en));
       expect(first.value, equals(isNotEmpty));
