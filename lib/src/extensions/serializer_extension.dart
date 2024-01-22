@@ -14,13 +14,13 @@ extension LanguageDataSerializer on LanguageData {
   ///
   /// Generated path:
   /// `path`
-  ///     |- resources
-  ///         |- language_helper
-  ///             |- json
-  ///                 |- codes.json
-  ///                 |- languages
-  ///                     |- en.json
-  ///                     |- vi.json
+  ///  |- resources
+  ///  |  |- language_helper
+  ///  |  |  |- json
+  ///  |  |  |  |- codes.json
+  ///  |  |  |  |  |- languages
+  ///  |  |  |  |  |  |- en.json
+  ///  |  |  |  |  |  |- vi.json
   void exportJson([String path = '.']) => s.exportJson(this, path);
 
   /// Convert the JSON back to the [LanguageData]

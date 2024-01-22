@@ -41,6 +41,15 @@ Map<String, dynamic> languageDataValuesFromMap(Map<String, dynamic> map) {
   });
 }
 
+/// Generated path:
+/// `path`
+///  |- resources
+///  |  |- language_helper
+///  |  |  |- json
+///  |  |  |  |- codes.json
+///  |  |  |  |  |- languages
+///  |  |  |  |  |  |- en.json
+///  |  |  |  |  |  |- vi.json
 void exportJson(LanguageData data, String path) {
   printDebug('===========================================================');
   printDebug('Exporting Json...');
