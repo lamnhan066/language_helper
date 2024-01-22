@@ -5,10 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:language_code/language_code.dart';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper/src/mixins/update_language.dart';
+import 'package:language_helper/src/utils/serializer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'language_data.dart';
-import 'update_language_mock.dart';
+import 'mocks.dart';
 import 'widgets.dart';
 
 void main() async {
@@ -47,7 +48,7 @@ void main() async {
       });
       await languageHelper.initial(
         data: data,
-        analysisKeys: data.entries.first.value.keys,
+        analysisKeys: languageHelper.data.entries.first.value.keys.toSet(),
         useInitialCodeWhenUnavailable: false,
         isDebug: true,
         onChanged: (value) {
@@ -139,7 +140,8 @@ void main() async {
     });
 
     test('Get the first code in `data` if current locale is not available', () {
-      expect(languageHelper.code, equals(data.entries.first.key));
+      expect(
+          languageHelper.code, equals(languageHelper.data.entries.first.key));
     });
   });
 
@@ -160,8 +162,8 @@ void main() async {
       };
 
       await languageHelper.initial(
-        data: data,
-        dataOverrides: dataOverrides,
+        data: LanguageDataProvider.data(data),
+        dataOverrides: LanguageDataProvider.data(dataOverrides),
         useInitialCodeWhenUnavailable: false,
         isAutoSave: false,
         isDebug: true,
@@ -185,8 +187,8 @@ void main() async {
       };
 
       await languageHelper.initial(
-        data: data,
-        dataOverrides: dataOverrides,
+        data: LanguageDataProvider.data(data),
+        dataOverrides: LanguageDataProvider.data(dataOverrides),
         useInitialCodeWhenUnavailable: false,
         isAutoSave: false,
         isDebug: true,
@@ -205,7 +207,7 @@ void main() async {
       SharedPreferences.setMockInitialValues({});
       await languageHelper.initial(
         data: data,
-        analysisKeys: analysisRemovedKeys,
+        analysisKeys: analysisRemovedKeys.toSet(),
         initialCode: LanguageCodes.cu,
         useInitialCodeWhenUnavailable: false,
         isAutoSave: false,
@@ -444,12 +446,12 @@ void main() async {
     });
 
     test('LanguageData ToJson and FromJson', () {
-      toJson = data.toJson();
+      toJson = languageHelper.data.toJson();
       expect(toJson, isA<String>());
 
       fromJson = LanguageDataSerializer.fromJson(toJson);
-      for (final key in data.keys) {
-        expect(data[key], equals(fromJson[key]));
+      for (final key in languageHelper.data.keys) {
+        expect(languageHelper.data[key], equals(fromJson[key]));
       }
       expect(fromJson.toJson(), equals(toJson));
     });
@@ -598,8 +600,10 @@ void main() async {
 
   /// This test have to be the last test because it will change the value of the database.
   group('Unit test for methods', () {
-    test('Add data with overwrite is false', () {
-      languageHelper.addData(dataAdd, overwrite: false);
+    test('Add data with overwrite is false', () async {
+      // print(languageHelper.data);
+      await languageHelper.addData(dataAdd, overwrite: false);
+      // print(languageHelper.data);
       languageHelper.reload();
 
       final addedData = languageHelper.data[LanguageCodes.en]!;
@@ -614,13 +618,49 @@ void main() async {
         dataOverrides: dataOverrides,
         initialCode: LanguageCodes.en,
       );
-      languageHelper.addDataOverrides(dataAdd, overwrite: true);
+      await languageHelper.addDataOverrides(dataAdd, overwrite: true);
       languageHelper.reload();
 
       final addedData = languageHelper.dataOverrides[LanguageCodes.en]!;
       expect(addedData, contains('Hello add'));
       expect(addedData['Hello'], isNot(equals('Hello')));
       expect(addedData['Hello'], equals('HelloOverwrite'));
+    });
+  });
+
+  group('Language Data Provider from - ', () {
+    test('asset', () async {
+      exportJson(languageHelper.data, './test');
+      const data =
+          LanguageDataProvider.asset('./test/resources/language_helper/json');
+
+      final codes = await data.getSupportedCodes();
+      expect(codes, equals({LanguageCodes.en, LanguageCodes.vi}));
+      final languages = await data.get(LanguageCodes.en);
+      final first = languages.entries.first;
+      expect(first.key, equals(LanguageCodes.en));
+      expect(first.value, equals(isNotEmpty));
+    });
+
+    test('network', () async {
+      final data = LanguageDataProvider.network(
+        'https://pub.lamnhan.dev/language_helper/json',
+        client: MockClient(),
+      );
+
+      final codes = await data.getSupportedCodes();
+      expect(codes, equals({LanguageCodes.en, LanguageCodes.vi}));
+      final languages = await data.get(LanguageCodes.en);
+      final first = languages.entries.first;
+      expect(first.key, equals(LanguageCodes.en));
+      expect(first.value, equals(isNotEmpty));
+    });
+  });
+
+  group('Verify variables', () {
+    test('locales == codes', () {
+      final locales = languageHelper.codesBoth.map((e) => e.locale);
+      expect(locales, equals(languageHelper.locales));
     });
   });
 }
