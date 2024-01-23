@@ -91,13 +91,6 @@ class _MyAppState extends State<MyApp> {
                 },
                 child: Text('This text will be changed when the data added'.tr),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  LanguageHelper.instance.data.exportJson(
-                      '/Users/thanhnhan/Documents/Development/Projects/Flutter Plugin/language_helper/example');
-                },
-                child: Text('Export JSON'.tr),
-              ),
             ],
           ),
         ),
