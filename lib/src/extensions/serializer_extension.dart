@@ -10,10 +10,24 @@ extension LanguageDataSerializer on LanguageData {
   /// Conver this [LanguageData] to Map
   Map<String, dynamic> toMap() => s.languageDataToMap(this);
 
-  /// Export to json files for `LanguageDataProvider`. Default `path` is set to '.'.
+  /// Export to json files for `LanguageDataProvider`. Default `path` is set to './lib'.
+  ///
+  /// We need a little trick to run this script to get the expected result:
+  /// - Create a `export_json.dart` file in your `test` folder.
+  /// - Add the below code:
+  ///
+  /// ```dart
+  /// void main() {
+  ///   test('', () {
+  ///     languageData.exportJson('./lib');
+  ///   });
+  /// }
+  /// ```
+  /// - Add the missed `import`.
+  /// - Run `flutter test ./test/export_json.dart`.
   ///
   /// Generated path:
-  /// `path`
+  /// [path]
   ///  |- resources
   ///  |  |- language_helper
   ///  |  |  |- json
@@ -21,7 +35,8 @@ extension LanguageDataSerializer on LanguageData {
   ///  |  |  |  |  |- languages
   ///  |  |  |  |  |  |- en.json
   ///  |  |  |  |  |  |- vi.json
-  void exportJson([String path = '.']) => s.exportJson(this, path);
+  ///  |  |  |  |  |  |- ...
+  void exportJson([String path = './lib']) => s.exportJson(this, path);
 
   /// Convert the JSON back to the [LanguageData]
   static LanguageData fromJson(String json) {
