@@ -1,20 +1,29 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:language_helper/language_helper.dart';
+import 'package:language_helper/src/utils/print_debug.dart';
 import 'package:language_helper/src/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LanguageDataProvider {
+  static Future<String> _loadAsset(String path) async {
+    try {
+      return await rootBundle.loadString(path);
+    } catch (_) {
+      printDebug('The $path does not exist in the assets');
+    }
+    return Future.value('');
+  }
+
   static Future<LanguageData> _asset({
     required Uri uri,
     required LanguageCodes code,
   }) async {
-    final file = File.fromUri(uri);
-    if (await file.exists()) {
-      String json = await File.fromUri(uri).readAsString();
+    String json = await _loadAsset(uri.path);
+    if (json.isNotEmpty) {
       return {code: LanguageDataSerializer.valuesFromJson(json)};
     }
     return {};
@@ -122,7 +131,7 @@ class LanguageDataProvider {
     }, () async {
       String path = Utils.removeLastSlash(parentPath);
       final uri = Uri.parse('$path/codes.json');
-      final json = await File.fromUri(uri).readAsString();
+      final json = await _loadAsset(uri.path);
       final decoded = jsonDecode(json).cast<String>() as List<String>;
       final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
       return Future.value(set);
