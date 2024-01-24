@@ -46,6 +46,11 @@ void main() async {
     languageSub?.cancel();
   });
 
+  test('Test with empty data', () async {
+    await languageHelper.initial(data: []);
+    expect(languageHelper.code, equals(LanguageCodes.en));
+  });
+
   group('Test with SharedPreferences', () {
     setUp(() async {
       SharedPreferences.setMockInitialValues({
