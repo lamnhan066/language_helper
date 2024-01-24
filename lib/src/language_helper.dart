@@ -124,7 +124,7 @@ class LanguageHelper {
 
   /// Initialize the plugin with the List of [data] that you have created,
   /// you can set the [initialCode] for this app or it will get the first
-  /// language in [data], so **[data] must be not empty**. You can also set
+  /// language in [data], the [LanguageCodes.en] will be added when the `data` is empty. You can also set
   /// the [forceRebuild] to `true` if you want to rebuild all the [LanguageBuilder]
   /// widgets, not only the root widget (it will decreases the performance of the app).
   /// The [onChanged] callback will be called when the language is changed.
@@ -210,9 +210,10 @@ class LanguageHelper {
     _analysisKeys = analysisKeys;
     _initialCode = initialCode;
 
-    // When the `data` is empty, we will create a temporary data.
+    // When the `data` is empty, a temporary data will be added.
     if (_dataProviders.isEmpty ||
-        (await _getSupportedCode(provider: _dataProvider, isOverrides: false))
+        (await _getSupportedCode(
+                provider: _dataProviders.first, isOverrides: false))
             .isEmpty) {
       printDebug(
           'The `data` is empty, we will use a temporary `data` for developing state');
