@@ -4,6 +4,8 @@
 
 Multi-language app tool with an efficient generator and a custom GPT-4 translator for easy localization.
 
+I'm not a big fan of the '.arb' format or using short variables to store text in app development. It can be a bit tricky to control the length of the text when working with these methods. That's why I came up with a handy package that makes it easier to use real text during development and even simplify localization based on text. I hope you find it useful!
+
 ## Features
 
 - Easy to control the language translations in your application. Automatically uses the current device locale upon first open, if possible.
@@ -18,19 +20,182 @@ Multi-language app tool with an efficient generator and a custom GPT-4 translato
 
 ## Contents
 
-- [Usage](#usage)
-- [Language Helper Generator](#language-helper-generator)
+- [Set Up](#set-up): Only this step is required while developing
+  - [Add The language_helper To Your Project](#add-the-language_helper-to-your-project)
+  - [Add An Empty LanguageHelper While Developing](#add-an-empty-languagehelper-while-developing)
+  - [Add `.tr` Or `.trP` To All Your Needed `String`s](#add-tr-or-trp-to-all-your-needed-strings)
+- [Generator Flow Usage](#generator-flow-usage)
+  - [Dart Map](#dart-map)
+  - [JSON](#json)
+- [Manual Flow Usage](#manual-flow-usage)
+  - [Create The Translations](#create-the-translations)
+  - [Add To Your Project](#add-to-your-project)
+- [Using `LanguageBuilder` To Update The `String`s](#using-languagebuilder-to-update-the-strings)
+- [Control The Translation](#control-the-translation)
+  - [Change The Language](#change-the-language)
+  - [Add A New Language Data](#add-a-new-language-data)
+  - [Get The List Of Supported Language Code](#get-the-list-of-supported-language-code)
+  - [Listen To The Language Changing State](#listen-to-the-language-changing-state)
+- [Advanced Language Helper Generator](#advanced-language-helper-generator)
+  - [Modify The Input Path](#modify-the-input-path)
+  - [Modify The Output Path](#modify-the-output-path)
+  - [Convert From `LanguageData` to `JSON`](#convert-from-languagedata-to-json)
 - [Language Data Serialization](#language-data-serialization)
 - [Language Helper Translator (A Custom Chat GPT-4)](#language-helper-translator-a-custom-chat-gpt-4)
 - [Additional Information](#additional-information)
 - [Contributions](#contributions)
 
-## Usage
+## Set Up
 
-**Here is your translation (can be created with `language_helper_generator`):**
+While developing, we just need to finish the [Set Up](#set-up) steps. All other steps can be done when the app is ready to implement the localizations.
 
-``` dart
+### Add The language_helper To Your Project
+
+```shell
+flutter pub add language_helper
+```
+
+### Add An Empty LanguageHelper While Developing
+
+```dart
+final languageHelper = LanguageHelper.instance;
+
+main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await languageHelper.initial(data: []);
+  runApp(const MyApp());
+}
+```
+
+### Add `.tr` Or `.trP` To All Your Needed `String`s
+
+Normal translation
+
+```dart
+Text('Translate this text'.tr)
+```
+
+Translate with parameters
+
+```dart
+Text('Hello @{name}'.trP({'name': name}))
+```
+
+Plural (Read [Manual Flow Usage](#manual-flow-usage) to know how to use it)
+
+```dart
+Text('We have @{number} dollar'.trP({'number': number}))
+```
+
+## Generator Flow Usage
+
+### Dart Map
+
+**Generate:**
+
+```shell
+dart run language_helper:generate
+```
+
+The data will be generated in this path by default:
+
+```txt
+|-- .lib
+|   |--- resources
+|   |    |--- language_helper
+|   |    |    |--- _language_data_abstract.g.dart   ; This file will be overwritten when generating
+|   |    |    |--- language_data.dart
+```
+
+**Implement to your project:**
+
+```dart
+final languageHelper = LanguageHelper.instance;
+
+final languageDataProvider = LanguageDataProvider.data(languageData);
+
+main() async {
+  await languageHelper.initial(
+      data: [languageDataProvider],
+  );
+
+  runApp(const MyApp());
+}
+```
+
+### JSON
+
+When using JSON, you can store your translation data in `assets` or on network
+
+```shell
+dart run language_helper:generate --json
+```
+
+The data will be generated in this path by default:
+
+```txt
+|-- assets
+|  |- language_helper
+|  |  |- codes.json            ; This file will be overwritten when generating
+|  |  |  |- languages
+|  |  |  |  |- _generated.json ; This file will be overwritten when generating
+```
+
+### Implement to your project
+
+**Define the language data:**
+
+```dart
+final languageHelper = LanguageHelper.instance;
+
+// Assets
+final languageDataProvider = LanguageDataProvider.asset('assets/language_helper');
+
+// Network
+final languageDataProvider = LanguageDataProvider.network('https://example.com/language_helper');
+```
+
+**Add to the `LanguageHelper` instance:**
+
+```dart
+final languageHelper = LanguageHelper.instance;
+
+main() async {
+  await languageHelper.initial(
+      data: [languageDataProvider],
+  );
+
+  runApp(const MyApp());
+}
+```
+
+**Combine all of them to improve the translation:**
+
+```dart
+main() async {
+  await languageHelper.initial(
+      data: [
+        LanguageDataProvider.network('https://example.com/language_helper'),
+        LanguageDataProvider.asset('assets/language_helper'),
+        LanguageDataProvider.data(languageData),
+      ],
+  );
+
+  runApp(const MyApp());
+}
+```
+
+The package will get the translation data in order from top to bottom.
+
+## Manual Flow Usage
+
+### Create The Translations
+
+**Dart Map:**
+
+```dart
 final en = {
+  'Translate this text': 'Translate this text',
   'Hello @{name}': 'Hello @{name}',
   'We have @{number} dollar': LanguageCondition(
     param: 'number',
@@ -45,6 +210,7 @@ final en = {
 };
 
 const vi = {
+  'Translate this text': 'Dịch chữ này',
   'Hello @{name}': 'Xin chào @{name}',
   'We have @{number} dollar': 'Chúng ta có @{number} đô-la', 
 };
@@ -53,37 +219,70 @@ LanguageData languageData = {
   LanguageCodes.en: en,
   LanguageCodes.vi: vi,
 };
+
+final languageDataProvider = LanguageDataProvider.data(languageData);
 ```
 
 With `LanguageConditions`, you can completely control which text is returned according to the parameters' conditions. You can use `'default'` or `'_'` to set the default value for the condition.
 
-**Initialize the data:**
+**JSON:**
 
-``` dart
+`assets/language_helper/codes.json`: Contains all language codes
+
+```JSON
+["en", "vi"]
+```
+
+`assets/language_helper/languages/vi.json`:
+
+```JSON
+{
+  "Translate this text": "Translate this text",
+  "Hello @{name}": "Hello @{name}",
+  "We have @{number} dollar": {
+    "param": "number",
+    "conditions": {
+      "0": "We have zero dollar",
+      "1": "We have one dollar",
+
+      // Default value.
+      "_": "We have @{number} dollars",
+    }
+  }
+}
+```
+
+`assets/language_helper/languages/en.json`:
+
+```JSON
+{
+  "Translate this text": "Dịch chữ này",
+  "Hello @{name}": "Xin chào @{name}",
+  "We have @{number} dollar": "Chúng ta có @{number} đô-la", 
+}
+```
+
+```dart
+final languageDataProvider = LanguageDataProvider.asset('assets/language_helper');
+```
+
+### Add To Your Project
+
+```dart
 final languageHelper = LanguageHelper.instance;
 
 main() async {
-  // LanguageHelper should be initialized before calling `runApp`.
   await languageHelper.initial(
-      // This is [LanguageData] and it must not be empty.
-      data: languageData,
-      // Like the `languageData` but with higher priority.
-      dataOverrides: languageDataOverrides,
-      // Default is set to the device locale (if available) or the first language of the `languageData`.
-      initialCode: LanguageCodes.en,
-      // Changes the app language when the device language changes. Default is set to `true`.
-      syncWithDevice: true,
-      // Attempts to handle Locale codes with optional country specification.
-      // When a full Locale code (including country code) is not available in the data,
-      // this method will fallback to using just the language code.
-      isOptionalCountryCode: true,
+      data: [languageDataProvider],
   );
 
   runApp(const MyApp());
 }
 ```
 
-Implement flutter localizations to your app like this
+## Using `LanguageBuilder` To Update The `String`s
+
+### In the `MaterialApp`
 
 ``` dart
 class App extends StatelessWidget {
@@ -94,7 +293,7 @@ class App extends StatelessWidget {
     return LanguageBuilder(
       builder: (context) {
         return MaterialApp(
-          localizationsDelegates: languageHelper.delegate,
+          localizationsDelegates: languageHelper.delegates,
           supportedLocales: languageHelper.locales,
           locale: languageHelper.locale,
           home: const HomePage(),
@@ -105,9 +304,9 @@ class App extends StatelessWidget {
 }
 ```
 
-**Here is your `Widget`s:**
+### In your `Widget`s
 
-Using `LanguageBuilder`
+**Using `LanguageBuilder`:**
 
 ``` dart
 LanguageBuilder(
@@ -124,63 +323,42 @@ LanguageBuilder(
 ),
 ```
 
-Using `Tr` (A short version of `LanguageBuilder`)
+**Using `Tr` (A short version of `LanguageBuilder`):**
 
 ``` dart
 Tr((_) => Text('Hello @{name}'.tr)),
 ```
 
-**Change the language:**
+## Control The Translation
+
+### Change The Language
 
 ``` dart
 languageHelper.change(LanguageCodes.vi);
 ```
 
-**Add a new language data:**
+### Add A New Language Data
 
 ``` dart
-languageHelper.addData(newLanguageData);
-languageHelper.addDataOverrides(newLanguageDataOverrides);
+languageHelper.addData(LanguageDataProvider.data(newLanguageData));
+languageHelper.addDataOverrides(LanguageDataProvider.data(newLanguageDataOverrides));
 ```
 
 The `addData` and `addDataOverrides` have `activate` parameter which automaticaly rebuild all needed `LanguageBuilder`, so notice that you may get the `setState` issue because of the rebuilding of the `LanguageBuilder` when it's still building. If the error occurs, you may need to set it to `false` and activate the new data yourself by using `reload` method.
 
-**Get list of implemented `LanguageCodes`s:**
+### Get The List Of Supported Language Code
 
 ``` dart
-// List of [LanguageCodes] from the [data]
+// List of [LanguageCodes] from both of the [data] and [dataOverrides] without duplicated
 final codes = languageHelper.codes;
 
 // List of [LanguageCodes] from the [dataOverrides]
 final codesOverrides = languageHelper.codesOverrides;
-
-// List of [LanguageCodes] from both of the [data] and [dataOverrides] without duplicated
-final codesBoth = languageHelper.codesBoth;
 ```
 
-**Get text:**
+### Listen To The Language Changing State
 
-``` dart
-final translated = languageHelper.translate(
-    'Hello @{text}, @{number}', 
-    toCode: LanguageCodes.en, // [Optional] Translate to specific language code
-    params {'text' : 'World', 'number': '10'}, // [Optional] Translate with parameters
-);
-// Hello World, 10
-```
-
-**Use extension:**
-
-``` dart
-final translated = 'Hello'.tr;
-final translatedParam = 'Hello @{text}, @{number}'.trP({'text': 'World', 'number': '10'});
-final translatedTo = 'Hello @{text}, @{number}'.trT(LanguageCodes.en);
-final translatedFull = 'Hello @{text}, @{number}'.trF(toCode: LanguageCodes.en, params: {'text': 'World', 'number': '10'});
-```
-
-**Note:** The `@{param}` works in all cases (We should use this way to avoid issues when translating with `Language Helper Translator`). The `@param` only work if the text ends with a white space, end of line, or end with a new line.
-
-Beside the `onChanged` method, you can listen to the language changed events by using `stream`:
+Beside the `onChanged` callback, you can listen to the language changed events by using `stream`:
 
 ``` dart
 final sub = languageHelper.stream.listen((code) => print(code));
@@ -188,7 +366,9 @@ final sub = languageHelper.stream.listen((code) => print(code));
 
 **Note:** Remember to `sub.cancel()` when it's not in use to avoid memory leaks.
 
-**You can analyze the missing texts for all language with this function:**
+### Analyze The Translation
+
+**Currently works properly with `LanguageDataProvider.data` method**
 
 ``` dart
 languageHelper.analyze();
@@ -196,55 +376,51 @@ languageHelper.analyze();
 
 This function will automatically be called in `initial` when `isDebug` is `true`.
 
-Here is the result from the Example:
+## Advanced Language Helper Generator
 
-``` shell
-flutter: [Language Helper]
-flutter: [Language Helper] ==================================================
-flutter: [Language Helper]
-flutter: [Language Helper] Analyze all languages to find the missing texts...
-flutter: [Language Helper] Results:
-flutter: [Language Helper]   LanguageCodes.en:
-flutter: [Language Helper]     This text is missing in `en`
-flutter: [Language Helper]
-flutter: [Language Helper]   LanguageCodes.vi:
-flutter: [Language Helper]     This text is missing in `vi`
-flutter: [Language Helper]
-flutter: [Language Helper] ==================================================
-flutter: [Language Helper]
+### Modify The Input Path
+
+Add `--path` option to your command:
+
+```shell
+dart run language_helper:generate --path=./lib
 ```
 
-## Language Helper Generator
+### Modify The Output Path
 
-You can create a base `LanguageData` by using [language_helper_generator](https://pub.dev/packages/language_helper_generator)'s command:
+Add `--output` option to your command:
 
-``` shell
-dart run language_helper:generate
+```shell
+dart run language_helper:generate --output=./lib
 ```
 
-If you want to change the generating path, using this:
+### Convert From `LanguageData` to `JSON`
 
-``` shell
-dart run language_helper:generate --path=./example/lib
+- Create a `bin` folder in the same level with your `lib`.
+- Create a `export_json.dart` file in your `bin`.
+- Add this code to your `export_json.dart`:
+
+```dart
+void main() {
+  test('', () {
+    languageData.exportJson('./assets');
+  });
+}
 ```
 
-This command will also run `dart format` for the generated files, so you can easily manage the translations using the version control.
+- Add the missing `import`s.
+- Run `flutter test ./bin/export_json.dart`.
+- The JSON will be generated in this path:
 
-This runner will get all the texts that using language_helper extensions (`.tr`, `.trP`, `.trT`, `.trF`) and `.translate` method then creating a base structure for `LanguageData`. You can see the generated data in the [example](https://github.com/vnniz/language_helper_generator/tree/main/example/lib/resources/language_helper).
-
-The data will be generated with this format:
-
-``` txt
-|-- .lib
-|   |--- resources
-|   |    |--- language_helper
-|   |    |    |--- _language_data_abstract.g.dart
-|   |    |    |--- language_data.dart
+```txt
+assets
+|  |- language_helper
+|  |  |- codes.json
+|  |  |  |- languages
+|  |  |  |  |- en.json
+|  |  |  |  |- vi.json
+|  |  |  |  |- ...
 ```
-
-- [_language_data_abstract.g.dart](https://github.com/vnniz/language_helper_generator/tree/main/example/lib/resources/language_helper/_language_data_abstract.g.dart): Contains your base language from your all `.dart` files. This file will be re-generated when you run the command.
-
-- [language_data.dart](https://github.com/vnniz/language_helper_generator/tree/main/example/lib/resources/language_helper/language_data.dart): Modifiable language data because it's only generated 1 time.
 
 ## Language Data Serialization
 
@@ -305,11 +481,11 @@ final en = {
 
 ## Additional Information
 
-- The app will try to use the `Devicelocale` to set the `initialCode` if it is not set, if the `Devicelocale` is unavailable, it will use the first language in `data` instead.
+- The app will try to use the `Devicelocale` to set the `initialCode` if it is not set. If the `Devicelocale` is unavailable, it will use the first language in `data` instead.
 
-- No matter how many `LanguageBuilder` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageBuilder`, so it significantly improves performance.. And all `LanguageBuilder` widgets will be rebuilt at the same time. This setting can be changed with `forceRebuild` parameter in both `initial` for global setting and `LanguageBuilder` for local setting.
+- No matter how many `LanguageBuilder` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageBuilder`, so it significantly improves performance. If you want to force rebuild some Widget, you can set the `forceRebuild` parameter in the `LanguageBuilder` to `true`.
 
-- The `LanguageCodes` contains all the languages with additional information like name in English (englishName) and name in native language (nativeName).
+- The `LanguageCodes` contains all the common languages with additional information like name in English (englishName) and name in native language (nativeName).
 
 - The `@{param}` works in all cases (We should use this way to avoid issues when translating with `Language Helper Translator`). The `@param` only work if the text ends with a white space, end of line, or end with a new line.
 
