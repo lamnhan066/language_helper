@@ -43,13 +43,10 @@ Map<String, dynamic> languageDataValuesFromMap(Map<String, dynamic> map) {
 
 /// Generated path:
 /// `path`
-///  |- resources
-///  |  |- language_helper
-///  |  |  |- json
-///  |  |  |  |- codes.json
-///  |  |  |  |  |- languages
-///  |  |  |  |  |  |- en.json
-///  |  |  |  |  |  |- vi.json
+///  |  |- codes.json
+///  |  |  |- languages
+///  |  |  |  |- en.json
+///  |  |  |  |- vi.json
 void exportJson(LanguageData data, String path) {
   printDebug('===========================================================');
   printDebug('Exporting Json...');
@@ -64,7 +61,7 @@ void _exportJsonCodes(LanguageData data, String path) {
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
-  final desFile = File('$path/resources/language_helper/json/codes.json');
+  final desFile = File('$path/codes.json');
   desFile.createSync(recursive: true);
   final codes = data.keys.map((e) => e.code).toList();
   desFile.writeAsStringSync(encoder.convert(codes));
@@ -77,7 +74,7 @@ void _exportJsonLanguages(LanguageData data, String path) {
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
-  final desPath = '$path/resources/language_helper/json/languages/';
+  final desPath = '$path/languages/';
   final map = languageDataToMap(data);
   for (final MapEntry(key: String key, value: dynamic value) in map.entries) {
     final desFile = File('$desPath$key.json');
