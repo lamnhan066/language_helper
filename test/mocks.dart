@@ -9,9 +9,9 @@ class MockClient extends http.BaseClient {
   @override
   Future<http.Response> get(Uri url, {Map<String, String>? headers}) {
     return switch (url.path) {
-      '/language_helper/json/codes.json' =>
+      '/language_helper/codes.json' =>
         Future.value(http.Response(jsonEncode(["en", "vi"]), 200)),
-      '/language_helper/json/languages/en.json' => Future.value(
+      '/language_helper/languages/en.json' => Future.value(
           http.Response(
             jsonEncode({
               "Hello": "Hello",
@@ -41,7 +41,7 @@ class MockClient extends http.BaseClient {
             200,
           ),
         ),
-      '/language_helper/json/languages/vi.json' => Future.value(
+      '/language_helper/languages/vi.json' => Future.value(
           http.Response(
             jsonEncode(
               {

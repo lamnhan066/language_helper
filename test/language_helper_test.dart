@@ -150,7 +150,7 @@ void main() async {
     });
   });
 
-  group('Test for [codesBoth]', () {
+  group('Test for [codes]', () {
     tearDown(() {
       LanguageCode.setTestCode();
     });
@@ -176,8 +176,7 @@ void main() async {
           expect(value, isA<LanguageCodes>());
         },
       );
-      expect(languageHelper.codesBoth, equals(dataOverrides.keys));
-      expect(languageHelper.codesBoth, equals(dataOverrides.keys));
+      expect(languageHelper.codes, equals(dataOverrides.keys));
     });
 
     test('[dataOverrides] has more LanguageCodes than [data]', () async {
@@ -202,8 +201,7 @@ void main() async {
         },
       );
 
-      expect(languageHelper.codesBoth, equals(data.keys));
-      expect(languageHelper.codesBoth, equals(data.keys));
+      expect(languageHelper.codes, equals(data.keys));
     });
   });
 
@@ -608,7 +606,7 @@ void main() async {
     test('export json', () {
       final dir = Directory('./test/export_json');
       data.exportJson(dir.path);
-      final codesFile = File('./test/export_json/codes.json');
+      final codesFile = File('./test/export_json/language_helper/codes.json');
       final codesJson = codesFile.readAsStringSync();
       expect(jsonDecode(codesJson), isA<List>());
       expect(jsonDecode(codesJson), isNotEmpty);
@@ -662,7 +660,7 @@ void main() async {
     });
 
     test('asset - ok', () async {
-      final data = LanguageDataProvider.asset('assets/languages');
+      final data = LanguageDataProvider.asset('assets/language_helper');
       final codes = await data.getSupportedCodes();
       expect(codes, equals({LanguageCodes.en, LanguageCodes.vi}));
       final languages = await data.getData(LanguageCodes.en);
@@ -679,7 +677,7 @@ void main() async {
 
     test('network - ok', () async {
       final data = LanguageDataProvider.network(
-        'https://pub.lamnhan.dev/language_helper/json',
+        'https://pub.lamnhan.dev/language_helper/',
         client: MockClient(),
       );
 
@@ -703,7 +701,7 @@ void main() async {
 
   group('Verify variables', () {
     test('locales == codes', () {
-      final locales = languageHelper.codesBoth.map((e) => e.locale);
+      final locales = languageHelper.codes.map((e) => e.locale);
       expect(locales, equals(languageHelper.locales));
     });
   });
