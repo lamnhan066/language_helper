@@ -3,19 +3,21 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:language_code/language_code.dart';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper/src/mixins/update_language.dart';
-import 'package:language_helper/src/utils/serializer.dart';
 import 'package:language_helper/src/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'assets.dart';
 import 'language_data.dart';
 import 'mocks.dart';
 import 'widgets.dart';
 
 void main() async {
+  TestWidgetsFlutterBinding.ensureInitialized();
   // Initial
   final languageHelper = LanguageHelper.instance;
   // Use en as default language
@@ -606,8 +608,7 @@ void main() async {
     test('export json', () {
       final dir = Directory('./test/export_json');
       data.exportJson(dir.path);
-      final codesFile =
-          File('./test/export_json/resources/language_helper/json/codes.json');
+      final codesFile = File('./test/export_json/codes.json');
       final codesJson = codesFile.readAsStringSync();
       expect(jsonDecode(codesJson), isA<List>());
       expect(jsonDecode(codesJson), isNotEmpty);
@@ -618,9 +619,7 @@ void main() async {
   /// This test have to be the last test because it will change the value of the database.
   group('Unit test for methods', () {
     test('Add data with overwrite is false', () async {
-      // print(languageHelper.data);
       await languageHelper.addData(dataAdd, overwrite: false);
-      // print(languageHelper.data);
       languageHelper.reload();
 
       final addedData = languageHelper.data[LanguageCodes.en]!;
@@ -646,11 +645,24 @@ void main() async {
   });
 
   group('Language Data Provider from - ', () {
-    test('asset - ok', () async {
-      exportJson(languageHelper.data, './test');
-      final data =
-          LanguageDataProvider.asset('./test/resources/language_helper/json');
+    setUp(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMessageHandler(
+        'flutter/assets',
+        (message) async {
+          if (message == null) return null;
 
+          final String assetKey = utf8.decode(message.buffer.asUint8List());
+          return mockAssets.containsKey(assetKey)
+              ? ByteData.view(
+                  Uint8List.fromList(mockAssets[assetKey]!.codeUnits).buffer)
+              : null;
+        },
+      );
+    });
+
+    test('asset - ok', () async {
+      final data = LanguageDataProvider.asset('assets/languages');
       final codes = await data.getSupportedCodes();
       expect(codes, equals({LanguageCodes.en, LanguageCodes.vi}));
       final languages = await data.getData(LanguageCodes.en);
@@ -701,7 +713,6 @@ void main() async {
       expect(Utils.removeLastSlash('abc///'), equals('abc'));
     });
     test('get url', () async {
-      const url = 'https://example.com';
       const errorUrl = 'abc';
       await Utils.getUrl(Uri.parse(errorUrl));
       expect(
