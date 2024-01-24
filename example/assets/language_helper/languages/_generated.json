@@ -1,0 +1,15 @@
+{
+  "@path_0": "./lib/page_asset.dart",
+  "Asset": "Asset",
+  "This is the line 1": "This is the line 1",
+  "This is the line 2": "This is the line 2",
+  "@path_1": "./lib/main.dart",
+  "Hello": "Hello",
+  "Change language": "Change language",
+  "Analyze languages": "Analyze languages",
+  "This is @number dollar": "This is @number dollar",
+  "This text will be changed when the data added": "This text will be changed when the data added",
+  "Other Page": "Other Page",
+  "Text will be changed": "Text will be changed",
+  "Text will be not changed": "Text will be not changed"
+}
