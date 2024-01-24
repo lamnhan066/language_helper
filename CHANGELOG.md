@@ -1,3 +1,13 @@
+## 0.11.0-rc.1
+
+* Bump min sdk to `3.0.0`.
+* Able to create a new `LanguageHelper` instance.
+* Change from `LanguageData` to `LanguageDataProvider` to support the data from `data` (the default `LanguageData`), `asset` (JSON from the local assets) and `network` (JSON from the URL).
+* Multiple `LanguageDataProvider` inputs are supported.
+* Able export JSONs from the current `LanguageData` (for the migration).
+* Remove deprecated features.
+* Improve README.
+
 ## 0.10.0
 
 * Promote to stable.
