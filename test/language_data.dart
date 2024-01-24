@@ -1,7 +1,7 @@
 import 'package:language_helper/language_helper.dart';
 
-LanguageDataProvider data = LanguageDataProvider.data(_data);
-LanguageData _data = {
+final dataList = [LanguageDataProvider.data(data)];
+LanguageData data = {
   LanguageCodes.en: {
     'Hello': 'Hello',
     'You have @number dollars': 'You have @number dollars',
@@ -40,7 +40,7 @@ LanguageData _data = {
   }
 };
 
-LanguageDataProvider dataOverrides = LanguageDataProvider.data(_dataOverrides);
+final dataOverrides = [LanguageDataProvider.data(_dataOverrides)];
 LanguageData _dataOverrides = {
   LanguageCodes.en: {
     'Hello': 'Hello',
@@ -56,7 +56,8 @@ LanguageData _dataOverrides = {
   },
 };
 
-LanguageDataProvider dataAdd = LanguageDataProvider.data(_dataAdd);
+final dataAdds = [LanguageDataProvider.data(_dataAdd)];
+final dataAdd = LanguageDataProvider.data(_dataAdd);
 LanguageData _dataAdd = {
   LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'},
   LanguageCodes.zh: {'Hello': '你好'},

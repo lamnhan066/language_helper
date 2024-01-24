@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,6 +8,7 @@ import 'package:language_code/language_code.dart';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper/src/mixins/update_language.dart';
 import 'package:language_helper/src/utils/serializer.dart';
+import 'package:language_helper/src/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'language_data.dart';
@@ -22,7 +25,7 @@ void main() async {
 
   setUpAll(() async {
     await languageHelper.initial(
-      data: data,
+      data: dataList,
       initialCode: LanguageCodes.en,
       useInitialCodeWhenUnavailable: false,
       isDebug: true,
@@ -47,7 +50,7 @@ void main() async {
         languageHelper.codeKey: LanguageCodes.vi.code,
       });
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         analysisKeys: languageHelper.data.entries.first.value.keys.toSet(),
         useInitialCodeWhenUnavailable: false,
         isDebug: true,
@@ -65,7 +68,7 @@ void main() async {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         useInitialCodeWhenUnavailable: false,
         isDebug: true,
         isAutoSave: false,
@@ -83,7 +86,7 @@ void main() async {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         initialCode: LanguageCodes.cu,
         useInitialCodeWhenUnavailable: false,
         isAutoSave: false,
@@ -102,7 +105,7 @@ void main() async {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         analysisKeys: analysisMissedKeys,
         initialCode: LanguageCodes.cu,
         useInitialCodeWhenUnavailable: false,
@@ -124,7 +127,7 @@ void main() async {
       SharedPreferences.setMockInitialValues({});
       LanguageCode.setTestCode(LanguageCodes.cu);
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         useInitialCodeWhenUnavailable: false,
         syncWithDevice: false,
         isAutoSave: false,
@@ -162,8 +165,8 @@ void main() async {
       };
 
       await languageHelper.initial(
-        data: LanguageDataProvider.data(data),
-        dataOverrides: LanguageDataProvider.data(dataOverrides),
+        data: [LanguageDataProvider.data(data)],
+        dataOverrides: [LanguageDataProvider.data(dataOverrides)],
         useInitialCodeWhenUnavailable: false,
         isAutoSave: false,
         isDebug: true,
@@ -187,8 +190,8 @@ void main() async {
       };
 
       await languageHelper.initial(
-        data: LanguageDataProvider.data(data),
-        dataOverrides: LanguageDataProvider.data(dataOverrides),
+        data: [LanguageDataProvider.data(data)],
+        dataOverrides: [LanguageDataProvider.data(dataOverrides)],
         useInitialCodeWhenUnavailable: false,
         isAutoSave: false,
         isDebug: true,
@@ -206,7 +209,7 @@ void main() async {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         analysisKeys: analysisRemovedKeys.toSet(),
         initialCode: LanguageCodes.cu,
         useInitialCodeWhenUnavailable: false,
@@ -228,7 +231,7 @@ void main() async {
     test('true', () async {
       SharedPreferences.setMockInitialValues({});
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         initialCode: LanguageCodes.en,
         useInitialCodeWhenUnavailable: true,
         onChanged: (code) {},
@@ -243,7 +246,7 @@ void main() async {
     test('false', () async {
       SharedPreferences.setMockInitialValues({});
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         initialCode: LanguageCodes.en,
         useInitialCodeWhenUnavailable: false,
       );
@@ -257,7 +260,7 @@ void main() async {
     test('true but initial code is null', () async {
       SharedPreferences.setMockInitialValues({});
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         useInitialCodeWhenUnavailable: false,
       );
       languageHelper.change(LanguageCodes.vi);
@@ -414,13 +417,13 @@ void main() async {
       expect(fromJson.toJson(), toJson);
 
       expect(conditions.toString(), isA<String>());
-      expect(data.hashCode, isNot(fromJson.hashCode));
+      expect(dataList.hashCode, isNot(fromJson.hashCode));
     });
   });
 
   group('dataOverrides', () {
     test('not using dataOverrides', () async {
-      await languageHelper.initial(data: data);
+      await languageHelper.initial(data: dataList);
       languageHelper.change(LanguageCodes.en);
 
       final errorTranslated =
@@ -428,7 +431,8 @@ void main() async {
       expect(errorTranslated, 'You have 2 dollar in your wallet');
     });
     test('using dataOverrides', () async {
-      await languageHelper.initial(data: data, dataOverrides: dataOverrides);
+      await languageHelper.initial(
+          data: dataList, dataOverrides: dataOverrides);
       languageHelper.change(LanguageCodes.en);
 
       final translated =
@@ -464,7 +468,7 @@ void main() async {
       });
       LanguageCode.setTestCode(LanguageCodes.en);
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         initialCode: LanguageCodes.vi,
         syncWithDevice: false,
       );
@@ -476,7 +480,7 @@ void main() async {
       SharedPreferences.setMockInitialValues({});
       LanguageCode.setTestCode(LanguageCodes.en);
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         initialCode: LanguageCodes.vi,
         syncWithDevice: true,
       );
@@ -490,7 +494,7 @@ void main() async {
       SharedPreferences.setMockInitialValues({});
       LanguageCode.setTestCode(LanguageCodes.zh_TW);
       await languageHelper.initial(
-        data: dataAdd,
+        data: dataAdds,
         syncWithDevice: true,
       );
 
@@ -503,7 +507,7 @@ void main() async {
       SharedPreferences.setMockInitialValues({});
       LanguageCode.setTestCode(LanguageCodes.zh_TW);
       await languageHelper.initial(
-        data: dataAdd,
+        data: dataAdds,
         syncWithDevice: true,
         isOptionalCountryCode: false,
       );
@@ -517,7 +521,7 @@ void main() async {
       });
       LanguageCode.setTestCode(LanguageCodes.vi);
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         initialCode: LanguageCodes.vi,
         syncWithDevice: true,
       );
@@ -531,7 +535,7 @@ void main() async {
       });
       LanguageCode.setTestCode(LanguageCodes.en);
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         initialCode: LanguageCodes.vi,
         syncWithDevice: true,
       );
@@ -544,7 +548,8 @@ void main() async {
     testWidgets('LanguageBuilder', (tester) async {
       // Use en as default language
       SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(data: data, initialCode: LanguageCodes.en);
+      await languageHelper.initial(
+          data: dataList, initialCode: LanguageCodes.en);
 
       await tester.pumpWidget(const LanguageHelperWidget());
       await tester.pumpAndSettle();
@@ -572,7 +577,8 @@ void main() async {
     testWidgets('Tr', (tester) async {
       // Use en as default language
       SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(data: data, initialCode: LanguageCodes.en);
+      await languageHelper.initial(
+          data: dataList, initialCode: LanguageCodes.en);
 
       await tester.pumpWidget(const TrWidget());
       await tester.pumpAndSettle();
@@ -596,6 +602,17 @@ void main() async {
       expect(dollar100, findsNothing);
       expect(dollar10, findsNothing);
     });
+
+    test('export json', () {
+      final dir = Directory('./test/export_json');
+      data.exportJson(dir.path);
+      final codesFile =
+          File('./test/export_json/resources/language_helper/json/codes.json');
+      final codesJson = codesFile.readAsStringSync();
+      expect(jsonDecode(codesJson), isA<List>());
+      expect(jsonDecode(codesJson), isNotEmpty);
+      dir.deleteSync(recursive: true);
+    });
   });
 
   /// This test have to be the last test because it will change the value of the database.
@@ -614,7 +631,7 @@ void main() async {
 
     test('Add data with overwrite is true', () async {
       await languageHelper.initial(
-        data: data,
+        data: dataList,
         dataOverrides: dataOverrides,
         initialCode: LanguageCodes.en,
       );
@@ -629,7 +646,7 @@ void main() async {
   });
 
   group('Language Data Provider from - ', () {
-    test('asset', () async {
+    test('asset - ok', () async {
       exportJson(languageHelper.data, './test');
       final data =
           LanguageDataProvider.asset('./test/resources/language_helper/json');
@@ -642,7 +659,13 @@ void main() async {
       expect(first.value, equals(isNotEmpty));
     });
 
-    test('network', () async {
+    test('asset - error', () async {
+      final data = LanguageDataProvider.asset('abc');
+      expect(data.isEmpty, equals(false));
+      expect(await data.getData(LanguageCodes.en), isEmpty);
+    });
+
+    test('network - ok', () async {
       final data = LanguageDataProvider.network(
         'https://pub.lamnhan.dev/language_helper/json',
         client: MockClient(),
@@ -655,12 +678,36 @@ void main() async {
       expect(first.key, equals(LanguageCodes.en));
       expect(first.value, equals(isNotEmpty));
     });
+
+    test('network - error', () async {
+      final data = LanguageDataProvider.network(
+        'abc',
+        client: MockClient(),
+      );
+
+      expect(await data.getData(LanguageCodes.en), isEmpty);
+    });
   });
 
   group('Verify variables', () {
     test('locales == codes', () {
       final locales = languageHelper.codesBoth.map((e) => e.locale);
       expect(locales, equals(languageHelper.locales));
+    });
+  });
+
+  group('Test utils', () {
+    test('remove ending slash', () {
+      expect(Utils.removeLastSlash('abc///'), equals('abc'));
+    });
+    test('get url', () async {
+      const url = 'https://example.com';
+      const errorUrl = 'abc';
+      await Utils.getUrl(Uri.parse(errorUrl));
+      expect(
+        await Utils.getUrl(Uri.parse(errorUrl), client: MockClient()),
+        isEmpty,
+      );
     });
   });
 }
