@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 
+import 'page_asset.dart';
 import 'resources/language_helper/language_data.dart';
 
 void main() async {
@@ -90,6 +91,13 @@ class _MyAppState extends State<MyApp> {
                       .addData(LanguageDataProvider.data(languageDataAdd));
                 },
                 child: Text('This text will be changed when the data added'.tr),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const PageAsset()));
+                },
+                child: const Text('Asset'),
               ),
             ],
           ),

@@ -20,7 +20,7 @@ class _PageAssetState extends State<PageAsset> {
 
   void initial() async {
     await languageHelper.initial(
-      data: [LanguageDataProvider.asset('assets')],
+      data: [LanguageDataProvider.asset('assets/languages')],
     );
 
     setState(() {
@@ -30,7 +30,7 @@ class _PageAssetState extends State<PageAsset> {
 
   @override
   Widget build(BuildContext context) {
-    return isLoaded
+    return !isLoaded
         ? const Center(child: CircularProgressIndicator())
         : Scaffold(
             appBar: AppBar(
