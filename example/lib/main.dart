@@ -8,7 +8,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await LanguageHelper.instance.initial(
-    data: LanguageDataProvider.data(languageData),
+    data: [LanguageDataProvider.data(languageData)],
     analysisKeys: analysisLanguageData.keys.toSet(),
     initialCode: LanguageCodes.en,
     isDebug: !kReleaseMode,
