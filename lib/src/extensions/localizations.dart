@@ -14,13 +14,4 @@ extension LanguageLocalizations on LanguageHelper {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ];
-
-  /// Get the flutter default localizations
-  ///
-  /// Includes:
-  ///     GlobalMaterialLocalizations.delegate
-  ///      GlobalWidgetsLocalizations.delegate
-  ///      GlobalCupertinoLocalizations.delegat
-  @Deprecated('Use the `delegates` insteads')
-  List<LocalizationsDelegate> get delegate => delegates;
 }
