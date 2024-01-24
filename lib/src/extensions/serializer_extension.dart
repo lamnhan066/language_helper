@@ -28,15 +28,13 @@ extension LanguageDataSerializer on LanguageData {
   ///
   /// Generated path:
   /// [path]
-  ///  |- resources
   ///  |  |- language_helper
-  ///  |  |  |- json
-  ///  |  |  |  |- codes.json
-  ///  |  |  |  |  |- languages
-  ///  |  |  |  |  |  |- en.json
-  ///  |  |  |  |  |  |- vi.json
-  ///  |  |  |  |  |  |- ...
-  void exportJson([String path = './assets/languages']) {
+  ///  |  |  |- codes.json
+  ///  |  |  |  |- languages
+  ///  |  |  |  |  |- en.json
+  ///  |  |  |  |  |- vi.json
+  ///  |  |  |  |  |- ...
+  void exportJson([String path = './assets']) {
     return s.exportJson(this, path);
   }
 

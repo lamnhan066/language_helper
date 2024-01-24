@@ -61,7 +61,7 @@ void _exportJsonCodes(LanguageData data, String path) {
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
-  final desFile = File('$path/codes.json');
+  final desFile = File('$path/language_helper/codes.json');
   desFile.createSync(recursive: true);
   final codes = data.keys.map((e) => e.code).toList();
   desFile.writeAsStringSync(encoder.convert(codes));
@@ -74,7 +74,7 @@ void _exportJsonLanguages(LanguageData data, String path) {
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
-  final desPath = '$path/languages/';
+  final desPath = '$path/language_helper/languages/';
   final map = languageDataToMap(data);
   for (final MapEntry(key: String key, value: dynamic value) in map.entries) {
     final desFile = File('$desPath$key.json');
