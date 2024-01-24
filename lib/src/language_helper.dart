@@ -30,7 +30,7 @@ class LanguageHelper {
   /// Get all languages
   late LanguageDataProvider _dataProvider;
 
-  late Iterable<LanguageDataProvider> _dataProviders;
+  Iterable<LanguageDataProvider> _dataProviders = [];
 
   /// Get the current `data` as [LanguageData].
   LanguageData get data => _data;
@@ -41,7 +41,7 @@ class LanguageHelper {
   /// Get all languages
   late LanguageDataProvider _dataOverridesProvider;
 
-  late Iterable<LanguageDataProvider> _dataOverridesProviders;
+  Iterable<LanguageDataProvider> _dataOverridesProviders = [];
 
   /// Get the current `dataOverrides` as [LanguageData].
   LanguageData get dataOverrides => _dataOverrides;
@@ -53,12 +53,8 @@ class LanguageHelper {
   /// text is missing in your language data.
   Iterable<String> _analysisKeys = const {};
 
-  /// Get list of [LanguageCodes] from both [data] and [dataOverrides]
-  Set<LanguageCodes> get codesBoth =>
-      <LanguageCodes>{...codes, ...codesOverrides}.toSet();
-
-  /// Get list of [LanguageCodes] of the [data]
-  Set<LanguageCodes> get codes => _codes;
+  /// Get list of [LanguageCodes] of the [data] and [dataOverrides]
+  Set<LanguageCodes> get codes => {..._codes, ..._codesOverrides}.toSet();
   Set<LanguageCodes> _codes = {};
 
   /// Get list of [LanguageCodes] of the [dataOverrides]
@@ -66,7 +62,7 @@ class LanguageHelper {
   Set<LanguageCodes> _codesOverrides = {};
 
   /// Get list of language as [Locale]
-  Set<Locale> get locales => codesBoth.map((e) => e.locale).toSet();
+  Set<Locale> get locales => codes.map((e) => e.locale).toSet();
 
   /// Get current language as [LanguageCodes]
   ///
@@ -201,8 +197,6 @@ class LanguageHelper {
     /// Print the debug log.
     bool isDebug = false,
   }) async {
-    assert(data.isNotEmpty, 'Data must be not empty');
-
     _data.clear();
     _dataOverrides.clear();
     _dataProviders = data;
@@ -215,6 +209,17 @@ class LanguageHelper {
     _syncWithDevice = syncWithDevice;
     _analysisKeys = analysisKeys;
     _initialCode = initialCode;
+
+    // When the `data` is empty, we will create a temporary data.
+    if (_dataProviders.isEmpty ||
+        (await _getSupportedCode(provider: _dataProvider, isOverrides: false))
+            .isEmpty) {
+      printDebug(
+          'The `data` is empty, we will use a temporary `data` for developing state');
+      _dataProviders = [
+        LanguageDataProvider.data({LanguageCodes.en: {}})
+      ];
+    }
 
     LanguageCodes finalCode = _initialCode ?? LanguageCode.code;
 
@@ -270,7 +275,7 @@ class LanguageHelper {
       }
     }
 
-    if (!codesBoth.contains(finalCode)) {
+    if (!codes.contains(finalCode)) {
       LanguageCodes? tempCode;
       if (isOptionalCountryCode && finalCode.locale.countryCode != null) {
         // Try to use the `languageCode` only if the `languageCode_countryCode`
@@ -279,7 +284,7 @@ class LanguageHelper {
             'language does not contain the $finalCode => Try to use the `languageCode` only..');
         try {
           tempCode = LanguageCodes.fromCode(finalCode.locale.languageCode);
-          if (!codesBoth.contains(tempCode)) {
+          if (!codes.contains(tempCode)) {
             tempCode = null;
           }
         } catch (_) {}
@@ -407,7 +412,7 @@ class LanguageHelper {
 
   /// Change the language to this [code]
   Future<void> change(LanguageCodes toCode) async {
-    if (!codesBoth.contains(toCode)) {
+    if (!codes.contains(toCode)) {
       printDebug('$toCode is not available in `data` or `dataOverrides`');
 
       if (!_useInitialCodeWhenUnavailable) {
@@ -415,7 +420,7 @@ class LanguageHelper {
             'Does not allow using the initial code => Cannot change the language.');
         return;
       } else {
-        if (codesBoth.contains(_initialCode)) {
+        if (codes.contains(_initialCode)) {
           printDebug(
               '`useInitialCodeWhenUnavailable` is true => Change the language to $_initialCode');
           _currentCode = _initialCode;
@@ -603,7 +608,7 @@ class LanguageHelper {
 
   Future<void> _saveSupportedCodes({required bool isOverrides}) async {
     final p = '$prefix.${isOverrides ? 'DataOverrides' : 'Data'}';
-    LanguageDataProvider.saveCodes(p, codesBoth);
+    LanguageDataProvider.saveCodes(p, codes);
   }
 
   Future<LanguageData> _getData({
