@@ -21,15 +21,15 @@ I'm not a big fan of the '.arb' format or using short variables to store text in
 ## Contents
 
 - [Set Up](#set-up): Only this step is required while developing
-  - [Add The language_helper To Your Project](#add-the-language_helper-to-your-project)
+  - [Add The language_helper To The Project](#add-the-language_helper-to-the-project)
   - [Add An Empty LanguageHelper While Developing](#add-an-empty-languagehelper-while-developing)
-  - [Add `.tr` Or `.trP` To All Your Needed `String`s](#add-tr-or-trp-to-all-your-needed-strings)
+  - [Add `.tr` Or `.trP` To All Needed `String`s](#add-tr-or-trp-to-all-needed-strings)
 - [Generator Flow Usage](#generator-flow-usage)
   - [Dart Map](#dart-map)
   - [JSON](#json)
 - [Manual Flow Usage](#manual-flow-usage)
   - [Create The Translations](#create-the-translations)
-  - [Add To Your Project](#add-to-your-project)
+  - [Add To The Project](#add-to-the-project)
 - [Using `LanguageBuilder` To Update The `String`s](#using-languagebuilder-to-update-the-strings)
 - [Control The Translation](#control-the-translation)
   - [Change The Language](#change-the-language)
@@ -49,7 +49,7 @@ I'm not a big fan of the '.arb' format or using short variables to store text in
 
 While developing, we just need to finish the [Set Up](#set-up) steps. All other steps can be done when the app is ready to implement the localizations.
 
-### Add The language_helper To Your Project
+### Add The language_helper To The Project
 
 ```shell
 flutter pub add language_helper
@@ -67,7 +67,7 @@ main() async {
 }
 ```
 
-### Add `.tr` Or `.trP` To All Your Needed `String`s
+### Add `.tr` Or `.trP` To All Needed `String`s
 
 Normal translation
 
@@ -266,7 +266,7 @@ With `LanguageConditions`, you can completely control which text is returned acc
 final languageDataProvider = LanguageDataProvider.asset('assets/language_helper');
 ```
 
-### Add To Your Project
+### Add To The Project
 
 ```dart
 final languageHelper = LanguageHelper.instance;
