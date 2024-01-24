@@ -8,6 +8,86 @@ import 'package:language_helper/src/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LanguageDataProvider {
+  static Future<LanguageData> _asset({
+    required Uri uri,
+    required LanguageCodes code,
+  }) async {
+    String json = await File.fromUri(uri).readAsString();
+    if (json.isNotEmpty) {
+      return {code: LanguageDataSerializer.valuesFromJson(json)};
+    } else {
+      return {};
+    }
+  }
+
+  static Future<LanguageData> _network({
+    required Uri uri,
+    required LanguageCodes code,
+    required Client? client,
+    required Map<String, String>? headers,
+  }) async {
+    String json = await Utils.getUrl(uri, client: client, headers: headers);
+    if (json.isNotEmpty) {
+      return {code: LanguageDataSerializer.valuesFromJson(json)};
+    } else {
+      return {};
+    }
+  }
+
+  /// Get saved `LanguageData` from `SharedPreferences`.
+  static Future<LanguageData> getSavedData(
+    LanguageCodes code,
+    String prefix,
+  ) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final key = '$prefix.CachedLanguageData.${code.code}';
+    final json = prefs.getString(key);
+
+    if (json != null && json.isNotEmpty) {
+      return {code: LanguageDataSerializer.valuesFromJson(json)};
+    }
+    return {};
+  }
+
+  /// Save `LanguageData` to `SharedPreferences`.
+  static Future<void> saveData(
+    LanguageCodes code,
+    String prefix,
+    LanguageData data,
+  ) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final key = '$prefix.CachedLanguageData.${code.code}';
+
+    if (data.isNotEmpty) {
+      await prefs.setString(key, data.toJson());
+    }
+  }
+
+  /// Get saved `LanguageData` from `SharedPreferences`.
+  static Future<Set<LanguageCodes>> getSavedCodes(String prefix) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final key = '$prefix.CachedLanguageCode';
+    final list = prefs.getStringList(key);
+
+    if (list != null && list.isNotEmpty) {
+      return list.map((e) => LanguageCodes.fromCode(e)).toSet();
+    }
+    return {};
+  }
+
+  /// Save `LanguageData` to `SharedPreferences`.
+  static Future<void> saveCodes(
+    String prefix,
+    Set<LanguageCodes> codes,
+  ) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final key = '$prefix.CachedLanguageCode';
+
+    if (codes.isNotEmpty) {
+      await prefs.setStringList(key, codes.map((e) => e.code).toList());
+    }
+  }
+
   /// Get the `LanguageData` based on the `code`.
   FutureOr<LanguageData> Function(LanguageCodes code) get getData =>
       _getData == null ? (code) => Future.value({}) : _getData!;
@@ -95,58 +175,5 @@ class LanguageDataProvider {
     }, () {
       return data.keys.toSet();
     });
-  }
-
-  static Future<LanguageData> _asset({
-    required Uri uri,
-    required LanguageCodes code,
-  }) async {
-    String json = await File.fromUri(uri).readAsString();
-    if (json.isNotEmpty) {
-      return {code: LanguageDataSerializer.valuesFromJson(json)};
-    } else {
-      return {};
-    }
-  }
-
-  static Future<LanguageData> _network({
-    required Uri uri,
-    required LanguageCodes code,
-    required Client? client,
-    required Map<String, String>? headers,
-  }) async {
-    String json = await Utils.getUrl(uri, client: client, headers: headers);
-    if (json.isNotEmpty) {
-      return {code: LanguageDataSerializer.valuesFromJson(json)};
-    } else {
-      return {};
-    }
-  }
-
-  static Future<LanguageData> getSavedData(
-    LanguageCodes code,
-    String prefix,
-  ) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final key = '$prefix.CachedLanguageData.${code.code}';
-    final json = prefs.getString(key);
-
-    if (json != null && json.isNotEmpty) {
-      return {code: LanguageDataSerializer.valuesFromJson(json)};
-    }
-    return {};
-  }
-
-  static Future<void> saveData(
-    LanguageCodes code,
-    String prefix,
-    LanguageData data,
-  ) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final key = '$prefix.CachedLanguageData.${code.code}';
-
-    if (data.isNotEmpty) {
-      await prefs.setString(key, data.toJson());
-    }
   }
 }
