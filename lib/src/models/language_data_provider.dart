@@ -12,12 +12,12 @@ class LanguageDataProvider {
     required Uri uri,
     required LanguageCodes code,
   }) async {
-    String json = await File.fromUri(uri).readAsString();
-    if (json.isNotEmpty) {
+    final file = File.fromUri(uri);
+    if (await file.exists()) {
+      String json = await File.fromUri(uri).readAsString();
       return {code: LanguageDataSerializer.valuesFromJson(json)};
-    } else {
-      return {};
     }
+    return {};
   }
 
   static Future<LanguageData> _network({
@@ -117,21 +117,15 @@ class LanguageDataProvider {
   factory LanguageDataProvider.asset(String parentPath) {
     return LanguageDataProvider._((code) {
       String path = Utils.removeLastSlash(parentPath);
-      final uri = Uri.tryParse('$path/languages/${code.code}.json');
-      if (uri != null) {
-        return _asset(uri: uri, code: code);
-      }
-      return {};
+      final uri = Uri.parse('$path/languages/${code.code}.json');
+      return _asset(uri: uri, code: code);
     }, () async {
       String path = Utils.removeLastSlash(parentPath);
-      final uri = Uri.tryParse('$path/codes.json');
-      if (uri != null) {
-        final json = await File.fromUri(uri).readAsString();
-        final decoded = jsonDecode(json).cast<String>() as List<String>;
-        final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
-        return Future.value(set);
-      }
-      return {};
+      final uri = Uri.parse('$path/codes.json');
+      final json = await File.fromUri(uri).readAsString();
+      final decoded = jsonDecode(json).cast<String>() as List<String>;
+      final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
+      return Future.value(set);
     });
   }
 
@@ -150,21 +144,15 @@ class LanguageDataProvider {
   }) {
     return LanguageDataProvider._((code) {
       String path = Utils.removeLastSlash(parentUrl);
-      final uri = Uri.tryParse('$path/languages/${code.code}.json');
-      if (uri != null) {
-        return _network(uri: uri, code: code, client: client, headers: headers);
-      }
-      return {};
+      final uri = Uri.parse('$path/languages/${code.code}.json');
+      return _network(uri: uri, code: code, client: client, headers: headers);
     }, () async {
       String path = Utils.removeLastSlash(parentUrl);
-      final uri = Uri.tryParse('$path/codes.json');
-      if (uri != null) {
-        final json = await Utils.getUrl(uri, client: client, headers: headers);
-        final decoded = jsonDecode(json).cast<String>() as List<String>;
-        final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
-        return Future.value(set);
-      }
-      return {};
+      final uri = Uri.parse('$path/codes.json');
+      final json = await Utils.getUrl(uri, client: client, headers: headers);
+      final decoded = jsonDecode(json).cast<String>() as List<String>;
+      final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
+      return Future.value(set);
     });
   }
 
