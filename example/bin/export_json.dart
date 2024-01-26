@@ -4,6 +4,6 @@ import 'package:language_helper_example/resources/language_helper/language_data.
 
 void main() {
   test('', () {
-    languageData.exportJson('./assets');
+    languageData.exportJson('./assets/resources');
   });
 }
