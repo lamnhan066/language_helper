@@ -103,8 +103,9 @@ The data will be generated in this path by default:
 |-- .lib
 |   |--- resources
 |   |    |--- language_helper
-|   |    |    |--- _language_data_abstract.g.dart   ; This file will be overwritten when generating
 |   |    |    |--- language_data.dart
+|   |    |    |--- languages
+|   |    |    |    |--- _generated.dart   ; This file will be overwritten when re-generating
 ```
 
 **Implement to your project:**
@@ -135,10 +136,11 @@ The data will be generated in this path by default:
 
 ```txt
 |-- assets
-|  |- language_helper
-|  |  |- codes.json            ; This file will be overwritten when generating
-|  |  |  |- languages
-|  |  |  |  |- _generated.json ; This file will be overwritten when generating
+|   |--- resources
+|   |    |--- language_helper
+|   |    |    |--- codes.json
+|   |    |    |--- languages
+|   |    |    |    |--- _generated.json ; This file will be overwritten when re-generating
 ```
 
 ### Implement to your project
@@ -149,10 +151,10 @@ The data will be generated in this path by default:
 final languageHelper = LanguageHelper.instance;
 
 // Assets
-final languageDataProvider = LanguageDataProvider.asset('assets/language_helper');
+final languageDataProvider = LanguageDataProvider.asset('assets/resources/language_helper');
 
 // Network
-final languageDataProvider = LanguageDataProvider.network('https://example.com/language_helper');
+final languageDataProvider = LanguageDataProvider.network('https://example.com/resources/language_helper');
 ```
 
 **Add to the `LanguageHelper` instance:**
@@ -175,8 +177,8 @@ main() async {
 main() async {
   await languageHelper.initial(
       data: [
-        LanguageDataProvider.network('https://example.com/language_helper'),
-        LanguageDataProvider.asset('assets/language_helper'),
+        LanguageDataProvider.network('https://example.com/resources/language_helper'),
+        LanguageDataProvider.asset('assets/resources/language_helper'),
         LanguageDataProvider.data(languageData),
       ],
   );
@@ -227,13 +229,13 @@ With `LanguageConditions`, you can completely control which text is returned acc
 
 **JSON:**
 
-`assets/language_helper/codes.json`: Contains all language codes
+`assets/resources/language_helper/codes.json`: Contains all language codes
 
 ```JSON
 ["en", "vi"]
 ```
 
-`assets/language_helper/languages/vi.json`:
+`assets/resources/language_helper/languages/en.json`:
 
 ```JSON
 {
@@ -252,7 +254,7 @@ With `LanguageConditions`, you can completely control which text is returned acc
 }
 ```
 
-`assets/language_helper/languages/en.json`:
+`assets/resources/language_helper/languages/vi.json`:
 
 ```JSON
 {
@@ -262,8 +264,17 @@ With `LanguageConditions`, you can completely control which text is returned acc
 }
 ```
 
+Remember to add those files to the `pubspec.yaml`:
+
+```yaml
+flutter:
+  assets:
+    - assets/resources/language_helper/codes.json
+    - assets/resources/language_helper/languages/
+```
+
 ```dart
-final languageDataProvider = LanguageDataProvider.asset('assets/language_helper');
+final languageDataProvider = LanguageDataProvider.asset('assets/resources/language_helper');
 ```
 
 ### Add To The Project
@@ -391,7 +402,7 @@ dart run language_helper:generate --path=./lib
 Add `--output` option to your command:
 
 ```shell
-dart run language_helper:generate --output=./lib
+dart run language_helper:generate --output=./lib/resources
 ```
 
 ### Convert From `LanguageData` to `JSON`
@@ -403,7 +414,7 @@ dart run language_helper:generate --output=./lib
 ```dart
 void main() {
   test('', () {
-    languageData.exportJson('./assets');
+    languageData.exportJson('./assets/resources');
   });
 }
 ```
