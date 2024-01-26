@@ -665,7 +665,7 @@ void main() async {
     });
 
     test('asset - ok', () async {
-      final data = LanguageDataProvider.asset('assets/language_helper');
+      final data = LanguageDataProvider.asset('assets');
       final codes = await data.getSupportedCodes();
       expect(codes, equals({LanguageCodes.en, LanguageCodes.vi}));
       final languages = await data.getData(LanguageCodes.en);
@@ -682,7 +682,7 @@ void main() async {
 
     test('network - ok', () async {
       final data = LanguageDataProvider.network(
-        'https://pub.lamnhan.dev/language_helper/',
+        'https://pub.lamnhan.dev',
         client: MockClient(),
       );
 
