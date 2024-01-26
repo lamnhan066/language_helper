@@ -10,7 +10,7 @@ extension LanguageDataSerializer on LanguageData {
   /// Conver this [LanguageData] to Map
   Map<String, dynamic> toMap() => s.languageDataToMap(this);
 
-  /// Export to json files for `LanguageDataProvider`. Default `path` is set to './assets/languages'.
+  /// Export to json files for `LanguageDataProvider`. Default `path` is set to './assets/resources'.
   ///
   /// We need a little trick to run this script to get the expected result:
   /// - Create a `export_json.dart` file in your `bin` folder (the same level with the `lib`).
@@ -19,7 +19,7 @@ extension LanguageDataSerializer on LanguageData {
   /// ```dart
   /// void main() {
   ///   test('', () {
-  ///     languageData.exportJson('./assets/languages');
+  ///     languageData.exportJson('./assets/resources');
   ///   });
   /// }
   /// ```
@@ -34,7 +34,7 @@ extension LanguageDataSerializer on LanguageData {
   ///  |  |  |  |  |- en.json
   ///  |  |  |  |  |- vi.json
   ///  |  |  |  |  |- ...
-  void exportJson([String path = './assets']) {
+  void exportJson([String path = './assets/resources']) {
     return s.exportJson(this, path);
   }
 

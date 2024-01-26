@@ -120,17 +120,18 @@ class LanguageDataProvider {
   /// The `parentPath` is a path that point to `codes.json` file but not includes
   /// it.
   ///
-  /// Ex: `assets/resources/language_data/codes.json` and your languages is in
-  ///     `assets/resources/language_data/languages/en.json`...
-  /// The `parentPath` will be `assets/resources/language_data`.
+  /// Ex: `assets/resources/language_helper/codes.json` and your languages is in
+  ///     `assets/resources/language_helper/languages/en.json`...
+  /// The `parentPath` will be `assets/resources`.
   factory LanguageDataProvider.asset(String parentPath) {
     return LanguageDataProvider._((code) {
       String path = Utils.removeLastSlash(parentPath);
-      final uri = Uri.parse('$path/languages/${code.code}.json');
+      final uri =
+          Uri.parse('$path/language_helper/languages/${code.code}.json');
       return _asset(uri: uri, code: code);
     }, () async {
       String path = Utils.removeLastSlash(parentPath);
-      final uri = Uri.parse('$path/codes.json');
+      final uri = Uri.parse('$path/language_helper/codes.json');
       final json = await _loadAsset(uri.path);
       final decoded = jsonDecode(json).cast<String>() as List<String>;
       final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
@@ -143,9 +144,9 @@ class LanguageDataProvider {
   /// The `parentPath` is a path that point to `codes.json` file but not includes
   /// it.
   ///
-  /// Ex: `https://example.com/assets/resources/language_data/codes.json` and your languages is in
-  ///     `https://example.com/assets/resources/language_data/languages/en.json`...
-  /// The `parentPath` will be `ahttps://example.com/ssets/resources/language_data`.
+  /// Ex: `https://example.com/assets/resources/language_helper/codes.json` and your languages is in
+  ///     `https://example.com/assets/resources/language_helper/languages/en.json`...
+  /// The `parentPath` will be `https://example.com/assets/resources`.
   factory LanguageDataProvider.network(
     String parentUrl, {
     Client? client,
@@ -153,11 +154,12 @@ class LanguageDataProvider {
   }) {
     return LanguageDataProvider._((code) {
       String path = Utils.removeLastSlash(parentUrl);
-      final uri = Uri.parse('$path/languages/${code.code}.json');
+      final uri =
+          Uri.parse('$path/language_helper/languages/${code.code}.json');
       return _network(uri: uri, code: code, client: client, headers: headers);
     }, () async {
       String path = Utils.removeLastSlash(parentUrl);
-      final uri = Uri.parse('$path/codes.json');
+      final uri = Uri.parse('$path/language_helper/codes.json');
       final json = await Utils.getUrl(uri, client: client, headers: headers);
       final decoded = jsonDecode(json).cast<String>() as List<String>;
       final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
