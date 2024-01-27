@@ -46,9 +46,16 @@ void main() async {
     languageSub?.cancel();
   });
 
-  test('Test with empty data', () async {
-    await languageHelper.initial(data: []);
-    expect(languageHelper.code, equals(LanguageCodes.en));
+  group('Test with empty data and use temporary testing data -', () {
+    test('data = []', () async {
+      await languageHelper.initial(data: []);
+      expect(languageHelper.code, equals(LanguageCodes.en));
+    });
+
+    test('data = [LanguageDataProvider.data({})]', () async {
+      await languageHelper.initial(data: [LanguageDataProvider.data({})]);
+      expect(languageHelper.code, equals(LanguageCodes.en));
+    });
   });
 
   group('Test with SharedPreferences', () {
@@ -71,9 +78,11 @@ void main() async {
     });
   });
 
-  group('Test without SharedPreferences', () {
+  group('Test without SharedPreferences -', () {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
+    });
+    test('Get language from prefs and is available in LanguageData', () async {
       await languageHelper.initial(
         data: dataList,
         useInitialCodeWhenUnavailable: false,
@@ -83,15 +92,11 @@ void main() async {
           expect(value, isA<LanguageCodes>());
         },
       );
-    });
-    test('Get language from prefs and is available in LanguageData', () {
       expect(languageHelper.code, equals(LanguageCodes.en));
     });
-  });
 
-  group('Test without SharedPreferences', () {
-    setUp(() async {
-      SharedPreferences.setMockInitialValues({});
+    test('Get language from prefs and is unavailable in LanguageData',
+        () async {
       await languageHelper.initial(
         data: dataList,
         initialCode: LanguageCodes.cu,
@@ -102,8 +107,6 @@ void main() async {
           expect(value, isA<LanguageCodes>());
         },
       );
-    });
-    test('Get language from prefs and is unavailable in LanguageData', () {
       expect(languageHelper.code, equals(LanguageCodes.en));
     });
   });
