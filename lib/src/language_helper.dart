@@ -210,23 +210,18 @@ class LanguageHelper {
     _analysisKeys = analysisKeys;
     _initialCode = initialCode;
 
-    // When the `data` is empty, a temporary data will be added.
-    if (_dataProviders.isEmpty ||
-        (await _getSupportedCode(
-                provider: _dataProviders.first, isOverrides: false))
-            .isEmpty) {
-      printDebug(
-          'The `data` is empty, we will use a temporary `data` for developing state');
-      _dataProviders = [
-        LanguageDataProvider.data({LanguageCodes.en: {}})
-      ];
-    }
-
-    LanguageCodes finalCode = _initialCode ?? LanguageCode.code;
-
     _dataProvider = await _chooseTheBestDataProvider(_dataProviders, false);
     _dataOverridesProvider =
         await _chooseTheBestDataProvider(_dataOverridesProviders, true);
+
+    // When the `data` is empty, a temporary data will be added.
+    if ((await _dataProvider.getSupportedCodes()).isEmpty) {
+      printDebug(
+          'The `data` is empty, we will use a temporary `data` for the developing state');
+      _dataProvider = LanguageDataProvider.data({LanguageCodes.en: {}});
+    }
+
+    LanguageCodes finalCode = _initialCode ?? LanguageCode.code;
 
     _codes = await _getSupportedCode(
       provider: _dataProvider,
