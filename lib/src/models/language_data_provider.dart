@@ -18,31 +18,6 @@ class LanguageDataProvider {
     return Future.value('');
   }
 
-  static Future<LanguageData> _asset({
-    required Uri uri,
-    required LanguageCodes code,
-  }) async {
-    String json = await _loadAsset(uri.path);
-    if (json.isNotEmpty) {
-      return {code: LanguageDataSerializer.valuesFromJson(json)};
-    }
-    return {};
-  }
-
-  static Future<LanguageData> _network({
-    required Uri uri,
-    required LanguageCodes code,
-    required Client? client,
-    required Map<String, String>? headers,
-  }) async {
-    String json = await Utils.getUrl(uri, client: client, headers: headers);
-    if (json.isNotEmpty) {
-      return {code: LanguageDataSerializer.valuesFromJson(json)};
-    } else {
-      return {};
-    }
-  }
-
   /// Get saved `LanguageData` from `SharedPreferences`.
   static Future<LanguageData> getSavedData(
     LanguageCodes code,
@@ -124,18 +99,25 @@ class LanguageDataProvider {
   ///     `assets/resources/language_helper/languages/en.json`...
   /// The `parentPath` will be `assets/resources`.
   factory LanguageDataProvider.asset(String parentPath) {
-    return LanguageDataProvider._((code) {
+    return LanguageDataProvider._((code) async {
       String path = Utils.removeLastSlash(parentPath);
       final uri =
           Uri.parse('$path/language_helper/languages/${code.code}.json');
-      return _asset(uri: uri, code: code);
+      String json = await _loadAsset(uri.path);
+      if (json.isNotEmpty) {
+        return {code: LanguageDataSerializer.valuesFromJson(json)};
+      }
+      return {};
     }, () async {
       String path = Utils.removeLastSlash(parentPath);
       final uri = Uri.parse('$path/language_helper/codes.json');
       final json = await _loadAsset(uri.path);
-      final decoded = jsonDecode(json).cast<String>() as List<String>;
-      final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
-      return Future.value(set);
+      if (json.isNotEmpty) {
+        final decoded = jsonDecode(json).cast<String>() as List<String>;
+        final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
+        return Future.value(set);
+      }
+      return {};
     });
   }
 
@@ -152,18 +134,25 @@ class LanguageDataProvider {
     Client? client,
     Map<String, String>? headers,
   }) {
-    return LanguageDataProvider._((code) {
+    return LanguageDataProvider._((code) async {
       String path = Utils.removeLastSlash(parentUrl);
       final uri =
           Uri.parse('$path/language_helper/languages/${code.code}.json');
-      return _network(uri: uri, code: code, client: client, headers: headers);
+      String json = await Utils.getUrl(uri, client: client, headers: headers);
+      if (json.isNotEmpty) {
+        return {code: LanguageDataSerializer.valuesFromJson(json)};
+      }
+      return {};
     }, () async {
       String path = Utils.removeLastSlash(parentUrl);
       final uri = Uri.parse('$path/language_helper/codes.json');
       final json = await Utils.getUrl(uri, client: client, headers: headers);
-      final decoded = jsonDecode(json).cast<String>() as List<String>;
-      final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
-      return Future.value(set);
+      if (json.isNotEmpty) {
+        final decoded = jsonDecode(json).cast<String>() as List<String>;
+        final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
+        return Future.value(set);
+      }
+      return {};
     });
   }
 
