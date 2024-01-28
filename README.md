@@ -150,12 +150,14 @@ The data will be generated in this path by default:
 ```dart
 final languageHelper = LanguageHelper.instance;
 
-// Assets
-final languageDataProvider = LanguageDataProvider.asset('assets/resources/language_helper');
-
 // Network
-final languageDataProvider = LanguageDataProvider.network('https://example.com/resources/language_helper');
+final languageDataProvider = LanguageDataProvider.network('https://example.com/resources');
+
+// Assets
+final languageDataProvider = LanguageDataProvider.asset('assets/resources');
 ```
+
+If valid data is available in the chosen language, it will be cached automatically. This way, the app will load the data from the cache if it's not available next time, which is helpful when using `network` data. You can disable this behavior by setting the `cachesData`'s value to `false` in the `initial`.
 
 **Add to the `LanguageHelper` instance:**
 
