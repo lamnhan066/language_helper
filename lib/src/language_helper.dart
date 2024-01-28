@@ -88,6 +88,11 @@ class LanguageHelper {
   /// Auto save and load [LanguageCodes] from memory
   bool _isAutoSave = false;
 
+  /// TODO(lamnhan066): Make sure (add test) the caching feature this feature worked before publishing
+  ///
+  /// Caches the valid data for later use. Useful when using data from `network`.
+  final bool _cachesData = false;
+
   /// Sync with the device language
   bool _syncWithDevice = true;
 
@@ -177,6 +182,11 @@ class LanguageHelper {
     /// language in the next open instead of [initialCode].
     bool isAutoSave = true,
 
+    /// TODO(lamnhan066): Make sure (add test) the caching feature this feature worked before publishing
+    ///
+    /// Caches the valid data for later use. Useful when using data from `network`.
+    // bool cachesData = true,
+
     /// Apply the device language when it's changed.
     /// If this value is `true`, update the app language when the device language changes.
     /// Otherwise, keep the current app language even if the device language changes.
@@ -206,13 +216,20 @@ class LanguageHelper {
     _isDebug = isDebug;
     _useInitialCodeWhenUnavailable = useInitialCodeWhenUnavailable;
     _isAutoSave = isAutoSave;
+    // TODO(lamnhan066): Make sure (add test) the caching feature this feature worked before publishing
+    // _cachesData = cachesData;
     _syncWithDevice = syncWithDevice;
     _analysisKeys = analysisKeys;
     _initialCode = initialCode;
 
-    _dataProvider = await _chooseTheBestDataProvider(_dataProviders, false);
-    _dataOverridesProvider =
-        await _chooseTheBestDataProvider(_dataOverridesProviders, true);
+    _dataProvider = await _chooseTheBestDataProvider(
+      _dataProviders,
+      false,
+    );
+    _dataOverridesProvider = await _chooseTheBestDataProvider(
+      _dataOverridesProviders,
+      true,
+    );
 
     // When the `data` is empty, a temporary data will be added.
     if ((await _dataProvider.getSupportedCodes()).isEmpty) {
@@ -593,10 +610,13 @@ class LanguageHelper {
     final p = '$prefix.${isOverrides ? 'DataOverrides' : 'Data'}';
 
     var codes = await provider.getSupportedCodes();
-    if (codes.isEmpty) {
-      codes = await LanguageDataProvider.getSavedCodes(p);
-    } else {
-      LanguageDataProvider.saveCodes(p, codes);
+    if (_cachesData) {
+      if (codes.isEmpty) {
+        codes = await LanguageDataProvider.getSavedCodes(p);
+        print('> $p -> $codes');
+      } else {
+        LanguageDataProvider.saveCodes(p, codes);
+      }
     }
 
     return codes;
@@ -615,10 +635,12 @@ class LanguageHelper {
     final p = '$prefix.${isOverrides ? 'DataOverrides' : 'Data'}';
 
     var data = await provider.getData(code);
-    if (data.isEmpty) {
-      data = await LanguageDataProvider.getSavedData(code, p);
-    } else {
-      LanguageDataProvider.saveData(code, p, data);
+    if (_cachesData) {
+      if (data.isEmpty) {
+        data = await LanguageDataProvider.getSavedData(code, p);
+      } else {
+        LanguageDataProvider.saveData(code, p, data);
+      }
     }
 
     return data;

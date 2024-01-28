@@ -157,8 +157,6 @@ final languageDataProvider = LanguageDataProvider.network('https://example.com/r
 final languageDataProvider = LanguageDataProvider.asset('assets/resources');
 ```
 
-If valid data is available in the chosen language, it will be cached automatically. This way, the app will load the data from the cache if it's not available next time, which is helpful when using `network` data. You can disable this behavior by setting the `cachesData`'s value to `false` in the `initial`.
-
 **Add to the `LanguageHelper` instance:**
 
 ```dart
