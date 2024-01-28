@@ -1,3 +1,24 @@
+## 0.11.0-rc.3
+
+* Improve the logic of using the temporary data while developing.
+  * Right:
+
+  ```dart
+  languageHelper.initial(
+    data: []
+  );
+  ```
+
+  * Wrong:
+
+  ```dart
+  languageHelper.initial(
+    data: [LanguageDataProvider.data({})],
+  );
+  ```
+
+* `assets` data is preferred between `assets` and `network` because we still haven't a way to cache it.
+
 ## 0.11.0-rc.2
 
 * The `language_helper` in `.asset` and `.network` of `LanguageDataProvider` are now required. So we don't need to add it into the input path:
