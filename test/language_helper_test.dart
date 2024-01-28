@@ -51,11 +51,6 @@ void main() async {
       await languageHelper.initial(data: []);
       expect(languageHelper.code, equals(LanguageCodes.en));
     });
-
-    test('data = [LanguageDataProvider.data({})]', () async {
-      await languageHelper.initial(data: [LanguageDataProvider.data({})]);
-      expect(languageHelper.code, equals(LanguageCodes.en));
-    });
   });
 
   group('Test with SharedPreferences', () {

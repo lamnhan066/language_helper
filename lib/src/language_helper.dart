@@ -145,7 +145,8 @@ class LanguageHelper {
   /// The plugin also supports auto save the [LanguageCodes] when changed and
   /// reload it from memory in the next opening.
   Future<void> initial({
-    /// Data of languages. The [data] must be not empty.
+    /// Data of languages. If this value is empty, a temporary data ([LanguageDataProvider.data({LanguagesCode.en: {}})])
+    /// will be added to let make it easier to develop the app.
     required Iterable<LanguageDataProvider> data,
 
     /// Data of the languages that you want to override the [data]. This feature
@@ -222,21 +223,18 @@ class LanguageHelper {
     _analysisKeys = analysisKeys;
     _initialCode = initialCode;
 
-    _dataProvider = await _chooseTheBestDataProvider(
-      _dataProviders,
-      false,
-    );
-    _dataOverridesProvider = await _chooseTheBestDataProvider(
-      _dataOverridesProviders,
-      true,
-    );
-
     // When the `data` is empty, a temporary data will be added.
-    if ((await _dataProvider.getSupportedCodes()).isEmpty) {
+    if (_dataProviders.isEmpty) {
       printDebug(
           'The `data` is empty, we will use a temporary `data` for the developing state');
-      _dataProvider = LanguageDataProvider.data({LanguageCodes.en: {}});
+      _dataProviders = [
+        LanguageDataProvider.data({LanguageCodes.en: {}})
+      ];
     }
+
+    _dataProvider = await _chooseTheBestDataProvider(_dataProviders, false);
+    _dataOverridesProvider =
+        await _chooseTheBestDataProvider(_dataOverridesProviders, true);
 
     LanguageCodes finalCode = _initialCode ?? LanguageCode.code;
 
@@ -248,6 +246,9 @@ class LanguageHelper {
       provider: _dataOverridesProvider,
       isOverrides: true,
     );
+
+    assert(
+        _codes.isNotEmpty, 'The LanguageData in the `data` must be not empty');
 
     // Try to reload from memory if `isAutoSave` is `true`
     if (_isAutoSave) {
@@ -613,7 +614,6 @@ class LanguageHelper {
     if (_cachesData) {
       if (codes.isEmpty) {
         codes = await LanguageDataProvider.getSavedCodes(p);
-        print('> $p -> $codes');
       } else {
         LanguageDataProvider.saveCodes(p, codes);
       }
