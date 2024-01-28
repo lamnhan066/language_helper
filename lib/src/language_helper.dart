@@ -88,11 +88,6 @@ class LanguageHelper {
   /// Auto save and load [LanguageCodes] from memory
   bool _isAutoSave = false;
 
-  /// TODO(lamnhan066): Make sure (add test) the caching feature this feature worked before publishing
-  ///
-  /// Caches the valid data for later use. Useful when using data from `network`.
-  final bool _cachesData = false;
-
   /// Sync with the device language
   bool _syncWithDevice = true;
 
@@ -217,8 +212,6 @@ class LanguageHelper {
     _isDebug = isDebug;
     _useInitialCodeWhenUnavailable = useInitialCodeWhenUnavailable;
     _isAutoSave = isAutoSave;
-    // TODO(lamnhan066): Make sure (add test) the caching feature this feature worked before publishing
-    // _cachesData = cachesData;
     _syncWithDevice = syncWithDevice;
     _analysisKeys = analysisKeys;
     _initialCode = initialCode;
@@ -238,14 +231,8 @@ class LanguageHelper {
 
     LanguageCodes finalCode = _initialCode ?? LanguageCode.code;
 
-    _codes = await _getSupportedCode(
-      provider: _dataProvider,
-      isOverrides: false,
-    );
-    _codesOverrides = await _getSupportedCode(
-      provider: _dataOverridesProvider,
-      isOverrides: true,
-    );
+    _codes = await _dataProvider.getSupportedCodes();
+    _codesOverrides = await _dataOverridesProvider.getSupportedCodes();
 
     assert(
         _codes.isNotEmpty, 'The LanguageData in the `data` must be not empty');
@@ -318,16 +305,8 @@ class LanguageHelper {
     printDebug('Set `currentCode` to $finalCode');
     _currentCode = finalCode;
 
-    _data.addAll(await _getData(
-      provider: _dataProvider,
-      code: code,
-      isOverrides: false,
-    ));
-    _dataOverrides.addAll(await _getData(
-      provider: _dataOverridesProvider,
-      code: code,
-      isOverrides: true,
-    ));
+    _data.addAll(await _dataProvider.getData(code));
+    _dataOverrides.addAll(await _dataOverridesProvider.getData(code));
 
     if (_isDebug) {
       analyze();
@@ -354,8 +333,6 @@ class LanguageHelper {
     final getData = await data.getData(_currentCode!);
     _addData(data: getData, database: _data, overwrite: overwrite);
     _codes.addAll(await data.getSupportedCodes());
-    _saveData(isOverrides: false);
-    _saveSupportedCodes(isOverrides: false);
     if (activate) change(code);
     printDebug(
         'The new `data` is added and activated with overwrite is $overwrite');
@@ -376,8 +353,6 @@ class LanguageHelper {
     final getData = await dataOverrides.getData(_currentCode!);
     _addData(data: getData, database: _dataOverrides, overwrite: overwrite);
     _codesOverrides.addAll(await dataOverrides.getSupportedCodes());
-    _saveData(isOverrides: true);
-    _saveSupportedCodes(isOverrides: true);
     if (activate) change(code);
     printDebug(
         'The new `dataOverrides` is added and activated with overwrite is $overwrite');
@@ -456,16 +431,8 @@ class LanguageHelper {
     if (!_data.containsKey(_currentCode)) {
       _data.clear();
       _dataOverrides.clear();
-      _data.addAll(await _getData(
-        provider: _dataProvider,
-        code: code,
-        isOverrides: false,
-      ));
-      _dataOverrides.addAll(await _getData(
-        provider: _dataOverridesProvider,
-        code: code,
-        isOverrides: true,
-      ));
+      _data.addAll(await _dataProvider.getData(code));
+      _dataOverrides.addAll(await _dataOverridesProvider.getData(code));
     }
 
     printDebug('Change language to $toCode for ${_states.length} states');
@@ -590,10 +557,7 @@ class LanguageHelper {
   ) async {
     LanguageDataProvider? result;
     for (final provider in providers) {
-      Set<LanguageCodes> codes = await _getSupportedCode(
-        provider: provider,
-        isOverrides: isOverrides,
-      );
+      Set<LanguageCodes> codes = await provider.getSupportedCodes();
 
       if (codes.isNotEmpty) {
         result = provider;
@@ -602,53 +566,6 @@ class LanguageHelper {
     }
 
     return result ?? LanguageDataProvider.data({});
-  }
-
-  Future<Set<LanguageCodes>> _getSupportedCode({
-    required LanguageDataProvider provider,
-    required bool isOverrides,
-  }) async {
-    final p = '$prefix.${isOverrides ? 'DataOverrides' : 'Data'}';
-
-    var codes = await provider.getSupportedCodes();
-    if (_cachesData) {
-      if (codes.isEmpty) {
-        codes = await LanguageDataProvider.getSavedCodes(p);
-      } else {
-        LanguageDataProvider.saveCodes(p, codes);
-      }
-    }
-
-    return codes;
-  }
-
-  Future<void> _saveSupportedCodes({required bool isOverrides}) async {
-    final p = '$prefix.${isOverrides ? 'DataOverrides' : 'Data'}';
-    LanguageDataProvider.saveCodes(p, codes);
-  }
-
-  Future<LanguageData> _getData({
-    required LanguageDataProvider provider,
-    required LanguageCodes code,
-    required bool isOverrides,
-  }) async {
-    final p = '$prefix.${isOverrides ? 'DataOverrides' : 'Data'}';
-
-    var data = await provider.getData(code);
-    if (_cachesData) {
-      if (data.isEmpty) {
-        data = await LanguageDataProvider.getSavedData(code, p);
-      } else {
-        LanguageDataProvider.saveData(code, p, data);
-      }
-    }
-
-    return data;
-  }
-
-  Future<void> _saveData({required bool isOverrides}) async {
-    final p = '$prefix.${isOverrides ? 'DataOverrides' : 'Data'}';
-    LanguageDataProvider.saveData(code, p, data);
   }
 
   /// Replace @{param} or @param with the real text

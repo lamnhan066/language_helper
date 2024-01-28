@@ -6,7 +6,6 @@ import 'package:http/http.dart';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper/src/utils/print_debug.dart';
 import 'package:language_helper/src/utils/utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LanguageDataProvider {
   static Future<String> _loadAsset(String path) async {
@@ -16,60 +15,6 @@ class LanguageDataProvider {
       printDebug('The $path does not exist in the assets');
     }
     return Future.value('');
-  }
-
-  /// Get saved `LanguageData` from `SharedPreferences`.
-  static Future<LanguageData> getSavedData(
-    LanguageCodes code,
-    String prefix,
-  ) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final key = '$prefix.CachedLanguageData.${code.code}';
-    final json = prefs.getString(key);
-
-    if (json != null && json.isNotEmpty) {
-      return {code: LanguageDataSerializer.valuesFromJson(json)};
-    }
-    return {};
-  }
-
-  /// Save `LanguageData` to `SharedPreferences`.
-  static Future<void> saveData(
-    LanguageCodes code,
-    String prefix,
-    LanguageData data,
-  ) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final key = '$prefix.CachedLanguageData.${code.code}';
-
-    if (data.isNotEmpty) {
-      await prefs.setString(key, data.toJson());
-    }
-  }
-
-  /// Get saved `LanguageData` from `SharedPreferences`.
-  static Future<Set<LanguageCodes>> getSavedCodes(String prefix) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final key = '$prefix.CachedLanguageCode';
-    final list = prefs.getStringList(key);
-
-    if (list != null && list.isNotEmpty) {
-      return list.map((e) => LanguageCodes.fromCode(e)).toSet();
-    }
-    return {};
-  }
-
-  /// Save `LanguageData` to `SharedPreferences`.
-  static Future<void> saveCodes(
-    String prefix,
-    Set<LanguageCodes> codes,
-  ) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final key = '$prefix.CachedLanguageCode';
-
-    if (codes.isNotEmpty) {
-      await prefs.setStringList(key, codes.map((e) => e.code).toList());
-    }
   }
 
   /// Get the `LanguageData` based on the `code`.
