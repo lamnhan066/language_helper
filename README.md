@@ -177,8 +177,8 @@ main() async {
 main() async {
   await languageHelper.initial(
       data: [
-        LanguageDataProvider.network('https://example.com/resources/language_helper'),
-        LanguageDataProvider.asset('assets/resources/language_helper'),
+        LanguageDataProvider.network('https://example.com/resources'),
+        LanguageDataProvider.asset('assets/resources'),
         LanguageDataProvider.data(languageData),
       ],
   );
@@ -274,7 +274,7 @@ flutter:
 ```
 
 ```dart
-final languageDataProvider = LanguageDataProvider.asset('assets/resources/language_helper');
+final languageDataProvider = LanguageDataProvider.asset('assets/resources');
 ```
 
 ### Add To The Project
