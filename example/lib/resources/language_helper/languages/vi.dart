@@ -4,8 +4,8 @@ final vi = {
   ///===========================================================================
   '@path_0': './lib/page_asset.dart',
   'Asset': 'Asset',
-  'This is the line 1': 'This is the line 1',
-  'This is the line 2': 'This is the line 2',
+  'This is the line 1': 'Đây là dòng thứ 1',
+  'This is the line 2': 'Đây là dòng thứ 2',
 
   ///===========================================================================
   /// Path: ./lib/main.dart

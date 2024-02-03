@@ -9,7 +9,7 @@ class PageAsset extends StatefulWidget {
 }
 
 class _PageAssetState extends State<PageAsset> {
-  final languageHelper = LanguageHelper('NewLanguageHelper');
+  final languageHelper = LanguageHelper.instance;
   bool isLoaded = false;
 
   @override
@@ -19,9 +19,7 @@ class _PageAssetState extends State<PageAsset> {
   }
 
   void initial() async {
-    await languageHelper.initial(
-      data: [LanguageDataProvider.asset('assets/resources')],
-    );
+    languageHelper.addData(LanguageDataProvider.asset('assets/resources'));
 
     setState(() {
       isLoaded = true;
@@ -32,14 +30,26 @@ class _PageAssetState extends State<PageAsset> {
   Widget build(BuildContext context) {
     return !isLoaded
         ? const Center(child: CircularProgressIndicator())
-        : Scaffold(
-            appBar: AppBar(
-              title: Text('Asset'.tr),
-            ),
-            body: Column(children: [
-              Text('This is the line 1'.tr),
-              Text('This is the line 2'.tr),
-            ]),
-          );
+        : LanguageBuilder(builder: (context) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text('Asset'.tr),
+              ),
+              body: Column(children: [
+                Text('This is the line 1'.tr),
+                Text('This is the line 2'.tr),
+                ElevatedButton(
+                  onPressed: () {
+                    if (LanguageHelper.instance.code == LanguageCodes.vi) {
+                      LanguageHelper.instance.change(LanguageCodes.en);
+                    } else {
+                      LanguageHelper.instance.change(LanguageCodes.vi);
+                    }
+                  },
+                  child: Text('Change language'.tr),
+                ),
+              ]),
+            );
+          });
   }
 }

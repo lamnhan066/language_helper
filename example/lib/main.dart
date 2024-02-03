@@ -69,13 +69,7 @@ class _MyAppState extends State<MyApp> {
                     LanguageHelper.instance.change(LanguageCodes.vi);
                   }
                 },
-                child: Text('Change language'.tr),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  LanguageHelper.instance.analyze();
-                },
-                child: Text('Analyze languages'.tr),
+                child: const Text('Change language'),
               ),
               Builder(builder: (_) => Text('Hello'.tr)),
               Dialog(
@@ -92,22 +86,23 @@ class _MyAppState extends State<MyApp> {
                 },
                 child: Text('This text will be changed when the data added'.tr),
               ),
+              const Divider(),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const OtherPage()));
+                },
+                child: const Text('Go to Other Page'),
+              ),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (_) => const PageAsset()));
                 },
-                child: const Text('Asset'),
+                child: const Text('Go to Asset Page'),
               ),
             ],
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.navigate_next_rounded),
-          onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (_) => const OtherPage()));
-          },
         ),
       );
     });
