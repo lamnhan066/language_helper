@@ -53,6 +53,24 @@ void main() async {
     });
   });
 
+  group('Test initial -', () {
+    test('`isInitialized`', () async {
+      final temp = LanguageHelper('TempLanguageHelper');
+      expect(temp.isInitialized, equals(false));
+      await temp.initial(data: []);
+      expect(temp.isInitialized, equals(true));
+    });
+    test('`ensureInitialized`', () async {
+      final temp = LanguageHelper('TempLanguageHelper');
+      temp.ensureInitialized.then((value) {
+        expect(temp.isInitialized, equals(true));
+      });
+      await temp.initial(data: []);
+      await temp.ensureInitialized;
+      expect(temp.isInitialized, equals(true));
+    });
+  });
+
   group('Test with SharedPreferences', () {
     setUp(() async {
       SharedPreferences.setMockInitialValues({
