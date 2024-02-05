@@ -1,3 +1,7 @@
+## 0.11.0-rc.6
+
+* Add topics.
+
 ## 0.11.0-rc.5
 
 * Add `isInitialized` (bool) and `ensureInitialized` (Future<void>) to check whether the `initial` is run.
