@@ -122,6 +122,13 @@ class LanguageHelper {
   /// Language code of the device
   String get _deviceCodeKey => '$prefix.DeviceCode';
 
+  /// Return `true` if the `initial` method is completed.
+  bool get isInitialized => _ensureInitialized.isCompleted;
+
+  /// Wait until the `initial` method is completed.
+  Future<void> get ensureInitialized => _ensureInitialized.future;
+  final _ensureInitialized = Completer<void>();
+
   /// Initialize the plugin with the List of [data] that you have created,
   /// you can set the [initialCode] for this app or it will get the first
   /// language in [data], the [LanguageCodes.en] will be added when the `data` is empty. You can also set
@@ -310,6 +317,10 @@ class LanguageHelper {
 
     if (_isDebug) {
       analyze();
+    }
+
+    if (!_ensureInitialized.isCompleted) {
+      _ensureInitialized.complete();
     }
   }
 
