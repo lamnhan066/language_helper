@@ -1,3 +1,8 @@
+## 0.11.0-rc.5
+
+* Add `isInitialized` (bool) and `ensureInitialized` (Future<void>) to check whether the `initial` is run.
+* Update tests.
+
 ## 0.11.0-rc.4
 
 * Improve README.

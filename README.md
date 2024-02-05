@@ -504,6 +504,8 @@ final en = {
 
 - The `assets` data is preferred between `assets` and `network` because we still haven't a way to cache it.
 
+- Use the `isInitialized` (bool) and `ensureInitialized` (Future<void>) to check whether the `initial` is run.
+
 ## Contributions
 
 As the project is currently in its early stages, it may contain bugs or other issues. Should you experience any problems, we kindly ask that you file an issue to let us know. Additionally, we welcome contributions in the form of pull requests (PRs) to help enhance the project.
