@@ -624,6 +624,37 @@ void main() async {
       expect(dollar10, findsNothing);
     });
 
+    testWidgets('LanguageBuilder with custom LanguageHelper', (tester) async {
+      // Use en as default language
+      SharedPreferences.setMockInitialValues({});
+      final helper = LanguageHelper('CustomLanguageHelper');
+      await helper.initial(data: dataList, initialCode: LanguageCodes.en);
+
+      await tester.pumpWidget(CustomLanguageHelperWidget(
+        helper: helper,
+      ));
+      await tester.pumpAndSettle();
+
+      // initial language is English
+      final helloText = find.text('Hello');
+      final xinChaoText = find.text('Xin Chào');
+      final dollar100 = find.text('You have 100 dollars');
+      final dollar10 = find.text('You have 10, dollars');
+
+      expect(helloText, findsNWidgets(2));
+      expect(xinChaoText, findsNothing);
+      expect(dollar100, findsOneWidget);
+      expect(dollar10, findsOneWidget);
+
+      helper.change(LanguageCodes.vi);
+      await tester.pumpAndSettle();
+
+      expect(helloText, findsOneWidget);
+      expect(xinChaoText, findsOneWidget);
+      expect(dollar100, findsNothing);
+      expect(dollar10, findsNothing);
+    });
+
     test('export json', () {
       final dir = Directory('./test/export_json');
       data.exportJson(dir.path);
@@ -708,6 +739,12 @@ void main() async {
       final first = languages.entries.first;
       expect(first.key, equals(LanguageCodes.en));
       expect(first.value, equals(isNotEmpty));
+
+      final helper = LanguageHelper('NetworkLanguageHelper');
+      await helper.initial(data: [data], initialCode: LanguageCodes.en);
+      expect(helper.code, equals(LanguageCodes.en));
+      await helper.change(LanguageCodes.vi);
+      expect(helper.code, equals(LanguageCodes.vi));
     });
 
     test('network - error', () async {

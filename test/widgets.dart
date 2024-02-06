@@ -22,6 +22,7 @@ class LanguageHelperWidget extends StatelessWidget {
               ),
             ),
             LanguageBuilder(
+              forceRebuild: true,
               builder: (_) => Text(
                 'You have @{number}, dollars'.trP({'number': 10}),
               ),
@@ -82,6 +83,46 @@ class TrWidget extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CustomLanguageHelperWidget extends StatelessWidget {
+  const CustomLanguageHelperWidget({super.key, required this.helper});
+
+  final LanguageHelper helper;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      localizationsDelegates: LanguageHelper.instance.delegates,
+      supportedLocales: LanguageHelper.instance.locales,
+      locale: LanguageHelper.instance.locale,
+      home: Scaffold(
+        body: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            LanguageBuilder(
+                languageHelper: helper,
+                builder: (_) => Text('Hello'.trC(helper))),
+            Text('Hello'.trC(helper)),
+            LanguageBuilder(
+              languageHelper: helper,
+              builder: (_) => Text(
+                'You have @number dollars'.trC(helper, params: {'number': 100}),
+              ),
+            ),
+            LanguageBuilder(
+              languageHelper: helper,
+              forceRebuild: true,
+              builder: (_) => Text(
+                'You have @{number}, dollars'
+                    .trC(helper, params: {'number': 10}),
               ),
             ),
           ],
