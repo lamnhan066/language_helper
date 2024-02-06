@@ -1,4 +1,9 @@
 {
+  "@path_0": "./lib/page_asset.dart",
+  "Asset": "Asset",
+  "This is the line 1": "Đây là dòng 1",
+  "This is the line 2": "Đây là dòng 2",
+  "@path_1": "./lib/main.dart",
   "This is @number dollar": "Đây là @number đô-la",
   "Hello": "Xin Chào",
   "Change language": "Thay đổi ngôn ngữ",

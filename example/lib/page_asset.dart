@@ -9,7 +9,7 @@ class PageAsset extends StatefulWidget {
 }
 
 class _PageAssetState extends State<PageAsset> {
-  final languageHelper = LanguageHelper.instance;
+  final languageHelper = LanguageHelper('CustomLanguageHelper');
   bool isLoaded = false;
 
   @override
@@ -19,7 +19,8 @@ class _PageAssetState extends State<PageAsset> {
   }
 
   void initial() async {
-    languageHelper.addData(LanguageDataProvider.asset('assets/resources'));
+    await languageHelper
+        .initial(data: [LanguageDataProvider.asset('assets/resources')]);
 
     setState(() {
       isLoaded = true;
@@ -30,26 +31,28 @@ class _PageAssetState extends State<PageAsset> {
   Widget build(BuildContext context) {
     return !isLoaded
         ? const Center(child: CircularProgressIndicator())
-        : LanguageBuilder(builder: (context) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('Asset'.tr),
-              ),
-              body: Column(children: [
-                Text('This is the line 1'.tr),
-                Text('This is the line 2'.tr),
-                ElevatedButton(
-                  onPressed: () {
-                    if (LanguageHelper.instance.code == LanguageCodes.vi) {
-                      LanguageHelper.instance.change(LanguageCodes.en);
-                    } else {
-                      LanguageHelper.instance.change(LanguageCodes.vi);
-                    }
-                  },
-                  child: Text('Change language'.tr),
+        : LanguageBuilder(
+            languageHelper: languageHelper,
+            builder: (context) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text('Asset'.trC(languageHelper)),
                 ),
-              ]),
-            );
-          });
+                body: Column(children: [
+                  Text('This is the line 1'.trC(languageHelper)),
+                  Text('This is the line 2'.trC(languageHelper)),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (languageHelper.code == LanguageCodes.vi) {
+                        languageHelper.change(LanguageCodes.en);
+                      } else {
+                        languageHelper.change(LanguageCodes.vi);
+                      }
+                    },
+                    child: Text('Change language'.trC(languageHelper)),
+                  ),
+                ]),
+              );
+            });
   }
 }
