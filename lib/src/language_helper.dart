@@ -13,12 +13,44 @@ part 'language_builder.dart';
 /// Make it easier for you to control multiple languages in your app
 class LanguageHelper {
   // Get the LanguageHelper instance
-  static LanguageHelper instance = LanguageHelper('LanguageHelper');
+  static final LanguageHelper instance = LanguageHelper('LanguageHelper');
 
   /// To control [LanguageBuilder]
   final Set<UpdateLanguage> _states = {};
 
-  /// Create a new instance with a modified `prefix` for `SharedPreferences`.
+  /// Prefer using the built-in instance of `LanguageHelper` when possible instead of creating a custom one.
+  /// Utilizing the built-in instance allows access to all extension methods (such as `tr`, `trP`, `trT`, `trF`)
+  /// and builder widgets (like `LanguageBuilder` and `Tr`) without the need to pass the instance explicitly to each.
+  /// This approach simplifies usage and ensures consistency across your application.
+  ///
+  /// When creating a custom instance of `LanguageHelper`, be aware that its use is limited to `.trC` and
+  /// `languageHelper.translate` for text translations. The convenience extensions (`tr`, `trP`, `trT`, `trF`)
+  /// are not available with custom instances, restricting the ease of use and integration with the rest of your application.
+  ///
+  /// For instance:
+  ///
+  /// final helper = LanguageHelper('CustomLanguageHelper');
+  ///
+  /// // String
+  /// final translated = 'Translate this text'.trC(helper);
+  ///
+  /// // Widget
+  /// final text = Text('Translate this text'.trC(helper));
+  ///
+  /// // Builder
+  /// LanguageBuilder(
+  ///   languageHelper: helper,
+  ///   builder: (context) {
+  ///     return Text('Translate this text'.trC(helper)),
+  ///   }
+  /// )
+  ///
+  /// // Tr
+  /// Tr(
+  ///   (_) => Text('Translate this text'.trC(helper)),
+  ///   languageHelper: helper,
+  /// )
+  ///
   LanguageHelper(this.prefix);
 
   /// Prefix of the key to save the data to `SharedPreferences`.
