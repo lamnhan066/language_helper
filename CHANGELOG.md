@@ -1,3 +1,7 @@
+## 0.11.0-rc.7
+
+* Able to use the custom `LanguageHelper` in `LanguageBuilder` and `Tr`.
+
 ## 0.11.0-rc.6
 
 * Add topics.

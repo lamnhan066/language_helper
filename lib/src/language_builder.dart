@@ -8,6 +8,7 @@ class LanguageBuilder extends StatefulWidget {
     super.key,
     required this.builder,
     this.forceRebuild,
+    this.languageHelper,
   });
 
   /// Add your builder
@@ -19,13 +20,16 @@ class LanguageBuilder extends StatefulWidget {
   /// from LanguageHelper.initial() if this value is null.
   final bool? forceRebuild;
 
+  /// Add the custom instance of `LanguageHelper`.
+  final LanguageHelper? languageHelper;
+
   @override
   State<LanguageBuilder> createState() => _LanguageBuilderState();
 }
 
 class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   var _key = UniqueKey();
-  final _languageHelper = LanguageHelper.instance;
+  late LanguageHelper _languageHelper;
 
   /// Update the language
   @override
@@ -45,6 +49,7 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   @override
   void initState() {
     super.initState();
+    _languageHelper = widget.languageHelper ?? LanguageHelper.instance;
     if ((widget.forceRebuild == true ||
         (widget.forceRebuild == null && _languageHelper._forceRebuild))) {
       if (_languageHelper._states.add(this)) {
@@ -91,7 +96,12 @@ class Tr extends StatelessWidget {
   /// ``` dart
   /// Tr((_) => 'hello world'.tr),
   /// ```
-  const Tr(this.builder, {super.key, this.forceRebuild = false});
+  const Tr(
+    this.builder, {
+    super.key,
+    this.forceRebuild = false,
+    this.languageHelper,
+  });
 
   /// Add your builder
   final Widget Function(BuildContext _) builder;
@@ -101,6 +111,9 @@ class Tr extends StatelessWidget {
   /// this widget when the language is changed. Use the default value
   /// from LanguageHelper.initial() if this value is null.
   final bool forceRebuild;
+
+  /// Add the custom instance of `LanguageHelper`.
+  final LanguageHelper? languageHelper;
 
   @override
   Widget build(BuildContext context) {
