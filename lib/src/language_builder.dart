@@ -121,6 +121,7 @@ class Tr extends StatelessWidget {
       key: key,
       builder: builder,
       forceRebuild: forceRebuild,
+      languageHelper: languageHelper,
     );
   }
 }
