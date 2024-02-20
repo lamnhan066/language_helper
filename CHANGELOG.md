@@ -1,3 +1,7 @@
+## 0.11.0
+
+* Release to stable.
+
 ## 0.11.0-rc.8
 
 * Add `trC` to translate with the custom instance of LanguageHelper.
