@@ -12,25 +12,70 @@ part 'language_builder.dart';
 
 /// Make it easier for you to control multiple languages in your app
 class LanguageHelper {
-  // Get LanguageHelper instance
-  static LanguageHelper instance = LanguageHelper._();
+  // Get the LanguageHelper instance
+  static final LanguageHelper instance = LanguageHelper('LanguageHelper');
 
   /// To control [LanguageBuilder]
   final Set<UpdateLanguage> _states = {};
 
-  /// Private instance
-  LanguageHelper._();
+  /// Prefer using the built-in instance of `LanguageHelper` when possible instead of creating a custom one.
+  /// Utilizing the built-in instance allows access to all extension methods (such as `tr`, `trP`, `trT`, `trF`)
+  /// and builder widgets (like `LanguageBuilder` and `Tr`) without the need to pass the instance explicitly to each.
+  /// This approach simplifies usage and ensures consistency across your application.
+  ///
+  /// When creating a custom instance of `LanguageHelper`, be aware that its use is limited to `.trC` and
+  /// `languageHelper.translate` for text translations. The convenience extensions (`tr`, `trP`, `trT`, `trF`)
+  /// are not available with custom instances, restricting the ease of use and integration with the rest of your application.
+  ///
+  /// For instance:
+  ///
+  /// final helper = LanguageHelper('CustomLanguageHelper');
+  ///
+  /// // String
+  /// final translated = 'Translate this text'.trC(helper);
+  ///
+  /// // Widget
+  /// final text = Text('Translate this text'.trC(helper));
+  ///
+  /// // Builder
+  /// LanguageBuilder(
+  ///   languageHelper: helper,
+  ///   builder: (context) {
+  ///     return Text('Translate this text'.trC(helper)),
+  ///   }
+  /// )
+  ///
+  /// // Tr
+  /// Tr(
+  ///   (_) => Text('Translate this text'.trC(helper)),
+  ///   languageHelper: helper,
+  /// )
+  ///
+  LanguageHelper(this.prefix);
+
+  /// Prefix of the key to save the data to `SharedPreferences`.
+  final String prefix;
 
   /// Get all languages
   final LanguageData _data = {};
 
-  @visibleForTesting
+  /// Get all languages
+  late LanguageDataProvider _dataProvider;
+
+  Iterable<LanguageDataProvider> _dataProviders = [];
+
+  /// Get the current `data` as [LanguageData].
   LanguageData get data => _data;
 
   /// Get all languages
   final LanguageData _dataOverrides = {};
 
-  @visibleForTesting
+  /// Get all languages
+  late LanguageDataProvider _dataOverridesProvider;
+
+  Iterable<LanguageDataProvider> _dataOverridesProviders = [];
+
+  /// Get the current `dataOverrides` as [LanguageData].
   LanguageData get dataOverrides => _dataOverrides;
 
   /// List of all the keys of text in your project.
@@ -38,20 +83,18 @@ class LanguageHelper {
   /// You can maintain it by yourself or using [language_helper_generator](https://pub.dev/packages/language_helper_generator).
   /// This value will be used by `analyze` method to let you know that which
   /// text is missing in your language data.
-  Iterable<String> _analysisKeys = const [];
+  Iterable<String> _analysisKeys = const {};
 
-  /// Get list of [LanguageCodes] from both [data] and [dataOverrides]
-  List<LanguageCodes> get codesBoth =>
-      (codes..addAll(codesOverrides)).toSet().toList();
-
-  /// Get list of [LanguageCodes] of the [data]
-  List<LanguageCodes> get codes => _data.keys.toList();
+  /// Get list of [LanguageCodes] of the [data] and [dataOverrides]
+  Set<LanguageCodes> get codes => {..._codes, ..._codesOverrides}.toSet();
+  Set<LanguageCodes> _codes = {};
 
   /// Get list of [LanguageCodes] of the [dataOverrides]
-  List<LanguageCodes> get codesOverrides => _dataOverrides.keys.toList();
+  Set<LanguageCodes> get codesOverrides => _codesOverrides;
+  Set<LanguageCodes> _codesOverrides = {};
 
   /// Get list of language as [Locale]
-  List<Locale> get locales => _data.keys.map((e) => e.locale).toList();
+  Set<Locale> get locales => codes.map((e) => e.locale).toSet();
 
   /// Get current language as [LanguageCodes]
   ///
@@ -99,21 +142,28 @@ class LanguageHelper {
 
   /// Language code preferences key
   @visibleForTesting
-  String get codeKey => _codeKey;
+  String get codeKey => _autoSaveCodeKey;
 
   /// Language code preferences key
-  static const _codeKey = 'LanguageHelper.AutoSaveCode';
+  String get _autoSaveCodeKey => '$prefix.AutoSaveCode';
 
   /// Language code of the device
   @visibleForTesting
   String get deviceCodeKey => _deviceCodeKey;
 
   /// Language code of the device
-  static const _deviceCodeKey = 'LanguageHelper.DeviceCode';
+  String get _deviceCodeKey => '$prefix.DeviceCode';
+
+  /// Return `true` if the `initial` method is completed.
+  bool get isInitialized => _ensureInitialized.isCompleted;
+
+  /// Wait until the `initial` method is completed.
+  Future<void> get ensureInitialized => _ensureInitialized.future;
+  final _ensureInitialized = Completer<void>();
 
   /// Initialize the plugin with the List of [data] that you have created,
   /// you can set the [initialCode] for this app or it will get the first
-  /// language in [data], so **[data] must be not empty**. You can also set
+  /// language in [data], the [LanguageCodes.en] will be added when the `data` is empty. You can also set
   /// the [forceRebuild] to `true` if you want to rebuild all the [LanguageBuilder]
   /// widgets, not only the root widget (it will decreases the performance of the app).
   /// The [onChanged] callback will be called when the language is changed.
@@ -129,8 +179,9 @@ class LanguageHelper {
   /// The plugin also supports auto save the [LanguageCodes] when changed and
   /// reload it from memory in the next opening.
   Future<void> initial({
-    /// Data of languages. The [data] must be not empty.
-    required LanguageData data,
+    /// Data of languages. If this value is empty, a temporary data ([LanguageDataProvider.data({LanguagesCode.en: {}})])
+    /// will be added to let make it easier to develop the app.
+    required Iterable<LanguageDataProvider> data,
 
     /// Data of the languages that you want to override the [data]. This feature
     /// will helpful when you want to change just some translations of the language
@@ -138,14 +189,16 @@ class LanguageHelper {
     ///
     /// Common case is that you're using the generated [languageData] as your [data]
     /// but you want to change some translations (mostly with [LanguageConditions]).
-    LanguageData dataOverrides = const {},
+    Iterable<LanguageDataProvider> dataOverrides = const [
+      LanguageDataProvider.empty()
+    ],
 
     /// List of all the keys of text in your project.
     ///
     /// You can maintain it by yourself or using [language_helper_generator](https://pub.dev/packages/language_helper_generator).
     /// This value will be used by `analyze` method to let you know that which
     /// text is missing in your language data.
-    Iterable<String> analysisKeys = const [],
+    Iterable<String> analysisKeys = const {},
 
     /// Firstly, the app will try to use this [initialCode]. If [initialCode] is null,
     /// the plugin will try to get the current device language. If both of them are
@@ -163,6 +216,11 @@ class LanguageHelper {
     /// Auto save the current change of the language. The app will use the new
     /// language in the next open instead of [initialCode].
     bool isAutoSave = true,
+
+    /// TODO(lamnhan066): Make sure (add test) the caching feature this feature worked before publishing
+    ///
+    /// Caches the valid data for later use. Useful when using data from `network`.
+    // bool cachesData = true,
 
     /// Apply the device language when it's changed.
     /// If this value is `true`, update the app language when the device language changes.
@@ -184,13 +242,10 @@ class LanguageHelper {
     /// Print the debug log.
     bool isDebug = false,
   }) async {
-    assert(data.isNotEmpty, 'Data must be not empty');
-
     _data.clear();
     _dataOverrides.clear();
-
-    _data.addAll(data);
-    _dataOverrides.addAll(dataOverrides);
+    _dataProviders = data;
+    _dataOverridesProviders = dataOverrides;
     _forceRebuild = forceRebuild;
     _onChanged = onChanged;
     _isDebug = isDebug;
@@ -200,14 +255,33 @@ class LanguageHelper {
     _analysisKeys = analysisKeys;
     _initialCode = initialCode;
 
+    // When the `data` is empty, a temporary data will be added.
+    if (_dataProviders.isEmpty) {
+      printDebug(
+          'The `data` is empty, we will use a temporary `data` for the developing state');
+      _dataProviders = [
+        LanguageDataProvider.data({LanguageCodes.en: {}})
+      ];
+    }
+
+    _dataProvider = await _chooseTheBestDataProvider(_dataProviders, false);
+    _dataOverridesProvider =
+        await _chooseTheBestDataProvider(_dataOverridesProviders, true);
+
     LanguageCodes finalCode = _initialCode ?? LanguageCode.code;
+
+    _codes = await _dataProvider.getSupportedCodes();
+    _codesOverrides = await _dataOverridesProvider.getSupportedCodes();
+
+    assert(
+        _codes.isNotEmpty, 'The LanguageData in the `data` must be not empty');
 
     // Try to reload from memory if `isAutoSave` is `true`
     if (_isAutoSave) {
       final prefs = await SharedPreferences.getInstance();
 
-      if (prefs.containsKey(_codeKey)) {
-        final code = prefs.getString(_codeKey);
+      if (prefs.containsKey(_autoSaveCodeKey)) {
+        final code = prefs.getString(_autoSaveCodeKey);
 
         if (code != null && code.isNotEmpty) {
           finalCode = LanguageCodes.fromCode(code);
@@ -241,7 +315,7 @@ class LanguageHelper {
       }
     }
 
-    if (!codesBoth.contains(finalCode)) {
+    if (!codes.contains(finalCode)) {
       LanguageCodes? tempCode;
       if (isOptionalCountryCode && finalCode.locale.countryCode != null) {
         // Try to use the `languageCode` only if the `languageCode_countryCode`
@@ -250,7 +324,7 @@ class LanguageHelper {
             'language does not contain the $finalCode => Try to use the `languageCode` only..');
         try {
           tempCode = LanguageCodes.fromCode(finalCode.locale.languageCode);
-          if (!codesBoth.contains(tempCode)) {
+          if (!codes.contains(tempCode)) {
             tempCode = null;
           }
         } catch (_) {}
@@ -267,11 +341,18 @@ class LanguageHelper {
       finalCode = tempCode ?? codes.first;
     }
 
-    printDebug('Set currentCode to $finalCode');
+    printDebug('Set `currentCode` to $finalCode');
     _currentCode = finalCode;
+
+    _data.addAll(await _dataProvider.getData(code));
+    _dataOverrides.addAll(await _dataOverridesProvider.getData(code));
 
     if (_isDebug) {
       analyze();
+    }
+
+    if (!_ensureInitialized.isCompleted) {
+      _ensureInitialized.complete();
     }
   }
 
@@ -287,12 +368,14 @@ class LanguageHelper {
   /// If the [activate] is `true`, all the visible [LanguageBuilder]s will be rebuilt
   /// automatically, **notice that you may get the `setState` issue
   /// because of the rebuilding of the [LanguageBuilder] when it's still building.**
-  void addData(
-    LanguageData data, {
+  Future<void> addData(
+    LanguageDataProvider data, {
     bool overwrite = true,
     bool activate = true,
-  }) {
-    _addData(data: data, database: _data, overwrite: overwrite);
+  }) async {
+    final getData = await data.getData(_currentCode!);
+    _addData(data: getData, database: _data, overwrite: overwrite);
+    _codes.addAll(await data.getSupportedCodes());
     if (activate) change(code);
     printDebug(
         'The new `data` is added and activated with overwrite is $overwrite');
@@ -305,13 +388,14 @@ class LanguageHelper {
   /// If the [activate] is `true`, all the visible [LanguageBuilder]s will be rebuilt
   /// automatically, **notice that you may get the `setState` issue
   /// because of the rebuilding of the [LanguageBuilder] when it's still building.**
-  void addDataOverrides(
-    LanguageData dataOverrides, {
+  Future<void> addDataOverrides(
+    LanguageDataProvider dataOverrides, {
     bool overwrite = true,
     bool activate = true,
-  }) {
-    _addData(
-        data: dataOverrides, database: _dataOverrides, overwrite: overwrite);
+  }) async {
+    final getData = await dataOverrides.getData(_currentCode!);
+    _addData(data: getData, database: _dataOverrides, overwrite: overwrite);
+    _codesOverrides.addAll(await dataOverrides.getSupportedCodes());
     if (activate) change(code);
     printDebug(
         'The new `dataOverrides` is added and activated with overwrite is $overwrite');
@@ -356,11 +440,11 @@ class LanguageHelper {
   }
 
   /// Reload all the `LanguageBuilder` to apply the new data.
-  void reload() => change(code);
+  Future<void> reload() => change(code);
 
   /// Change the language to this [code]
-  void change(LanguageCodes toCode) {
-    if (!codesBoth.contains(toCode)) {
+  Future<void> change(LanguageCodes toCode) async {
+    if (!codes.contains(toCode)) {
       printDebug('$toCode is not available in `data` or `dataOverrides`');
 
       if (!_useInitialCodeWhenUnavailable) {
@@ -368,7 +452,7 @@ class LanguageHelper {
             'Does not allow using the initial code => Cannot change the language.');
         return;
       } else {
-        if (codesBoth.contains(_initialCode)) {
+        if (codes.contains(_initialCode)) {
           printDebug(
               '`useInitialCodeWhenUnavailable` is true => Change the language to $_initialCode');
           _currentCode = _initialCode;
@@ -381,6 +465,17 @@ class LanguageHelper {
     } else {
       printDebug('Set currentCode to $toCode');
       _currentCode = toCode;
+    }
+
+    _dataProvider = await _chooseTheBestDataProvider(_dataProviders, false);
+    _dataOverridesProvider =
+        await _chooseTheBestDataProvider(_dataOverridesProviders, true);
+
+    if (!_data.containsKey(_currentCode)) {
+      _data.clear();
+      _dataOverrides.clear();
+      _data.addAll(await _dataProvider.getData(code));
+      _dataOverrides.addAll(await _dataOverridesProvider.getData(code));
     }
 
     printDebug('Change language to $toCode for ${_states.length} states');
@@ -397,7 +492,7 @@ class LanguageHelper {
     if (_isAutoSave) {
       printDebug('Save this $toCode to local memory');
       SharedPreferences.getInstance().then((pref) {
-        pref.setString(_codeKey, toCode.code);
+        pref.setString(_autoSaveCodeKey, toCode.code);
       });
     }
 
@@ -411,6 +506,7 @@ class LanguageHelper {
 
   /// Analyze the [_data] so you can know which ones are missing what text.
   /// The results will be print in the console log with the below format:
+
   ///
   /// Result:
   ///   LanguageCodes.en:
@@ -431,6 +527,9 @@ class LanguageHelper {
 
     // Add all keys to [keys]
     for (final code in codes) {
+      if (!_data.containsKey(code)) {
+        return 'Can analyze the data from `LanguageDataProvider.data` only';
+      }
       for (final key in _data[code]!.keys) {
         if (!keys.contains(key)) keys.add(key);
       }
@@ -493,6 +592,23 @@ class LanguageHelper {
     printDebug(buffer.toString());
 
     return buffer.toString();
+  }
+
+  Future<LanguageDataProvider> _chooseTheBestDataProvider(
+    Iterable<LanguageDataProvider> providers,
+    bool isOverrides,
+  ) async {
+    LanguageDataProvider? result;
+    for (final provider in providers) {
+      Set<LanguageCodes> codes = await provider.getSupportedCodes();
+
+      if (codes.isNotEmpty) {
+        result = provider;
+        break;
+      }
+    }
+
+    return result ?? LanguageDataProvider.data({});
   }
 
   /// Replace @{param} or @param with the real text

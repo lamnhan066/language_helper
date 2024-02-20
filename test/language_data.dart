@@ -1,5 +1,6 @@
 import 'package:language_helper/language_helper.dart';
 
+final dataList = [LanguageDataProvider.data(data)];
 LanguageData data = {
   LanguageCodes.en: {
     'Hello': 'Hello',
@@ -39,7 +40,8 @@ LanguageData data = {
   }
 };
 
-LanguageData dataOverrides = {
+final dataOverrides = [LanguageDataProvider.data(_dataOverrides)];
+LanguageData _dataOverrides = {
   LanguageCodes.en: {
     'Hello': 'Hello',
     'You have @{number} dollar in your wallet': LanguageConditions(
@@ -54,19 +56,20 @@ LanguageData dataOverrides = {
   },
 };
 
-LanguageData dataAdd = {
+final dataAdds = [LanguageDataProvider.data(_dataAdd)];
+final dataAdd = LanguageDataProvider.data(_dataAdd);
+LanguageData _dataAdd = {
   LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'},
   LanguageCodes.zh: {'Hello': '你好'},
 };
 
-List<String> analysisMissedKeys = [
+Set<String> analysisMissedKeys = {
   'Hello',
   'You have @number dollars',
   'You have @{number}, dollars',
   'You have @{number} dollar',
   'This is a new key',
-  'This is a new key',
-];
+};
 
 List<String> analysisRemovedKeys = [
   'Hello',

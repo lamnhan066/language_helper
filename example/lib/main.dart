@@ -2,14 +2,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 
+import 'page_asset.dart';
 import 'resources/language_helper/language_data.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await LanguageHelper.instance.initial(
-    data: languageData,
-    analysisKeys: analysisLanguageData.keys,
+    data: [LanguageDataProvider.data(languageData)],
+    analysisKeys: analysisLanguageData.keys.toSet(),
     initialCode: LanguageCodes.en,
     isDebug: !kReleaseMode,
   );
@@ -68,13 +69,7 @@ class _MyAppState extends State<MyApp> {
                     LanguageHelper.instance.change(LanguageCodes.vi);
                   }
                 },
-                child: Text('Change language'.tr),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  LanguageHelper.instance.analyze();
-                },
-                child: Text('Analyze languages'.tr),
+                child: const Text('Change language'),
               ),
               Builder(builder: (_) => Text('Hello'.tr)),
               Dialog(
@@ -86,19 +81,28 @@ class _MyAppState extends State<MyApp> {
               Text('This is a contains variable line $mounted'.tr),
               ElevatedButton(
                 onPressed: () {
-                  LanguageHelper.instance.addData(languageDataAdd);
+                  LanguageHelper.instance
+                      .addData(LanguageDataProvider.data(languageDataAdd));
                 },
                 child: Text('This text will be changed when the data added'.tr),
               ),
+              const Divider(),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const OtherPage()));
+                },
+                child: const Text('Go to Other Page'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const PageAsset()));
+                },
+                child: const Text('Go to Asset Page'),
+              ),
             ],
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.navigate_next_rounded),
-          onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (_) => const OtherPage()));
-          },
         ),
       );
     });

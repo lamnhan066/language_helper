@@ -1,3 +1,128 @@
+## 0.11.0
+
+* Release to stable.
+
+## 0.11.0-rc.8
+
+* Add `trC` to translate with the custom instance of LanguageHelper.
+* The default instance is now set to final to avoid modifying.
+* Improve Tr builder.
+* Update example and tests.
+* Bump `language_helper_generator` to support `trC`.
+
+## 0.11.0-rc.7
+
+* Able to use the custom `LanguageHelper` in `LanguageBuilder` and `Tr`.
+
+## 0.11.0-rc.6
+
+* Add topics.
+
+## 0.11.0-rc.5
+
+* Add `isInitialized` (bool) and `ensureInitialized` (Future<void>) to check whether the `initial` is run.
+* Update tests.
+
+## 0.11.0-rc.4
+
+* Improve README.
+* Improve example.
+
+## 0.11.0-rc.3
+
+* Improve the logic of using the temporary data while developing.
+  * Right:
+
+  ```dart
+  languageHelper.initial(
+    data: []
+  );
+  ```
+
+  * Wrong:
+
+  ```dart
+  languageHelper.initial(
+    data: [LanguageDataProvider.data({})],
+  );
+  ```
+
+* `assets` data is preferred between `assets` and `network` because we still haven't a way to cache it.
+
+## 0.11.0-rc.2
+
+* The `language_helper` in `.asset` and `.network` of `LanguageDataProvider` are now required. So we don't need to add it into the input path:
+  * Before:
+
+  ```dart
+  LanguageDataProvider.asset('assets/resources/language_helper');
+  LanguageDataProvider.network('https://example.com/resources/language_helper');
+  ```
+
+  * Now:
+
+  ```dart
+  LanguageDataProvider.asset('assets/resources');
+  LanguageDataProvider.network('https://example.com/resources');  
+  ```
+
+* Generator:
+  * Change the default path of the Dart Map generator:
+    * Before:
+
+    ```txt
+    |-- .lib
+    |   |--- resources
+    |   |    |--- language_helper
+    |   |    |    |--- _language_data_abstract.g.dart   ; This file will be overwritten when generating
+    |   |    |    |--- language_data.dart
+    ```
+
+    * Now:
+
+    ```txt
+    |-- .lib
+    |   |--- resources
+    |   |    |--- language_helper
+    |   |    |    |--- language_data.dart
+    |   |    |    |--- languages
+    |   |    |    |    |--- _generated.dart   ; This will be overwritten when re-generating
+    ```
+
+  * Change the default path of the Dart Map generator:
+    * Before:
+
+    ```txt
+    |-- assets
+    |   |--- language_helper
+    |   |    |--- codes.json   ; List of supported language code
+    |   |    |--- languages
+    |   |    |    |--- _generated.json ; Each language will be stored in 1 files
+    ```
+
+    * Now:
+
+    ```txt
+    |-- assets
+    |   |--- resources
+    |   |    |--- language_helper
+    |   |    |    |--- codes.json
+    |   |    |    |--- languages
+    |   |    |    |   |--- _generated.json ; This file will be overwritten when re-generating
+    ```
+
+  * JSON generator will not overwrite the `codes.json` when re-generating.
+
+## 0.11.0-rc.1
+
+* Bump min sdk to `3.0.0`.
+* Able to create a new `LanguageHelper` instance.
+* Change from `LanguageData` to `LanguageDataProvider` to support the data from `data` (the default `LanguageData`), `asset` (JSON from the local assets) and `network` (JSON from the URL).
+* Multiple `LanguageDataProvider` inputs are supported.
+* Able export JSONs from the current `LanguageData` (for the migration).
+* Remove deprecated features.
+* Improve README.
+
 ## 0.10.0
 
 * Promote to stable.

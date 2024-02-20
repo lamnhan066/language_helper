@@ -26,4 +26,10 @@ extension LanguageHelperEx on String {
     return LanguageHelper.instance
         .translate(this, params: params, toCode: toCode);
   }
+
+  /// Translate with custom instance of `LanguageHelper`.
+  String trC(LanguageHelper helper,
+      {Map<String, dynamic> params = const {}, LanguageCodes? toCode}) {
+    return helper.translate(this, params: params, toCode: toCode);
+  }
 }
