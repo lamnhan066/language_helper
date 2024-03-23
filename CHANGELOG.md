@@ -1,4 +1,4 @@
-## 0.11.1
+## 0.11.1+1
 
 * Bump `language_helper_generator` to `0.5.1`:
   * Change the generated path in Map from `'@path_1': '.lib/to/file.dart'` to `"@path_.lib/to/file.dart": ''`
