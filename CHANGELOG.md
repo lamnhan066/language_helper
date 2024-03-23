@@ -1,3 +1,9 @@
+## 0.11.1
+
+* Bump `language_helper_generator` to `0.5.1`:
+  * Change the generated path in Map from `'@path_1': '.lib/to/file.dart'` to `"@path_.lib/to/file.dart": ''`
+* Bump dependencies.
+
 ## 0.11.0
 
 * Release to stable.

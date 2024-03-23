@@ -1,6 +1,6 @@
 name: language_helper
 description: Multi-language app tool with an efficient generator and a custom GPT-4 translator for easy localization.
-version: 0.11.0
+version: 0.11.1
 homepage: https://github.com/lamnhan066/language_helper
 topics:
   - i18n
@@ -18,8 +18,8 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  language_code: ^0.4.0
-  language_helper_generator: ^0.5.0
+  language_code: ^0.4.1
+  language_helper_generator: 0.5.1
   shared_preferences: ^2.2.2
   args: ^2.4.2
   http: ^1.2.0
