@@ -1,3 +1,7 @@
+## 0.11.2
+
+* Support a wider range of dependency versions.
+
 ## 0.11.1+1
 
 * Bump `language_helper_generator` to `0.5.1`:
