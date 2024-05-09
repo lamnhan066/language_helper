@@ -1,3 +1,7 @@
+## 0.11.2+1
+
+* Support the web platform (only improve the list on pub.dev).
+
 ## 0.11.2
 
 * Support a wider range of dependency versions.

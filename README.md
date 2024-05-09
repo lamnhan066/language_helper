@@ -4,8 +4,6 @@
 
 Multi-language app tool with an efficient generator and a custom GPT-4 translator for easy localization.
 
-I'm not a big fan of the '.arb' format or using short variables to store text in app development. It can be a bit tricky to control the length of the text when working with these methods. That's why I came up with a handy package that makes it easier to use real text during development and even simplify localization based on text. I hope you find it useful!
-
 ## Features
 
 - Easy to control the language translations in your application. Automatically uses the current device locale upon first open, if possible.
