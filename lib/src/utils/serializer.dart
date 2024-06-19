@@ -48,16 +48,18 @@ Map<String, dynamic> languageDataValuesFromMap(Map<String, dynamic> map) {
 ///  |  |  |  |- en.json
 ///  |  |  |  |- vi.json
 void exportJson(LanguageData data, String path) {
-  printDebug('===========================================================');
-  printDebug('Exporting Json...');
+  printDebug(
+      () => '===========================================================');
+  printDebug(() => 'Exporting Json...');
   _exportJsonCodes(data, path);
   _exportJsonLanguages(data, path);
-  printDebug('Exported Json');
-  printDebug('===========================================================');
+  printDebug(() => 'Exported Json');
+  printDebug(
+      () => '===========================================================');
 }
 
 void _exportJsonCodes(LanguageData data, String path) {
-  printDebug('Creating codes.json...');
+  printDebug(() => 'Creating codes.json...');
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
@@ -66,11 +68,11 @@ void _exportJsonCodes(LanguageData data, String path) {
   final codes = data.keys.map((e) => e.code).toList();
   desFile.writeAsStringSync(encoder.convert(codes));
 
-  printDebug('Created codes.json');
+  printDebug(() => 'Created codes.json');
 }
 
 void _exportJsonLanguages(LanguageData data, String path) {
-  printDebug('Creating languages json files...');
+  printDebug(() => 'Creating languages json files...');
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
@@ -83,5 +85,5 @@ void _exportJsonLanguages(LanguageData data, String path) {
     desFile.writeAsStringSync(data);
   }
 
-  printDebug('Created languages json files');
+  printDebug(() => 'Created languages json files');
 }

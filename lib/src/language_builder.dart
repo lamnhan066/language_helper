@@ -53,7 +53,7 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
     if ((widget.forceRebuild == true ||
         (widget.forceRebuild == null && _languageHelper._forceRebuild))) {
       if (_languageHelper._states.add(this)) {
-        printDebug(
+        printDebug(() =>
             'Added $this to the states because the `forceRebuild` is `true`');
       }
     } else {
@@ -63,17 +63,17 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
       // so all the posible `root` widgets have definitely been added to the list
       // of the states. So we just need to add the state that its' parent is null.
       if (getRoot == null && _languageHelper._states.add(this)) {
-        printDebug('Added $this to the states');
+        printDebug(() => 'Added $this to the states');
       } else {
-        printDebug('$this was already contained in the states');
+        printDebug(() => '$this was already contained in the states');
       }
     }
-    printDebug('Length of the states: ${_languageHelper._states.length}');
+    printDebug(() => 'Length of the states: ${_languageHelper._states.length}');
   }
 
   @override
   void dispose() {
-    printDebug('Removed $this from the states');
+    printDebug(() => 'Removed $this from the states');
     _languageHelper._states.remove(this);
     super.dispose();
   }
