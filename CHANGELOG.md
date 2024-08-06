@@ -1,3 +1,7 @@
+## 0.11.3
+
+* Improve the way to print the debug log.
+
 ## 0.11.2+1
 
 * Support the web platform (only improve the list on pub.dev).
