@@ -12,7 +12,7 @@ class LanguageDataProvider {
     try {
       return await rootBundle.loadString(path);
     } catch (_) {
-      printDebug(() => () => 'The $path does not exist in the assets');
+      printDebug(() => 'The $path does not exist in the assets');
     }
     return Future.value('');
   }
