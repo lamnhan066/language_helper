@@ -1,3 +1,7 @@
+## 0.11.3+1
+
+* Improve README for ios locales configuration.
+
 ## 0.11.3
 
 * Improve the way to print the debug log.
