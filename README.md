@@ -85,6 +85,18 @@ Plural (Read [Manual Flow Usage](#manual-flow-usage) to know how to use it)
 Text('We have @{number} dollar'.trP({'number': number}))
 ```
 
+### iOS configuration
+
+Add the supported localizations to the `Infi.plist`. For instance with `en` and `vi` supported:
+
+```plist
+<key>CFBundleLocalizations</key>
+<array>
+   <string>en</string>
+   <string>vi</string>
+</array>
+```
+
 ## Generator Flow Usage
 
 ### Dart Map
