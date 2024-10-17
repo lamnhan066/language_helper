@@ -424,7 +424,7 @@ void main() async {
   group('Test LanguageConditions', () {
     late LanguageConditions conditions;
     setUp(() {
-      conditions = LanguageConditions(param: 'number', conditions: {
+      conditions = const LanguageConditions(param: 'number', conditions: {
         '0': '0 dollar',
         '1': '1 dollar',
         'default': '@number dollars',

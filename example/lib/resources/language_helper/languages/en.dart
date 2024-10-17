@@ -20,7 +20,7 @@ final en = {
   'Analyze languages': 'Analyze languages',
   // 'Hello': 'Hello',  // Duplicated
   // 'Hello': 'Hello',  // Duplicated
-  'This is @number dollar': LanguageConditions(param: 'number', conditions: {
+  'This is @number dollar': const LanguageConditions(param: 'number', conditions: {
     '0': 'This is zero dollar',
     '1': 'This is one dollar',
     '_': 'This is @number dollars',

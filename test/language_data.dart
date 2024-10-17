@@ -6,7 +6,7 @@ LanguageData data = {
     'Hello': 'Hello',
     'You have @number dollars': 'You have @number dollars',
     'You have @{number}, dollars': 'You have @{number}, dollars',
-    'You have @{number} dollar': LanguageConditions(
+    'You have @{number} dollar': const LanguageConditions(
       param: 'number',
       conditions: {
         '0': 'You have zero dollar',
@@ -16,7 +16,7 @@ LanguageData data = {
       },
     ),
     'Text is missed in vi': 'Text is missed in vi',
-    'There are @number people in your family': LanguageConditions(
+    'There are @number people in your family': const LanguageConditions(
       param: 'number',
       conditions: {
         '0': 'There is @number people in your family',
@@ -44,7 +44,7 @@ final dataOverrides = [LanguageDataProvider.data(_dataOverrides)];
 LanguageData _dataOverrides = {
   LanguageCodes.en: {
     'Hello': 'Hello',
-    'You have @{number} dollar in your wallet': LanguageConditions(
+    'You have @{number} dollar in your wallet': const LanguageConditions(
       param: 'number',
       conditions: {
         '0': 'You have zero dollar in your wallet',
