@@ -1,3 +1,8 @@
+## 0.11.4
+
+* Add `const` to the `LanguageConditions`.
+* Remove the `language_helper` library.
+
 ## 0.11.3+1
 
 * Improve README for ios locales configuration.
