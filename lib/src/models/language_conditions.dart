@@ -33,7 +33,7 @@ class LanguageConditions {
   ///   }
   /// };
   /// ```
-  LanguageConditions({
+  const LanguageConditions({
     required this.param,
     required this.conditions,
   });
