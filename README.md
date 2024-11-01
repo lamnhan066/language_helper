@@ -209,7 +209,7 @@ The package will get the translation data in order from top to bottom.
 final en = {
   'Translate this text': 'Translate this text',
   'Hello @{name}': 'Hello @{name}',
-  'We have @{number} dollar': LanguageCondition(
+  'We have @{number} dollar': LanguageConditions(
     param: 'number',
     conditions: {
       '0': 'We have zero dollar',
@@ -464,7 +464,7 @@ final data = LanguageDataSerializer.fromJson(json);
 ```dart
 final en = {
   'Hello @{name}': 'Hello @{name}',
-  'We have @{number} dollar': LanguageCondition(
+  'We have @{number} dollar': LanguageConditions(
     param: 'number',
     conditions: {
       '0': 'We have zero dollar',
@@ -485,7 +485,7 @@ This is the translation of the [app/game] that [purpose of the app/game to help 
 
 final en = {
   'Hello @{name}': 'Hello @{name}',
-  'We have @{number} dollar': LanguageCondition(
+  'We have @{number} dollar': LanguageConditions(
     param: 'number',
     conditions: {
       '0': 'We have zero dollar',
