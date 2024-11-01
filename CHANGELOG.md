@@ -1,3 +1,8 @@
+## 0.11.5
+
+* Add `--help` flag to the generator to show help.
+* Fix `LanguageConditions` TYPO in README.
+
 ## 0.11.4
 
 * Add `const` to the `LanguageConditions`.
