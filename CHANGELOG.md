@@ -1,3 +1,7 @@
+## 0.11.6
+
+* Improve pub points.
+
 ## 0.11.5
 
 * Add `--help` flag to the generator to show help.
