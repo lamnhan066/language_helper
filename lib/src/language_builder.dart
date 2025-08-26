@@ -12,12 +12,13 @@ class LanguageBuilder extends StatefulWidget {
   });
 
   /// Add your builder
-  final Widget Function(BuildContext _) builder;
+  final Widget Function(BuildContext context) builder;
 
-  /// The plugin only rebuilds the root widget even when you use multiple [LanguageBuilder],
-  /// So, you can set this value to `true` if you want to force rebuild
-  /// this widget when the language is changed. Use the default value
-  /// from LanguageHelper.initial() if this value is null.
+  /// The plugin only rebuilds the root widget even when you use multiple [LanguageBuilder].
+  ///
+  /// - `true`  → always rebuild this widget when the language is changed.
+  /// - `false` → only rebuild the root widget.
+  /// - `null`  → fallback to `LanguageHelper.forceRebuild` default.
   final bool? forceRebuild;
 
   /// Add the custom instance of `LanguageHelper`.
@@ -28,16 +29,13 @@ class LanguageBuilder extends StatefulWidget {
 }
 
 class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
-  var _key = UniqueKey();
   late LanguageHelper _languageHelper;
 
   /// Update the language
   @override
   void updateLanguage() {
     if (mounted) {
-      setState(() {
-        _key = UniqueKey();
-      });
+      setState(() {/* Update the state */});
     }
   }
 
@@ -50,18 +48,25 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   void initState() {
     super.initState();
     _languageHelper = widget.languageHelper ?? LanguageHelper.instance;
-    if ((widget.forceRebuild == true ||
-        (widget.forceRebuild == null && _languageHelper._forceRebuild))) {
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final effectiveForceRebuild =
+        widget.forceRebuild ?? _languageHelper._forceRebuild;
+
+    if (effectiveForceRebuild) {
       if (_languageHelper._states.add(this)) {
-        printDebug(() =>
-            'Added $this to the states because the `forceRebuild` is `true`');
+        printDebug(
+          () => 'Added $this to the states because `forceRebuild` is true',
+        );
       }
     } else {
       final getRoot = _of(context);
 
-      // Because the Widget trees are built from a higher level to a lower level,
-      // so all the posible `root` widgets have definitely been added to the list
-      // of the states. So we just need to add the state that its' parent is null.
+      // Root detection: add only if this is the highest `LanguageBuilder`.
       if (getRoot == null && _languageHelper._states.add(this)) {
         printDebug(() => 'Added $this to the states');
       } else {
@@ -80,37 +85,33 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
 
   @override
   Widget build(BuildContext context) {
-    return KeyedSubtree(
-      key: _key,
-      child: widget.builder(context),
-    );
+    return widget.builder(context);
   }
 }
 
 class Tr extends StatelessWidget {
-  /// This is a short version of [LanguageBuilder].
+  /// A shorthand version of [LanguageBuilder].
   ///
-  /// Wrap the widget that you want to change when changing language
-  ///
-  /// Ex:
-  /// ``` dart
+  /// Example:
+  /// ```dart
   /// Tr((_) => 'hello world'.tr),
   /// ```
   const Tr(
     this.builder, {
     super.key,
-    this.forceRebuild = false,
+    this.forceRebuild,
     this.languageHelper,
   });
 
   /// Add your builder
   final Widget Function(BuildContext _) builder;
 
-  /// The plugin only rebuilds the root widget even when you use multiple [LanguageBuilder],
-  /// So, you can set this value to `true` if you want to force rebuild
-  /// this widget when the language is changed. Use the default value
-  /// from LanguageHelper.initial() if this value is null.
-  final bool forceRebuild;
+  /// Controls when to rebuild.
+  ///
+  /// - `true`  → always rebuild this widget when the language is changed.
+  /// - `false` → only rebuild the root widget.
+  /// - `null`  → fallback to `LanguageHelper.forceRebuild` default.
+  final bool? forceRebuild;
 
   /// Add the custom instance of `LanguageHelper`.
   final LanguageHelper? languageHelper;
