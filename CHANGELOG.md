@@ -1,3 +1,8 @@
+## 0.11.7
+
+* Update the `LanguageBuilder` to update the state only instead of update the `KeyedSubtree`.
+* Improve tests.
+
 ## 0.11.6
 
 * Improve pub points.
