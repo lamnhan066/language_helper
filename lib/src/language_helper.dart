@@ -18,6 +18,9 @@ class LanguageHelper {
   /// To control [LanguageBuilder]
   final Set<UpdateLanguage> _states = {};
 
+  @visibleForTesting
+  Set<UpdateLanguage> get states => _states;
+
   /// Prefer using the built-in instance of `LanguageHelper` when possible instead of creating a custom one.
   /// Utilizing the built-in instance allows access to all extension methods (such as `tr`, `trP`, `trT`, `trF`)
   /// and builder widgets (like `LanguageBuilder` and `Tr`) without the need to pass the instance explicitly to each.

@@ -657,6 +657,149 @@ void main() async {
       expect(dollar10, findsNothing);
     });
 
+    testWidgets('Tr rebuilds only itself on language change', (tester) async {
+      int buildCount = 0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Tr(
+            (_) {
+              buildCount++;
+              return Text('hello'.tr);
+            },
+          ),
+        ),
+      );
+
+      expect(find.text('hello'.tr), findsOneWidget);
+      expect(buildCount, 1);
+
+      // Trigger language update
+      LanguageHelper.instance.change(LanguageCodes.vi);
+
+      await tester.pump();
+
+      expect(find.text('hello'.tr), findsOneWidget);
+      expect(buildCount, 2, reason: 'Tr rebuilt itself once');
+    });
+
+    testWidgets(
+      'Only the outermost LanguageBuilder triggers a rebuild on language change',
+      (tester) async {
+        int outerBuilds = 0;
+        int innerBuilds = 0;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LanguageBuilder(
+              builder: (_) {
+                outerBuilds++;
+                return LanguageBuilder(
+                  builder: (_) {
+                    innerBuilds++;
+                    return const Text('nested');
+                  },
+                );
+              },
+            ),
+          ),
+        );
+
+        // Initial build
+        expect(find.text('nested'), findsOneWidget);
+        expect(outerBuilds, 1,
+            reason: 'Outer LanguageBuilder should build once');
+        expect(innerBuilds, 1,
+            reason: 'Inner LanguageBuilder should build once');
+
+        // Trigger language change
+        LanguageHelper.instance.change(LanguageCodes.vi);
+        await tester.pump();
+
+        expect(
+          outerBuilds,
+          2,
+          reason:
+              'Outer LanguageBuilder should rebuild once when language changes',
+        );
+        expect(
+          innerBuilds,
+          2,
+          reason:
+              'Inner LanguageBuilder should only rebuild as part of outer rebuild, not independently',
+        );
+      },
+    );
+
+    testWidgets('Disposed Tr is removed from LanguageHelper states',
+        (tester) async {
+      final helper = LanguageHelper.instance;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Tr((_) => const Text('hello')),
+        ),
+      );
+
+      expect(helper.states.isNotEmpty, true);
+
+      // Remove the widget
+      await tester.pumpWidget(const SizedBox.shrink());
+
+      await tester.pump();
+
+      expect(helper.states.isEmpty, true,
+          reason: 'Disposed Tr should unregister itself');
+    });
+
+    testWidgets(
+      'Only the outermost LanguageBuilder triggers a rebuild on language change',
+      (tester) async {
+        int outerBuilds = 0;
+        int innerBuilds = 0;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LanguageBuilder(
+              builder: (_) {
+                outerBuilds++;
+                return LanguageBuilder(
+                  builder: (_) {
+                    innerBuilds++;
+                    return const Text('nested');
+                  },
+                );
+              },
+            ),
+          ),
+        );
+
+        // Initial build
+        expect(find.text('nested'), findsOneWidget);
+        expect(outerBuilds, 1,
+            reason: 'Outer LanguageBuilder should build once');
+        expect(innerBuilds, 1,
+            reason: 'Inner LanguageBuilder should build once');
+
+        // Trigger language change
+        LanguageHelper.instance.change(LanguageCodes.vi);
+        await tester.pump();
+
+        expect(
+          outerBuilds,
+          2,
+          reason:
+              'Outer LanguageBuilder should rebuild once when language changes',
+        );
+        expect(
+          innerBuilds,
+          2,
+          reason:
+              'Inner LanguageBuilder should only rebuild as part of outer rebuild, not independently',
+        );
+      },
+    );
+
     test('export json', () {
       final dir = Directory('./test/export_json');
       data.exportJson(dir.path);
