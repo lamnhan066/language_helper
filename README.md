@@ -212,7 +212,6 @@ final en = {
   'We have @{number} dollar': LanguageConditions(
     param: 'number',
     conditions: {
-      '0': 'We have zero dollar',
       '1': 'We have one dollar',
 
       // Default value.
@@ -254,7 +253,6 @@ With `LanguageConditions`, you can completely control which text is returned acc
   "We have @{number} dollar": {
     "param": "number",
     "conditions": {
-      "0": "We have zero dollar",
       "1": "We have one dollar",
 
       // Default value.
@@ -467,7 +465,6 @@ final en = {
   'We have @{number} dollar': LanguageConditions(
     param: 'number',
     conditions: {
-      '0': 'We have zero dollar',
       '1': 'We have one dollar',
 
       // Default value.
@@ -488,7 +485,6 @@ final en = {
   'We have @{number} dollar': LanguageConditions(
     param: 'number',
     conditions: {
-      '0': 'We have zero dollar',
       '1': 'We have one dollar',
 
       // Default value.
@@ -514,7 +510,7 @@ final en = {
 
 - The `assets` data is preferred between `assets` and `network` because we still haven't a way to cache it.
 
-- Use the `isInitialized` (bool) and `ensureInitialized` (Future<void>) to check whether the `initial` is run.
+- Use the `isInitialized` (bool) and `ensureInitialized` (`Future<void>`) to check whether the `initial` is run.
 
 ## Contributions
 
