@@ -1,3 +1,7 @@
+## 0.11.7+1
+
+* Update README for plural example.
+
 ## 0.11.7
 
 * Update the `LanguageBuilder` to update the state only instead of update the `KeyedSubtree`.
@@ -61,7 +65,7 @@
 
 ## 0.11.0-rc.5
 
-* Add `isInitialized` (bool) and `ensureInitialized` (Future<void>) to check whether the `initial` is run.
+* Add `isInitialized` (bool) and `ensureInitialized` (`Future<void>`) to check whether the `initial` is run.
 * Update tests.
 
 ## 0.11.0-rc.4
