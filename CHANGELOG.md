@@ -1,3 +1,7 @@
+## 0.12.1
+
+* Updated Flutter dependency to `>=3.29.0`.
+
 ## 0.12.0
 
 * Updated Flutter dependency to `^3.29.0` and Dart SDK to `^3.7.0`.
