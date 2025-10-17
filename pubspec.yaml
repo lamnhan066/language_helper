@@ -26,7 +26,6 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   language_code: ">=0.4.0 <0.6.0"
-  language_helper_generator: ^0.5.3
   shared_preferences: ^2.0.0
   http: ^1.0.0
 
