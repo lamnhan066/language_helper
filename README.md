@@ -4,6 +4,7 @@
 
 Multi-language app tool with an efficient generator and a custom GPT-4 translator for easy localization.
 
+
 ## Features
 
 - Easy to control the language translations in your application. Automatically uses the current device locale upon first open, if possible.
