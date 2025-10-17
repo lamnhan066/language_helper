@@ -110,20 +110,22 @@ void main() async {
       expect(languageHelper.code, equals(LanguageCodes.en));
     });
 
-    test('Get language from prefs and is unavailable in LanguageData',
-        () async {
-      await languageHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.cu,
-        useInitialCodeWhenUnavailable: false,
-        isAutoSave: false,
-        isDebug: true,
-        onChanged: (value) {
-          expect(value, isA<LanguageCodes>());
-        },
-      );
-      expect(languageHelper.code, equals(LanguageCodes.en));
-    });
+    test(
+      'Get language from prefs and is unavailable in LanguageData',
+      () async {
+        await languageHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.cu,
+          useInitialCodeWhenUnavailable: false,
+          isAutoSave: false,
+          isDebug: true,
+          onChanged: (value) {
+            expect(value, isA<LanguageCodes>());
+          },
+        );
+        expect(languageHelper.code, equals(LanguageCodes.en));
+      },
+    );
   });
 
   group('Test for analyzing missed key', () {
@@ -169,7 +171,9 @@ void main() async {
 
     test('Get the first code in `data` if current locale is not available', () {
       expect(
-          languageHelper.code, equals(languageHelper.data.entries.first.key));
+        languageHelper.code,
+        equals(languageHelper.data.entries.first.key),
+      );
     });
   });
 
@@ -184,10 +188,7 @@ void main() async {
         LanguageCodes.en: {},
         LanguageCodes.cu: {},
       };
-      final LanguageData data = {
-        LanguageCodes.vi: {},
-        LanguageCodes.en: {},
-      };
+      final LanguageData data = {LanguageCodes.vi: {}, LanguageCodes.en: {}};
 
       await languageHelper.initial(
         data: [LanguageDataProvider.data(data)],
@@ -246,7 +247,9 @@ void main() async {
 
     test('', () {
       expect(
-          languageHelper.analyze(), contains('The below keys were deprecated'));
+        languageHelper.analyze(),
+        contains('The below keys were deprecated'),
+      );
     });
   });
 
@@ -324,8 +327,10 @@ void main() async {
     test('Test with default language', () {
       expect('Hello'.tr, equals('Hello'));
 
-      expect('You have @number dollars'.trP({'number': '100'}),
-          equals('You have 100 dollars'));
+      expect(
+        'You have @number dollars'.trP({'number': '100'}),
+        equals('You have 100 dollars'),
+      );
     });
 
     test('Test with vi language', () {
@@ -333,8 +338,10 @@ void main() async {
 
       expect('Hello'.tr, equals('Xin Chào'));
 
-      expect('You have @number dollars'.trP({'number': '100'}),
-          equals('Bạn có 100 đô-la'));
+      expect(
+        'You have @number dollars'.trP({'number': '100'}),
+        equals('Bạn có 100 đô-la'),
+      );
     });
 
     test('Test with the code that does not in the data', () {
@@ -342,76 +349,110 @@ void main() async {
     });
 
     test(
-        'Test with undefined language when useInitialCodeWhenUnavailable = false',
-        () {
-      languageHelper.change(LanguageCodes.vi);
-      languageHelper.setUseInitialCodeWhenUnavailable(false);
-      languageHelper.change(LanguageCodes.cu);
+      'Test with undefined language when useInitialCodeWhenUnavailable = false',
+      () {
+        languageHelper.change(LanguageCodes.vi);
+        languageHelper.setUseInitialCodeWhenUnavailable(false);
+        languageHelper.change(LanguageCodes.cu);
 
-      expect('Hello'.tr, equals('Xin Chào'));
+        expect('Hello'.tr, equals('Xin Chào'));
 
-      expect('You have @number dollars'.trP({'number': '100'}),
-          equals('Bạn có 100 đô-la'));
-    });
+        expect(
+          'You have @number dollars'.trP({'number': '100'}),
+          equals('Bạn có 100 đô-la'),
+        );
+      },
+    );
 
     test(
-        'Test with undefined language when useInitialCodeWhenUnavailable = true',
-        () {
-      languageHelper.setUseInitialCodeWhenUnavailable(true);
-      languageHelper.change(LanguageCodes.cu);
+      'Test with undefined language when useInitialCodeWhenUnavailable = true',
+      () {
+        languageHelper.setUseInitialCodeWhenUnavailable(true);
+        languageHelper.change(LanguageCodes.cu);
 
-      expect('Hello'.tr, equals('Hello'));
+        expect('Hello'.tr, equals('Hello'));
 
-      expect('You have @number dollars'.trP({'number': '100'}),
-          equals('You have 100 dollars'));
-    });
+        expect(
+          'You have @number dollars'.trP({'number': '100'}),
+          equals('You have 100 dollars'),
+        );
+      },
+    );
 
     test('Translate with parameters in multiple cases of text', () {
       languageHelper.setUseInitialCodeWhenUnavailable(true);
       languageHelper.change(LanguageCodes.en);
 
-      expect('@number is a started text'.trP({'number': 100}),
-          equals('100 is a started text'));
-      expect('@{number} is a started text'.trP({'number': 100}),
-          equals('100 is a started text'));
+      expect(
+        '@number is a started text'.trP({'number': 100}),
+        equals('100 is a started text'),
+      );
+      expect(
+        '@{number} is a started text'.trP({'number': 100}),
+        equals('100 is a started text'),
+      );
 
       expect(
-          'The @number @{number}, @number is a middle text'
-              .trP({'number': 100}),
-          equals('The 100 100, 100 is a middle text'));
+        'The @number @{number}, @number is a middle text'.trP({'number': 100}),
+        equals('The 100 100, 100 is a middle text'),
+      );
 
-      expect('This text will end with @number'.trP({'number': 100}),
-          equals('This text will end with 100'));
-      expect('This text will end with @{number}'.trP({'number': 100}),
-          equals('This text will end with 100'));
+      expect(
+        'This text will end with @number'.trP({'number': 100}),
+        equals('This text will end with 100'),
+      );
+      expect(
+        'This text will end with @{number}'.trP({'number': 100}),
+        equals('This text will end with 100'),
+      );
     });
 
     test('Translate with condition', () {
       languageHelper.setUseInitialCodeWhenUnavailable(true);
       languageHelper.change(LanguageCodes.en);
 
-      expect('You have @{number} dollar'.trP({'number': 0}),
-          equals('You have zero dollar'));
-      expect('You have @{number} dollar'.trP({'number': 1}),
-          equals('You have 1 dollar'));
-      expect('You have @{number} dollar'.trP({'number': 2}),
-          equals('You have 2 dollars'));
-      expect('You have @{number} dollar'.trP({'number': 100}),
-          equals('You have 100 dollars'));
-      expect('There are @number people in your family'.trP({'number': 100}),
-          equals('There are 100 people in your family'));
-      expect('There are @number people in your family'.trP({'non_number': 100}),
-          equals('There are @number people in your family'));
+      expect(
+        'You have @{number} dollar'.trP({'number': 0}),
+        equals('You have zero dollar'),
+      );
+      expect(
+        'You have @{number} dollar'.trP({'number': 1}),
+        equals('You have 1 dollar'),
+      );
+      expect(
+        'You have @{number} dollar'.trP({'number': 2}),
+        equals('You have 2 dollars'),
+      );
+      expect(
+        'You have @{number} dollar'.trP({'number': 100}),
+        equals('You have 100 dollars'),
+      );
+      expect(
+        'There are @number people in your family'.trP({'number': 100}),
+        equals('There are 100 people in your family'),
+      );
+      expect(
+        'There are @number people in your family'.trP({'non_number': 100}),
+        equals('There are @number people in your family'),
+      );
 
       languageHelper.change(LanguageCodes.vi);
-      expect('You have @{number} dollar'.trP({'number': 0}),
-          equals('Bạn có 0 đô-la'));
-      expect('You have @{number} dollar'.trP({'number': 1}),
-          equals('Bạn có 1 đô-la'));
-      expect('You have @{number} dollar'.trP({'number': 2}),
-          equals('Bạn có 2 đô-la'));
-      expect('You have @{number} dollar'.trP({'number': 100}),
-          equals('Bạn có 100 đô-la'));
+      expect(
+        'You have @{number} dollar'.trP({'number': 0}),
+        equals('Bạn có 0 đô-la'),
+      );
+      expect(
+        'You have @{number} dollar'.trP({'number': 1}),
+        equals('Bạn có 1 đô-la'),
+      );
+      expect(
+        'You have @{number} dollar'.trP({'number': 2}),
+        equals('Bạn có 2 đô-la'),
+      );
+      expect(
+        'You have @{number} dollar'.trP({'number': 100}),
+        equals('Bạn có 100 đô-la'),
+      );
     });
 
     test('Test trT', () {
@@ -424,11 +465,14 @@ void main() async {
   group('Test LanguageConditions', () {
     late LanguageConditions conditions;
     setUp(() {
-      conditions = const LanguageConditions(param: 'number', conditions: {
-        '0': '0 dollar',
-        '1': '1 dollar',
-        'default': '@number dollars',
-      });
+      conditions = const LanguageConditions(
+        param: 'number',
+        conditions: {
+          '0': '0 dollar',
+          '1': '1 dollar',
+          'default': '@number dollars',
+        },
+      );
     });
 
     test('toJson and fromJson', () {
@@ -449,17 +493,21 @@ void main() async {
       await languageHelper.initial(data: dataList);
       languageHelper.change(LanguageCodes.en);
 
-      final errorTranslated =
-          'You have @{number} dollar in your wallet'.trP({'number': 2});
+      final errorTranslated = 'You have @{number} dollar in your wallet'.trP({
+        'number': 2,
+      });
       expect(errorTranslated, 'You have 2 dollar in your wallet');
     });
     test('using dataOverrides', () async {
       await languageHelper.initial(
-          data: dataList, dataOverrides: dataOverrides);
+        data: dataList,
+        dataOverrides: dataOverrides,
+      );
       languageHelper.change(LanguageCodes.en);
 
-      final translated =
-          'You have @{number} dollar in your wallet'.trP({'number': 2});
+      final translated = 'You have @{number} dollar in your wallet'.trP({
+        'number': 2,
+      });
       expect(translated, 'You have 2 dollars in your wallet');
     });
   });
@@ -512,31 +560,30 @@ void main() async {
     });
 
     test(
-        'true, the `languageCode_countryCode` not available in local database but the `languageCode` only is available and isOptionalCountryCode is true',
-        () async {
-      SharedPreferences.setMockInitialValues({});
-      LanguageCode.setTestCode(LanguageCodes.zh_TW);
-      await languageHelper.initial(
-        data: dataAdds,
-        syncWithDevice: true,
-      );
+      'true, the `languageCode_countryCode` not available in local database but the `languageCode` only is available and isOptionalCountryCode is true',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        LanguageCode.setTestCode(LanguageCodes.zh_TW);
+        await languageHelper.initial(data: dataAdds, syncWithDevice: true);
 
-      expect(languageHelper.code, equals(LanguageCodes.zh));
-    });
+        expect(languageHelper.code, equals(LanguageCodes.zh));
+      },
+    );
 
     test(
-        'true, the `languageCode_countryCode` not available in local database but the `languageCode` only is available and isOptionalCountryCode is false',
-        () async {
-      SharedPreferences.setMockInitialValues({});
-      LanguageCode.setTestCode(LanguageCodes.zh_TW);
-      await languageHelper.initial(
-        data: dataAdds,
-        syncWithDevice: true,
-        isOptionalCountryCode: false,
-      );
+      'true, the `languageCode_countryCode` not available in local database but the `languageCode` only is available and isOptionalCountryCode is false',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        LanguageCode.setTestCode(LanguageCodes.zh_TW);
+        await languageHelper.initial(
+          data: dataAdds,
+          syncWithDevice: true,
+          isOptionalCountryCode: false,
+        );
 
-      expect(languageHelper.code, equals(LanguageCodes.en));
-    });
+        expect(languageHelper.code, equals(LanguageCodes.en));
+      },
+    );
 
     test('true and have local database but with no changed code', () async {
       SharedPreferences.setMockInitialValues({
@@ -572,7 +619,9 @@ void main() async {
       // Use en as default language
       SharedPreferences.setMockInitialValues({});
       await languageHelper.initial(
-          data: dataList, initialCode: LanguageCodes.en);
+        data: dataList,
+        initialCode: LanguageCodes.en,
+      );
 
       await tester.pumpWidget(const LanguageHelperWidget());
       await tester.pumpAndSettle();
@@ -601,7 +650,9 @@ void main() async {
       // Use en as default language
       SharedPreferences.setMockInitialValues({});
       await languageHelper.initial(
-          data: dataList, initialCode: LanguageCodes.en);
+        data: dataList,
+        initialCode: LanguageCodes.en,
+      );
 
       await tester.pumpWidget(const TrWidget());
       await tester.pumpAndSettle();
@@ -632,9 +683,7 @@ void main() async {
       final helper = LanguageHelper('CustomLanguageHelper');
       await helper.initial(data: dataList, initialCode: LanguageCodes.en);
 
-      await tester.pumpWidget(CustomLanguageHelperWidget(
-        helper: helper,
-      ));
+      await tester.pumpWidget(CustomLanguageHelperWidget(helper: helper));
       await tester.pumpAndSettle();
 
       // initial language is English
@@ -662,12 +711,10 @@ void main() async {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Tr(
-            (_) {
-              buildCount++;
-              return Text('hello'.tr);
-            },
-          ),
+          home: Tr((_) {
+            buildCount++;
+            return Text('hello'.tr);
+          }),
         ),
       );
 
@@ -707,10 +754,16 @@ void main() async {
 
         // Initial build
         expect(find.text('nested'), findsOneWidget);
-        expect(outerBuilds, 1,
-            reason: 'Outer LanguageBuilder should build once');
-        expect(innerBuilds, 1,
-            reason: 'Inner LanguageBuilder should build once');
+        expect(
+          outerBuilds,
+          1,
+          reason: 'Outer LanguageBuilder should build once',
+        );
+        expect(
+          innerBuilds,
+          1,
+          reason: 'Inner LanguageBuilder should build once',
+        );
 
         // Trigger language change
         LanguageHelper.instance.change(LanguageCodes.vi);
@@ -731,14 +784,13 @@ void main() async {
       },
     );
 
-    testWidgets('Disposed Tr is removed from LanguageHelper states',
-        (tester) async {
+    testWidgets('Disposed Tr is removed from LanguageHelper states', (
+      tester,
+    ) async {
       final helper = LanguageHelper.instance;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Tr((_) => const Text('hello')),
-        ),
+        MaterialApp(home: Tr((_) => const Text('hello'))),
       );
 
       expect(helper.states.isNotEmpty, true);
@@ -748,8 +800,11 @@ void main() async {
 
       await tester.pump();
 
-      expect(helper.states.isEmpty, true,
-          reason: 'Disposed Tr should unregister itself');
+      expect(
+        helper.states.isEmpty,
+        true,
+        reason: 'Disposed Tr should unregister itself',
+      );
     });
 
     testWidgets(
@@ -776,10 +831,16 @@ void main() async {
 
         // Initial build
         expect(find.text('nested'), findsOneWidget);
-        expect(outerBuilds, 1,
-            reason: 'Outer LanguageBuilder should build once');
-        expect(innerBuilds, 1,
-            reason: 'Inner LanguageBuilder should build once');
+        expect(
+          outerBuilds,
+          1,
+          reason: 'Outer LanguageBuilder should build once',
+        );
+        expect(
+          innerBuilds,
+          1,
+          reason: 'Inner LanguageBuilder should build once',
+        );
 
         // Trigger language change
         LanguageHelper.instance.change(LanguageCodes.vi);
@@ -842,18 +903,16 @@ void main() async {
   group('Language Data Provider from - ', () {
     setUp(() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMessageHandler(
-        'flutter/assets',
-        (message) async {
-          if (message == null) return null;
+          .setMockMessageHandler('flutter/assets', (message) async {
+            if (message == null) return null;
 
-          final String assetKey = utf8.decode(message.buffer.asUint8List());
-          return mockAssets.containsKey(assetKey)
-              ? ByteData.view(
-                  Uint8List.fromList(mockAssets[assetKey]!.codeUnits).buffer)
-              : null;
-        },
-      );
+            final String assetKey = utf8.decode(message.buffer.asUint8List());
+            return mockAssets.containsKey(assetKey)
+                ? ByteData.view(
+                  Uint8List.fromList(mockAssets[assetKey]!.codeUnits).buffer,
+                )
+                : null;
+          });
     });
 
     test('asset - ok', () async {
@@ -893,10 +952,7 @@ void main() async {
     });
 
     test('network - error', () async {
-      final data = LanguageDataProvider.network(
-        'abc',
-        client: MockClient(),
-      );
+      final data = LanguageDataProvider.network('abc', client: MockClient());
 
       expect(await data.getData(LanguageCodes.en), isEmpty);
     });

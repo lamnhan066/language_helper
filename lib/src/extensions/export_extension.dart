@@ -43,13 +43,15 @@ extension ExportLanguageData on LanguageData {
 ///  |  |  |  |- vi.json
 void _exportJson(LanguageData data, String path) {
   printDebug(
-      () => '===========================================================');
+    () => '===========================================================',
+  );
   printDebug(() => 'Exporting Json...');
   _exportJsonCodes(data, path);
   _exportJsonLanguages(data, path);
   printDebug(() => 'Exported Json');
   printDebug(
-      () => '===========================================================');
+    () => '===========================================================',
+  );
 }
 
 void _exportJsonCodes(LanguageData data, String path) {

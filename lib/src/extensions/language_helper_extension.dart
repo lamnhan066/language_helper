@@ -23,13 +23,19 @@ extension LanguageHelperEx on String {
 
   /// Full version of the translation, includes all parameters.
   String trF({Map<String, dynamic> params = const {}, LanguageCodes? toCode}) {
-    return LanguageHelper.instance
-        .translate(this, params: params, toCode: toCode);
+    return LanguageHelper.instance.translate(
+      this,
+      params: params,
+      toCode: toCode,
+    );
   }
 
   /// Translate with custom instance of `LanguageHelper`.
-  String trC(LanguageHelper helper,
-      {Map<String, dynamic> params = const {}, LanguageCodes? toCode}) {
+  String trC(
+    LanguageHelper helper, {
+    Map<String, dynamic> params = const {},
+    LanguageCodes? toCode,
+  }) {
     return helper.translate(this, params: params, toCode: toCode);
   }
 }

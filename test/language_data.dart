@@ -37,7 +37,7 @@ LanguageData data = {
         'Có @number người trong gia đình bạn',
     'You have @{number} dollar in your wallet':
         'Bạn có @{number} đô-la trong ví của bạn',
-  }
+  },
 };
 
 final dataOverrides = [LanguageDataProvider.data(_dataOverrides)];
@@ -71,7 +71,4 @@ Set<String> analysisMissedKeys = {
   'This is a new key',
 };
 
-List<String> analysisRemovedKeys = [
-  'Hello',
-  'You have @number dollars',
-];
+List<String> analysisRemovedKeys = ['Hello', 'You have @number dollars'];

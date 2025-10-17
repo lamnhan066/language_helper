@@ -24,10 +24,12 @@ void main(List<String> args) async {
   if (effectiveArgs.contains('--add-generator')) {
     print('Adding language_helper_generator to dev dependencies...');
 
-    final addProcess = await Process.run(
-      'dart',
-      ['pub', 'add', 'language_helper_generator', '--dev'],
-    );
+    final addProcess = await Process.run('dart', [
+      'pub',
+      'add',
+      'language_helper_generator',
+      '--dev',
+    ]);
 
     if (addProcess.exitCode != 0) {
       print('Failed to add language_helper_generator: ${addProcess.stderr}');
@@ -39,10 +41,11 @@ void main(List<String> args) async {
     effectiveArgs.remove('--add-generator');
   }
 
-  final process = await Process.start(
-    'dart',
-    ['run', 'language_helper_generator', ...effectiveArgs],
-  );
+  final process = await Process.start('dart', [
+    'run',
+    'language_helper_generator',
+    ...effectiveArgs,
+  ]);
 
   process.stdout.transform(const Utf8Decoder()).listen(print);
   process.stderr.transform(const Utf8Decoder()).listen((e) {

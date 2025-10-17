@@ -10,8 +10,8 @@ extension LanguageLocalizations on LanguageHelper {
   ///      GlobalWidgetsLocalizations.delegate
   ///      GlobalCupertinoLocalizations.delegate
   List<LocalizationsDelegate> get delegates => [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ];
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ];
 }

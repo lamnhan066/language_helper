@@ -33,17 +33,11 @@ class LanguageConditions {
   ///   }
   /// };
   /// ```
-  const LanguageConditions({
-    required this.param,
-    required this.conditions,
-  });
+  const LanguageConditions({required this.param, required this.conditions});
 
   /// Convert to Map
   Map<String, dynamic> toMap() {
-    return {
-      'param': param,
-      'conditions': conditions,
-    };
+    return {'param': param, 'conditions': conditions};
   }
 
   /// Convert to LanguageConditions from Map

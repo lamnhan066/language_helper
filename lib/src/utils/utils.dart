@@ -24,8 +24,10 @@ class Utils {
       if (response.statusCode == 200) {
         return utf8.decode(response.bodyBytes);
       } else {
-        printDebug(() =>
-            'Failed to load data from URL. Status code: ${response.statusCode}');
+        printDebug(
+          () =>
+              'Failed to load data from URL. Status code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       printDebug(() => 'Error fetching data from URL: $e');

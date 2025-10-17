@@ -17,15 +17,14 @@ class LanguageHelperWidget extends StatelessWidget {
             LanguageBuilder(builder: (_) => Text('Hello'.tr)),
             Text('Hello'.tr),
             LanguageBuilder(
-              builder: (_) => Text(
-                'You have @number dollars'.trP({'number': 100}),
-              ),
+              builder:
+                  (_) => Text('You have @number dollars'.trP({'number': 100})),
             ),
             LanguageBuilder(
               forceRebuild: true,
-              builder: (_) => Text(
-                'You have @{number}, dollars'.trP({'number': 10}),
-              ),
+              builder:
+                  (_) =>
+                      Text('You have @{number}, dollars'.trP({'number': 10})),
             ),
           ],
         ),
@@ -47,9 +46,8 @@ class TrWidget extends StatelessWidget {
             Tr((_) => Text('Hello'.tr)),
             Text('Hello'.tr),
             Tr(
-              (_) => Text(
-                'You have @number dollars'.trF(params: {'number': 100}),
-              ),
+              (_) =>
+                  Text('You have @number dollars'.trF(params: {'number': 100})),
             ),
             Tr(
               (_) => Column(
@@ -73,14 +71,12 @@ class TrWidget extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Tr(
-                    (_) => Text(
-                      'You have @{number}'.trF(params: {'number': 10}),
-                    ),
+                    (_) =>
+                        Text('You have @{number}'.trF(params: {'number': 10})),
                   ),
                   Tr(
-                    (_) => Text(
-                      'You have @{number}'.trF(params: {'number': 10}),
-                    ),
+                    (_) =>
+                        Text('You have @{number}'.trF(params: {'number': 10})),
                   ),
                 ],
               ),
@@ -108,22 +104,30 @@ class CustomLanguageHelperWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             LanguageBuilder(
-                languageHelper: helper,
-                builder: (_) => Text('Hello'.trC(helper))),
+              languageHelper: helper,
+              builder: (_) => Text('Hello'.trC(helper)),
+            ),
             Text('Hello'.trC(helper)),
             LanguageBuilder(
               languageHelper: helper,
-              builder: (_) => Text(
-                'You have @number dollars'.trC(helper, params: {'number': 100}),
-              ),
+              builder:
+                  (_) => Text(
+                    'You have @number dollars'.trC(
+                      helper,
+                      params: {'number': 100},
+                    ),
+                  ),
             ),
             LanguageBuilder(
               languageHelper: helper,
               forceRebuild: true,
-              builder: (_) => Text(
-                'You have @{number}, dollars'
-                    .trC(helper, params: {'number': 10}),
-              ),
+              builder:
+                  (_) => Text(
+                    'You have @{number}, dollars'.trC(
+                      helper,
+                      params: {'number': 10},
+                    ),
+                  ),
             ),
           ],
         ),

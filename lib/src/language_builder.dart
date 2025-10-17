@@ -35,7 +35,9 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   @override
   void updateLanguage() {
     if (mounted) {
-      setState(() {/* Update the state */});
+      setState(() {
+        /* Update the state */
+      });
     }
   }
 
@@ -96,12 +98,7 @@ class Tr extends StatelessWidget {
   /// ```dart
   /// Tr((_) => 'hello world'.tr),
   /// ```
-  const Tr(
-    this.builder, {
-    super.key,
-    this.forceRebuild,
-    this.languageHelper,
-  });
+  const Tr(this.builder, {super.key, this.forceRebuild, this.languageHelper});
 
   /// Add your builder
   final Widget Function(BuildContext _) builder;

@@ -19,12 +19,12 @@ class LanguageDataProvider {
 
   /// Get the `LanguageData` based on the `code`.
   FutureOr<LanguageData> Function(LanguageCodes code) get getData =>
-      _getData == null ? (code) => Future.value({}) : _getData!;
+      _getData ?? (code) => Future.value({});
   final FutureOr<LanguageData> Function(LanguageCodes code)? _getData;
 
   /// Get all supported `LanguageCodes`.
   FutureOr<Set<LanguageCodes>> Function() get getSupportedCodes =>
-      _getSupportedCodes == null ? () => Future.value({}) : _getSupportedCodes!;
+      _getSupportedCodes ?? () => Future.value({});
   final FutureOr<Set<LanguageCodes>> Function()? _getSupportedCodes;
 
   /// Check whether the current `LanguageDataProvider` this `empty`.
@@ -44,26 +44,30 @@ class LanguageDataProvider {
   ///     `assets/resources/language_helper/languages/en.json`...
   /// The `parentPath` will be `assets/resources`.
   factory LanguageDataProvider.asset(String parentPath) {
-    return LanguageDataProvider._((code) async {
-      String path = Utils.removeLastSlash(parentPath);
-      final uri =
-          Uri.parse('$path/language_helper/languages/${code.code}.json');
-      String json = await _loadAsset(uri.path);
-      if (json.isNotEmpty) {
-        return {code: LanguageDataSerializer.valuesFromJson(json)};
-      }
-      return {};
-    }, () async {
-      String path = Utils.removeLastSlash(parentPath);
-      final uri = Uri.parse('$path/language_helper/codes.json');
-      final json = await _loadAsset(uri.path);
-      if (json.isNotEmpty) {
-        final decoded = jsonDecode(json).cast<String>() as List<String>;
-        final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
-        return Future.value(set);
-      }
-      return {};
-    });
+    return LanguageDataProvider._(
+      (code) async {
+        String path = Utils.removeLastSlash(parentPath);
+        final uri = Uri.parse(
+          '$path/language_helper/languages/${code.code}.json',
+        );
+        String json = await _loadAsset(uri.path);
+        if (json.isNotEmpty) {
+          return {code: LanguageDataSerializer.valuesFromJson(json)};
+        }
+        return {};
+      },
+      () async {
+        String path = Utils.removeLastSlash(parentPath);
+        final uri = Uri.parse('$path/language_helper/codes.json');
+        final json = await _loadAsset(uri.path);
+        if (json.isNotEmpty) {
+          final decoded = jsonDecode(json).cast<String>() as List<String>;
+          final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
+          return Future.value(set);
+        }
+        return {};
+      },
+    );
   }
 
   /// Create an instance of data from `network`.
@@ -79,34 +83,41 @@ class LanguageDataProvider {
     Client? client,
     Map<String, String>? headers,
   }) {
-    return LanguageDataProvider._((code) async {
-      String path = Utils.removeLastSlash(parentUrl);
-      final uri =
-          Uri.parse('$path/language_helper/languages/${code.code}.json');
-      String json = await Utils.getUrl(uri, client: client, headers: headers);
-      if (json.isNotEmpty) {
-        return {code: LanguageDataSerializer.valuesFromJson(json)};
-      }
-      return {};
-    }, () async {
-      String path = Utils.removeLastSlash(parentUrl);
-      final uri = Uri.parse('$path/language_helper/codes.json');
-      final json = await Utils.getUrl(uri, client: client, headers: headers);
-      if (json.isNotEmpty) {
-        final decoded = jsonDecode(json).cast<String>() as List<String>;
-        final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
-        return Future.value(set);
-      }
-      return {};
-    });
+    return LanguageDataProvider._(
+      (code) async {
+        String path = Utils.removeLastSlash(parentUrl);
+        final uri = Uri.parse(
+          '$path/language_helper/languages/${code.code}.json',
+        );
+        String json = await Utils.getUrl(uri, client: client, headers: headers);
+        if (json.isNotEmpty) {
+          return {code: LanguageDataSerializer.valuesFromJson(json)};
+        }
+        return {};
+      },
+      () async {
+        String path = Utils.removeLastSlash(parentUrl);
+        final uri = Uri.parse('$path/language_helper/codes.json');
+        final json = await Utils.getUrl(uri, client: client, headers: headers);
+        if (json.isNotEmpty) {
+          final decoded = jsonDecode(json).cast<String>() as List<String>;
+          final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
+          return Future.value(set);
+        }
+        return {};
+      },
+    );
   }
 
   /// Create an instance of data from [LanguageData].
   factory LanguageDataProvider.data(LanguageData data) {
-    return LanguageDataProvider._((code) {
-      return data;
-    }, () {
-      return data.keys.toSet();
-    });
+    return LanguageDataProvider._(
+      (code) {
+        return data;
+      },
+      () {
+        return data.keys.toSet();
+      },
+    );
   }
 }
