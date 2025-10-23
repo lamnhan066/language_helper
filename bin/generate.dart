@@ -37,16 +37,16 @@ void main(List<String> args) async {
       }
 
       print('Added language_helper_generator to dev dependencies.');
+    } else {
+      print(
+        'Missing dependency: `language_helper_generator`.\n'
+        'To fix this, you have two options:\n'
+        '1. Run: `dart pub add language_helper_generator --dev`\n'
+        '2. Or simply re-run this command with the `--add-generator` flag to '
+        'add it automatically.',
+      );
+      exit(11);
     }
-  } else {
-    print(
-      'Missing dependency: `language_helper_generator`.\n'
-      'To fix this, you have two options:\n'
-      '1. Run: `dart pub add language_helper_generator --dev`\n'
-      '2. Or simply re-run this command with the `--add-generator` flag to '
-      'add it automatically.',
-    );
-    exit(11);
   }
 
   final process = await Process.start('dart', [
