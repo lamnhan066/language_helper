@@ -450,7 +450,7 @@ class LanguageHelper {
       return _replaceParams(text, stringParams);
     }
 
-    final translated = _dataOverrides[toCode]?[text] ?? _data[toCode]![text];
+    final translated = _dataOverrides[toCode]?[text] ?? _data[toCode]?[text];
     if (translated == null) {
       printDebug(() => 'This text is not contained in current $toCode ($text)');
       return _replaceParams(text, stringParams);
