@@ -35,6 +35,36 @@ extension ExportLanguageData on LanguageData {
   }
 }
 
+extension ExportLazyLanguageData on LazyLanguageData {
+  /// Export to json files for `LanguageDataProvider`. Default `path` is set to './assets/resources'.
+  ///
+  /// We need a little trick to run this script to get the expected result:
+  /// - Create a `export_json.dart` file in your `bin` folder (the same level with the `lib`).
+  /// - Add the below code:
+  ///
+  /// ```dart
+  /// void main() {
+  ///   test('', () {
+  ///     languageData.exportJson('./assets/resources');
+  ///   });
+  /// }
+  /// ```
+  /// - Add the missed `import`.
+  /// - Run `flutter test ./bin/export_json.dart`.
+  ///
+  /// Generated path:
+  /// [path]
+  ///  |  |- language_helper
+  ///  |  |  |- codes.json
+  ///  |  |  |  |- languages
+  ///  |  |  |  |  |- en.json
+  ///  |  |  |  |  |- vi.json
+  ///  |  |  |  |  |- ...
+  void exportJson([String path = './assets/resources']) {
+    return _exportJson(map((k, v) => MapEntry(k, v())), path);
+  }
+}
+
 /// Generated path:
 /// `path`
 ///  |  |- codes.json
