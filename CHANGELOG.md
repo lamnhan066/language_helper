@@ -1,3 +1,8 @@
+## 0.12.2
+
+* Add `LazyLanguageData` and `LanguageDataProvider.lazyData(LazyLanguageData data)` to support lazy loading.
+* Improve the CLI.
+
 ## 0.12.1
 
 * Updated Flutter dependency to `>=3.29.0`.

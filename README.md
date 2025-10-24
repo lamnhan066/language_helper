@@ -191,6 +191,7 @@ main() async {
         LanguageDataProvider.network('https://example.com/resources'),
         LanguageDataProvider.asset('assets/resources'),
         LanguageDataProvider.data(languageData),
+        LanguageDataProvider.lazyData(languageData),
       ],
   );
 
@@ -232,7 +233,13 @@ LanguageData languageData = {
   LanguageCodes.vi: vi,
 };
 
+LazyLanguageData lazyLanguageData = {
+  LanguageCodes.en: () => en,
+  LanguageCodes.vi: () => vi,
+}
+
 final languageDataProvider = LanguageDataProvider.data(languageData);
+final lazyLanguageDataProvider = LanguageDataProvider.lazyData(languageData);
 ```
 
 With `LanguageConditions`, you can completely control which text is returned according to the parameters' conditions. You can use `'default'` or `'_'` to set the default value for the condition.

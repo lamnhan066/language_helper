@@ -195,7 +195,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.12.0"
+    version: "0.12.2"
   language_helper_generator:
     dependency: "direct dev"
     description:
