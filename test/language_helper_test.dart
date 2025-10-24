@@ -900,6 +900,83 @@ void main() async {
     });
   });
 
+  group('Lazy data provider', () {
+    test('initial loads only requested language lazily', () async {
+      SharedPreferences.setMockInitialValues({});
+
+      final callCount = {
+        LanguageCodes.en: 0,
+        LanguageCodes.vi: 0,
+      };
+
+      LazyLanguageData lazyData = {
+        LanguageCodes.en: () {
+          callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
+          return Map<String, dynamic>.from(data[LanguageCodes.en]!);
+        },
+        LanguageCodes.vi: () {
+          callCount[LanguageCodes.vi] = callCount[LanguageCodes.vi]! + 1;
+          return Map<String, dynamic>.from(data[LanguageCodes.vi]!);
+        },
+      };
+
+      final helper = LanguageHelper('LazyLanguageHelper');
+      addTearDown(helper.dispose);
+
+      await helper.initial(
+        data: [LanguageDataProvider.lazyData(lazyData)],
+        initialCode: LanguageCodes.en,
+        syncWithDevice: false,
+        isAutoSave: false,
+        useInitialCodeWhenUnavailable: false,
+      );
+
+      expect(helper.code, equals(LanguageCodes.en));
+      expect(helper.translate('Hello'), equals('Hello'));
+      expect(callCount[LanguageCodes.en], equals(1));
+      expect(callCount[LanguageCodes.vi], equals(0));
+    });
+
+    test('changing language evaluates lazy data on demand', () async {
+      SharedPreferences.setMockInitialValues({});
+
+      final callCount = {
+        LanguageCodes.en: 0,
+        LanguageCodes.vi: 0,
+      };
+
+      LazyLanguageData lazyData = {
+        LanguageCodes.en: () {
+          callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
+          return Map<String, dynamic>.from(data[LanguageCodes.en]!);
+        },
+        LanguageCodes.vi: () {
+          callCount[LanguageCodes.vi] = callCount[LanguageCodes.vi]! + 1;
+          return Map<String, dynamic>.from(data[LanguageCodes.vi]!);
+        },
+      };
+
+      final helper = LanguageHelper('LazyLanguageHelperChange');
+      addTearDown(helper.dispose);
+
+      await helper.initial(
+        data: [LanguageDataProvider.lazyData(lazyData)],
+        initialCode: LanguageCodes.en,
+        syncWithDevice: false,
+        isAutoSave: false,
+        useInitialCodeWhenUnavailable: false,
+      );
+
+      expect(helper.translate('Hello'), equals('Hello'));
+      expect(callCount[LanguageCodes.en], equals(1));
+      expect(callCount[LanguageCodes.vi], equals(0));
+
+      await helper.change(LanguageCodes.vi);
+      expect(helper.translate('Hello'), equals('Xin Chào'));
+      expect(callCount[LanguageCodes.vi], equals(1));
+    });
+  });
+
   group('Language Data Provider from - ', () {
     setUp(() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
