@@ -1,3 +1,8 @@
+## 0.12.3
+
+* Add exportJson helper for LazyLanguageData.
+* Drop redundant key from Tr wrapper.
+
 ## 0.12.2
 
 * Add `LazyLanguageData` and `LanguageDataProvider.lazyData(LazyLanguageData data)` to support lazy loading.
