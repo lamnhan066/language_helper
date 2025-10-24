@@ -451,9 +451,7 @@ class LanguageHelper {
     }
 
     final translated = _dataOverrides[toCode]?[text] ?? _data[toCode]![text];
-
-    // If there is no translated text (or empty), then fallback to the key
-    if (translated == null || (translated is String && translated.isEmpty)) {
+    if (translated == null) {
       printDebug(() => 'This text is not contained in current $toCode ($text)');
       return _replaceParams(text, stringParams);
     }
