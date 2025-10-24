@@ -5,12 +5,18 @@ import 'package:language_helper/language_helper.dart';
 import 'page_asset.dart';
 import 'resources/language_helper/language_data.dart';
 
+LanguageData languageDataAdd = {
+  LanguageCodes.vi: {
+    'This text will be changed when the data added':
+        ' Chữ này sẽ thay đổi khi thêm data',
+  },
+};
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await LanguageHelper.instance.initial(
-    data: [LanguageDataProvider.data(languageData)],
-    analysisKeys: analysisLanguageData.keys.toSet(),
+    data: [LanguageDataProvider.lazyData(languageData)],
     initialCode: LanguageCodes.en,
     isDebug: !kReleaseMode,
   );
@@ -47,65 +53,74 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return LanguageBuilder(builder: (_) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Tr((_) => Text('Hello'.tr)),
-        ),
-        body: Center(
-          child: Column(
-            children: [
-              LanguageBuilder(builder: (context) {
-                return LanguageBuilder(builder: (context) {
-                  return Text('Hello'.tr);
-                });
-              }),
-              Text('Hello'.tr),
-              ElevatedButton(
-                onPressed: () {
-                  if (LanguageHelper.instance.code == LanguageCodes.vi) {
-                    LanguageHelper.instance.change(LanguageCodes.en);
-                  } else {
-                    LanguageHelper.instance.change(LanguageCodes.vi);
-                  }
-                },
-                child: const Text('Change language'),
-              ),
-              Builder(builder: (_) => Text('Hello'.tr)),
-              Dialog(
-                child: Text('Hello'.tr),
-              ),
-              Text('This is @number dollar'.trP({'number': 0})),
-              Text('This is @number dollar'.trP({'number': 1})),
-              Text('This is @number dollar'.trP({'number': 100})),
-              Text('This is a contains variable line $mounted'.tr),
-              ElevatedButton(
-                onPressed: () {
-                  LanguageHelper.instance
-                      .addData(LanguageDataProvider.data(languageDataAdd));
-                },
-                child: Text('This text will be changed when the data added'.tr),
-              ),
-              const Divider(),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => const OtherPage()));
-                },
-                child: const Text('Go to Other Page'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => const PageAsset()));
-                },
-                child: const Text('Go to Asset Page'),
-              ),
-            ],
+    return LanguageBuilder(
+      builder: (_) {
+        return Scaffold(
+          appBar: AppBar(title: Tr((_) => Text('Hello'.tr))),
+          body: Center(
+            child: Column(
+              children: [
+                LanguageBuilder(
+                  builder: (context) {
+                    return LanguageBuilder(
+                      builder: (context) {
+                        return Text('Hello'.tr);
+                      },
+                    );
+                  },
+                ),
+                Text('Hello'.tr),
+                ElevatedButton(
+                  onPressed: () {
+                    if (LanguageHelper.instance.code == LanguageCodes.vi) {
+                      LanguageHelper.instance.change(LanguageCodes.en);
+                    } else {
+                      LanguageHelper.instance.change(LanguageCodes.vi);
+                    }
+                  },
+                  child: const Text('Change language'),
+                ),
+                Builder(builder: (_) => Text('Hello'.tr)),
+                Dialog(child: Text('Hello'.tr)),
+                Text('This is @number dollar'.trP({'number': 0})),
+                Text('This is @number dollar'.trP({'number': 1})),
+                Text('This is @number dollar'.trP({'number': 100})),
+                Text('This is a contains variable line $mounted'.tr),
+                ElevatedButton(
+                  onPressed: () {
+                    LanguageHelper.instance.addData(
+                      LanguageDataProvider.data(languageDataAdd),
+                    );
+                  },
+                  child: Text(
+                    'This text will be changed when the data added'.tr,
+                  ),
+                ),
+                const Divider(),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const OtherPage()),
+                    );
+                  },
+                  child: const Text('Go to Other Page'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const PageAsset()),
+                    );
+                  },
+                  child: const Text('Go to Asset Page'),
+                ),
+              ],
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 }
 
@@ -116,9 +131,11 @@ class OtherPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: LanguageBuilder(builder: (context) {
-          return Text('Other Page'.tr);
-        }),
+        title: LanguageBuilder(
+          builder: (context) {
+            return Text('Other Page'.tr);
+          },
+        ),
       ),
       body: Column(
         children: [
