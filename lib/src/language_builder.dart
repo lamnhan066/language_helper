@@ -116,7 +116,6 @@ class Tr extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LanguageBuilder(
-      key: key,
       builder: builder,
       forceRebuild: forceRebuild,
       languageHelper: languageHelper,
