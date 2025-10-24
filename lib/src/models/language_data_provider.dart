@@ -120,4 +120,16 @@ class LanguageDataProvider {
       },
     );
   }
+
+  /// Create an instance of data from [LazyLanguageData].
+  factory LanguageDataProvider.lazyData(LazyLanguageData data) {
+    return LanguageDataProvider._(
+      (code) {
+        return {code: data[code]!()};
+      },
+      () {
+        return data.keys.toSet();
+      },
+    );
+  }
 }
