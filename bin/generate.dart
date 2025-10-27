@@ -55,6 +55,15 @@ void main(List<String> args) async {
     ...[...args]..remove('--add-generator'),
   ]);
 
+  // Forward stdout and stderr to the parent process
+  process.stdout.listen((data) {
+    stdout.add(data);
+  });
+
+  process.stderr.listen((data) {
+    stderr.add(data);
+  });
+
   exit(await process.exitCode);
 }
 
