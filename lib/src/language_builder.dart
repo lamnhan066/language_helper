@@ -42,8 +42,14 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   }
 
   /// Get the root state
-  static _LanguageBuilderState? _of(BuildContext context) {
-    return context.findRootAncestorStateOfType<_LanguageBuilderState>();
+  _LanguageBuilderState? _of(BuildContext context) {
+    final root = context.findRootAncestorStateOfType<_LanguageBuilderState>();
+    if (root == null ||
+        !root.mounted ||
+        root._languageHelper != _languageHelper) {
+      return null;
+    }
+    return root;
   }
 
   @override

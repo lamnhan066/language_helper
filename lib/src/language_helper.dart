@@ -725,4 +725,14 @@ class LanguageHelper {
   String _removeNewline(String text) {
     return text.replaceAll('\n', ' ⏎ ');
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is LanguageHelper && other.prefix == prefix;
+  }
+
+  @override
+  int get hashCode => prefix.hashCode;
 }

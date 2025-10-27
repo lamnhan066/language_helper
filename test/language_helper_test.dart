@@ -920,6 +920,316 @@ void main() async {
       expect(codesFile.existsSync(), isTrue);
       dir.deleteSync(recursive: true);
     });
+
+    testWidgets('LanguageBuilder with different prefixes', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper1 = LanguageHelper('WidgetTest1');
+      final helper2 = LanguageHelper('WidgetTest2');
+
+      await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
+      await helper2.initial(data: dataList, initialCode: LanguageCodes.vi);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                LanguageBuilder(
+                  languageHelper: helper1,
+                  builder: (_) => Text('Hello'.trC(helper1)),
+                ),
+                LanguageBuilder(
+                  languageHelper: helper2,
+                  builder: (_) => Text('Hello'.trC(helper2)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Both widgets should show their respective languages
+      expect(find.text('Hello'), findsOneWidget); // helper1 shows English
+      expect(find.text('Xin Chào'), findsOneWidget); // helper2 shows Vietnamese
+
+      // Change language in helper1 only
+      await helper1.change(LanguageCodes.vi);
+      await tester.pumpAndSettle();
+
+      // Only helper1 should change, helper2 should remain Vietnamese
+      expect(
+        find.text('Xin Chào'),
+        findsNWidgets(2),
+      ); // Both show Vietnamese now
+      expect(find.text('Hello'), findsNothing);
+
+      // Dispose helpers
+      helper1.dispose();
+      helper2.dispose();
+    });
+
+    testWidgets('Tr widget with different prefixes', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper1 = LanguageHelper('TrTest1');
+      final helper2 = LanguageHelper('TrTest2');
+
+      await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
+      await helper2.initial(data: dataList, initialCode: LanguageCodes.vi);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                Tr((_) => Text('Hello'.trC(helper1)), languageHelper: helper1),
+                Tr((_) => Text('Hello'.trC(helper2)), languageHelper: helper2),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Both widgets should show their respective languages
+      expect(find.text('Hello'), findsOneWidget); // helper1 shows English
+      expect(find.text('Xin Chào'), findsOneWidget); // helper2 shows Vietnamese
+
+      // Change language in helper1 only
+      await helper1.change(LanguageCodes.vi);
+      await tester.pumpAndSettle();
+
+      // Only helper1 should change, helper2 should remain Vietnamese
+      expect(
+        find.text('Xin Chào'),
+        findsNWidgets(2),
+      ); // Both show Vietnamese now
+      expect(find.text('Hello'), findsNothing);
+
+      // Dispose helpers
+      helper1.dispose();
+      helper2.dispose();
+    });
+
+    testWidgets('Multiple LanguageHelper instances with same prefix', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper1 = LanguageHelper('SharedWidgetPrefix');
+      final helper2 = LanguageHelper('SharedWidgetPrefix');
+
+      await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
+
+      // Change language in helper1
+      await helper1.change(LanguageCodes.vi);
+
+      // Initialize helper2 - should load the saved language
+      await helper2.initial(data: dataList, initialCode: LanguageCodes.en);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                LanguageBuilder(
+                  languageHelper: helper1,
+                  builder: (_) => Text('Hello'.trC(helper1)),
+                ),
+                LanguageBuilder(
+                  languageHelper: helper2,
+                  builder: (_) => Text('Hello'.trC(helper2)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Both should show Vietnamese since they share the same prefix
+      expect(find.text('Xin Chào'), findsNWidgets(2));
+      expect(find.text('Hello'), findsNothing);
+
+      // Dispose helpers
+      helper1.dispose();
+      helper2.dispose();
+    });
+
+    testWidgets('Widget rebuild behavior with different prefixes', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper1 = LanguageHelper('RebuildTest1');
+      final helper2 = LanguageHelper('RebuildTest2');
+
+      await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
+      await helper2.initial(data: dataList, initialCode: LanguageCodes.en);
+
+      int buildCount1 = 0;
+      int buildCount2 = 0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                LanguageBuilder(
+                  languageHelper: helper1,
+                  builder: (_) {
+                    buildCount1++;
+                    return Text('Hello'.trC(helper1));
+                  },
+                ),
+                LanguageBuilder(
+                  languageHelper: helper2,
+                  builder: (_) {
+                    buildCount2++;
+                    return Text('Hello'.trC(helper2));
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(buildCount1, equals(1));
+      expect(buildCount2, equals(1));
+
+      // Change language in helper1 only
+      await helper1.change(LanguageCodes.vi);
+      await tester.pumpAndSettle();
+
+      // Only helper1 should rebuild
+      expect(buildCount1, equals(2));
+      expect(buildCount2, equals(1));
+
+      // Change language in helper2
+      await helper2.change(LanguageCodes.vi);
+      await tester.pumpAndSettle();
+
+      // Only helper2 should rebuild
+      expect(buildCount1, equals(2));
+      expect(buildCount2, equals(2));
+
+      // Dispose helpers
+      helper1.dispose();
+      helper2.dispose();
+    });
+
+    testWidgets('Nested LanguageBuilder with different prefixes', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final outerHelper = LanguageHelper('OuterPrefix');
+      final innerHelper = LanguageHelper('InnerPrefix');
+
+      await outerHelper.initial(data: dataList, initialCode: LanguageCodes.en);
+      await innerHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageBuilder(
+              languageHelper: outerHelper,
+              builder:
+                  (_) => Column(
+                    children: [
+                      Text('Hello'.trC(outerHelper)),
+                      LanguageBuilder(
+                        languageHelper: innerHelper,
+                        builder: (_) => Text('Hello'.trC(innerHelper)),
+                      ),
+                    ],
+                  ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Outer should show English, inner should show Vietnamese
+      expect(find.text('Hello'), findsOneWidget);
+      expect(find.text('Xin Chào'), findsOneWidget);
+
+      // Change outer helper language
+      await outerHelper.change(LanguageCodes.vi);
+      await tester.pumpAndSettle();
+
+      // Both should show Vietnamese now
+      expect(find.text('Xin Chào'), findsNWidgets(2));
+      expect(find.text('Hello'), findsNothing);
+
+      // Change inner helper language
+      await innerHelper.change(LanguageCodes.en);
+      await tester.pumpAndSettle();
+
+      // Outer should show Vietnamese, inner should show English
+      expect(find.text('Hello'), findsOneWidget);
+      expect(find.text('Xin Chào'), findsOneWidget);
+
+      // Dispose helpers
+      outerHelper.dispose();
+      innerHelper.dispose();
+    });
+
+    testWidgets('Tr widget with custom prefix and parameters', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper = LanguageHelper('ParameterTest');
+      await helper.initial(data: dataList, initialCode: LanguageCodes.en);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                Tr(
+                  (_) => Text(
+                    'You have @number dollars'.trC(
+                      helper,
+                      params: {'number': 100},
+                    ),
+                  ),
+                  languageHelper: helper,
+                ),
+                Tr(
+                  (_) => Text(
+                    'You have @{number} dollar'.trC(
+                      helper,
+                      params: {'number': 1},
+                    ),
+                  ),
+                  languageHelper: helper,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Should show English translations
+      expect(find.text('You have 100 dollars'), findsOneWidget);
+      expect(find.text('You have 1 dollar'), findsOneWidget);
+
+      // Change to Vietnamese
+      await helper.change(LanguageCodes.vi);
+      await tester.pumpAndSettle();
+
+      // Should show Vietnamese translations
+      expect(find.text('Bạn có 100 đô-la'), findsOneWidget);
+      expect(find.text('Bạn có 1 đô-la'), findsOneWidget);
+
+      // Dispose helper
+      helper.dispose();
+    });
   });
 
   /// This test have to be the last test because it will change the value of the database.
@@ -1108,12 +1418,142 @@ void main() async {
     });
   });
 
-  group('Test edge cases and error handling', () {
+  group('Test LanguageHelper instances with modified prefixes', () {
     test('LanguageHelper with empty prefix', () {
       final helper = LanguageHelper('');
       expect(helper.prefix, equals(''));
     });
 
+    test('LanguageHelper with custom prefix', () {
+      final helper = LanguageHelper('CustomPrefix');
+      expect(helper.prefix, equals('CustomPrefix'));
+    });
+
+    test('LanguageHelper with special characters in prefix', () {
+      final helper = LanguageHelper('prefix-with-special.chars');
+      expect(helper.prefix, equals('prefix-with-special.chars'));
+    });
+
+    test('Multiple LanguageHelper instances with different prefixes', () {
+      final helper1 = LanguageHelper('Helper1');
+      final helper2 = LanguageHelper('Helper2');
+      final helper3 = LanguageHelper('Helper1'); // Same prefix as helper1
+
+      expect(helper1.prefix, equals('Helper1'));
+      expect(helper2.prefix, equals('Helper2'));
+      expect(helper3.prefix, equals('Helper1'));
+
+      // Different prefixes should create different instances
+      expect(helper1, isNot(equals(helper2)));
+      expect(helper2, isNot(equals(helper3)));
+
+      // Same prefixes should be equal
+      expect(helper1, equals(helper3));
+    });
+
+    test('LanguageHelper prefix affects SharedPreferences keys', () {
+      final helper1 = LanguageHelper('App1');
+      final helper2 = LanguageHelper('App2');
+
+      expect(helper1.codeKey, equals('App1.AutoSaveCode'));
+      expect(helper1.deviceCodeKey, equals('App1.DeviceCode'));
+      expect(helper2.codeKey, equals('App2.AutoSaveCode'));
+      expect(helper2.deviceCodeKey, equals('App2.DeviceCode'));
+    });
+
+    test('Different prefixes maintain separate language preferences', () async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper1 = LanguageHelper('App1');
+      final helper2 = LanguageHelper('App2');
+
+      // Initialize both helpers with different initial languages
+      await helper1.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+        isAutoSave: true,
+        syncWithDevice: false,
+      );
+
+      await helper2.initial(
+        data: dataList,
+        initialCode: LanguageCodes.vi,
+        isAutoSave: true,
+        syncWithDevice: false,
+      );
+
+      // Change languages
+      await helper1.change(LanguageCodes.vi);
+      await helper2.change(LanguageCodes.en);
+
+      // Verify they maintain separate states
+      expect(helper1.code, equals(LanguageCodes.vi));
+      expect(helper2.code, equals(LanguageCodes.en));
+
+      // Dispose helpers
+      helper1.dispose();
+      helper2.dispose();
+    });
+
+    test(
+      'LanguageHelper instances with same prefix share preferences',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+
+        final helper1 = LanguageHelper('SharedPrefix');
+        final helper2 = LanguageHelper('SharedPrefix');
+
+        // Initialize first helper
+        await helper1.initial(
+          data: dataList,
+          initialCode: LanguageCodes.en,
+          isAutoSave: true,
+          syncWithDevice: false,
+        );
+
+        // Change language in first helper
+        await helper1.change(LanguageCodes.vi);
+
+        // Initialize second helper - should load the saved language
+        await helper2.initial(
+          data: dataList,
+          initialCode: LanguageCodes.en,
+          isAutoSave: true,
+          syncWithDevice: false,
+        );
+
+        // Second helper should have the language saved by first helper
+        expect(helper2.code, equals(LanguageCodes.vi));
+
+        // Dispose helpers
+        helper1.dispose();
+        helper2.dispose();
+      },
+    );
+
+    test('LanguageHelper hashCode based on prefix', () {
+      final helper1 = LanguageHelper('TestPrefix');
+      final helper2 = LanguageHelper('TestPrefix');
+      final helper3 = LanguageHelper('DifferentPrefix');
+
+      expect(helper1.hashCode, equals(helper2.hashCode));
+      expect(helper1.hashCode, isNot(equals(helper3.hashCode)));
+    });
+
+    test(
+      'LanguageHelper instances are properly created with different prefixes',
+      () {
+        final helper1 = LanguageHelper('Prefix1');
+        final helper2 = LanguageHelper('Prefix2');
+
+        expect(helper1.prefix, equals('Prefix1'));
+        expect(helper2.prefix, equals('Prefix2'));
+        expect(helper1, isNot(equals(helper2)));
+      },
+    );
+  });
+
+  group('Test edge cases and error handling', () {
     test('LanguageHelper with empty data', () async {
       final helper = LanguageHelper('TestHelper');
       await helper.initial(data: []);
