@@ -6,7 +6,7 @@ import 'package:language_helper/src/utils/print_debug.dart';
 import 'package:language_helper/src/utils/serializer.dart';
 
 extension ExportLanguageData on LanguageData {
-  /// Export to json files for `LanguageDataProvider`. Default `path` is set to './assets/resources'.
+  /// Export to json files for `LanguageDataProvider`. Default `path` is set to './assets/languages'.
   ///
   /// We need a little trick to run this script to get the expected result:
   /// - Create a `export_json.dart` file in your `bin` folder (the same level with the `lib`).
@@ -15,7 +15,7 @@ extension ExportLanguageData on LanguageData {
   /// ```dart
   /// void main() {
   ///   test('', () {
-  ///     languageData.exportJson('./assets/resources');
+  ///     languageData.exportJson('./assets/languages');
   ///   });
   /// }
   /// ```
@@ -30,13 +30,13 @@ extension ExportLanguageData on LanguageData {
   ///  |  |  |  |  |- en.json
   ///  |  |  |  |  |- vi.json
   ///  |  |  |  |  |- ...
-  void exportJson([String path = './assets/resources']) {
+  void exportJson([String path = './assets/languages']) {
     return _exportJson(this, path);
   }
 }
 
 extension ExportLazyLanguageData on LazyLanguageData {
-  /// Export to json files for `LanguageDataProvider`. Default `path` is set to './assets/resources'.
+  /// Export to json files for `LanguageDataProvider`. Default `path` is set to './assets/languages'.
   ///
   /// We need a little trick to run this script to get the expected result:
   /// - Create a `export_json.dart` file in your `bin` folder (the same level with the `lib`).
@@ -45,7 +45,7 @@ extension ExportLazyLanguageData on LazyLanguageData {
   /// ```dart
   /// void main() {
   ///   test('', () {
-  ///     languageData.exportJson('./assets/resources');
+  ///     languageData.exportJson('./assets/languages');
   ///   });
   /// }
   /// ```
@@ -60,7 +60,7 @@ extension ExportLazyLanguageData on LazyLanguageData {
   ///  |  |  |  |  |- en.json
   ///  |  |  |  |  |- vi.json
   ///  |  |  |  |  |- ...
-  void exportJson([String path = './assets/resources']) {
+  void exportJson([String path = './assets/languages']) {
     return _exportJson(map((k, v) => MapEntry(k, v())), path);
   }
 }
@@ -89,7 +89,7 @@ void _exportJsonCodes(LanguageData data, String path) {
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
-  final desFile = File('$path/language_helper/codes.json');
+  final desFile = File('$path/codes.json');
   desFile.createSync(recursive: true);
   final codes = data.keys.map((e) => e.code).toList();
   desFile.writeAsStringSync(encoder.convert(codes));
@@ -102,7 +102,7 @@ void _exportJsonLanguages(LanguageData data, String path) {
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
-  final desPath = '$path/language_helper/languages/';
+  final desPath = '$path/data/';
   final map = languageDataToMap(data);
   for (final MapEntry(key: String key, value: dynamic value) in map.entries) {
     final desFile = File('$desPath$key.json');
