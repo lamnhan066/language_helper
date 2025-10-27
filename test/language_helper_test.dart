@@ -486,6 +486,34 @@ void main() async {
       expect(conditions.toString(), isA<String>());
       expect(dataList.hashCode, isNot(fromJson.hashCode));
     });
+
+    test('equality and hashCode', () {
+      final conditions1 = const LanguageConditions(
+        param: 'number',
+        conditions: {'0': 'zero', 'default': 'default'},
+      );
+      final conditions2 = const LanguageConditions(
+        param: 'number',
+        conditions: {'0': 'zero', 'default': 'default'},
+      );
+      final conditions3 = const LanguageConditions(
+        param: 'count',
+        conditions: {'0': 'zero', 'default': 'default'},
+      );
+
+      expect(conditions1, equals(conditions2));
+      expect(conditions1.hashCode, equals(conditions2.hashCode));
+      expect(conditions1, isNot(equals(conditions3)));
+    });
+
+    test('empty conditions', () {
+      final emptyConditions = const LanguageConditions(
+        param: 'test',
+        conditions: {},
+      );
+      expect(emptyConditions.conditions, isEmpty);
+      expect(emptyConditions.toJson(), isA<String>());
+    });
   });
 
   group('dataOverrides', () {
@@ -864,10 +892,32 @@ void main() async {
     test('export json', () {
       final dir = Directory('./test/export_json');
       data.exportJson(dir.path);
-      final codesFile = File('./test/export_json/language_helper/codes.json');
+      final codesFile = File('./test/export_json/codes.json');
       final codesJson = codesFile.readAsStringSync();
       expect(jsonDecode(codesJson), isA<List>());
       expect(jsonDecode(codesJson), isNotEmpty);
+
+      // Test that language files are created in the correct structure
+      final enFile = File('./test/export_json/data/en.json');
+      final viFile = File('./test/export_json/data/vi.json');
+      expect(enFile.existsSync(), isTrue);
+      expect(viFile.existsSync(), isTrue);
+
+      final enJson = jsonDecode(enFile.readAsStringSync());
+      final viJson = jsonDecode(viFile.readAsStringSync());
+      expect(enJson, isA<Map>());
+      expect(viJson, isA<Map>());
+      expect(enJson['Hello'], equals('Hello'));
+      expect(viJson['Hello'], equals('Xin Chào'));
+
+      dir.deleteSync(recursive: true);
+    });
+
+    test('export json with custom path', () {
+      final dir = Directory('./test/custom_export');
+      data.exportJson(dir.path);
+      final codesFile = File('./test/custom_export/codes.json');
+      expect(codesFile.existsSync(), isTrue);
       dir.deleteSync(recursive: true);
     });
   });
@@ -904,10 +954,7 @@ void main() async {
     test('initial loads only requested language lazily', () async {
       SharedPreferences.setMockInitialValues({});
 
-      final callCount = {
-        LanguageCodes.en: 0,
-        LanguageCodes.vi: 0,
-      };
+      final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
 
       LazyLanguageData lazyData = {
         LanguageCodes.en: () {
@@ -940,10 +987,7 @@ void main() async {
     test('changing language evaluates lazy data on demand', () async {
       SharedPreferences.setMockInitialValues({});
 
-      final callCount = {
-        LanguageCodes.en: 0,
-        LanguageCodes.vi: 0,
-      };
+      final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
 
       LazyLanguageData lazyData = {
         LanguageCodes.en: () {
@@ -993,7 +1037,7 @@ void main() async {
     });
 
     test('asset - ok', () async {
-      final data = LanguageDataProvider.asset('assets');
+      final data = LanguageDataProvider.asset('assets/languages');
       final codes = await data.getSupportedCodes();
       expect(codes, equals({LanguageCodes.en, LanguageCodes.vi}));
       final languages = await data.getData(LanguageCodes.en);
@@ -1010,7 +1054,7 @@ void main() async {
 
     test('network - ok', () async {
       final data = LanguageDataProvider.network(
-        'https://pub.lamnhan.dev',
+        'https://pub.lamnhan.dev/languages',
         client: MockClient(),
       );
 
@@ -1033,6 +1077,28 @@ void main() async {
 
       expect(await data.getData(LanguageCodes.en), isEmpty);
     });
+
+    test('empty data provider', () async {
+      final data = LanguageDataProvider.empty();
+      expect(data.isEmpty, equals(true));
+      expect(await data.getData(LanguageCodes.en), isEmpty);
+      expect(await data.getSupportedCodes(), isEmpty);
+    });
+
+    test('data provider with custom data', () async {
+      final customData = {
+        LanguageCodes.en: {'test': 'test value'},
+        LanguageCodes.vi: {'test': 'giá trị test'},
+      };
+      final data = LanguageDataProvider.data(customData);
+      expect(data.isEmpty, equals(false));
+
+      final codes = await data.getSupportedCodes();
+      expect(codes, equals({LanguageCodes.en, LanguageCodes.vi}));
+
+      final enData = await data.getData(LanguageCodes.en);
+      expect(enData[LanguageCodes.en]!['test'], equals('test value'));
+    });
   });
 
   group('Verify variables', () {
@@ -1042,10 +1108,53 @@ void main() async {
     });
   });
 
+  group('Test edge cases and error handling', () {
+    test('LanguageHelper with empty prefix', () {
+      final helper = LanguageHelper('');
+      expect(helper.prefix, equals(''));
+    });
+
+    test('LanguageHelper with empty data', () async {
+      final helper = LanguageHelper('TestHelper');
+      await helper.initial(data: []);
+      // When data is empty, LanguageHelper creates a temporary data entry
+      expect(helper.data, isNotEmpty);
+      expect(helper.codes, isNotEmpty);
+      expect(helper.codes, contains(LanguageCodes.en));
+    });
+
+    test('translate with empty string', () {
+      expect(''.tr, equals(''));
+    });
+
+    test('translate with missing parameter', () {
+      expect('Hello @{name}'.trP({'other': 'value'}), equals('Hello @{name}'));
+    });
+
+    test('translate with empty parameters', () {
+      expect('Hello @{name}'.trP({}), equals('Hello @{name}'));
+    });
+
+    test('change to same language', () async {
+      await languageHelper.change(LanguageCodes.en);
+      expect(languageHelper.code, equals(LanguageCodes.en));
+    });
+
+    test('dispose multiple times', () {
+      final helper = LanguageHelper('TestHelper');
+      helper.dispose();
+      helper.dispose(); // Should not throw
+    });
+  });
+
   group('Test utils', () {
     test('remove ending slash', () {
       expect(Utils.removeLastSlash('abc///'), equals('abc'));
+      expect(Utils.removeLastSlash('abc/'), equals('abc'));
+      expect(Utils.removeLastSlash('abc'), equals('abc'));
+      expect(Utils.removeLastSlash(''), equals(''));
     });
+
     test('get url', () async {
       const errorUrl = 'abc';
       await Utils.getUrl(Uri.parse(errorUrl));
@@ -1053,6 +1162,15 @@ void main() async {
         await Utils.getUrl(Uri.parse(errorUrl), client: MockClient()),
         isEmpty,
       );
+    });
+
+    test('get url with valid response', () async {
+      final result = await Utils.getUrl(
+        Uri.parse('https://pub.lamnhan.dev/languages/data/en.json'),
+        client: MockClient(),
+      );
+      expect(result, isNotEmpty);
+      expect(result, contains('Hello'));
     });
   });
 }

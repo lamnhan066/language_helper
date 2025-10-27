@@ -1,10 +1,10 @@
 Map<String, String> mockAssets = {
-  'assets/language_helper/codes.json': '''
+  'assets/languages/codes.json': '''
 [
   "en",
   "vi"
 ]''',
-  'assets/language_helper/languages/en.json': '''
+  'assets/languages/data/en.json': '''
 {
   "Hello": "Hello",
   "You have @number dollars": "You have @number dollars",
@@ -29,7 +29,7 @@ Map<String, String> mockAssets = {
   },
   "You have @{number} dollar in your wallet": "You have @{number} dollar in your wallet"
 }''',
-  'assets/language_helper/languages/vi.json': '''
+  'assets/languages/data/vi.json': '''
 {
   "Hello": "Xin Chào",
   "You have @number dollars": "Bạn có @number đô-la",
