@@ -1,3 +1,7 @@
+## 0.12.4
+
+* Forward stdout and stderr to parent process when running the generator.
+
 ## 0.12.3
 
 * Add exportJson helper for LazyLanguageData.
