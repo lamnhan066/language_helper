@@ -2,59 +2,26 @@
 
 [![codecov](https://codecov.io/gh/lamnhan066/language_helper/graph/badge.svg?token=AIGGNCGOVR)](https://codecov.io/gh/lamnhan066/language_helper)
 
-Multi-language app tool with an efficient generator and a custom GPT-4 translator for easy localization.
-
+A Flutter package for easy multi-language app localization with automatic text extraction and translation support.
 
 ## Features
 
-- Easy to control the language translations in your application. Automatically uses the current device locale upon first open, if possible.
+- 🚀 **Easy Setup**: Add `.tr` and `.trP` to any string for instant translation
+- 🔍 **Auto Extraction**: Automatically extract all translatable text from your Dart files
+- 🎯 **Smart Translation**: Control translations with conditions and parameters
+- 🌐 **Multiple Sources**: Support for Dart maps, JSON files, assets, and network data
+- 📱 **Device Locale**: Automatically uses device locale on first launch
+- 🔧 **GPT-4 Integration**: Custom translator for easy language conversion
 
-- You can completely control the translated text with `LanguageConditions`.
+## Quick Start
 
-- Supports analyzing which text is missing in a specific language or is in your app but not in your language data, and vice versa.
+### 1. Add to your project
 
-- Supports extracting the needed text for translation from all `.dart` files in your project with a single command (Not using `build_runner` nor custom parser so it very fast and reliable).
-
-- A `Language Helper Translator` on Chat GPT-4 that make it easier to translate the language data to a destination language.
-
-## Contents
-
-- [Set Up](#set-up): Only this step is required while developing
-  - [Add The language_helper To The Project](#add-the-language_helper-to-the-project)
-  - [Add An Empty LanguageHelper While Developing](#add-an-empty-languagehelper-while-developing)
-  - [Add `.tr` Or `.trP` To All Needed `String`s](#add-tr-or-trp-to-all-needed-strings)
-- [Generator Flow Usage](#generator-flow-usage)
-  - [Dart Map](#dart-map)
-  - [JSON](#json)
-- [Manual Flow Usage](#manual-flow-usage)
-  - [Create The Translations](#create-the-translations)
-  - [Add To The Project](#add-to-the-project)
-- [Using `LanguageBuilder` To Update The `String`s](#using-languagebuilder-to-update-the-strings)
-- [Control The Translation](#control-the-translation)
-  - [Change The Language](#change-the-language)
-  - [Add A New Language Data](#add-a-new-language-data)
-  - [Get The List Of Supported Language Code](#get-the-list-of-supported-language-code)
-  - [Listen To The Language Changing State](#listen-to-the-language-changing-state)
-- [Advanced Language Helper Generator](#advanced-language-helper-generator)
-  - [Modify The Input Path](#modify-the-input-path)
-  - [Modify The Output Path](#modify-the-output-path)
-  - [Convert From `LanguageData` to `JSON`](#convert-from-languagedata-to-json)
-- [Language Data Serialization](#language-data-serialization)
-- [Language Helper Translator (A Custom Chat GPT-4)](#language-helper-translator-a-custom-chat-gpt-4)
-- [Additional Information](#additional-information)
-- [Contributions](#contributions)
-
-## Set Up
-
-While developing, we just need to finish the [Set Up](#set-up) steps. All other steps can be done when the app is ready to implement the localizations.
-
-### Add The language_helper To The Project
-
-```shell
+```bash
 flutter pub add language_helper
 ```
 
-### Add An Empty LanguageHelper While Developing
+### 2. Initialize (while developing)
 
 ```dart
 final languageHelper = LanguageHelper.instance;
@@ -66,255 +33,23 @@ main() async {
 }
 ```
 
-### Add `.tr` Or `.trP` To All Needed `String`s
-
-Normal translation
+### 3. Add translations to your strings
 
 ```dart
-Text('Translate this text'.tr)
+// Simple translation
+Text('Hello World'.tr)
+
+// With parameters
+Text('Hello @{name}'.trP({'name': 'John'}))
+
+// With conditions
+Text('You have @{count} item'.trP({'count': itemCount}))
 ```
 
-Translate with parameters
+### 4. Wrap your app
 
 ```dart
-Text('Hello @{name}'.trP({'name': name}))
-```
-
-Plural (Read [Manual Flow Usage](#manual-flow-usage) to know how to use it)
-
-```dart
-Text('We have @{number} dollar'.trP({'number': number}))
-```
-
-### iOS configuration
-
-Add the supported localizations to the `Infi.plist`. For instance with `en` and `vi` supported:
-
-```plist
-<key>CFBundleLocalizations</key>
-<array>
-   <string>en</string>
-   <string>vi</string>
-</array>
-```
-
-## Generator Flow Usage
-
-### Dart Map
-
-**Generate:**
-
-```shell
-dart run language_helper:generate
-```
-
-The data will be generated in this path by default:
-
-```txt
-|-- .lib
-|   |--- resources
-|   |    |--- language_helper
-|   |    |    |--- language_data.dart
-|   |    |    |--- languages
-|   |    |    |    |--- _generated.dart   ; This file will be overwritten when re-generating
-```
-
-**Implement to your project:**
-
-```dart
-final languageHelper = LanguageHelper.instance;
-
-final languageDataProvider = LanguageDataProvider.data(languageData);
-
-main() async {
-  await languageHelper.initial(
-      data: [languageDataProvider],
-  );
-
-  runApp(const MyApp());
-}
-```
-
-### JSON
-
-When using JSON, you can store your translation data in `assets` or on network
-
-```shell
-dart run language_helper:generate --json
-```
-
-The data will be generated in this path by default:
-
-```txt
-|-- assets
-|   |--- resources
-|   |    |--- language_helper
-|   |    |    |--- codes.json
-|   |    |    |--- languages
-|   |    |    |    |--- _generated.json ; This file will be overwritten when re-generating
-```
-
-### Implement to your project
-
-**Define the language data:**
-
-```dart
-final languageHelper = LanguageHelper.instance;
-
-// Network
-final languageDataProvider = LanguageDataProvider.network('https://example.com/resources');
-
-// Assets
-final languageDataProvider = LanguageDataProvider.asset('assets/resources');
-```
-
-**Add to the `LanguageHelper` instance:**
-
-```dart
-final languageHelper = LanguageHelper.instance;
-
-main() async {
-  await languageHelper.initial(
-      data: [languageDataProvider],
-  );
-
-  runApp(const MyApp());
-}
-```
-
-**Combine all of them to improve the translation:**
-
-```dart
-main() async {
-  await languageHelper.initial(
-      data: [
-        LanguageDataProvider.network('https://example.com/resources'),
-        LanguageDataProvider.asset('assets/resources'),
-        LanguageDataProvider.data(languageData),
-        LanguageDataProvider.lazyData(languageData),
-      ],
-  );
-
-  runApp(const MyApp());
-}
-```
-
-The package will get the translation data in order from top to bottom.
-
-## Manual Flow Usage
-
-### Create The Translations
-
-**Dart Map:**
-
-```dart
-final en = {
-  'Translate this text': 'Translate this text',
-  'Hello @{name}': 'Hello @{name}',
-  'We have @{number} dollar': LanguageConditions(
-    param: 'number',
-    conditions: {
-      '1': 'We have one dollar',
-
-      // Default value.
-      '_': 'We have @{number} dollars',
-    }
-  ),
-};
-
-const vi = {
-  'Translate this text': 'Dịch chữ này',
-  'Hello @{name}': 'Xin chào @{name}',
-  'We have @{number} dollar': 'Chúng ta có @{number} đô-la', 
-};
-
-LanguageData languageData = {
-  LanguageCodes.en: en,
-  LanguageCodes.vi: vi,
-};
-
-LazyLanguageData lazyLanguageData = {
-  LanguageCodes.en: () => en,
-  LanguageCodes.vi: () => vi,
-}
-
-final languageDataProvider = LanguageDataProvider.data(languageData);
-final lazyLanguageDataProvider = LanguageDataProvider.lazyData(languageData);
-```
-
-With `LanguageConditions`, you can completely control which text is returned according to the parameters' conditions. You can use `'default'` or `'_'` to set the default value for the condition.
-
-**JSON:**
-
-`assets/resources/language_helper/codes.json`: Contains all language codes
-
-```JSON
-["en", "vi"]
-```
-
-`assets/resources/language_helper/languages/en.json`:
-
-```JSON
-{
-  "Translate this text": "Translate this text",
-  "Hello @{name}": "Hello @{name}",
-  "We have @{number} dollar": {
-    "param": "number",
-    "conditions": {
-      "1": "We have one dollar",
-
-      // Default value.
-      "_": "We have @{number} dollars",
-    }
-  }
-}
-```
-
-`assets/resources/language_helper/languages/vi.json`:
-
-```JSON
-{
-  "Translate this text": "Dịch chữ này",
-  "Hello @{name}": "Xin chào @{name}",
-  "We have @{number} dollar": "Chúng ta có @{number} đô-la", 
-}
-```
-
-Remember to add those files to the `pubspec.yaml`:
-
-```yaml
-flutter:
-  assets:
-    - assets/resources/language_helper/codes.json
-    - assets/resources/language_helper/languages/
-```
-
-```dart
-final languageDataProvider = LanguageDataProvider.asset('assets/resources');
-```
-
-### Add To The Project
-
-```dart
-final languageHelper = LanguageHelper.instance;
-
-main() async {
-  await languageHelper.initial(
-      data: [languageDataProvider],
-  );
-
-  runApp(const MyApp());
-}
-```
-
-## Using `LanguageBuilder` To Update The `String`s
-
-### In the `MaterialApp`
-
-``` dart
 class App extends StatelessWidget {
-  const App({super.key});
-
   @override
   Widget build(BuildContext context) {
     return LanguageBuilder(
@@ -331,195 +66,311 @@ class App extends StatelessWidget {
 }
 ```
 
-### In your `Widget`s
+## Generate Translations
 
-**Using `LanguageBuilder`:**
+The generator automatically scans your project for text using language_helper extensions (`tr`, `trP`, `trT`, `trF`) and `translate` method, then creates organized translation files with your existing translations preserved.
 
-``` dart
-LanguageBuilder(
-    builder: (context) {
-        return Scaffold(
-          body: Column(
-            children: [
-              Text('Hello @{name}'.tr),
-              Text('We have @{number} dollar'.tr),
-            ],
-          ),
-        );
-    },
-),
+> **Note**: The generator is smart about managing translations:
+>
+> - ✅ **Keeps existing translations** - Your current translated texts are preserved
+> - 🆕 **Marks new texts with TODO** - Only untranslated texts get TODO markers
+> - 🗑️ **Removes unused texts** - Automatically cleans up translations no longer used in your code
+
+### Add Generator Dependency
+
+First, add the generator to your `pubspec.yaml`:
+
+```yaml
+dev_dependencies:
+  language_helper_generator: ^0.7.0
 ```
 
-**Using `Tr` (A short version of `LanguageBuilder`):**
+Then run:
 
-``` dart
-Tr((_) => Text('Hello @{name}'.tr)),
+```bash
+flutter pub get
 ```
 
-## Control The Translation
+### Basic Generation
 
-### Change The Language
+Extract all translatable text and generate language files:
 
-``` dart
-languageHelper.change(LanguageCodes.vi);
+```bash
+dart run language_helper:generate --languages=en,vi,fr --ignore-todo=en
 ```
 
-### Add A New Language Data
+This creates:
 
-``` dart
-languageHelper.addData(LanguageDataProvider.data(newLanguageData));
-languageHelper.addDataOverrides(LanguageDataProvider.data(newLanguageDataOverrides));
+```txt
+lib/languages/
+├── codes.dart
+└── data/
+    ├── en.dart // without TODO markers for missing translations
+    ├── vi.dart // with TODO markers for missing translations
+    └── fr.dart // with TODO markers for missing translations
 ```
 
-The `addData` and `addDataOverrides` have `activate` parameter which automaticaly rebuild all needed `LanguageBuilder`, so notice that you may get the `setState` issue because of the rebuilding of the `LanguageBuilder` when it's still building. If the error occurs, you may need to set it to `false` and activate the new data yourself by using `reload` method.
+### JSON Generation
 
-### Get The List Of Supported Language Code
+For assets or network-based translations:
 
-``` dart
-// List of [LanguageCodes] from both of the [data] and [dataOverrides] without duplicated
-final codes = languageHelper.codes;
-
-// List of [LanguageCodes] from the [dataOverrides]
-final codesOverrides = languageHelper.codesOverrides;
+```bash
+dart run language_helper:generate --languages=en,vi --json
 ```
 
-### Listen To The Language Changing State
+Creates:
 
-Beside the `onChanged` callback, you can listen to the language changed events by using `stream`:
-
-``` dart
-final sub = languageHelper.stream.listen((code) => print(code));
+```txt
+assets/languages/
+├── codes.json
+└── data/
+    ├── en.json
+    ├── vi.json
+    └── fr.json
 ```
 
-**Note:** Remember to `sub.cancel()` when it's not in use to avoid memory leaks.
+### Generator Options
 
-### Analyze The Translation
+| Option | Description | Example |
+|--------|-------------|---------|
+| `--languages` | Language codes to generate | `--languages=en,vi,es` |
+| `--ignore-todo` | Skip TODO markers for specific languages | `--ignore-todo=en` |
+| `--path` | Custom output directory | `--path=./lib/resources` |
+| `--json` | Generate JSON files instead of Dart | `--json` |
 
-**Currently works properly with `LanguageDataProvider.data` method**
+### Common Examples
 
-``` dart
-languageHelper.analyze();
+**Skip TODOs in English (your base language):**
+
+```bash
+dart run language_helper:generate --languages=en,vi --ignore-todo=en
 ```
 
-This function will automatically be called in `initial` when `isDebug` is `true`.
+**Custom output path:**
 
-## Advanced Language Helper Generator
-
-### Modify The Input Path
-
-Add `--path` option to your command:
-
-```shell
-dart run language_helper:generate --path=./lib
+```bash
+dart run language_helper:generate --path=./lib/languages --languages=en,vi
 ```
 
-### Modify The Output Path
+**Generate for multiple languages:**
 
-Add `--output` option to your command:
-
-```shell
-dart run language_helper:generate --output=./lib/resources
+```bash
+dart run language_helper:generate --languages=en,vi,es,fr --ignore-todo=en
 ```
 
-### Convert From `LanguageData` to `JSON`
+## Using Generated Data
 
-- Create a `bin` folder in the same level with your `lib`.
-- Create a `export_json.dart` file in your `bin`.
-- Add this code to your `export_json.dart`:
+### Dart Map
 
 ```dart
-void main() {
-  test('', () {
-    languageData.exportJson('./assets/resources');
-  });
+final languageDataProvider = LanguageDataProvider.lazyData(languageData);
+
+main() async {
+  await languageHelper.initial(data: [languageDataProvider]);
+  runApp(const MyApp());
 }
 ```
 
-- Add the missing `import`s.
-- Run `flutter test ./bin/export_json.dart`.
-- The JSON will be generated in this path:
+### JSON Assets
+
+```dart
+final languageDataProvider = LanguageDataProvider.asset('assets/languages');
+
+main() async {
+  await languageHelper.initial(data: [languageDataProvider]);
+  runApp(const MyApp());
+}
+```
+
+### Network Data
+
+```dart
+final languageDataProvider = LanguageDataProvider.network('https://api.example.com/translations');
+
+main() async {
+  await languageHelper.initial(data: [languageDataProvider]);
+  runApp(const MyApp());
+}
+```
+
+## Manual Translation Setup
+
+### Dart Map Example
+
+```dart
+final en = {
+  'Hello World': 'Hello World',
+  'Hello @{name}': 'Hello @{name}',
+  'You have @{count} item': LanguageConditions(
+    param: 'count',
+    conditions: {
+      '1': 'You have one item',
+      '_': 'You have @{count} items', // Default
+    }
+  ),
+};
+
+final vi = {
+  'Hello World': 'Xin chào thế giới',
+  'Hello @{name}': 'Xin chào @{name}',
+  'You have @{count} item': 'Bạn có @{count} mục',
+};
+
+LazyLanguageData languageData = {
+  LanguageCodes.en: () => en,
+  LanguageCodes.vi: () => vi,
+};
+```
+
+### JSON Example
+
+`assets/languages/codes.json`:
+
+```json
+["en", "vi"]
+```
+
+`assets/languages/data/en.json`:
+
+```json
+{
+  "Hello World": "Hello World",
+  "Hello @{name}": "Hello @{name}",
+  "You have @{count} item": {
+    "param": "count",
+    "conditions": {
+      "1": "You have one item",
+      "_": "You have @{count} items"
+    }
+  }
+}
+```
+
+Don't forget to add to `pubspec.yaml`:
+
+```yaml
+flutter:
+  assets:
+    - assets/languages/codes.json
+    - assets/languages/data/
+```
+
+## Language Control
+
+### Change Language
+
+```dart
+languageHelper.change(LanguageCodes.vi);
+```
+
+### Add New Language Data
+
+```dart
+languageHelper.addData(LanguageDataProvider.lazyData(newLanguageData));
+```
+
+### Listen to Changes
+
+```dart
+final sub = languageHelper.stream.listen((code) => print('Language changed to: $code'));
+// Remember to cancel: sub.cancel()
+```
+
+### Get Supported Languages
+
+```dart
+final codes = languageHelper.codes; // All supported languages
+final overrides = languageHelper.codesOverrides; // Override languages
+```
+
+## Advanced Usage
+
+### Generator Features
+
+- **Fast**: Uses Dart Analyzer, no build_runner dependency
+- **Smart**: Preserves existing translations
+- **Organized**: Groups translations by file path
+- **Helpful**: Adds TODO markers for missing translations
+- **Clean**: Removes unused translation keys automatically
+
+### Custom Paths
+
+```bash
+# Custom output path
+dart run language_helper:generate --path=./lib/resources --languages=en,vi
+
+# Generate JSON to assets folder
+dart run language_helper:generate --path=./assets/languages --languages=en,vi --json
+```
+
+### Multiple Data Sources
+
+```dart
+main() async {
+  await languageHelper.initial(
+    data: [
+      LanguageDataProvider.network('https://api.example.com/translations'),
+      LanguageDataProvider.asset('assets/languages'),
+      LanguageDataProvider.lazyData(localLanguageData),
+    ],
+  );
+  runApp(const MyApp());
+}
+```
+
+> **Data Priority**: When multiple sources contain the same translation:
+>
+> - **First source wins** - Data sources are processed in order (top to bottom) for the entire source
+> - **Specific overrides** - To override individual translations, use `dataOverrides` instead of adding to `data`
+> - **AddData behavior** - New data can overwrite existing translations (controlled by `overwrite` parameter)
+
+### Widget Rebuilding
+
+```dart
+LanguageBuilder(
+  builder: (context) => Text('Hello'.tr),
+)
+
+Tr((_) => Text('Hello'.tr))
+```
+
+## GPT-4 Translator
+
+Use the [Language Helper Translator](https://chat.openai.com/g/g-qoPMopEAb-language-helper-translator) for easy translation:
 
 ```txt
-assets
-|  |- language_helper
-|  |  |- codes.json
-|  |  |  |- languages
-|  |  |  |  |- en.json
-|  |  |  |  |- vi.json
-|  |  |  |  |- ...
-```
-
-## Language Data Serialization
-
-Convert `LanguageData` to JSON:
-
-``` dart
-final json = data.toJson();
-```
-
-Convert JSON to `LanguageData`:
-
-``` dart
-final data = LanguageDataSerializer.fromJson(json);
-```
-
-## Language Helper Translator (A Custom Chat GPT-4)
-
-- Assume that here is our language data:
-
-```dart
-final en = {
-  'Hello @{name}': 'Hello @{name}',
-  'We have @{number} dollar': LanguageConditions(
-    param: 'number',
-    conditions: {
-      '1': 'We have one dollar',
-
-      // Default value.
-      '_': 'We have @{number} dollars',
-    }
-  ),
-};
-```
-
-- Go to [Language Helper Translator](https://chat.openai.com/g/g-qoPMopEAb-language-helper-translator). You should open a New Chat a few times to let the AI read the instructions carefully to improve the translation (just my personal experience).
-- Use this template to translate the data. Be sure to replace `[]` with the appropriate infomation:
-
-```dart
-This is the translation of the [app/game] that [purpose of the app/game to help the AI understand the context]. Translate it into [destination language]:
+This is the translation of my Flutter app. Translate it into Spanish:
 
 final en = {
   'Hello @{name}': 'Hello @{name}',
-  'We have @{number} dollar': LanguageConditions(
-    param: 'number',
-    conditions: {
-      '1': 'We have one dollar',
-
-      // Default value.
-      '_': 'We have @{number} dollars',
-    }
-  ),
+  'Welcome to the app': 'Welcome to the app',
 };
 ```
 
-- The GPT will keeps all keys and comments in their original text, positions them exactly as they appear in the source, keeps the @{param} and @param in their appropriate places during the translation.
+## iOS Configuration
 
-## Additional Information
+Add supported localizations to `Info.plist`:
 
-- The app will try to use the `Devicelocale` to set the `initialCode` if it is not set. If the `Devicelocale` is unavailable, it will use the first language in `data` instead.
+```xml
+<key>CFBundleLocalizations</key>
+<array>
+   <string>en</string>
+   <string>vi</string>
+</array>
+```
 
-- No matter how many `LanguageBuilder` that you use, the plugin only rebuilds the outest (the root) widget of `LanguageBuilder`, so it significantly improves performance. If you want to force rebuild some Widget, you can set the `forceRebuild` parameter in the `LanguageBuilder` to `true`.
+## Tips
 
-- The `LanguageCodes` contains all the common languages with additional information like name in English (englishName) and name in native language (nativeName).
+- Use `@{param}` for parameters (recommended)
+- The package automatically uses device locale on first launch
+- Only the outermost `LanguageBuilder` rebuilds for better performance
+- Use `isInitialized` to check if `initial()` has been called
+- Assets are preferred over network data (no caching yet)
 
-- The `@{param}` works in all cases (We should use this way to avoid issues when translating with `Language Helper Translator`). The `@param` only work if the text ends with a white space, end of line, or end with a new line.
+## Contributing
 
-- The `addData` and `addDataOverrides` have `activate` parameter which automaticaly rebuild all needed `LanguageBuilder`, so notice that you may get the `setState` issue because of the rebuilding of the `LanguageBuilder` when it's still building. If the error occurs, you may need to set it to `false` and activate the new data yourself by using `reload` method.
+Found a bug or want to contribute? Please file an issue or submit a pull request!
 
-- The `assets` data is preferred between `assets` and `network` because we still haven't a way to cache it.
+## License
 
-- Use the `isInitialized` (bool) and `ensureInitialized` (`Future<void>`) to check whether the `initial` is run.
-
-## Contributions
-
-As the project is currently in its early stages, it may contain bugs or other issues. Should you experience any problems, we kindly ask that you file an issue to let us know. Additionally, we welcome contributions in the form of pull requests (PRs) to help enhance the project.
+This project is licensed under the MIT License.
