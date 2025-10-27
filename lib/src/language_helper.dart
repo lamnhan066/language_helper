@@ -497,17 +497,17 @@ class LanguageHelper {
       _currentCode = toCode;
     }
 
-    _dataProvider = await _chooseTheBestDataProvider(_dataProviders, false);
-    _dataOverridesProvider = await _chooseTheBestDataProvider(
-      _dataOverridesProviders,
-      true,
-    );
-
     if (!_data.containsKey(_currentCode)) {
-      _data.clear();
-      _dataOverrides.clear();
-      _data.addAll(await _dataProvider.getData(code));
-      _dataOverrides.addAll(await _dataOverridesProvider.getData(code));
+      _dataProvider = await _chooseTheBestDataProvider(_dataProviders, false);
+      _dataOverridesProvider = await _chooseTheBestDataProvider(
+        _dataOverridesProviders,
+        true,
+      );
+
+      final data = await _dataProvider.getData(code);
+      final dataOverrides = await _dataOverridesProvider.getData(code);
+      _data.addAll(data);
+      _dataOverrides.addAll(dataOverrides);
     }
 
     printDebug(() => 'Change language to $toCode for ${_states.length} states');
