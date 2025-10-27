@@ -40,16 +40,14 @@ class LanguageDataProvider {
   /// The `parentPath` is a path that point to `codes.json` file but not includes
   /// it.
   ///
-  /// Ex: `assets/resources/language_helper/codes.json` and your languages is in
-  ///     `assets/resources/language_helper/languages/en.json`...
-  /// The `parentPath` will be `assets/resources`.
+  /// Ex: `assets/languages/codes.json` and your languages is in
+  ///     `assets/languages/data/en.json`...
+  /// The `parentPath` will be `assets/languages`.
   factory LanguageDataProvider.asset(String parentPath) {
     return LanguageDataProvider._(
       (code) async {
         String path = Utils.removeLastSlash(parentPath);
-        final uri = Uri.parse(
-          '$path/language_helper/languages/${code.code}.json',
-        );
+        final uri = Uri.parse('$path/data/${code.code}.json');
         String json = await _loadAsset(uri.path);
         if (json.isNotEmpty) {
           return {code: LanguageDataSerializer.valuesFromJson(json)};
@@ -58,7 +56,7 @@ class LanguageDataProvider {
       },
       () async {
         String path = Utils.removeLastSlash(parentPath);
-        final uri = Uri.parse('$path/language_helper/codes.json');
+        final uri = Uri.parse('$path/codes.json');
         final json = await _loadAsset(uri.path);
         if (json.isNotEmpty) {
           final decoded = jsonDecode(json).cast<String>() as List<String>;
@@ -72,12 +70,12 @@ class LanguageDataProvider {
 
   /// Create an instance of data from `network`.
   ///
-  /// The `parentPath` is a path that point to `codes.json` file but not includes
+  /// The `parentUrl` is a URL that point to `codes.json` file but not includes
   /// it.
   ///
-  /// Ex: `https://example.com/assets/resources/language_helper/codes.json` and your languages is in
-  ///     `https://example.com/assets/resources/language_helper/languages/en.json`...
-  /// The `parentPath` will be `https://example.com/assets/resources`.
+  /// Ex: `https://example.com/assets/languages/codes.json` and your languages is in
+  ///     `https://example.com/assets/languages/data/en.json`...
+  /// The `parentUrl` will be `https://example.com/assets/languages`.
   factory LanguageDataProvider.network(
     String parentUrl, {
     Client? client,
@@ -86,9 +84,7 @@ class LanguageDataProvider {
     return LanguageDataProvider._(
       (code) async {
         String path = Utils.removeLastSlash(parentUrl);
-        final uri = Uri.parse(
-          '$path/language_helper/languages/${code.code}.json',
-        );
+        final uri = Uri.parse('$path/data/${code.code}.json');
         String json = await Utils.getUrl(uri, client: client, headers: headers);
         if (json.isNotEmpty) {
           return {code: LanguageDataSerializer.valuesFromJson(json)};
@@ -97,7 +93,7 @@ class LanguageDataProvider {
       },
       () async {
         String path = Utils.removeLastSlash(parentUrl);
-        final uri = Uri.parse('$path/language_helper/codes.json');
+        final uri = Uri.parse('$path/codes.json');
         final json = await Utils.getUrl(uri, client: client, headers: headers);
         if (json.isNotEmpty) {
           final decoded = jsonDecode(json).cast<String>() as List<String>;
