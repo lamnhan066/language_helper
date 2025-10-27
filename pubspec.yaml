@@ -1,5 +1,5 @@
 name: language_helper
-description: Control multiple languages with an efficient generator and a custom GPT-4 translator for easy localization.
+description: A Flutter package for easy multi-language app localization with automatic text extraction and translation support.
 version: 0.12.4
 homepage: https://github.com/lamnhan066/language_helper
 topics:
