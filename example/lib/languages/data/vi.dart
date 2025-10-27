@@ -33,8 +33,6 @@ const viLanguageData = <String, dynamic>{
   "Supported Languages": 'Ngôn ngữ được hỗ trợ',
   "Current Locale": 'Locale hiện tại',
   "Device Locale": 'Locale thiết bị',
-  // TODO: Add `vi` language translation
-  "Translation Examples": "Translation Examples",
   "Simple Translation": 'Dịch đơn giản',
   "Hello @{name}": 'Xin chào @{name}',
   "Parameter Translation": 'Dịch có tham số',
@@ -47,8 +45,6 @@ const viLanguageData = <String, dynamic>{
       '_': 'Bạn có @{count} mục',
     },
   ),
-  // TODO: Add `vi` language translation
-  "Quick Actions": "Quick Actions",
 
   ///===========================================================================
   /// Path: pages/network_data_page.dart
@@ -57,95 +53,11 @@ const viLanguageData = <String, dynamic>{
   "Loading translations from network...": 'Đang tải bản dịch từ mạng...',
   "Failed to load network translations": 'Không thể tải bản dịch từ mạng',
   "Retry": 'Thử lại',
-  // TODO: Add `vi` language translation
-  "Network Data Source": "Network Data Source",
-  "Network translations loaded successfully": 'Tải bản dịch từ mạng thành công',
-  // TODO: Add `vi` language translation
-  "Language Controls": "Language Controls",
-  // TODO: Add `vi` language translation
-  "Code Example": "Code Example",
-
-  ///===========================================================================
-  /// Path: pages/advanced_features_page.dart
-  ///===========================================================================
-  "@path_pages/advanced_features_page.dart": "",
-  // TODO: Add `vi` language translation
-  "Language changed from @{from} to @{to}":
-      "Language changed from @{from} to @{to}",
-  // TODO: Add `vi` language translation
-  "Advanced Language Features": "Advanced Language Features",
-  // TODO: Add `vi` language translation
-  "Complex Conditional Translations": "Complex Conditional Translations",
-  // TODO: Add `vi` language translation
-  "Notifications": "Notifications",
-  // TODO: Add `vi` language translation
-  "You have @{count} notification": "You have @{count} notification",
-  // TODO: Add `vi` language translation
-  "Time Format": "Time Format",
-  // TODO: Add `vi` language translation
-  "Time format": "Time format",
-  // TODO: Add `vi` language translation
-  "Plural Items": "Plural Items",
-  // TODO: Add `vi` language translation
-  "Plural items": "Plural items",
-  // TODO: Add `vi` language translation
-  "Dynamic Parameter Injection": "Dynamic Parameter Injection",
-  // TODO: Add `vi` language translation
-  "Welcome Message": "Welcome Message",
-  // TODO: Add `vi` language translation
-  "Welcome @{name}": "Welcome @{name}",
-  // TODO: Add `vi` language translation
-  "Timestamp": "Timestamp",
-  // TODO: Add `vi` language translation
-  "Current timestamp": "Current timestamp",
-  // TODO: Add `vi` language translation
-  "Device Info": "Device Info",
-  // TODO: Add `vi` language translation
-  "Device info": "Device info",
-  // TODO: Add `vi` language translation
-  "Language Change Listener": "Language Change Listener",
-  // TODO: Add `vi` language translation
-  "Current Language": "Current Language",
-  // TODO: Add `vi` language translation
-  "Is Initialized": "Is Initialized",
-  // TODO: Add `vi` language translation
-  "Data Sources": "Data Sources",
 
   ///===========================================================================
   /// Path: pages/multiple_sources_page.dart
   ///===========================================================================
   "@path_pages/multiple_sources_page.dart": "",
-  // TODO: Add `vi` language translation
-  "Multiple Data Sources": "Multiple Data Sources",
-  // TODO: Add `vi` language translation
-  "Data Source Priority": "Data Source Priority",
-  // TODO: Add `vi` language translation
-  "From Primary Source": "From Primary Source",
-  // TODO: Add `vi` language translation
-  "From Secondary Source": "From Secondary Source",
-  // TODO: Add `vi` language translation
-  "Multiple sources working": "Multiple sources working",
-  // TODO: Add `vi` language translation
-  "Dynamic Addition": "Dynamic Addition",
-  "This text was added dynamically": 'Văn bản này được thêm động',
-  // TODO: Add `vi` language translation
-  "Dynamic Data Management": "Dynamic Data Management",
   "Add New Translation": 'Thêm bản dịch mới',
   "Remove Translation": 'Xóa bản dịch',
-  // TODO: Add `vi` language translation
-  "Dynamic data added successfully!": "Dynamic data added successfully!",
-
-  ///===========================================================================
-  /// Path: pages/json_asset_page.dart
-  ///===========================================================================
-  "@path_pages/json_asset_page.dart": "",
-  // TODO: Add `vi` language translation
-  "JSON Asset Data Source": "JSON Asset Data Source",
-
-  ///===========================================================================
-  /// Path: pages/dart_map_page.dart
-  ///===========================================================================
-  "@path_pages/dart_map_page.dart": "",
-  // TODO: Add `vi` language translation
-  "Dart Map Data Source": "Dart Map Data Source",
 };

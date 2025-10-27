@@ -139,10 +139,9 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: Text('Advanced Features'.tr),
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
+      elevation: 0,
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black87,
     ),
     body:
         !_isLoaded
@@ -151,173 +150,233 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
               languageHelper: _languageHelper,
               builder:
                   (context) => SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Advanced Language Features'.trC(
-                                    _languageHelper,
-                                  ),
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'This page demonstrates advanced features like complex conditions, language change listeners, and dynamic parameter injection.',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
+                        // Header Card
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Color(0xFFEC4899), Color(0xFFDB2777)],
                             ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.auto_awesome,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'Advanced Language Features'.trC(
+                                        _languageHelper,
+                                      ),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'Master complex conditions, dynamic parameters, and language change listeners.'
+                                    .trC(_languageHelper),
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
 
                         Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Complex Conditional Translations'.trC(
-                                    _languageHelper,
-                                  ),
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.pink.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.rule,
+                                        color: Colors.pink,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Complex Conditional Translations'.trC(
+                                        _languageHelper,
+                                      ),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 12),
+                                const SizedBox(height: 16),
 
-                                _buildTranslationExample(
+                                _buildConditionSection(
                                   'Notifications'.trC(_languageHelper),
-                                  'You have @{count} notification'.trC(
-                                    _languageHelper,
-                                    params: {'count': 0},
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  '',
-                                  'You have @{count} notification'.trC(
-                                    _languageHelper,
-                                    params: {'count': 1},
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  '',
-                                  'You have @{count} notification'.trC(
-                                    _languageHelper,
-                                    params: {'count': 5},
-                                  ),
+                                  [
+                                    _buildTranslationExample(
+                                      '',
+                                      'You have @{count} notification'.trC(
+                                        _languageHelper,
+                                        params: {'count': 0},
+                                      ),
+                                    ),
+                                    _buildTranslationExample(
+                                      '',
+                                      'You have @{count} notification'.trC(
+                                        _languageHelper,
+                                        params: {'count': 1},
+                                      ),
+                                    ),
+                                    _buildTranslationExample(
+                                      '',
+                                      'You have @{count} notification'.trC(
+                                        _languageHelper,
+                                        params: {'count': 5},
+                                      ),
+                                    ),
+                                  ],
                                 ),
 
-                                const Divider(),
+                                const SizedBox(height: 12),
 
-                                _buildTranslationExample(
+                                _buildConditionSection(
                                   'Time Format'.trC(_languageHelper),
-                                  'Time format'.trC(
-                                    _languageHelper,
-                                    params: {'hours': 0},
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  '',
-                                  'Time format'.trC(
-                                    _languageHelper,
-                                    params: {'hours': 1},
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  '',
-                                  'Time format'.trC(
-                                    _languageHelper,
-                                    params: {'hours': 12},
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  '',
-                                  'Time format'.trC(
-                                    _languageHelper,
-                                    params: {'hours': 15},
-                                  ),
+                                  [
+                                    _buildTranslationExample(
+                                      '',
+                                      'Time format'.trC(
+                                        _languageHelper,
+                                        params: {'hours': 0},
+                                      ),
+                                    ),
+                                    _buildTranslationExample(
+                                      '',
+                                      'Time format'.trC(
+                                        _languageHelper,
+                                        params: {'hours': 1},
+                                      ),
+                                    ),
+                                    _buildTranslationExample(
+                                      '',
+                                      'Time format'.trC(
+                                        _languageHelper,
+                                        params: {'hours': 12},
+                                      ),
+                                    ),
+                                    _buildTranslationExample(
+                                      '',
+                                      'Time format'.trC(
+                                        _languageHelper,
+                                        params: {'hours': 15},
+                                      ),
+                                    ),
+                                  ],
                                 ),
 
-                                const Divider(),
+                                const SizedBox(height: 12),
 
-                                _buildTranslationExample(
+                                _buildConditionSection(
                                   'Plural Items'.trC(_languageHelper),
-                                  'Plural items'.trC(
-                                    _languageHelper,
-                                    params: {'count': 0},
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  '',
-                                  'Plural items'.trC(
-                                    _languageHelper,
-                                    params: {'count': 1},
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  '',
-                                  'Plural items'.trC(
-                                    _languageHelper,
-                                    params: {'count': 2},
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  '',
-                                  'Plural items'.trC(
-                                    _languageHelper,
-                                    params: {'count': 3},
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  '',
-                                  'Plural items'.trC(
-                                    _languageHelper,
-                                    params: {'count': 4},
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  '',
-                                  'Plural items'.trC(
-                                    _languageHelper,
-                                    params: {'count': 5},
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  '',
-                                  'Plural items'.trC(
-                                    _languageHelper,
-                                    params: {'count': 10},
-                                  ),
+                                  [
+                                    _buildTranslationExample(
+                                      '',
+                                      'Plural items'.trC(
+                                        _languageHelper,
+                                        params: {'count': 0},
+                                      ),
+                                    ),
+                                    _buildTranslationExample(
+                                      '',
+                                      'Plural items'.trC(
+                                        _languageHelper,
+                                        params: {'count': 1},
+                                      ),
+                                    ),
+                                    _buildTranslationExample(
+                                      '',
+                                      'Plural items'.trC(
+                                        _languageHelper,
+                                        params: {'count': 3},
+                                      ),
+                                    ),
+                                    _buildTranslationExample(
+                                      '',
+                                      'Plural items'.trC(
+                                        _languageHelper,
+                                        params: {'count': 5},
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
 
                         Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Dynamic Parameter Injection'.trC(
-                                    _languageHelper,
-                                  ),
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.amber.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.input,
+                                        color: Colors.amber,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Dynamic Parameter Injection'.trC(
+                                        _languageHelper,
+                                      ),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 12),
-
+                                const SizedBox(height: 16),
                                 _buildTranslationExample(
                                   'Welcome Message'.trC(_languageHelper),
                                   'Welcome @{name}'.trC(
@@ -325,7 +384,6 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                                     params: {'name': 'Advanced User'},
                                   ),
                                 ),
-
                                 _buildTranslationExample(
                                   'Timestamp'.trC(_languageHelper),
                                   'Current timestamp'.trC(
@@ -337,7 +395,6 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                                     },
                                   ),
                                 ),
-
                                 _buildTranslationExample(
                                   'Device Info'.trC(_languageHelper),
                                   'Device info'.trC(
@@ -352,25 +409,46 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
 
                         Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Language Change Listener'.trC(
-                                    _languageHelper,
-                                  ),
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.cyan.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.volume_down,
+                                        color: Colors.cyan,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Language Change Listener'.trC(
+                                        _languageHelper,
+                                      ),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 12),
                                 Text(
-                                  'Change the language below to see the listener in action. A snackbar will show the language change notification.',
-                                  style: Theme.of(context).textTheme.bodySmall,
+                                  'Change language to see listener notifications.'
+                                      .trC(_languageHelper),
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(color: Colors.grey),
                                 ),
                                 const SizedBox(height: 12),
                                 Wrap(
@@ -387,10 +465,15 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor:
                                                     _languageHelper.code == code
-                                                        ? Theme.of(
-                                                          context,
-                                                        ).primaryColor
-                                                        : null,
+                                                        ? const Color(
+                                                          0xFFDB2777,
+                                                        )
+                                                        : Colors.grey[200],
+                                                foregroundColor:
+                                                    _languageHelper.code == code
+                                                        ? Colors.white
+                                                        : Colors.black87,
+                                                elevation: 0,
                                               ),
                                               child: Text(
                                                 _getLanguageName(code),
@@ -403,18 +486,39 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
 
                         Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Language Statistics'.trC(_languageHelper),
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.bar_chart,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Language Statistics'.trC(
+                                        _languageHelper,
+                                      ),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 12),
                                 _buildInfoRow(
@@ -439,56 +543,74 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
 
                         Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Code Example'.trC(_languageHelper),
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.purple.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.code,
+                                        color: Colors.purple,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Code Example'.trC(_languageHelper),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 12),
                                 Container(
                                   width: double.infinity,
-                                  padding: const EdgeInsets.all(12),
+                                  padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[100],
-                                    borderRadius: BorderRadius.circular(8),
+                                    color: const Color(0xFF1F2937),
+                                    borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: Colors.grey[300]!,
+                                      color: Colors.grey[700]!,
                                     ),
                                   ),
-                                  child: const Text(
+                                  child: Text(
                                     r'''
-  // Complex conditions with multiple cases
-  'Plural items': LanguageConditions(
+// Complex conditions
+'Plural items': LanguageConditions(
   param: 'count',
   conditions: {
     '0': 'No items',
     '1': 'One item',
     '2': 'Two items',
-    '3': 'Three items',
-    '4': 'Four items',
-    '5': 'Five items',
-    '_': '@{count} items', // Default case
+    '_': '@{count} items',
   },
-  ),
-  
-  // Listen to language changes
-  languageHelper.stream.listen((newCode) {
-  print('Language changed to: $newCode');
-  });
-  
-  // Dynamic parameter injection
-  'Welcome @{name}'.trP({'name': 'John'})''',
+),
+
+// Listen to language changes
+languageHelper.stream.listen((newCode) {
+  print('Language: $newCode');
+});
+
+// Dynamic parameters
+'Welcome @{name}'.trP({'name': 'John'})''',
                                     style: TextStyle(
                                       fontFamily: 'monospace',
-                                      fontSize: 12,
+                                      fontSize: 11,
+                                      color: Colors.grey[300],
+                                      height: 1.6,
                                     ),
                                   ),
                                 ),
@@ -502,32 +624,53 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
             ),
   );
 
+  Widget _buildConditionSection(String title, List<Widget> children) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+          color: Colors.grey,
+        ),
+      ),
+      const SizedBox(height: 8),
+      ...children,
+    ],
+  );
+
   Widget _buildTranslationExample(String title, String example) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
+    padding: const EdgeInsets.only(bottom: 8),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (title.isNotEmpty) ...[
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+          ),
           const SizedBox(height: 4),
         ],
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.indigo[50],
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.indigo[200]!),
+            color: Colors.pink.withOpacity(0.03),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: Colors.pink.withOpacity(0.15)),
           ),
-          child: Text(example, style: const TextStyle(fontFamily: 'monospace')),
+          child: Text(
+            example,
+            style: const TextStyle(fontFamily: 'monospace', fontSize: 11),
+          ),
         ),
-        const SizedBox(height: 8),
       ],
     ),
   );
 
   Widget _buildInfoRow(String label, String value) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
+    padding: const EdgeInsets.symmetric(vertical: 6),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -535,10 +678,10 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
           width: 140,
           child: Text(
             '$label:',
-            style: const TextStyle(fontWeight: FontWeight.w500),
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
           ),
         ),
-        Expanded(child: Text(value)),
+        Expanded(child: Text(value, style: const TextStyle(fontSize: 13))),
       ],
     ),
   );

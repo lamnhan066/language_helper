@@ -11,6 +11,31 @@ class MultipleSourcesPage extends StatefulWidget {
 }
 
 class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
+  final additionalData = {
+    LanguageCodes.en: {
+      'This text was added dynamically': 'This text was added dynamically',
+      'This text will be removed': 'This text will be removed',
+      'Multiple sources working': 'Multiple sources working perfectly!',
+    },
+    LanguageCodes.es: {
+      'This text was added dynamically':
+          'Este texto fue agregado dinámicamente',
+      'This text will be removed': 'Este texto será eliminado',
+      'Multiple sources working':
+          '¡Múltiples fuentes funcionando perfectamente!',
+    },
+    LanguageCodes.fr: {
+      'This text was added dynamically': 'Ce texte a été ajouté dynamiquement',
+      'This text will be removed': 'Ce texte sera supprimé',
+      'Multiple sources working':
+          'Plusieurs sources fonctionnent parfaitement !',
+    },
+    LanguageCodes.vi: {
+      'This text was added dynamically': 'Văn bản này được thêm động',
+      'This text will be removed': 'Văn bản này sẽ bị xóa',
+      'Multiple sources working': 'Nhiều nguồn hoạt động hoàn hảo!',
+    },
+  };
   final LanguageHelper _languageHelper = LanguageHelper(
     'MultipleSourcesHelper',
   );
@@ -23,30 +48,9 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
   }
 
   Future<void> _initializeLanguageHelper() async {
-    // Create additional data to demonstrate multiple sources
-    final additionalData = {
-      LanguageCodes.en:
-          () => {
-            'This text was added dynamically':
-                'This text was added dynamically',
-            'This text will be removed': 'This text will be removed',
-            'Multiple sources working': 'Multiple sources working perfectly!',
-          },
-      LanguageCodes.vi:
-          () => {
-            'This text was added dynamically': 'Văn bản này được thêm động',
-            'This text will be removed': 'Văn bản này sẽ bị xóa',
-            'Multiple sources working': 'Nhiều nguồn hoạt động hoàn hảo!',
-          },
-    };
-
     await _languageHelper.initial(
       data: [
-        // Primary data source (Dart maps)
         LanguageDataProvider.lazyData(languageData),
-        // Secondary data source (additional data)
-        LanguageDataProvider.lazyData(additionalData),
-        // Tertiary data source (JSON assets)
         LanguageDataProvider.asset('assets/languages'),
       ],
     );
@@ -60,10 +64,9 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: Text('Multiple Sources Example'.tr),
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
+      elevation: 0,
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black87,
     ),
     body:
         !_isLoaded
@@ -72,33 +75,65 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
               languageHelper: _languageHelper,
               builder:
                   (context) => SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Multiple Data Sources'.trC(_languageHelper),
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'This page demonstrates using multiple data sources for translations. Data sources are processed in order, with the first source taking priority.',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
+                        // Header Card
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Color(0xFFA78BFA), Color(0xFF8B5CF6)],
                             ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.source,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'Multiple Data Sources'.trC(
+                                        _languageHelper,
+                                      ),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'Combine multiple translation sources with automatic priority handling.'
+                                    .trC(_languageHelper),
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
 
+                        // Data Source Priority
                         Card(
-                          color: Colors.blue[50],
+                          color: Colors.purple[50],
                           child: Padding(
                             padding: const EdgeInsets.all(16),
                             child: Column(
@@ -106,46 +141,81 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(
-                                      Icons.info_outline,
-                                      color: Colors.blue[600],
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.purple[600]!.withOpacity(
+                                          0.2,
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        Icons.priority_high,
+                                        color: Colors.purple[600],
+                                      ),
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: 12),
                                     Text(
                                       'Data Source Priority'.trC(
                                         _languageHelper,
                                       ),
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.blue[800],
+                                        fontSize: 15,
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '1. Dart Maps (Primary)\n2. Additional Data (Secondary)\n3. JSON Assets (Tertiary)',
-                                  style: TextStyle(color: Colors.blue[700]),
+                                const SizedBox(height: 12),
+                                _buildPriorityItem('1', 'Dart Maps (Primary)'),
+                                _buildPriorityItem(
+                                  '2',
+                                  'Additional Data (Secondary)',
+                                ),
+                                _buildPriorityItem(
+                                  '3',
+                                  'JSON Assets (Tertiary)',
                                 ),
                               ],
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
 
+                        // Translation Examples
                         Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Translation Examples'.trC(_languageHelper),
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.indigo.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.translate,
+                                        color: Colors.indigo,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Translation Examples'.trC(
+                                        _languageHelper,
+                                      ),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 12),
-
+                                const SizedBox(height: 16),
                                 _buildTranslationExample(
                                   'From Primary Source'.trC(_languageHelper),
                                   'Hello @{name}'.trC(
@@ -153,21 +223,18 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                                     params: {'name': 'Multi-Source User'},
                                   ),
                                 ),
-
                                 _buildTranslationExample(
                                   'From Secondary Source'.trC(_languageHelper),
                                   'Multiple sources working'.trC(
                                     _languageHelper,
                                   ),
                                 ),
-
                                 _buildTranslationExample(
                                   'Dynamic Addition'.trC(_languageHelper),
                                   'This text was added dynamically'.trC(
                                     _languageHelper,
                                   ),
                                 ),
-
                                 _buildTranslationExample(
                                   'Conditional Translation'.trC(
                                     _languageHelper,
@@ -181,46 +248,53 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
 
+                        // Dynamic Data Management
                         Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Dynamic Data Management'.trC(
-                                    _languageHelper,
-                                  ),
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.teal.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.settings,
+                                        color: Colors.teal,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Dynamic Data Management'.trC(
+                                        _languageHelper,
+                                      ),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 12),
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: ElevatedButton(
+                                      child: ElevatedButton.icon(
                                         onPressed: _addDynamicData,
-                                        child: Text(
-                                          'Add New Translation'.trC(
-                                            _languageHelper,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        onPressed: _removeDynamicData,
+                                        icon: const Icon(Icons.add),
+                                        label: Text('Add'.trC(_languageHelper)),
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.red,
+                                          backgroundColor: Colors.green[600],
                                           foregroundColor: Colors.white,
-                                        ),
-                                        child: Text(
-                                          'Remove Translation'.trC(
-                                            _languageHelper,
-                                          ),
+                                          elevation: 0,
                                         ),
                                       ),
                                     ),
@@ -230,18 +304,38 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
 
+                        // Language Controls
                         Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Language Controls'.trC(_languageHelper),
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.language,
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Select Language'.trC(_languageHelper),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 12),
                                 Wrap(
@@ -258,10 +352,15 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor:
                                                     _languageHelper.code == code
-                                                        ? Theme.of(
-                                                          context,
-                                                        ).primaryColor
-                                                        : null,
+                                                        ? const Color(
+                                                          0xFF8B5CF6,
+                                                        )
+                                                        : Colors.grey[200],
+                                                foregroundColor:
+                                                    _languageHelper.code == code
+                                                        ? Colors.white
+                                                        : Colors.black87,
+                                                elevation: 0,
                                               ),
                                               child: Text(
                                                 _getLanguageName(code),
@@ -274,49 +373,74 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
 
+                        // Code Example
                         Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Code Example'.trC(_languageHelper),
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.code,
+                                        color: Colors.orange,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Code Example'.trC(_languageHelper),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 12),
                                 Container(
                                   width: double.infinity,
-                                  padding: const EdgeInsets.all(12),
+                                  padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[100],
-                                    borderRadius: BorderRadius.circular(8),
+                                    color: const Color(0xFF1F2937),
+                                    borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: Colors.grey[300]!,
+                                      color: Colors.grey[700]!,
                                     ),
                                   ),
-                                  child: const Text(
+                                  child: Text(
                                     '''
-// Initialize with multiple data sources
+// Initialize with multiple sources
 await languageHelper.initial(
   data: [
-    LanguageDataProvider.lazyData(primaryData),    // First priority
-    LanguageDataProvider.lazyData(secondaryData),  // Second priority
-    LanguageDataProvider.asset('assets/languages'), // Third priority
+    LanguageDataProvider.lazyData(
+      primaryData),    // 1st priority
+    LanguageDataProvider.lazyData(
+      secondaryData),  // 2nd priority
+    LanguageDataProvider.asset(
+      'assets/languages'), // 3rd priority
   ],
 );
 
 // Add data dynamically
 languageHelper.addData(
   LanguageDataProvider.data(newData),
-  overwrite: true, // Allow overwriting existing translations
+  overwrite: true,
 );''',
                                     style: TextStyle(
                                       fontFamily: 'monospace',
-                                      fontSize: 12,
+                                      fontSize: 11,
+                                      color: Colors.grey[300],
+                                      height: 1.6,
                                     ),
                                   ),
                                 ),
@@ -330,79 +454,78 @@ languageHelper.addData(
             ),
   );
 
-  void _addDynamicData() {
-    final newData = {
-      LanguageCodes.en: {
-        'Dynamic text ${DateTime.now().millisecondsSinceEpoch}':
-            'Dynamic text added at ${DateTime.now().toString().substring(11, 19)}',
-      },
-      LanguageCodes.vi: {
-        'Dynamic text ${DateTime.now().millisecondsSinceEpoch}':
-            'Văn bản động được thêm lúc ${DateTime.now().toString().substring(11, 19)}',
-      },
-    };
-
-    _languageHelper.addData(LanguageDataProvider.data(newData));
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Dynamic data added successfully!'.trC(_languageHelper)),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
-  void _removeDynamicData() {
-    // Remove the last added dynamic data
-    final keysToRemove =
-        _languageHelper.codes
-            .map(
-              (code) =>
-                  _languageHelper.data[code]?.keys
-                      .where((key) => key.startsWith('Dynamic text'))
-                      .toList() ??
-                  [],
-            )
-            .expand((keys) => keys)
-            .toList();
-
-    if (keysToRemove.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Dynamic data removed: ${keysToRemove.length} items'.trC(
-              _languageHelper,
+  Widget _buildPriorityItem(String number, String text) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Row(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: Colors.purple[600],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Center(
+            child: Text(
+              number,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
             ),
           ),
-          backgroundColor: Colors.orange,
         ),
-      );
-    }
-  }
+        const SizedBox(width: 12),
+        Text(
+          text,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+      ],
+    ),
+  );
 
   Widget _buildTranslationExample(String title, String example) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
+    padding: const EdgeInsets.only(bottom: 12),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (title.isNotEmpty) ...[
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-          const SizedBox(height: 4),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          ),
+          const SizedBox(height: 6),
         ],
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.purple[50],
+            color: Colors.purple.withOpacity(0.05),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.purple[200]!),
+            border: Border.all(color: Colors.purple.withOpacity(0.2)),
           ),
-          child: Text(example, style: const TextStyle(fontFamily: 'monospace')),
+          child: Text(
+            example,
+            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+          ),
         ),
-        const SizedBox(height: 8),
       ],
     ),
   );
+
+  void _addDynamicData() {
+    _languageHelper.addData(LanguageDataProvider.data(additionalData));
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Dynamic data added successfully!'.trC(_languageHelper)),
+        backgroundColor: Colors.green[600],
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
 
   String _getLanguageName(LanguageCodes code) {
     switch (code) {

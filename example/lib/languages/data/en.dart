@@ -33,8 +33,6 @@ const enLanguageData = <String, dynamic>{
   "Supported Languages": 'Supported Languages',
   "Current Locale": 'Current Locale',
   "Device Locale": 'Device Locale',
-  // TODO: Add `en` language translation
-  "Translation Examples": "Translation Examples",
   "Simple Translation": 'Simple Translation',
   "Hello @{name}": 'Hello @{name}',
   "Parameter Translation": 'Parameter Translation',
@@ -47,8 +45,6 @@ const enLanguageData = <String, dynamic>{
       '_': 'You have @{count} items',
     },
   ),
-  // TODO: Add `en` language translation
-  "Quick Actions": "Quick Actions",
 
   ///===========================================================================
   /// Path: pages/network_data_page.dart
@@ -58,96 +54,13 @@ const enLanguageData = <String, dynamic>{
       'Loading translations from network...',
   "Failed to load network translations": 'Failed to load network translations',
   "Retry": 'Retry',
-  // TODO: Add `en` language translation
-  "Network Data Source": "Network Data Source",
   "Network translations loaded successfully":
       'Network translations loaded successfully',
-  // TODO: Add `en` language translation
-  "Language Controls": "Language Controls",
-  // TODO: Add `en` language translation
-  "Code Example": "Code Example",
-
-  ///===========================================================================
-  /// Path: pages/advanced_features_page.dart
-  ///===========================================================================
-  "@path_pages/advanced_features_page.dart": "",
-  // TODO: Add `en` language translation
-  "Language changed from @{from} to @{to}":
-      "Language changed from @{from} to @{to}",
-  // TODO: Add `en` language translation
-  "Advanced Language Features": "Advanced Language Features",
-  // TODO: Add `en` language translation
-  "Complex Conditional Translations": "Complex Conditional Translations",
-  // TODO: Add `en` language translation
-  "Notifications": "Notifications",
-  // TODO: Add `en` language translation
-  "You have @{count} notification": "You have @{count} notification",
-  // TODO: Add `en` language translation
-  "Time Format": "Time Format",
-  // TODO: Add `en` language translation
-  "Time format": "Time format",
-  // TODO: Add `en` language translation
-  "Plural Items": "Plural Items",
-  // TODO: Add `en` language translation
-  "Plural items": "Plural items",
-  // TODO: Add `en` language translation
-  "Dynamic Parameter Injection": "Dynamic Parameter Injection",
-  // TODO: Add `en` language translation
-  "Welcome Message": "Welcome Message",
-  // TODO: Add `en` language translation
-  "Welcome @{name}": "Welcome @{name}",
-  // TODO: Add `en` language translation
-  "Timestamp": "Timestamp",
-  // TODO: Add `en` language translation
-  "Current timestamp": "Current timestamp",
-  // TODO: Add `en` language translation
-  "Device Info": "Device Info",
-  // TODO: Add `en` language translation
-  "Device info": "Device info",
-  // TODO: Add `en` language translation
-  "Language Change Listener": "Language Change Listener",
-  // TODO: Add `en` language translation
-  "Current Language": "Current Language",
-  // TODO: Add `en` language translation
-  "Is Initialized": "Is Initialized",
-  // TODO: Add `en` language translation
-  "Data Sources": "Data Sources",
 
   ///===========================================================================
   /// Path: pages/multiple_sources_page.dart
   ///===========================================================================
   "@path_pages/multiple_sources_page.dart": "",
-  // TODO: Add `en` language translation
-  "Multiple Data Sources": "Multiple Data Sources",
-  // TODO: Add `en` language translation
-  "Data Source Priority": "Data Source Priority",
-  // TODO: Add `en` language translation
-  "From Primary Source": "From Primary Source",
-  // TODO: Add `en` language translation
-  "From Secondary Source": "From Secondary Source",
-  // TODO: Add `en` language translation
-  "Multiple sources working": "Multiple sources working",
-  // TODO: Add `en` language translation
-  "Dynamic Addition": "Dynamic Addition",
-  "This text was added dynamically": 'This text was added dynamically',
-  // TODO: Add `en` language translation
-  "Dynamic Data Management": "Dynamic Data Management",
   "Add New Translation": 'Add New Translation',
   "Remove Translation": 'Remove Translation',
-  // TODO: Add `en` language translation
-  "Dynamic data added successfully!": "Dynamic data added successfully!",
-
-  ///===========================================================================
-  /// Path: pages/json_asset_page.dart
-  ///===========================================================================
-  "@path_pages/json_asset_page.dart": "",
-  // TODO: Add `en` language translation
-  "JSON Asset Data Source": "JSON Asset Data Source",
-
-  ///===========================================================================
-  /// Path: pages/dart_map_page.dart
-  ///===========================================================================
-  "@path_pages/dart_map_page.dart": "",
-  // TODO: Add `en` language translation
-  "Dart Map Data Source": "Dart Map Data Source",
 };

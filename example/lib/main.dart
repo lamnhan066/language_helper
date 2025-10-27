@@ -29,15 +29,46 @@ class LanguageHelperDemoApp extends StatelessWidget {
   Widget build(BuildContext context) => LanguageBuilder(
     builder:
         (context) => MaterialApp(
-          key: UniqueKey(), // Rebuild the app when the language is changed
+          key: UniqueKey(),
           title: 'Language Helper Demo'.tr,
-          theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+          theme: _buildTheme(),
           localizationsDelegates: LanguageHelper.instance.delegates,
           supportedLocales: LanguageHelper.instance.locales,
           locale: LanguageHelper.instance.locale,
           home: const HomePage(),
         ),
   );
+
+  ThemeData _buildTheme() {
+    const primaryColor = Color(0xFF2563EB);
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
+      appBarTheme: const AppBarTheme(elevation: 0, centerTitle: false),
+      cardTheme: CardTheme(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        clipBehavior: Clip.antiAlias,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          elevation: 2,
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        filled: true,
+        fillColor: Colors.grey[50],
+      ),
+    );
+  }
 }
 
 class HomePage extends StatefulWidget {
@@ -63,9 +94,12 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: Text('Language Helper Demo'.tr),
+      elevation: 0,
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black87,
       actions: [
         PopupMenuButton<LanguageCodes>(
-          icon: const Icon(Icons.language),
+          icon: const Icon(Icons.language, color: Color(0xFF2563EB)),
           onSelected: LanguageHelper.instance.change,
           itemBuilder:
               (context) =>
@@ -76,14 +110,20 @@ class _HomePageState extends State<HomePage> {
                           child: Row(
                             children: [
                               Text(_getLanguageName(code)),
+                              const SizedBox(width: 8),
                               if (LanguageHelper.instance.code == code)
-                                const Icon(Icons.check, color: Colors.blue),
+                                const Icon(
+                                  Icons.check_circle,
+                                  color: Color(0xFF2563EB),
+                                  size: 18,
+                                ),
                             ],
                           ),
                         ),
                       )
                       .toList(),
         ),
+        const SizedBox(width: 8),
       ],
     ),
     body: IndexedStack(index: _selectedIndex, children: _pages),
@@ -91,27 +131,31 @@ class _HomePageState extends State<HomePage> {
       type: BottomNavigationBarType.fixed,
       currentIndex: _selectedIndex,
       onTap: (index) => setState(() => _selectedIndex = index),
+      elevation: 8,
+      backgroundColor: Colors.white,
+      selectedItemColor: const Color(0xFF2563EB),
+      unselectedItemColor: Colors.grey,
       items: [
         BottomNavigationBarItem(icon: const Icon(Icons.home), label: 'Home'.tr),
         BottomNavigationBarItem(
           icon: const Icon(Icons.map),
-          label: 'Dart Map Example'.tr,
+          label: 'Dart Map'.tr,
         ),
         BottomNavigationBarItem(
           icon: const Icon(Icons.folder),
-          label: 'JSON Asset Example'.tr,
+          label: 'JSON'.tr,
         ),
         BottomNavigationBarItem(
           icon: const Icon(Icons.cloud),
-          label: 'Network Data Example'.tr,
+          label: 'Network'.tr,
         ),
         BottomNavigationBarItem(
           icon: const Icon(Icons.layers),
-          label: 'Multiple Sources Example'.tr,
+          label: 'Multi'.tr,
         ),
         BottomNavigationBarItem(
           icon: const Icon(Icons.settings),
-          label: 'Advanced Features'.tr,
+          label: 'Advanced'.tr,
         ),
       ],
     ),
@@ -138,186 +182,229 @@ class HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
-    padding: const EdgeInsets.all(16),
+    padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Welcome to Language Helper'.tr,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'This is a comprehensive example'.tr,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ],
+        // Hero Card
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF2563EB), Color(0xFF7C3AED)],
             ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2563EB).withOpacity(0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Welcome to Language Helper'.tr,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'A comprehensive localization solution for Flutter'.tr,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
 
-        // Language Information Card
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Language Statistics'.tr,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 12),
-                _buildInfoRow(
-                  'Current language'.tr,
-                  LanguageHelper.instance.code.name,
-                ),
-                _buildInfoRow(
-                  'Supported Languages'.tr,
-                  LanguageHelper.instance.codes.map((e) => e.name).join(', '),
-                ),
-                _buildInfoRow(
-                  'Current Locale'.tr,
-                  LanguageHelper.instance.locale.toString(),
-                ),
-                _buildInfoRow(
-                  'Device Locale'.tr,
-                  Localizations.localeOf(context).toString(),
-                ),
-              ],
+        // Language Statistics Card
+        _buildSectionCard(
+          context,
+          title: 'Language Statistics'.tr,
+          icon: Icons.analytics_outlined,
+          children: [
+            _buildStatRow(
+              'Current Language'.tr,
+              LanguageHelper.instance.code.name,
             ),
-          ),
+            const SizedBox(height: 12),
+            _buildStatRow(
+              'Supported Languages'.tr,
+              LanguageHelper.instance.codes.map((e) => e.name).join(', '),
+            ),
+            const SizedBox(height: 12),
+            _buildStatRow(
+              'Current Locale'.tr,
+              LanguageHelper.instance.locale.toString(),
+            ),
+            const SizedBox(height: 12),
+            _buildStatRow(
+              'Device Locale'.tr,
+              Localizations.localeOf(context).toString(),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
 
         // Translation Examples Card
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Translation Examples'.tr,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 12),
-
-                // Simple Translation
-                _buildExampleSection(
-                  'Simple Translation'.tr,
-                  'Hello @{name}'.trP({'name': 'World'}),
-                ),
-
-                // Parameter Translation
-                _buildExampleSection(
-                  'Parameter Translation'.tr,
-                  'Hello @{name}'.trP({'name': 'Flutter'}),
-                ),
-
-                // Conditional Translation
-                _buildExampleSection(
-                  'Conditional Translation'.tr,
-                  'You have @{count} item'.trP({'count': 0}),
-                ),
-                _buildExampleSection(
-                  '',
-                  'You have @{count} item'.trP({'count': 1}),
-                ),
-                _buildExampleSection(
-                  '',
-                  'You have @{count} item'.trP({'count': 5}),
-                ),
-              ],
+        _buildSectionCard(
+          context,
+          title: 'Translation Examples'.tr,
+          icon: Icons.language,
+          children: [
+            _buildExampleSection(
+              'Simple Translation'.tr,
+              'Hello @{name}'.trP({'name': 'World'}),
             ),
-          ),
+            _buildExampleSection(
+              'Parameter Translation'.tr,
+              'Hello @{name}'.trP({'name': 'Flutter'}),
+            ),
+            _buildExampleSection(
+              'Conditional Translation'.tr,
+              'You have @{count} item'.trP({'count': 0}),
+            ),
+            _buildExampleSection(
+              '',
+              'You have @{count} item'.trP({'count': 1}),
+            ),
+            _buildExampleSection(
+              '',
+              'You have @{count} item'.trP({'count': 5}),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
 
         // Quick Actions
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Quick Actions'.tr,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children:
-                      LanguageHelper.instance.codes
-                          .map(
-                            (code) => ElevatedButton(
-                              onPressed:
-                                  () => LanguageHelper.instance.change(code),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    LanguageHelper.instance.code == code
-                                        ? Theme.of(context).primaryColor
-                                        : null,
-                              ),
-                              child: Text(_getLanguageName(code)),
-                            ),
-                          )
-                          .toList(),
-                ),
-              ],
+        _buildSectionCard(
+          context,
+          title: 'Switch Language'.tr,
+          icon: Icons.translate,
+          children: [
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children:
+                  LanguageHelper.instance.codes
+                      .map(
+                        (code) => ElevatedButton.icon(
+                          onPressed: () => LanguageHelper.instance.change(code),
+                          icon: Icon(
+                            LanguageHelper.instance.code == code
+                                ? Icons.check_circle
+                                : Icons.circle_outlined,
+                            size: 18,
+                          ),
+                          label: Text(_getLanguageName(code)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                LanguageHelper.instance.code == code
+                                    ? const Color(0xFF2563EB)
+                                    : Colors.grey[200],
+                            foregroundColor:
+                                LanguageHelper.instance.code == code
+                                    ? Colors.white
+                                    : Colors.black87,
+                            elevation: 0,
+                          ),
+                        ),
+                      )
+                      .toList(),
             ),
-          ),
+          ],
         ),
       ],
     ),
   );
 
-  Widget _buildInfoRow(String label, String value) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 120,
-          child: Text(
-            '$label:',
-            style: const TextStyle(fontWeight: FontWeight.w500),
+  Widget _buildSectionCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) => Card(
+    child: Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: const Color(0xFF2563EB), size: 24),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...children,
+        ],
+      ),
+    ),
+  );
+
+  Widget _buildStatRow(String label, String value) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      SizedBox(
+        width: 140,
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.grey,
           ),
         ),
-        Expanded(child: Text(value)),
-      ],
-    ),
+      ),
+      Expanded(
+        child: Text(
+          value,
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+        ),
+      ),
+    ],
   );
 
   Widget _buildExampleSection(String title, String example) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
+    padding: const EdgeInsets.only(bottom: 12),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (title.isNotEmpty) ...[
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-          const SizedBox(height: 4),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          ),
+          const SizedBox(height: 6),
         ],
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: const Color(0xFF2563EB).withOpacity(0.05),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey[300]!),
+            border: Border.all(color: const Color(0xFF2563EB).withOpacity(0.2)),
           ),
-          child: Text(example, style: const TextStyle(fontFamily: 'monospace')),
+          child: Text(
+            example,
+            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+          ),
         ),
-        const SizedBox(height: 8),
       ],
     ),
   );
