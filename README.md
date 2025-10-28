@@ -368,7 +368,15 @@ LanguageBuilder(
 )
 ```
 
-This is useful when you need to reset the state of complex widgets or ensure a complete rebuild of nested components when the language changes.
+> **⚠️ Performance Warning**: `refreshTree` causes the entire widget tree to be destroyed and recreated, which can be expensive for complex widgets. This may lead to:
+>
+> - Loss of widget state and animations
+> - Poor performance with large widget trees
+> - Unnecessary rebuilds of child widgets
+>
+> **💡 Note**: If you use `const` widgets nested inside a `LanguageBuilder`, they may not rebuild automatically when the root rebuilds. To ensure these widgets update on language change (without using `refreshTree`), wrap them in their own `LanguageBuilder` with `forceRebuild: true`.
+
+Use `refreshTree` only when you specifically need to reset widget state or when dealing with widgets that don't properly handle language changes.
 
 ## GPT-4 Translator
 
