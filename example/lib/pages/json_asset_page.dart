@@ -96,7 +96,8 @@ class _JsonAssetPageState extends State<JsonAssetPage> {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                'Load translations from JSON files stored in your app assets.'
+                                'Load translations from JSON files stored in '
+                                        'your app assets.'
                                     .trC(_languageHelper),
                                 style: const TextStyle(
                                   color: Colors.white70,

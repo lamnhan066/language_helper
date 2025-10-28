@@ -113,7 +113,9 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
 
     // Listen to language changes
     _languageSubscription = _languageHelper.stream.listen((newCode) {
-      if (_previousLanguage != null && _previousLanguage != newCode) {
+      if (_previousLanguage != null &&
+          _previousLanguage != newCode &&
+          mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -136,503 +138,459 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: Text('Advanced Features'.tr),
-      elevation: 0,
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.black87,
-    ),
-    body:
-        !_isLoaded
-            ? const Center(child: CircularProgressIndicator())
-            : LanguageBuilder(
-              languageHelper: _languageHelper,
-              builder:
-                  (context) => SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Advanced Features'.tr),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+      ),
+      body:
+          !_isLoaded
+              ? const Center(child: CircularProgressIndicator())
+              : _body(),
+    );
+  }
+
+  LanguageBuilder _body() {
+    return LanguageBuilder(
+      languageHelper: _languageHelper,
+      builder: (context) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Card
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFEC4899), Color(0xFFDB2777)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        // Header Card
-                        Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [Color(0xFFEC4899), Color(0xFFDB2777)],
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.auto_awesome,
-                                    color: Colors.white,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      'Advanced Language Features'.trC(
-                                        _languageHelper,
-                                      ),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleLarge?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Master complex conditions, dynamic parameters, and language change listeners.'
-                                    .trC(_languageHelper),
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
+                        const Icon(
+                          Icons.auto_awesome,
+                          color: Colors.white,
+                          size: 28,
                         ),
-                        const SizedBox(height: 20),
-
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.pink.withValues(
-                                          alpha: 0.1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(
-                                        Icons.rule,
-                                        color: Colors.pink,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      'Complex Conditional Translations'.trC(
-                                        _languageHelper,
-                                      ),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-
-                                _buildConditionSection(
-                                  'Notifications'.trC(_languageHelper),
-                                  [
-                                    _buildTranslationExample(
-                                      '',
-                                      'You have @{count} notification'.trC(
-                                        _languageHelper,
-                                        params: {'count': 0},
-                                      ),
-                                    ),
-                                    _buildTranslationExample(
-                                      '',
-                                      'You have @{count} notification'.trC(
-                                        _languageHelper,
-                                        params: {'count': 1},
-                                      ),
-                                    ),
-                                    _buildTranslationExample(
-                                      '',
-                                      'You have @{count} notification'.trC(
-                                        _languageHelper,
-                                        params: {'count': 5},
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                const SizedBox(height: 12),
-
-                                _buildConditionSection(
-                                  'Time Format'.trC(_languageHelper),
-                                  [
-                                    _buildTranslationExample(
-                                      '',
-                                      'Time format'.trC(
-                                        _languageHelper,
-                                        params: {'hours': 0},
-                                      ),
-                                    ),
-                                    _buildTranslationExample(
-                                      '',
-                                      'Time format'.trC(
-                                        _languageHelper,
-                                        params: {'hours': 1},
-                                      ),
-                                    ),
-                                    _buildTranslationExample(
-                                      '',
-                                      'Time format'.trC(
-                                        _languageHelper,
-                                        params: {'hours': 12},
-                                      ),
-                                    ),
-                                    _buildTranslationExample(
-                                      '',
-                                      'Time format'.trC(
-                                        _languageHelper,
-                                        params: {'hours': 15},
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                const SizedBox(height: 12),
-
-                                _buildConditionSection(
-                                  'Plural Items'.trC(_languageHelper),
-                                  [
-                                    _buildTranslationExample(
-                                      '',
-                                      'Plural items'.trC(
-                                        _languageHelper,
-                                        params: {'count': 0},
-                                      ),
-                                    ),
-                                    _buildTranslationExample(
-                                      '',
-                                      'Plural items'.trC(
-                                        _languageHelper,
-                                        params: {'count': 1},
-                                      ),
-                                    ),
-                                    _buildTranslationExample(
-                                      '',
-                                      'Plural items'.trC(
-                                        _languageHelper,
-                                        params: {'count': 3},
-                                      ),
-                                    ),
-                                    _buildTranslationExample(
-                                      '',
-                                      'Plural items'.trC(
-                                        _languageHelper,
-                                        params: {'count': 5},
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.amber.withValues(
-                                          alpha: 0.1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(
-                                        Icons.input,
-                                        color: Colors.amber,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      'Dynamic Parameter Injection'.trC(
-                                        _languageHelper,
-                                      ),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                _buildTranslationExample(
-                                  'Welcome Message'.trC(_languageHelper),
-                                  'Welcome @{name}'.trC(
-                                    _languageHelper,
-                                    params: {'name': 'Advanced User'},
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  'Timestamp'.trC(_languageHelper),
-                                  'Current timestamp'.trC(
-                                    _languageHelper,
-                                    params: {
-                                      'timestamp': DateTime.now()
-                                          .toString()
-                                          .substring(11, 19),
-                                    },
-                                  ),
-                                ),
-                                _buildTranslationExample(
-                                  'Device Info'.trC(_languageHelper),
-                                  'Device info'.trC(
-                                    _languageHelper,
-                                    params: {
-                                      'device': 'iPhone 15',
-                                      'platform': 'iOS',
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.cyan.withValues(
-                                          alpha: 0.1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(
-                                        Icons.volume_down,
-                                        color: Colors.cyan,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      'Language Change Listener'.trC(
-                                        _languageHelper,
-                                      ),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  'Change language to see listener notifications.'
-                                      .trC(_languageHelper),
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(color: Colors.grey),
-                                ),
-                                const SizedBox(height: 12),
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children:
-                                      _languageHelper.codes
-                                          .map(
-                                            (code) => ElevatedButton(
-                                              onPressed:
-                                                  () => _languageHelper.change(
-                                                    code,
-                                                  ),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    _languageHelper.code == code
-                                                        ? const Color(
-                                                          0xFFDB2777,
-                                                        )
-                                                        : Colors.grey[200],
-                                                foregroundColor:
-                                                    _languageHelper.code == code
-                                                        ? Colors.white
-                                                        : Colors.black87,
-                                                elevation: 0,
-                                              ),
-                                              child: Text(
-                                                _getLanguageName(code),
-                                              ),
-                                            ),
-                                          )
-                                          .toList(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.green.withValues(
-                                          alpha: 0.1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(
-                                        Icons.bar_chart,
-                                        color: Colors.green,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      'Language Statistics'.trC(
-                                        _languageHelper,
-                                      ),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                _buildInfoRow(
-                                  'Current Language'.trC(_languageHelper),
-                                  _languageHelper.code.name,
-                                ),
-                                _buildInfoRow(
-                                  'Supported Languages'.trC(_languageHelper),
-                                  _languageHelper.codes
-                                      .map((e) => e.name)
-                                      .join(', '),
-                                ),
-                                _buildInfoRow(
-                                  'Is Initialized'.trC(_languageHelper),
-                                  _languageHelper.isInitialized.toString(),
-                                ),
-                                _buildInfoRow(
-                                  'Data Sources'.trC(_languageHelper),
-                                  _languageHelper.data.length.toString(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.purple.withValues(
-                                          alpha: 0.1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(
-                                        Icons.code,
-                                        color: Colors.purple,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      'Code Example'.trC(_languageHelper),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF1F2937),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: Colors.grey[700]!,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    r'''
-// Complex conditions
-'Plural items': LanguageConditions(
-  param: 'count',
-  conditions: {
-    '0': 'No items',
-    '1': 'One item',
-    '2': 'Two items',
-    '_': '@{count} items',
-  },
-),
-
-// Listen to language changes
-languageHelper.stream.listen((newCode) {
-  print('Language: $newCode');
-});
-
-// Dynamic parameters
-'Welcome @{name}'.trP({'name': 'John'})''',
-                                    style: TextStyle(
-                                      fontFamily: 'monospace',
-                                      fontSize: 11,
-                                      color: Colors.grey[300],
-                                      height: 1.6,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Advanced Language Features'.trC(_languageHelper),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.titleLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Master complex conditions, dynamic parameters, '
+                              'and language change listeners.'
+                          .trC(_languageHelper),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.pink.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.rule, color: Colors.pink),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Complex Conditional Translations'.trC(
+                              _languageHelper,
+                            ),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      _buildConditionSection(
+                        'Notifications'.trC(_languageHelper),
+                        [
+                          _buildTranslationExample(
+                            '',
+                            'You have @{count} notification'.trC(
+                              _languageHelper,
+                              params: {'count': 0},
+                            ),
+                          ),
+                          _buildTranslationExample(
+                            '',
+                            'You have @{count} notification'.trC(
+                              _languageHelper,
+                              params: {'count': 1},
+                            ),
+                          ),
+                          _buildTranslationExample(
+                            '',
+                            'You have @{count} notification'.trC(
+                              _languageHelper,
+                              params: {'count': 5},
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      _buildConditionSection(
+                        'Time Format'.trC(_languageHelper),
+                        [
+                          _buildTranslationExample(
+                            '',
+                            'Time format'.trC(
+                              _languageHelper,
+                              params: {'hours': 0},
+                            ),
+                          ),
+                          _buildTranslationExample(
+                            '',
+                            'Time format'.trC(
+                              _languageHelper,
+                              params: {'hours': 1},
+                            ),
+                          ),
+                          _buildTranslationExample(
+                            '',
+                            'Time format'.trC(
+                              _languageHelper,
+                              params: {'hours': 12},
+                            ),
+                          ),
+                          _buildTranslationExample(
+                            '',
+                            'Time format'.trC(
+                              _languageHelper,
+                              params: {'hours': 15},
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      _buildConditionSection(
+                        'Plural Items'.trC(_languageHelper),
+                        [
+                          _buildTranslationExample(
+                            '',
+                            'Plural items'.trC(
+                              _languageHelper,
+                              params: {'count': 0},
+                            ),
+                          ),
+                          _buildTranslationExample(
+                            '',
+                            'Plural items'.trC(
+                              _languageHelper,
+                              params: {'count': 1},
+                            ),
+                          ),
+                          _buildTranslationExample(
+                            '',
+                            'Plural items'.trC(
+                              _languageHelper,
+                              params: {'count': 3},
+                            ),
+                          ),
+                          _buildTranslationExample(
+                            '',
+                            'Plural items'.trC(
+                              _languageHelper,
+                              params: {'count': 5},
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-            ),
-  );
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.input, color: Colors.amber),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Dynamic Parameter Injection'.trC(_languageHelper),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTranslationExample(
+                        'Welcome Message'.trC(_languageHelper),
+                        'Welcome @{name}'.trC(
+                          _languageHelper,
+                          params: {'name': 'Advanced User'},
+                        ),
+                      ),
+                      _buildTranslationExample(
+                        'Timestamp'.trC(_languageHelper),
+                        'Current timestamp'.trC(
+                          _languageHelper,
+                          params: {
+                            'timestamp': DateTime.now().toString().substring(
+                              11,
+                              19,
+                            ),
+                          },
+                        ),
+                      ),
+                      _buildTranslationExample(
+                        'Device Info'.trC(_languageHelper),
+                        'Device info'.trC(
+                          _languageHelper,
+                          params: {'device': 'iPhone 15', 'platform': 'iOS'},
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.cyan.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.volume_down,
+                              color: Colors.cyan,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Language Change Listener'.trC(_languageHelper),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Change language to see listener notifications.'.trC(
+                          _languageHelper,
+                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children:
+                            _languageHelper.codes
+                                .map(
+                                  (code) => ElevatedButton(
+                                    onPressed:
+                                        () => _languageHelper.change(code),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          _languageHelper.code == code
+                                              ? const Color(0xFFDB2777)
+                                              : Colors.grey[200],
+                                      foregroundColor:
+                                          _languageHelper.code == code
+                                              ? Colors.white
+                                              : Colors.black87,
+                                      elevation: 0,
+                                    ),
+                                    child: Text(_getLanguageName(code)),
+                                  ),
+                                )
+                                .toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.bar_chart,
+                              color: Colors.green,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Language Statistics'.trC(_languageHelper),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      _buildInfoRow(
+                        'Current Language'.trC(_languageHelper),
+                        _languageHelper.code.name,
+                      ),
+                      _buildInfoRow(
+                        'Supported Languages'.trC(_languageHelper),
+                        _languageHelper.codes.map((e) => e.name).join(', '),
+                      ),
+                      _buildInfoRow(
+                        'Is Initialized'.trC(_languageHelper),
+                        _languageHelper.isInitialized.toString(),
+                      ),
+                      _buildInfoRow(
+                        'Data Sources'.trC(_languageHelper),
+                        _languageHelper.data.length.toString(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.purple.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.code, color: Colors.purple),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Code Example'.trC(_languageHelper),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1F2937),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey[700]!),
+                        ),
+                        child: Text(
+                          r'''
+                // Complex conditions
+                'Plural items': LanguageConditions(
+                  param: 'count',
+                  conditions: {
+                    '0': 'No items',
+                    '1': 'One item',
+                    '2': 'Two items',
+                    '_': '@{count} items',
+                  },
+                ),
+                
+                // Listen to language changes
+                languageHelper.stream.listen((newCode) {
+                  print('Language: $newCode');
+                });
+                
+                // Dynamic parameters
+                'Welcome @{name}'.trP({'name': 'John'})''',
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 11,
+                            color: Colors.grey[300],
+                            height: 1.6,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   Widget _buildConditionSection(String title, List<Widget> children) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,

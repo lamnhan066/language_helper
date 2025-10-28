@@ -80,7 +80,7 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
         _isLoaded = true;
         _isLoading = false;
       });
-    } catch (e) {
+    } on Exception catch (e) {
       if (!mounted) return;
 
       setState(() {

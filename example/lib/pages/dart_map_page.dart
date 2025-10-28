@@ -49,7 +49,8 @@ class DartMapPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Define translations directly in Dart using maps and LanguageConditions.'
+                  'Define translations directly in Dart using maps and '
+                          'LanguageConditions.'
                       .tr,
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),

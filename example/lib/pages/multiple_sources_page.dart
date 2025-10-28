@@ -119,7 +119,8 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                'Combine multiple translation sources with automatic priority handling.'
+                                'Combine multiple translation sources with '
+                                        'automatic priority handling.'
                                     .trC(_languageHelper),
                                 style: const TextStyle(
                                   color: Colors.white70,
