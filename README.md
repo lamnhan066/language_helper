@@ -340,6 +340,36 @@ LanguageBuilder(
 Tr((_) => Text('Hello'.tr))
 ```
 
+### Force Rebuild and Tree Refresh
+
+#### `forceRebuild` Parameter
+
+By default, only the root `LanguageBuilder` widget rebuilds when the language changes for better performance. Use `forceRebuild: true` to force a specific widget to always rebuild:
+
+```dart
+LanguageBuilder(
+  forceRebuild: true, // This widget will always rebuild on language change
+  builder: (context) => Text('Hello'.tr),
+)
+```
+
+- `true` → Always rebuild this widget when language changes
+- `false` → Only rebuild the root widget (default behavior)
+- `null` → Fallback to `LanguageHelper.forceRebuild` default
+
+#### `refreshTree` Parameter
+
+Use `refreshTree: true` to completely refresh the widget tree using `KeyedSubtree`. This changes the key of the current tree so the entire tree is removed and recreated:
+
+```dart
+LanguageBuilder(
+  refreshTree: true, // Uses KeyedSubtree to refresh entire tree
+  builder: (context) => MyComplexWidget(),
+)
+```
+
+This is useful when you need to reset the state of complex widgets or ensure a complete rebuild of nested components when the language changes.
+
 ## GPT-4 Translator
 
 Use the [Language Helper Translator](https://chat.openai.com/g/g-qoPMopEAb-language-helper-translator) for easy translation:
