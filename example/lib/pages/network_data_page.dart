@@ -81,6 +81,8 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
+
       setState(() {
         _errorMessage = e.toString();
         _isLoading = false;
