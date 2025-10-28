@@ -1,3 +1,8 @@
+## 0.13.0-rc.3
+
+* Update minimum Dart SDK requirement to ^3.9.0 and Flutter to >=3.35.0.
+* Refactor widgets for better compatibility with the latest Flutter framework.
+
 ## 0.13.0-rc.2
 
 * Improve README.
