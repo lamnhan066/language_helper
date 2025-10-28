@@ -9,6 +9,7 @@ class LanguageBuilder extends StatefulWidget {
     required this.builder,
     this.forceRebuild,
     this.languageHelper,
+    this.refreshTree = false,
   });
 
   /// Add your builder
@@ -21,6 +22,10 @@ class LanguageBuilder extends StatefulWidget {
   /// - `null`  → fallback to `LanguageHelper.forceRebuild` default.
   final bool? forceRebuild;
 
+  /// If `true`, the widget will be refreshed when the language is changed.
+  /// It will rebuild the entire tree of the widget.
+  final bool refreshTree;
+
   /// Add the custom instance of `LanguageHelper`.
   final LanguageHelper? languageHelper;
 
@@ -30,6 +35,8 @@ class LanguageBuilder extends StatefulWidget {
 
 class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   late LanguageHelper _languageHelper;
+  bool get _forceRebuild =>
+      widget.forceRebuild ?? _languageHelper._forceRebuild;
 
   /// Update the language
   @override
@@ -42,7 +49,7 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   }
 
   /// Get the root state
-  _LanguageBuilderState? _of(BuildContext context) {
+  _LanguageBuilderState? _of() {
     final root = context.findRootAncestorStateOfType<_LanguageBuilderState>();
     if (root == null ||
         !root.mounted ||
@@ -56,31 +63,13 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   void initState() {
     super.initState();
     _languageHelper = widget.languageHelper ?? LanguageHelper.instance;
-  }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final effectiveForceRebuild =
-        widget.forceRebuild ?? _languageHelper._forceRebuild;
-
-    if (effectiveForceRebuild) {
-      if (_languageHelper._states.add(this)) {
-        printDebug(
-          () => 'Added $this to the states because `forceRebuild` is true',
-        );
-      }
+    if (_languageHelper._states.add(this)) {
+      printDebug(() => 'Added $this to the states');
     } else {
-      final getRoot = _of(context);
-
-      // Root detection: add only if this is the highest `LanguageBuilder`.
-      if (getRoot == null && _languageHelper._states.add(this)) {
-        printDebug(() => 'Added $this to the states');
-      } else {
-        printDebug(() => '$this was already contained in the states');
-      }
+      printDebug(() => '$this was already contained in the states');
     }
+
     printDebug(() => 'Length of the states: ${_languageHelper._states.length}');
   }
 
@@ -93,10 +82,12 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
 
   @override
   Widget build(BuildContext context) {
-    return KeyedSubtree(
-      key: ValueKey(_languageHelper.locale),
-      child: widget.builder(context),
-    );
+    return widget.refreshTree
+        ? KeyedSubtree(
+          key: ValueKey(_languageHelper.locale),
+          child: widget.builder(context),
+        )
+        : widget.builder(context);
   }
 }
 
@@ -107,7 +98,13 @@ class Tr extends StatelessWidget {
   /// ```dart
   /// Tr((_) => 'hello world'.tr),
   /// ```
-  const Tr(this.builder, {super.key, this.forceRebuild, this.languageHelper});
+  const Tr(
+    this.builder, {
+    super.key,
+    this.forceRebuild,
+    this.languageHelper,
+    this.refreshTree = false,
+  });
 
   /// Add your builder
   final Widget Function(BuildContext _) builder;
@@ -119,6 +116,10 @@ class Tr extends StatelessWidget {
   /// - `null`  → fallback to `LanguageHelper.forceRebuild` default.
   final bool? forceRebuild;
 
+  /// If `true`, the widget will be refreshed when the language is changed.
+  /// It will rebuild the entire tree of the widget.
+  final bool refreshTree;
+
   /// Add the custom instance of `LanguageHelper`.
   final LanguageHelper? languageHelper;
 
@@ -127,6 +128,7 @@ class Tr extends StatelessWidget {
     return LanguageBuilder(
       builder: builder,
       forceRebuild: forceRebuild,
+      refreshTree: refreshTree,
       languageHelper: languageHelper,
     );
   }

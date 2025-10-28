@@ -16,7 +16,7 @@ class LanguageHelper {
   static final LanguageHelper instance = LanguageHelper('LanguageHelper');
 
   /// To control [LanguageBuilder]
-  final Set<UpdateLanguage> _states = {};
+  final Set<_LanguageBuilderState> _states = {};
 
   @visibleForTesting
   Set<UpdateLanguage> get states => _states;
@@ -511,7 +511,24 @@ class LanguageHelper {
     }
 
     printDebug(() => 'Change language to $toCode for ${_states.length} states');
+    Set<_LanguageBuilderState> needToUpdate = {};
     for (var state in _states) {
+      if (state._forceRebuild) {
+        needToUpdate.add(state);
+        continue;
+      }
+
+      final root = state._of();
+      if (root != null) {
+        needToUpdate.add(root);
+      } else {
+        needToUpdate.add(state);
+      }
+    }
+
+    printDebug(() => 'Need to update ${needToUpdate.length} states');
+
+    for (var state in needToUpdate) {
       state.updateLanguage();
     }
 
