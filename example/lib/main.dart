@@ -127,43 +127,37 @@ class _HomePageState extends State<HomePage> {
       ],
     ),
     body: IndexedStack(index: _selectedIndex, children: _pages),
-    bottomNavigationBar: Tr(
-      forceRebuild: true,
-      (context) => BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        onTap: (index) => setState(() => _selectedIndex = index),
-        elevation: 8,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF2563EB),
-        unselectedItemColor: Colors.grey,
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home),
-            label: 'Home'.tr,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.map),
-            label: 'Dart Map'.tr,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.folder),
-            label: 'JSON'.tr,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.cloud),
-            label: 'Network'.tr,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.layers),
-            label: 'Multi'.tr,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.settings),
-            label: 'Advanced'.tr,
-          ),
-        ],
-      ),
+    bottomNavigationBar: BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      currentIndex: _selectedIndex,
+      onTap: (index) => setState(() => _selectedIndex = index),
+      elevation: 8,
+      backgroundColor: Colors.white,
+      selectedItemColor: const Color(0xFF2563EB),
+      unselectedItemColor: Colors.grey,
+      items: [
+        BottomNavigationBarItem(icon: const Icon(Icons.home), label: 'Home'.tr),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.map),
+          label: 'Dart Map'.tr,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.folder),
+          label: 'JSON'.tr,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.cloud),
+          label: 'Network'.tr,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.layers),
+          label: 'Multi'.tr,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.settings),
+          label: 'Advanced'.tr,
+        ),
+      ],
     ),
   );
 
