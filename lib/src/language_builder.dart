@@ -93,7 +93,10 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
 
   @override
   Widget build(BuildContext context) {
-    return widget.builder(context);
+    return KeyedSubtree(
+      key: ValueKey(_languageHelper.locale),
+      child: widget.builder(context),
+    );
   }
 }
 
