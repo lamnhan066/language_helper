@@ -15,6 +15,11 @@ dependencies:
   language_helper:
     path: ../
 
+dependency_overrides:
+  language_helper:
+    path: ../
+  language_helper_generator: ^0.7.0
+
 dev_dependencies:
   flutter_lints: ^2.0.0
 
