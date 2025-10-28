@@ -135,7 +135,7 @@ assets/languages/
 |--------|-------------|---------|
 | `--languages` | Language codes to generate | `--languages=en,vi,es` |
 | `--ignore-todo` | Skip TODO markers for specific languages | `--ignore-todo=en` |
-| `--path` | Custom output directory | `--path=./lib/resources` |
+| `--path` | Custom output directory | `--path=./lib/languages` |
 | `--json` | Generate JSON files instead of Dart | `--json` |
 
 ### Common Examples
@@ -297,7 +297,7 @@ final overrides = languageHelper.codesOverrides; // Override languages
 
 ```bash
 # Custom output path
-dart run language_helper:generate --path=./lib/resources --languages=en,vi
+dart run language_helper:generate --path=./lib/languages --languages=en,vi
 
 # Generate JSON to assets folder
 dart run language_helper:generate --path=./assets/languages --languages=en,vi --json
@@ -309,8 +309,14 @@ dart run language_helper:generate --path=./assets/languages --languages=en,vi --
 main() async {
   await languageHelper.initial(
     data: [
+      // Assume that our `code.json` in `https://api.example.com/translations/code.json`
+      // So our data will be in `https://api.example.com/translations/data/en.json`
       LanguageDataProvider.network('https://api.example.com/translations'),
+
+      // Assume that our `code.json` in `assets/languages/code.json`
+      // So our data will be in `assets/languages/en.json`
       LanguageDataProvider.asset('assets/languages'),
+      
       LanguageDataProvider.lazyData(localLanguageData),
     ],
   );
