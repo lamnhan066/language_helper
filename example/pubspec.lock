@@ -187,15 +187,15 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.12.4"
+    version: "0.13.0-rc.1"
   language_helper_generator:
     dependency: "direct overridden"
     description:
       name: language_helper_generator
-      sha256: "8a950c07c9242bae71dc967672af9a9fd702ef47f31ddfa51a875f799400f348"
+      sha256: "38ac6b4adcc71a8cd8f047af2b1c56815f0d8f15c51e980fd85a4a99a5a5f330"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.0"
+    version: "0.7.1"
   leak_tracker:
     dependency: transitive
     description:
