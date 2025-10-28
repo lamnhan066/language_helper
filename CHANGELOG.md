@@ -1,3 +1,25 @@
+## 0.13.0-rc.1
+
+* Add `LanguageBuilder.refreshTree` to rebuild the whole tree when the language is changed.
+* The `LanguageBuilder` will not find the root widget itself, the `LanguageHelper.change` will do it to improve the performance.
+* The recent refactor of `language_helper_generator v0.7.0` now allows you to use the previous asset and network structure for greater flexibility. The `language_helper` segment is no longer required in your asset or network paths, restoring compatibility with older versions.
+
+  * Before: The `language_helper` is required so we don't need to add it the the path/url
+
+  ```dart
+  LanguageDataProvider.asset('assets/resources');
+  LanguageDataProvider.network('https://example.com/resources');  
+  ```
+
+  * Now: The required of `language_helper` is removed, so we need to add it ourself
+
+  ```dart
+  LanguageDataProvider.asset('assets/resources/language_helper');
+  LanguageDataProvider.network('https://example.com/resources/language_helper');
+  ```
+
+* Rewrite the example.
+
 ## 0.12.4
 
 * Forward stdout and stderr to parent process when running the generator.
