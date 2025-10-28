@@ -353,6 +353,49 @@ final en = {
 };
 ```
 
+<details>
+<summary>Show GPT instruction</summary>
+
+### Step-by-Step Instructions for Translation
+
+1. Identify the Dart `Map<String, dynamic>` structure and focus only on translating the values, not the keys or structure.
+2. Analyze the entire input first to understand its context for the best translation results.
+3. Check for plural forms and, if present, restructure using `LanguageConditions`.
+4. Translate plural forms: 0 → '0 products', 1 → '1 product', other → '@{count} products'.
+5. Translate only the values, leaving keys and structure unchanged.
+6. Preserve all comments (`//` and `///`), leaving them untranslated.
+7. Do not translate nested comments.
+8. Ensure the map structure is maintained after translation, with correct handling of plural forms and comments.
+
+### Example for Plural Grammar Handling
+
+If input is:
+
+```dart
+'@{count} sản phẩm': '@{count} sản phẩm'
+```
+
+It should generate to the `en` language as:
+
+```dart
+'@{count} sản phẩm': LanguageConditions(
+  param: 'count',
+  conditions: {
+    '0': '0 products',
+    '1': '1 product',
+    '_': '@{count} products',
+  },
+)
+```
+
+### Important Reminders
+
+- Translate only values, never keys.
+- Leave comments unchanged.
+- Handle plural forms with `LanguageConditions` as needed.
+
+</details>
+
 ## iOS Configuration
 
 Add supported localizations to `Info.plist`:
