@@ -10,8 +10,8 @@ topics:
   - l10n
 
 environment:
-  sdk: ^3.7.0
-  flutter: ">=3.29.0"
+  sdk: ^3.9.0
+  flutter: ">=3.35.0"
 
 platforms:
   android:
@@ -33,4 +33,4 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0

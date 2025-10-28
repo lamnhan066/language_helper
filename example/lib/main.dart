@@ -45,7 +45,7 @@ class LanguageHelperDemoApp extends StatelessWidget {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
       appBarTheme: const AppBarTheme(elevation: 0, centerTitle: false),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         clipBehavior: Clip.antiAlias,
