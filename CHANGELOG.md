@@ -1,3 +1,8 @@
+## 0.13.0-rc.2
+
+* Improve README.
+* Fix lint issues in example.
+
 ## 0.13.0-rc.1
 
 * Add `LanguageBuilder.refreshTree` to rebuild the whole tree when the language is changed.
