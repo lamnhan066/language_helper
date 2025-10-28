@@ -115,7 +115,7 @@ lib/languages/
 For assets or network-based translations:
 
 ```bash
-dart run language_helper:generate --languages=en,vi --json
+dart run language_helper:generate --languages=en,vi,fr --json
 ```
 
 Creates:
@@ -128,6 +128,8 @@ assets/languages/
     ├── vi.json
     └── fr.json
 ```
+
+JSON files do not support TODO markers. To identify untranslated or new strings, look for entries where the key and value are identical.
 
 ### Generator Options
 
