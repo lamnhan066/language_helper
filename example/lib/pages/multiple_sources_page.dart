@@ -144,8 +144,8 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.purple[600]!.withOpacity(
-                                          0.2,
+                                        color: Colors.purple[600]!.withValues(
+                                          alpha: 0.2,
                                         ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
@@ -194,7 +194,9 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.indigo.withOpacity(0.1),
+                                        color: Colors.indigo.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
@@ -262,7 +264,9 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.teal.withOpacity(0.1),
+                                        color: Colors.teal.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
@@ -318,7 +322,9 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.blue.withOpacity(0.1),
+                                        color: Colors.blue.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
@@ -387,7 +393,9 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.orange.withOpacity(0.1),
+                                        color: Colors.orange.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
@@ -501,9 +509,9 @@ languageHelper.addData(
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.purple.withOpacity(0.05),
+            color: Colors.purple.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.purple.withOpacity(0.2)),
+            border: Border.all(color: Colors.purple.withValues(alpha: 0.2)),
           ),
           child: Text(
             example,

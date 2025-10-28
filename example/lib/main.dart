@@ -204,7 +204,7 @@ class HomeContent extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF2563EB).withOpacity(0.3),
+                color: const Color(0xFF2563EB).withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -402,9 +402,11 @@ class HomeContent extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFF2563EB).withOpacity(0.05),
+            color: const Color(0xFF2563EB).withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFF2563EB).withOpacity(0.2)),
+            border: Border.all(
+              color: const Color(0xFF2563EB).withValues(alpha: 0.2),
+            ),
           ),
           child: Text(
             example,

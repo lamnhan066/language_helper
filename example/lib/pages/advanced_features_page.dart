@@ -217,7 +217,9 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.pink.withOpacity(0.1),
+                                        color: Colors.pink.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
@@ -355,7 +357,9 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.amber.withOpacity(0.1),
+                                        color: Colors.amber.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
@@ -422,7 +426,9 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.cyan.withOpacity(0.1),
+                                        color: Colors.cyan.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
@@ -499,7 +505,9 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.green.withOpacity(0.1),
+                                        color: Colors.green.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
@@ -556,7 +564,9 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.purple.withOpacity(0.1),
+                                        color: Colors.purple.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
@@ -656,9 +666,9 @@ languageHelper.stream.listen((newCode) {
           width: double.infinity,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.pink.withOpacity(0.03),
+            color: Colors.pink.withValues(alpha: 0.03),
             borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: Colors.pink.withOpacity(0.15)),
+            border: Border.all(color: Colors.pink.withValues(alpha: 0.15)),
           ),
           child: Text(
             example,

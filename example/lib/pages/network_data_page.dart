@@ -140,7 +140,7 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.1),
+                        color: Colors.red.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -253,7 +253,9 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: Colors.green[600]!.withOpacity(0.2),
+                                    color: Colors.green[600]!.withValues(
+                                      alpha: 0.2,
+                                    ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Icon(
@@ -290,7 +292,9 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.orange.withOpacity(0.1),
+                                        color: Colors.orange.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
@@ -360,7 +364,9 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.teal.withOpacity(0.1),
+                                        color: Colors.teal.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
@@ -429,7 +435,9 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.indigo.withOpacity(0.1),
+                                        color: Colors.indigo.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
@@ -510,9 +518,9 @@ final mockData = {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.orange.withOpacity(0.05),
+            color: Colors.orange.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.orange.withOpacity(0.2)),
+            border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
           ),
           child: Text(
             example,
