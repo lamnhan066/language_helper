@@ -5,6 +5,15 @@ import 'package:language_helper/src/mixins/update_language.dart';
 
 class UpdateLanguageMixinMock with UpdateLanguage {}
 
+class CustomUpdateLanguageMixin with UpdateLanguage {
+  int updateCount = 0;
+
+  @override
+  void updateLanguage() {
+    updateCount++;
+  }
+}
+
 class MockClient extends http.BaseClient {
   @override
   Future<http.Response> get(Uri url, {Map<String, String>? headers}) {

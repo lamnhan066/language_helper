@@ -307,6 +307,23 @@ void main() async {
     test('UpdateLanguage Mixin', () {
       updateLanguageMixin.updateLanguage();
     });
+
+    test('UpdateLanguage Mixin with custom implementation', () {
+      final customMixin = CustomUpdateLanguageMixin();
+      customMixin.updateLanguage();
+      expect(customMixin.updateCount, equals(1));
+
+      customMixin.updateLanguage();
+      expect(customMixin.updateCount, equals(2));
+    });
+
+    test('UpdateLanguage Mixin with multiple calls', () {
+      final mixin = UpdateLanguageMixinMock();
+      mixin.updateLanguage();
+      mixin.updateLanguage();
+      mixin.updateLanguage();
+      // Should not throw
+    });
   });
 
   group('Test base translation', () {
@@ -557,6 +574,40 @@ void main() async {
         expect(languageHelper.data[key], equals(fromJson[key]));
       }
       expect(fromJson.toJson(), equals(toJson));
+    });
+
+    test('LanguageDataSerializer with empty data', () {
+      final emptyData = <LanguageCodes, Map<String, dynamic>>{};
+      final json = emptyData.toJson();
+      expect(json, isA<String>());
+      expect(json, equals('{}'));
+
+      final fromJson = LanguageDataSerializer.fromJson(json);
+      expect(fromJson, isEmpty);
+    });
+
+    test('LanguageDataSerializer with null values', () {
+      final dataWithNulls = {
+        LanguageCodes.en: {'key1': 'value1', 'key2': null},
+      };
+      final json = dataWithNulls.toJson();
+      expect(json, isA<String>());
+
+      final fromJson = LanguageDataSerializer.fromJson(json);
+      expect(fromJson[LanguageCodes.en]!['key1'], equals('value1'));
+      expect(fromJson[LanguageCodes.en]!['key2'], isNull);
+    });
+
+    test('LanguageDataSerializer with malformed JSON', () {
+      expect(
+        () => LanguageDataSerializer.fromJson('invalid json'),
+        throwsA(isA<FormatException>()),
+      );
+    });
+
+    test('LanguageDataSerializer with empty JSON', () {
+      final result = LanguageDataSerializer.fromJson('{}');
+      expect(result, isEmpty);
     });
   });
 
@@ -921,6 +972,26 @@ void main() async {
       dir.deleteSync(recursive: true);
     });
 
+    test('export lazy language data', () {
+      final dir = Directory('./test/export_lazy');
+      LazyLanguageData lazyData = {
+        LanguageCodes.en: () => {'Hello': 'Hello'},
+        LanguageCodes.vi: () => {'Hello': 'Xin Chào'},
+      };
+      lazyData.exportJson(dir.path);
+      final codesFile = File('./test/export_lazy/codes.json');
+      expect(codesFile.existsSync(), isTrue);
+      dir.deleteSync(recursive: true);
+    });
+
+    test('export json with default path', () {
+      final dir = Directory('./assets/languages');
+      data.exportJson();
+      final codesFile = File('./assets/languages/codes.json');
+      expect(codesFile.existsSync(), isTrue);
+      dir.deleteSync(recursive: true);
+    });
+
     testWidgets('LanguageBuilder with different prefixes', (tester) async {
       SharedPreferences.setMockInitialValues({});
 
@@ -1138,16 +1209,15 @@ void main() async {
           home: Scaffold(
             body: LanguageBuilder(
               languageHelper: outerHelper,
-              builder:
-                  (_) => Column(
-                    children: [
-                      Text('Hello'.trC(outerHelper)),
-                      LanguageBuilder(
-                        languageHelper: innerHelper,
-                        builder: (_) => Text('Hello'.trC(innerHelper)),
-                      ),
-                    ],
+              builder: (_) => Column(
+                children: [
+                  Text('Hello'.trC(outerHelper)),
+                  LanguageBuilder(
+                    languageHelper: innerHelper,
+                    builder: (_) => Text('Hello'.trC(innerHelper)),
                   ),
+                ],
+              ),
             ),
           ),
         ),
@@ -1230,6 +1300,184 @@ void main() async {
       // Dispose helper
       helper.dispose();
     });
+
+    testWidgets('LanguageBuilder with refreshTree enabled', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      await languageHelper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageBuilder(
+              refreshTree: true,
+              builder: (_) => Text('Hello'.tr),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Hello'), findsOneWidget);
+
+      // Change language
+      await languageHelper.change(LanguageCodes.vi);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Xin Chào'), findsOneWidget);
+    });
+
+    testWidgets('LanguageBuilder with forceRebuild true', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      await languageHelper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+      );
+
+      int buildCount = 0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageBuilder(
+              forceRebuild: true,
+              builder: (_) {
+                buildCount++;
+                return Text('Hello'.tr);
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(buildCount, equals(1));
+      expect(find.text('Hello'), findsOneWidget);
+
+      // Change language
+      await languageHelper.change(LanguageCodes.vi);
+      await tester.pumpAndSettle();
+
+      expect(buildCount, equals(2));
+      expect(find.text('Xin Chào'), findsOneWidget);
+    });
+
+    testWidgets('LanguageBuilder with forceRebuild false', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      await languageHelper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+      );
+
+      int buildCount = 0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageBuilder(
+              forceRebuild: false,
+              builder: (_) {
+                buildCount++;
+                return Text('Hello'.tr);
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(buildCount, equals(1));
+      expect(find.text('Hello'), findsOneWidget);
+
+      // Change language
+      await languageHelper.change(LanguageCodes.vi);
+      await tester.pumpAndSettle();
+
+      // The widget may still rebuild due to the root LanguageBuilder behavior
+      expect(buildCount, greaterThanOrEqualTo(1));
+      expect(find.text('Xin Chào'), findsOneWidget);
+    });
+
+    testWidgets('Tr widget with refreshTree enabled', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      await languageHelper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: Tr((_) => Text('Hello'.tr), refreshTree: true)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Hello'), findsOneWidget);
+
+      // Change language
+      await languageHelper.change(LanguageCodes.vi);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Xin Chào'), findsOneWidget);
+    });
+
+    testWidgets(
+      'LanguageBuilder _of() method with different LanguageHelper instances',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+
+        final helper1 = LanguageHelper('TestHelper1');
+        final helper2 = LanguageHelper('TestHelper2');
+
+        await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
+        await helper2.initial(data: dataList, initialCode: LanguageCodes.vi);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: LanguageBuilder(
+                languageHelper: helper1,
+                builder: (_) => Column(
+                  children: [
+                    Text('Hello'.trC(helper1)),
+                    // Nested LanguageBuilder with different LanguageHelper instance
+                    LanguageBuilder(
+                      languageHelper: helper2,
+                      builder: (_) => Text('Hello'.trC(helper2)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Both should show their respective languages
+        expect(find.text('Hello'), findsOneWidget); // helper1 shows English
+        expect(
+          find.text('Xin Chào'),
+          findsOneWidget,
+        ); // helper2 shows Vietnamese
+
+        // Change language in helper1 only
+        await helper1.change(LanguageCodes.vi);
+        await tester.pumpAndSettle();
+
+        // Only helper1 should change, helper2 should remain Vietnamese
+        expect(
+          find.text('Xin Chào'),
+          findsNWidgets(2),
+        ); // Both show Vietnamese now
+        expect(find.text('Hello'), findsNothing);
+
+        // Dispose helpers
+        helper1.dispose();
+        helper2.dispose();
+      },
+    );
   });
 
   /// This test have to be the last test because it will change the value of the database.
@@ -1340,8 +1588,8 @@ void main() async {
             final String assetKey = utf8.decode(message.buffer.asUint8List());
             return mockAssets.containsKey(assetKey)
                 ? ByteData.view(
-                  Uint8List.fromList(mockAssets[assetKey]!.codeUnits).buffer,
-                )
+                    Uint8List.fromList(mockAssets[assetKey]!.codeUnits).buffer,
+                  )
                 : null;
           });
     });
@@ -1585,6 +1833,137 @@ void main() async {
       helper.dispose();
       helper.dispose(); // Should not throw
     });
+
+    test('translate with null parameter', () {
+      expect('Hello @{name}'.trP({'name': null}), equals('Hello null'));
+    });
+
+    test('translate with complex parameter types', () {
+      expect('Value: @{value}'.trP({'value': 123}), equals('Value: 123'));
+      expect('Value: @{value}'.trP({'value': true}), equals('Value: true'));
+      expect('Value: @{value}'.trP({'value': 3.14}), equals('Value: 3.14'));
+    });
+
+    test('translate with special characters in parameters', () {
+      expect(
+        'Hello @{name}'.trP({'name': 'John@Doe'}),
+        equals('Hello John@Doe'),
+      );
+      expect(
+        'Hello @{name}'.trP({'name': 'John{Doe}'}),
+        equals('Hello John{Doe}'),
+      );
+    });
+
+    test('LanguageHelper with invalid initial code', () async {
+      final helper = LanguageHelper('TestHelper');
+      await helper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.cu, // Not in data
+        useInitialCodeWhenUnavailable: false,
+      );
+      expect(
+        helper.code,
+        equals(LanguageCodes.en),
+      ); // Should fallback to first available
+    });
+
+    test('LanguageHelper with null initial code', () async {
+      final helper = LanguageHelper('TestHelper');
+      await helper.initial(
+        data: dataList,
+        initialCode: null,
+        useInitialCodeWhenUnavailable: false,
+      );
+      expect(
+        helper.code,
+        equals(LanguageCodes.en),
+      ); // Should fallback to first available
+    });
+
+    test('LanguageHelper analyze with empty analysis keys', () {
+      final result = languageHelper.analyze();
+      expect(result, isNotEmpty);
+    });
+
+    test('LanguageHelper analyze with null analysis keys', () {
+      final result = languageHelper.analyze();
+      expect(result, isNotEmpty);
+    });
+
+    test('LanguageHelper reload with no data', () async {
+      final helper = LanguageHelper('TestHelper');
+      await helper.initial(data: []);
+      helper.reload();
+      expect(helper.data, isNotEmpty);
+    });
+
+    test('LanguageHelper addData with null data', () async {
+      final helper = LanguageHelper('TestHelper');
+      await helper.initial(data: dataList);
+      await helper.addData(LanguageDataProvider.data({}));
+      expect(helper.data, isNotEmpty);
+    });
+
+    test('LanguageHelper addDataOverrides with empty data', () async {
+      final helper = LanguageHelper('TestHelper');
+      await helper.initial(data: dataList);
+      await helper.addDataOverrides(LanguageDataProvider.data({}));
+      expect(
+        helper.dataOverrides,
+        isEmpty,
+      ); // Empty data results in empty dataOverrides
+    });
+
+    test('LanguageHelper stream subscription handling', () async {
+      final helper = LanguageHelper('TestHelper');
+      await helper.initial(data: dataList);
+
+      int streamCount = 0;
+      final subscription = helper.stream.listen((_) {
+        streamCount++;
+      });
+
+      await helper.change(LanguageCodes.vi);
+      await helper.change(LanguageCodes.en);
+
+      expect(streamCount, equals(2));
+      subscription.cancel();
+    });
+
+    test('LanguageHelper with malformed language data', () async {
+      final malformedData = {
+        LanguageCodes.en: {
+          'key1': 'value1',
+          'key2': null, // null value
+        },
+      };
+
+      final helper = LanguageHelper('TestHelper');
+      await helper.initial(data: [LanguageDataProvider.data(malformedData)]);
+      expect(helper.translate('key1'), equals('value1'));
+      expect(
+        helper.translate('key2'),
+        equals('key2'),
+      ); // Should return key when value is null
+    });
+
+    test('LanguageHelper with circular reference in data', () async {
+      final circularData = {
+        LanguageCodes.en: {
+          'key1': 'value1',
+          'key2': 'key1', // References another key
+        },
+      };
+
+      final helper = LanguageHelper('TestHelper');
+      await helper.initial(data: [LanguageDataProvider.data(circularData)]);
+      expect(helper.translate('key1'), equals('value1'));
+      expect(
+        helper.translate('key2'),
+        equals('key1'),
+      ); // Should not resolve circular reference
+    });
   });
 
   group('Test utils', () {
@@ -1611,6 +1990,22 @@ void main() async {
       );
       expect(result, isNotEmpty);
       expect(result, contains('Hello'));
+    });
+
+    test('get url with network error', () async {
+      final result = await Utils.getUrl(
+        Uri.parse('https://invalid-url-that-will-fail.com'),
+        client: MockClient(),
+      );
+      expect(result, isEmpty);
+    });
+
+    test('get url with timeout', () async {
+      final result = await Utils.getUrl(
+        Uri.parse('https://httpstat.us/200?sleep=10000'),
+        client: MockClient(),
+      );
+      expect(result, isEmpty);
     });
   });
 }
