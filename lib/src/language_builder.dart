@@ -66,8 +66,6 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
 
     if (_languageHelper._states.add(this)) {
       printDebug(() => 'Added $this to the states');
-    } else {
-      printDebug(() => '$this was already contained in the states');
     }
 
     printDebug(() => 'Length of the states: ${_languageHelper._states.length}');
@@ -84,9 +82,9 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   Widget build(BuildContext context) {
     return widget.refreshTree
         ? KeyedSubtree(
-          key: ValueKey(_languageHelper.locale),
-          child: widget.builder(context),
-        )
+            key: ValueKey(_languageHelper.locale),
+            child: widget.builder(context),
+          )
         : widget.builder(context);
   }
 }
