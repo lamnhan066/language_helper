@@ -11,7 +11,7 @@ A Flutter package for easy multi-language app localization with automatic text e
 - 🎯 **Smart Translation**: Control translations with conditions and parameters
 - 🌐 **Multiple Sources**: Support for Dart maps, JSON files, assets, and network data
 - 📱 **Device Locale**: Automatically uses device locale on first launch
-- 🔧 **GPT-4 Integration**: Custom translator for easy language conversion
+- 🔧 **AI Integration**: Custom translator for easy language conversion
 
 ## Quick Start
 
@@ -380,9 +380,9 @@ LanguageBuilder(
 
 Use `refreshTree` only when you specifically need to reset widget state or when dealing with widgets that don't properly handle language changes.
 
-## GPT-4 Translator
+## AI Translator
 
-Use the [Language Helper Translator](https://chat.openai.com/g/g-qoPMopEAb-language-helper-translator) for easy translation:
+Use the [Language Helper Translator](https://chat.openai.com/g/g-qoPMopEAb-language-helper-translator) in Chat-GPT for easy translation:
 
 ```txt
 This is the translation of my Flutter app. Translate it into Spanish:
@@ -394,45 +394,51 @@ final en = {
 ```
 
 <details>
-<summary>Show GPT instruction</summary>
+<summary>Or using AI instruction</summary>
 
-### Step-by-Step Instructions for Translation
+  ````md
+  ### Step-by-Step Instructions for Translation
 
-1. Identify the Dart `Map<String, dynamic>` structure and focus only on translating the values, not the keys or structure.
-2. Analyze the entire input first to understand its context for the best translation results.
-3. Check for plural forms and, if present, restructure using `LanguageConditions`.
-4. Translate plural forms: 0 → '0 products', 1 → '1 product', other → '@{count} products'.
-5. Translate only the values, leaving keys and structure unchanged.
-6. Preserve all comments (`//` and `///`), leaving them untranslated.
-7. Do not translate nested comments.
-8. Ensure the map structure is maintained after translation, with correct handling of plural forms and comments.
+  1. Identify the Dart `Map<String, dynamic>` structure and focus only on translating the values, not the keys or structure.
+  2. Analyze the entire input first to understand its context for the best translation results.
+  3. Check for plural forms and, if present, restructure using `LanguageConditions`.
+  4. Translate plural forms: 0 → '0 products', 1 → '1 product', other → '@{count} products'.
+  5. Translate only the values, leaving keys and structure unchanged.
+  6. Preserve all comments (`//` and `///`), leaving them untranslated.
+  7. Do not translate nested comments.
+  8. Ensure the map structure is maintained after translation, with correct handling of plural forms and comments.
 
-### Example for Plural Grammar Handling
+  ### Example for Plural Grammar Handling
 
-If input is:
+  If input is:
 
-```dart
-'@{count} sản phẩm': '@{count} sản phẩm'
-```
+  ```dart
+  {
+    '@{count} sản phẩm': '@{count} sản phẩm',
+  }
+  ```
 
-It should generate to the `en` language as:
+  And the destination language is  `en`. It should generate to:
 
-```dart
-'@{count} sản phẩm': LanguageConditions(
-  param: 'count',
-  conditions: {
-    '0': '0 products',
-    '1': '1 product',
-    '_': '@{count} products',
-  },
-)
-```
+  ```dart
+  {
+    '@{count} sản phẩm': LanguageConditions(
+      param: 'count',
+      conditions: {
+        '0': '0 products',
+        '1': '1 product',
+        '_': '@{count} products',
+      },
+    ),
+  }
+  ```
 
-### Important Reminders
+  ### Important Reminders
 
-- Translate only values, never keys.
-- Leave comments unchanged.
-- Handle plural forms with `LanguageConditions` as needed.
+  - Translate only values, never keys.
+  - Leave comments unchanged.
+  - Handle plural forms with `LanguageConditions` as needed.
+  ````
 
 </details>
 
