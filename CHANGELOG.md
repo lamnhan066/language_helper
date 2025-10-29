@@ -1,3 +1,8 @@
+## 0.13.0-rc.4
+
+* Add more tests.
+* Improve README.
+
 ## 0.13.0-rc.3
 
 * Update minimum Dart SDK requirement to ^3.9.0 and Flutter to >=3.35.0.
