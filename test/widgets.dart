@@ -17,14 +17,13 @@ class LanguageHelperWidget extends StatelessWidget {
             LanguageBuilder(builder: (_) => Text('Hello'.tr)),
             Text('Hello'.tr),
             LanguageBuilder(
-              builder:
-                  (_) => Text('You have @number dollars'.trP({'number': 100})),
+              builder: (_) =>
+                  Text('You have @number dollars'.trP({'number': 100})),
             ),
             LanguageBuilder(
               forceRebuild: true,
-              builder:
-                  (_) =>
-                      Text('You have @{number}, dollars'.trP({'number': 10})),
+              builder: (_) =>
+                  Text('You have @{number}, dollars'.trP({'number': 10})),
             ),
           ],
         ),
@@ -110,24 +109,19 @@ class CustomLanguageHelperWidget extends StatelessWidget {
             Text('Hello'.trC(helper)),
             LanguageBuilder(
               languageHelper: helper,
-              builder:
-                  (_) => Text(
-                    'You have @number dollars'.trC(
-                      helper,
-                      params: {'number': 100},
-                    ),
-                  ),
+              builder: (_) => Text(
+                'You have @number dollars'.trC(helper, params: {'number': 100}),
+              ),
             ),
             LanguageBuilder(
               languageHelper: helper,
               forceRebuild: true,
-              builder:
-                  (_) => Text(
-                    'You have @{number}, dollars'.trC(
-                      helper,
-                      params: {'number': 10},
-                    ),
-                  ),
+              builder: (_) => Text(
+                'You have @{number}, dollars'.trC(
+                  helper,
+                  params: {'number': 10},
+                ),
+              ),
             ),
           ],
         ),

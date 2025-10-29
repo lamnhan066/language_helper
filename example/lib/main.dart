@@ -27,15 +27,14 @@ class LanguageHelperDemoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LanguageBuilder(
-    builder:
-        (context) => MaterialApp(
-          title: 'Language Helper Demo'.tr,
-          theme: _buildTheme(),
-          localizationsDelegates: LanguageHelper.instance.delegates,
-          supportedLocales: LanguageHelper.instance.locales,
-          locale: LanguageHelper.instance.locale,
-          home: const HomePage(),
-        ),
+    builder: (context) => MaterialApp(
+      title: 'Language Helper Demo'.tr,
+      theme: _buildTheme(),
+      localizationsDelegates: LanguageHelper.instance.delegates,
+      supportedLocales: LanguageHelper.instance.locales,
+      locale: LanguageHelper.instance.locale,
+      home: const HomePage(),
+    ),
   );
 
   ThemeData _buildTheme() {
@@ -92,79 +91,76 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) => LanguageBuilder(
     forceRebuild: true,
-    builder:
-        (context) => Scaffold(
-          appBar: AppBar(
-            title: Text('Language Helper Demo'.tr),
-            elevation: 0,
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black87,
-            actions: [
-              PopupMenuButton<LanguageCodes>(
-                icon: const Icon(Icons.language, color: Color(0xFF2563EB)),
-                onSelected: LanguageHelper.instance.change,
-                itemBuilder:
-                    (context) =>
-                        LanguageHelper.instance.codes
-                            .map(
-                              (code) => PopupMenuItem<LanguageCodes>(
-                                value: code,
-                                child: Row(
-                                  children: [
-                                    Text(_getLanguageName(code)),
-                                    const SizedBox(width: 8),
-                                    if (LanguageHelper.instance.code == code)
-                                      const Icon(
-                                        Icons.check_circle,
-                                        color: Color(0xFF2563EB),
-                                        size: 18,
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            )
-                            .toList(),
-              ),
-              const SizedBox(width: 8),
-            ],
+    builder: (context) => Scaffold(
+      appBar: AppBar(
+        title: Text('Language Helper Demo'.tr),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        actions: [
+          PopupMenuButton<LanguageCodes>(
+            icon: const Icon(Icons.language, color: Color(0xFF2563EB)),
+            onSelected: LanguageHelper.instance.change,
+            itemBuilder: (context) => LanguageHelper.instance.codes
+                .map(
+                  (code) => PopupMenuItem<LanguageCodes>(
+                    value: code,
+                    child: Row(
+                      children: [
+                        Text(_getLanguageName(code)),
+                        const SizedBox(width: 8),
+                        if (LanguageHelper.instance.code == code)
+                          const Icon(
+                            Icons.check_circle,
+                            color: Color(0xFF2563EB),
+                            size: 18,
+                          ),
+                      ],
+                    ),
+                  ),
+                )
+                .toList(),
           ),
-          body: IndexedStack(index: _selectedIndex, children: _pages),
-          bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            currentIndex: _selectedIndex,
-            onTap: (index) => setState(() => _selectedIndex = index),
-            elevation: 8,
-            backgroundColor: Colors.white,
-            selectedItemColor: const Color(0xFF2563EB),
-            unselectedItemColor: Colors.grey,
-            items: [
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.home),
-                label: 'Home'.tr,
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.map),
-                label: 'Dart Map'.tr,
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.folder),
-                label: 'JSON'.tr,
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.cloud),
-                label: 'Network'.tr,
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.layers),
-                label: 'Multi'.tr,
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.settings),
-                label: 'Advanced'.tr,
-              ),
-            ],
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: IndexedStack(index: _selectedIndex, children: _pages),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        onTap: (index) => setState(() => _selectedIndex = index),
+        elevation: 8,
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0xFF2563EB),
+        unselectedItemColor: Colors.grey,
+        items: [
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.home),
+            label: 'Home'.tr,
           ),
-        ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.map),
+            label: 'Dart Map'.tr,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.folder),
+            label: 'JSON'.tr,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.cloud),
+            label: 'Network'.tr,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.layers),
+            label: 'Multi'.tr,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.settings),
+            label: 'Advanced'.tr,
+          ),
+        ],
+      ),
+    ),
   );
 
   String _getLanguageName(LanguageCodes code) {
@@ -301,32 +297,29 @@ class HomeContent extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children:
-                  LanguageHelper.instance.codes
-                      .map(
-                        (code) => ElevatedButton.icon(
-                          onPressed: () => LanguageHelper.instance.change(code),
-                          icon: Icon(
-                            LanguageHelper.instance.code == code
-                                ? Icons.check_circle
-                                : Icons.circle_outlined,
-                            size: 18,
-                          ),
-                          label: Text(_getLanguageName(code)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                LanguageHelper.instance.code == code
-                                    ? const Color(0xFF2563EB)
-                                    : Colors.grey[200],
-                            foregroundColor:
-                                LanguageHelper.instance.code == code
-                                    ? Colors.white
-                                    : Colors.black87,
-                            elevation: 0,
-                          ),
-                        ),
-                      )
-                      .toList(),
+              children: LanguageHelper.instance.codes
+                  .map(
+                    (code) => ElevatedButton.icon(
+                      onPressed: () => LanguageHelper.instance.change(code),
+                      icon: Icon(
+                        LanguageHelper.instance.code == code
+                            ? Icons.check_circle
+                            : Icons.circle_outlined,
+                        size: 18,
+                      ),
+                      label: Text(_getLanguageName(code)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: LanguageHelper.instance.code == code
+                            ? const Color(0xFF2563EB)
+                            : Colors.grey[200],
+                        foregroundColor: LanguageHelper.instance.code == code
+                            ? Colors.white
+                            : Colors.black87,
+                        elevation: 0,
+                      ),
+                    ),
+                  )
+                  .toList(),
             ),
           ],
         ),

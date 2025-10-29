@@ -113,18 +113,17 @@ void main() {
       await languageHelper.initial(
         data: [
           LanguageDataProvider.lazyData({
-            LanguageCodes.en:
-                () => {
-                  'Hello @{name}': 'Hello @{name}',
-                  'You have @{count} item': const LanguageConditions(
-                    param: 'count',
-                    conditions: {
-                      '0': 'You have no items',
-                      '1': 'You have one item',
-                      '_': 'You have @{count} items',
-                    },
-                  ),
+            LanguageCodes.en: () => {
+              'Hello @{name}': 'Hello @{name}',
+              'You have @{count} item': const LanguageConditions(
+                param: 'count',
+                conditions: {
+                  '0': 'You have no items',
+                  '1': 'You have one item',
+                  '_': 'You have @{count} items',
                 },
+              ),
+            },
           }),
         ],
       );

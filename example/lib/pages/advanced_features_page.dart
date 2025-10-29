@@ -31,80 +31,78 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
   Future<void> _initializeLanguageHelper() async {
     // Create advanced language data with complex conditions
     final advancedData = {
-      LanguageCodes.en:
-          () => {
-            'Welcome @{name}': 'Welcome @{name}',
-            'You have @{count} notification': const LanguageConditions(
-              param: 'count',
-              conditions: {
-                '0': 'You have no notifications',
-                '1': 'You have one notification',
-                '_': 'You have @{count} notifications',
-              },
-            ),
-            'Time format': const LanguageConditions(
-              param: 'hours',
-              conditions: {
-                '0': 'Midnight',
-                '1': '1 AM',
-                '12': 'Noon',
-                '_': "@{hours} o'clock",
-              },
-            ),
-            'Plural items': const LanguageConditions(
-              param: 'count',
-              conditions: {
-                '0': 'No items',
-                '1': 'One item',
-                '2': 'Two items',
-                '3': 'Three items',
-                '4': 'Four items',
-                '5': 'Five items',
-                '_': '@{count} items',
-              },
-            ),
-            'Language changed from @{from} to @{to}':
-                'Language changed from @{from} to @{to}',
-            'Current timestamp': 'Current timestamp: @{timestamp}',
-            'Device info': 'Device: @{device}, Platform: @{platform}',
+      LanguageCodes.en: () => {
+        'Welcome @{name}': 'Welcome @{name}',
+        'You have @{count} notification': const LanguageConditions(
+          param: 'count',
+          conditions: {
+            '0': 'You have no notifications',
+            '1': 'You have one notification',
+            '_': 'You have @{count} notifications',
           },
-      LanguageCodes.vi:
-          () => {
-            'Welcome @{name}': 'Chào mừng @{name}',
-            'You have @{count} notification': const LanguageConditions(
-              param: 'count',
-              conditions: {
-                '0': 'Bạn không có thông báo nào',
-                '1': 'Bạn có một thông báo',
-                '_': 'Bạn có @{count} thông báo',
-              },
-            ),
-            'Time format': const LanguageConditions(
-              param: 'hours',
-              conditions: {
-                '0': 'Nửa đêm',
-                '1': '1 giờ sáng',
-                '12': 'Trưa',
-                '_': '@{hours} giờ',
-              },
-            ),
-            'Plural items': const LanguageConditions(
-              param: 'count',
-              conditions: {
-                '0': 'Không có mục nào',
-                '1': 'Một mục',
-                '2': 'Hai mục',
-                '3': 'Ba mục',
-                '4': 'Bốn mục',
-                '5': 'Năm mục',
-                '_': '@{count} mục',
-              },
-            ),
-            'Language changed from @{from} to @{to}':
-                'Ngôn ngữ đã thay đổi từ @{from} sang @{to}',
-            'Current timestamp': 'Thời gian hiện tại: @{timestamp}',
-            'Device info': 'Thiết bị: @{device}, Nền tảng: @{platform}',
+        ),
+        'Time format': const LanguageConditions(
+          param: 'hours',
+          conditions: {
+            '0': 'Midnight',
+            '1': '1 AM',
+            '12': 'Noon',
+            '_': "@{hours} o'clock",
           },
+        ),
+        'Plural items': const LanguageConditions(
+          param: 'count',
+          conditions: {
+            '0': 'No items',
+            '1': 'One item',
+            '2': 'Two items',
+            '3': 'Three items',
+            '4': 'Four items',
+            '5': 'Five items',
+            '_': '@{count} items',
+          },
+        ),
+        'Language changed from @{from} to @{to}':
+            'Language changed from @{from} to @{to}',
+        'Current timestamp': 'Current timestamp: @{timestamp}',
+        'Device info': 'Device: @{device}, Platform: @{platform}',
+      },
+      LanguageCodes.vi: () => {
+        'Welcome @{name}': 'Chào mừng @{name}',
+        'You have @{count} notification': const LanguageConditions(
+          param: 'count',
+          conditions: {
+            '0': 'Bạn không có thông báo nào',
+            '1': 'Bạn có một thông báo',
+            '_': 'Bạn có @{count} thông báo',
+          },
+        ),
+        'Time format': const LanguageConditions(
+          param: 'hours',
+          conditions: {
+            '0': 'Nửa đêm',
+            '1': '1 giờ sáng',
+            '12': 'Trưa',
+            '_': '@{hours} giờ',
+          },
+        ),
+        'Plural items': const LanguageConditions(
+          param: 'count',
+          conditions: {
+            '0': 'Không có mục nào',
+            '1': 'Một mục',
+            '2': 'Hai mục',
+            '3': 'Ba mục',
+            '4': 'Bốn mục',
+            '5': 'Năm mục',
+            '_': '@{count} mục',
+          },
+        ),
+        'Language changed from @{from} to @{to}':
+            'Ngôn ngữ đã thay đổi từ @{from} sang @{to}',
+        'Current timestamp': 'Thời gian hiện tại: @{timestamp}',
+        'Device info': 'Thiết bị: @{device}, Nền tảng: @{platform}',
+      },
     };
 
     await _languageHelper.initial(
@@ -146,10 +144,9 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
       ),
-      body:
-          !_isLoaded
-              ? const Center(child: CircularProgressIndicator())
-              : _body(),
+      body: !_isLoaded
+          ? const Center(child: CircularProgressIndicator())
+          : _body(),
     );
   }
 
@@ -188,12 +185,11 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                         Expanded(
                           child: Text(
                             'Advanced Language Features'.trC(_languageHelper),
-                            style: Theme.of(
-                              context,
-                            ).textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                         ),
                       ],
@@ -442,27 +438,23 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children:
-                            _languageHelper.codes
-                                .map(
-                                  (code) => ElevatedButton(
-                                    onPressed:
-                                        () => _languageHelper.change(code),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          _languageHelper.code == code
-                                              ? const Color(0xFFDB2777)
-                                              : Colors.grey[200],
-                                      foregroundColor:
-                                          _languageHelper.code == code
-                                              ? Colors.white
-                                              : Colors.black87,
-                                      elevation: 0,
-                                    ),
-                                    child: Text(_getLanguageName(code)),
-                                  ),
-                                )
-                                .toList(),
+                        children: _languageHelper.codes
+                            .map(
+                              (code) => ElevatedButton(
+                                onPressed: () => _languageHelper.change(code),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _languageHelper.code == code
+                                      ? const Color(0xFFDB2777)
+                                      : Colors.grey[200],
+                                  foregroundColor: _languageHelper.code == code
+                                      ? Colors.white
+                                      : Colors.black87,
+                                  elevation: 0,
+                                ),
+                                child: Text(_getLanguageName(code)),
+                              ),
+                            )
+                            .toList(),
                       ),
                     ],
                   ),

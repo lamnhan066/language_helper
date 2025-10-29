@@ -187,7 +187,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.13.0-rc.2"
+    version: "0.13.0-rc.3"
   language_helper_generator:
     dependency: "direct overridden"
     description:
