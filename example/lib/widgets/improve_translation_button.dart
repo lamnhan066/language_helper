@@ -89,6 +89,7 @@ class ImproveTranslationButton extends StatelessWidget {
                     ),
                   );
                 },
+                autoSearchOnScroll: false,
               ),
             ),
           );
