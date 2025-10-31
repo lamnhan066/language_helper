@@ -1068,7 +1068,7 @@ class _LanguageImproverState extends State<LanguageImprover>
       body: _filteredKeys.isEmpty
           ? const Center(child: Text('No translations found'))
           : Container(
-              color: Colors.grey[50],
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
                 controller: _scrollController,
                 padding: const EdgeInsets.all(8),
@@ -1090,22 +1090,34 @@ class _LanguageImproverState extends State<LanguageImprover>
                       ? _flashAnimation!.value
                       : 0.0;
 
+                  // Get theme-aware colors
+                  final theme = Theme.of(context);
+                  final cardColor = theme.cardColor;
+                  final dividerColor = theme.dividerColor;
+                  final colorScheme = theme.colorScheme;
+                  final isDark = colorScheme.brightness == Brightness.dark;
+
+                  // Flash highlight color - use blue with appropriate opacity for dark/light theme
+                  final flashBlue = isDark
+                      ? Colors.blue.withValues(
+                          alpha: 0.3,
+                        ) // More visible in dark
+                      : Colors.blue.shade50; // Subtle in light
+
+                  final flashBorderBlue = isDark
+                      ? Colors
+                            .blue
+                            .shade400 // Bright blue in dark
+                      : Colors.blue.shade400; // Same bright blue
+
                   // Calculate animated colors based on flash value
                   final backgroundColor = isFlashing
-                      ? Color.lerp(
-                          Colors.white,
-                          Colors.blue[50]!,
-                          flashValue * 0.8,
-                        )!
-                      : Colors.white;
+                      ? Color.lerp(cardColor, flashBlue, flashValue * 0.9)!
+                      : cardColor;
 
                   final borderColor = isFlashing
-                      ? Color.lerp(
-                          Colors.grey[300]!,
-                          Colors.blue[400]!,
-                          flashValue,
-                        )!
-                      : Colors.grey[300]!;
+                      ? Color.lerp(dividerColor, flashBorderBlue, flashValue)!
+                      : dividerColor;
 
                   final borderWidth = isFlashing
                       ? 1.5 + (flashValue * 1.5)
@@ -1136,69 +1148,94 @@ class _LanguageImproverState extends State<LanguageImprover>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Translation key
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: Colors.grey[300]!),
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Icon(
-                                    Icons.tag,
-                                    size: 14,
-                                    color: Colors.grey[700],
+                            Builder(
+                              builder: (context) {
+                                final theme = Theme.of(context);
+                                final colorScheme = theme.colorScheme;
+                                final surfaceVariant =
+                                    colorScheme.surfaceContainerHighest;
+                                final onSurfaceVariant =
+                                    colorScheme.onSurfaceVariant;
+                                final dividerColor = theme.dividerColor;
+
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 6,
                                   ),
-                                  const SizedBox(width: 6),
-                                  Expanded(
-                                    child: Text(
-                                      key,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.grey[900],
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: 'monospace',
+                                  decoration: BoxDecoration(
+                                    color: surfaceVariant,
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: dividerColor),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.tag,
+                                        size: 14,
+                                        color: onSurfaceVariant,
                                       ),
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                      const SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          key,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: onSurfaceVariant,
+                                            fontWeight: FontWeight.w500,
+                                            fontFamily: 'monospace',
+                                          ),
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                             const SizedBox(height: 12),
 
                             // Default language translation
                             if (targetValue is String)
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${_defaultLanguage?.name ?? 'Default'}:',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.grey[700],
-                                      ),
+                              Builder(
+                                builder: (context) {
+                                  final theme = Theme.of(context);
+                                  final colorScheme = theme.colorScheme;
+                                  final surfaceVariant =
+                                      colorScheme.surfaceContainerHighest;
+                                  final onSurfaceVariant =
+                                      colorScheme.onSurfaceVariant;
+
+                                  return Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: surfaceVariant,
+                                      borderRadius: BorderRadius.circular(4),
                                     ),
-                                    const SizedBox(height: 4),
-                                    _ExpandableText(
-                                      text: defaultText,
-                                      style: const TextStyle(fontSize: 14),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${_defaultLanguage?.name ?? 'Default'}:',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: onSurfaceVariant,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        _ExpandableText(
+                                          text: defaultText,
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  );
+                                },
                               )
                             else if (targetValue is LanguageConditions)
                               // Show default LanguageConditions for reference
@@ -1207,14 +1244,18 @@ class _LanguageImproverState extends State<LanguageImprover>
                                   final defaultCondition =
                                       _getDefaultLanguageCondition(key);
                                   if (defaultCondition != null) {
+                                    final theme = Theme.of(context);
+                                    final colorScheme = theme.colorScheme;
+
                                     return Container(
                                       padding: const EdgeInsets.all(8),
                                       margin: const EdgeInsets.only(bottom: 8),
                                       decoration: BoxDecoration(
-                                        color: Colors.grey[100],
+                                        color:
+                                            colorScheme.surfaceContainerHighest,
                                         borderRadius: BorderRadius.circular(4),
                                         border: Border.all(
-                                          color: Colors.grey[300]!,
+                                          color: theme.dividerColor,
                                         ),
                                       ),
                                       child: Column(
