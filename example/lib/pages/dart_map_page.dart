@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 
+import '../widgets/improve_translation_button.dart';
+
 class DartMapPage extends StatelessWidget {
   const DartMapPage({super.key});
 
@@ -127,18 +129,26 @@ class DartMapPage extends StatelessWidget {
                   _buildTranslationExample(
                     'Simple Translation'.tr,
                     'Hello @{name}'.trP({'name': 'Flutter Developer'}),
+                    'Simple Translation',
+                    'Hello @{name}',
                   ),
                   _buildTranslationExample(
                     'Conditional Translation'.tr,
                     'You have @{count} item'.trP({'count': 0}),
+                    'Conditional Translation',
+                    'You have @{count} item',
                   ),
                   _buildTranslationExample(
                     '',
                     'You have @{count} item'.trP({'count': 1}),
+                    null,
+                    'You have @{count} item',
                   ),
                   _buildTranslationExample(
                     '',
                     'You have @{count} item'.trP({'count': 10}),
+                    null,
+                    'You have @{count} item',
                   ),
                 ],
               ),
@@ -228,15 +238,32 @@ final LazyLanguageData languageData = {
     ),
   );
 
-  Widget _buildTranslationExample(String title, String example) => Padding(
+  Widget _buildTranslationExample(
+    String title,
+    String example,
+    String? titleKey,
+    String? exampleKey,
+  ) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (title.isNotEmpty) ...[
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+              if (titleKey != null) ...[
+                const SizedBox(width: 4),
+                ImproveTranslationButton(translationKey: titleKey),
+              ],
+            ],
           ),
           const SizedBox(height: 6),
         ],
@@ -248,9 +275,20 @@ final LazyLanguageData languageData = {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
           ),
-          child: Text(
-            example,
-            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  example,
+                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                ),
+              ),
+              if (exampleKey != null) ...[
+                const SizedBox(width: 4),
+                ImproveTranslationButton(translationKey: exampleKey),
+              ],
+            ],
           ),
         ),
       ],
