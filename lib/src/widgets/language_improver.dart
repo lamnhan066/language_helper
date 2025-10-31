@@ -104,10 +104,20 @@ class _LanguageImproverState extends State<LanguageImprover> {
 
         // After data is loaded and widget rebuilt, scroll to key
         if (widget.scrollToKey != null) {
-          // Wait for the widget to build and keys to be available
+          // Pre-create the key in the map
+          final targetKey = widget.scrollToKey!;
+          if (!_keyMap.containsKey(targetKey)) {
+            _keyMap[targetKey] = GlobalKey();
+          }
+
+          // Wait for multiple frames to ensure ListView is fully built
           WidgetsBinding.instance.addPostFrameCallback((_) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              _attemptScrollToKey();
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  _attemptScrollToKey();
+                }
+              });
             });
           });
         }
@@ -122,10 +132,15 @@ class _LanguageImproverState extends State<LanguageImprover> {
       // Scroll to target key if it matches the search
       if (widget.scrollToKey != null &&
           _filteredKeys.contains(widget.scrollToKey)) {
-        Future.delayed(const Duration(milliseconds: 300), () {
-          if (mounted) {
-            _scrollToKey(widget.scrollToKey!);
-          }
+        // Wait for the ListView to rebuild with filtered results
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Future.delayed(const Duration(milliseconds: 200), () {
+              if (mounted) {
+                _scrollToKey(widget.scrollToKey!);
+              }
+            });
+          });
         });
       }
     });
@@ -137,56 +152,90 @@ class _LanguageImproverState extends State<LanguageImprover> {
   }
 
   void _scrollToKey(String targetKey) {
-    if (!_keyMap.containsKey(targetKey)) {
-      // Key not found in map yet, try again after a delay
-      // This can happen if the ListView hasn't built yet
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (mounted) {
-          if (_keyMap.containsKey(targetKey)) {
-            _scrollToKey(targetKey);
-          } else {
-            // Try one more time after a longer delay
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (mounted && _keyMap.containsKey(targetKey)) {
-                _scrollToKey(targetKey);
-              }
-            });
+    // Wait for ScrollController to be attached
+    void tryScrollWithController({int retryCount = 0}) {
+      if (!mounted) return;
+
+      // First, try to find the index of the target key in filtered keys
+      final index = _filteredKeys.indexOf(targetKey);
+
+      if (index >= 0 && _scrollController.hasClients) {
+        // Calculate approximate position based on index
+        // Estimate card height: padding (8*2) + margin (8*2) + card height (~200)
+        const estimatedCardHeight = 250.0; // Approximate height per card
+        final estimatedPosition = index * estimatedCardHeight;
+
+        // Clamp position to valid range
+        final maxScroll = _scrollController.position.maxScrollExtent;
+        final scrollPosition = estimatedPosition.clamp(0.0, maxScroll);
+
+        _scrollController.animateTo(
+          scrollPosition,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+
+        // After scrolling, try to use ensureVisible for precise positioning
+        Future.delayed(const Duration(milliseconds: 600), () {
+          if (mounted) {
+            _scrollToKeyPrecise(targetKey);
           }
-        }
-      });
-      return;
+        });
+      } else if (retryCount < 5) {
+        // ScrollController not ready yet, retry
+        Future.delayed(Duration(milliseconds: 100 + (retryCount * 50)), () {
+          tryScrollWithController(retryCount: retryCount + 1);
+        });
+      } else {
+        // Fallback to precise scrolling if controller never becomes ready
+        _scrollToKeyPrecise(targetKey);
+      }
+    }
+
+    tryScrollWithController();
+  }
+
+  /// Precise scrolling using Scrollable.ensureVisible
+  void _scrollToKeyPrecise(String targetKey) {
+    // Create the key if it doesn't exist yet
+    if (!_keyMap.containsKey(targetKey)) {
+      _keyMap[targetKey] = GlobalKey();
     }
 
     final globalKey = _keyMap[targetKey];
-    if (globalKey?.currentContext != null) {
-      try {
-        Scrollable.ensureVisible(
-          globalKey!.currentContext!,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-          alignment: 0.1, // Position slightly from top for better visibility
-        );
-      } catch (e) {
-        // If scroll fails, try again after a short delay
-        Future.delayed(const Duration(milliseconds: 300), () {
-          if (mounted && _keyMap[targetKey]?.currentContext != null) {
-            Scrollable.ensureVisible(
-              _keyMap[targetKey]!.currentContext!,
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
-              alignment: 0.1,
-            );
+
+    // Wait for the widget to be built and context to be available
+    void tryScroll({int retryCount = 0}) {
+      if (!mounted) return;
+
+      if (globalKey?.currentContext != null) {
+        try {
+          Scrollable.ensureVisible(
+            globalKey!.currentContext!,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            alignment: 0.1, // Position slightly from top for better visibility
+          );
+        } catch (e) {
+          // If scroll fails, retry up to 3 times
+          if (retryCount < 3) {
+            Future.delayed(const Duration(milliseconds: 200), () {
+              tryScroll(retryCount: retryCount + 1);
+            });
           }
-        });
-      }
-    } else {
-      // Context not available yet, try again
-      Future.delayed(const Duration(milliseconds: 200), () {
-        if (mounted && _keyMap[targetKey]?.currentContext != null) {
-          _scrollToKey(targetKey);
         }
-      });
+      } else {
+        // Context not available yet, retry up to 5 times
+        if (retryCount < 5) {
+          Future.delayed(Duration(milliseconds: 200 + (retryCount * 100)), () {
+            tryScroll(retryCount: retryCount + 1);
+          });
+        }
+      }
     }
+
+    // Start trying to scroll
+    tryScroll();
   }
 
   Future<void> _initializeLanguages() async {
@@ -269,13 +318,18 @@ class _LanguageImproverState extends State<LanguageImprover> {
 
     final targetKey = widget.scrollToKey!;
 
+    // If key is not in all keys, can't scroll to it
+    if (!_allKeys.contains(targetKey)) {
+      return;
+    }
+
     // If key is not in the filtered keys, try to filter first
     if (!_filteredKeys.contains(targetKey)) {
-      if (widget.autoSearchOnScroll && _allKeys.contains(targetKey)) {
+      if (widget.autoSearchOnScroll) {
         // Set search to show the key
         _searchController.text = targetKey;
-        // Wait for filtering to complete
-        Future.delayed(const Duration(milliseconds: 200), () {
+        // Wait for filtering to complete and widget to rebuild
+        Future.delayed(const Duration(milliseconds: 300), () {
           if (mounted) {
             _scrollToKey(targetKey);
           }
@@ -284,8 +338,13 @@ class _LanguageImproverState extends State<LanguageImprover> {
       return;
     }
 
-    // Key should be visible, try to scroll
-    _scrollToKey(targetKey);
+    // Key should be visible, wait for ListView to build the item
+    // We need to wait for the widget to actually be built in the ListView
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _scrollToKey(targetKey);
+      }
+    });
   }
 
   /// Ensure data is loaded for a specific language code
@@ -920,6 +979,7 @@ class _LanguageImproverState extends State<LanguageImprover> {
           : Container(
               color: Colors.grey[50],
               child: ListView.builder(
+                controller: _scrollController,
                 padding: const EdgeInsets.all(8),
                 itemCount: _filteredKeys.length,
                 itemBuilder: (context, index) {
