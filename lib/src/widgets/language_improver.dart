@@ -78,7 +78,8 @@ class LanguageImprover extends StatefulWidget {
   State<LanguageImprover> createState() => _LanguageImproverState();
 }
 
-class _LanguageImproverState extends State<LanguageImprover> {
+class _LanguageImproverState extends State<LanguageImprover>
+    with TickerProviderStateMixin {
   late LanguageHelper _helper;
   LanguageCodes? _defaultLanguage;
   LanguageCodes? _targetLanguage;
@@ -89,11 +90,55 @@ class _LanguageImproverState extends State<LanguageImprover> {
   final Set<String> _allKeys = {};
   final ScrollController _scrollController = ScrollController();
   final Map<String, GlobalKey> _keyMap = {};
+  AnimationController? _flashAnimationController;
+  Animation<double>? _flashAnimation;
+  String? _flashingKey;
+  Timer? _flashTimeoutTimer;
+  int _flashRepeatCount = 0;
+  static const int _maxFlashRepeats = 10;
+  static const Duration _flashTimeout = Duration(seconds: 10);
 
   @override
   void initState() {
     super.initState();
     _helper = widget.languageHelper ?? LanguageHelper.instance;
+
+    // Initialize flash animation controller (faster animation)
+    _flashAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _flashAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 0.0,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeIn)),
+        weight: 0.4,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 1.0,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 0.6,
+      ),
+    ]).animate(_flashAnimationController!);
+
+    _flashAnimationController!.addListener(() {
+      if (mounted) {
+        setState(() {
+          // Trigger rebuild to update animation
+        });
+      }
+    });
+
+    // Handle animation completion for repeating
+    _flashAnimationController!.addStatusListener((status) {
+      if (status == AnimationStatus.completed && mounted) {
+        _handleFlashAnimationComplete();
+      }
+    });
 
     // Get all available languages and keys
     _initializeLanguages().then((_) {
@@ -112,13 +157,9 @@ class _LanguageImproverState extends State<LanguageImprover> {
 
           // Wait for multiple frames to ensure ListView is fully built
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) {
-                  _attemptScrollToKey();
-                }
-              });
-            });
+            if (mounted) {
+              _attemptScrollToKey();
+            }
           });
         }
       }
@@ -134,12 +175,10 @@ class _LanguageImproverState extends State<LanguageImprover> {
           _filteredKeys.contains(widget.scrollToKey)) {
         // Wait for the ListView to rebuild with filtered results
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Future.delayed(const Duration(milliseconds: 200), () {
-              if (mounted) {
-                _scrollToKey(widget.scrollToKey!);
-              }
-            });
+          Future.delayed(const Duration(milliseconds: 200), () {
+            if (mounted) {
+              _scrollToKey(widget.scrollToKey!);
+            }
           });
         });
       }
@@ -216,6 +255,9 @@ class _LanguageImproverState extends State<LanguageImprover> {
             curve: Curves.easeInOut,
             alignment: 0.1, // Position slightly from top for better visibility
           );
+
+          // Trigger flash animation when key becomes visible
+          _triggerFlashAnimation(targetKey);
         } catch (e) {
           // If scroll fails, retry up to 3 times
           if (retryCount < 3) {
@@ -409,7 +451,70 @@ class _LanguageImproverState extends State<LanguageImprover> {
     }
     _searchController.dispose();
     _scrollController.dispose();
+    _flashAnimationController?.dispose();
     super.dispose();
+  }
+
+  /// Trigger flash animation for a specific key
+  void _triggerFlashAnimation(String key) {
+    if (!mounted) return;
+
+    setState(() {
+      _flashingKey = key;
+      _flashRepeatCount = 0;
+    });
+
+    // Cancel any existing timeout timer
+    _flashTimeoutTimer?.cancel();
+
+    // Set timeout to stop flashing after duration
+    _flashTimeoutTimer = Timer(_flashTimeout, () {
+      if (mounted && _flashingKey == key) {
+        _stopFlashAnimation();
+      }
+    });
+
+    // Start the first flash
+    _flashAnimationController?.reset();
+    _flashAnimationController?.forward();
+  }
+
+  /// Handle flash animation completion - repeat if needed
+  void _handleFlashAnimationComplete() {
+    if (!mounted || _flashingKey == null) return;
+
+    _flashRepeatCount++;
+
+    if (_flashRepeatCount < _maxFlashRepeats) {
+      // Repeat the animation
+      _flashAnimationController?.reset();
+      _flashAnimationController?.forward();
+    } else {
+      // Stop after max repeats
+      _stopFlashAnimation();
+    }
+  }
+
+  /// Stop the flash animation
+  void _stopFlashAnimation() {
+    if (!mounted) return;
+
+    _flashTimeoutTimer?.cancel();
+    _flashTimeoutTimer = null;
+    _flashAnimationController?.stop();
+    _flashAnimationController?.reset();
+
+    setState(() {
+      _flashingKey = null;
+      _flashRepeatCount = 0;
+    });
+  }
+
+  /// Handle tap on the flashing card to stop animation
+  void _onCardTap(String key) {
+    if (_flashingKey == key) {
+      _stopFlashAnimation();
+    }
   }
 
   List<String> get _filteredKeys {
@@ -993,393 +1098,267 @@ class _LanguageImproverState extends State<LanguageImprover> {
                   }
                   final cardKey = _keyMap[key]!;
 
-                  final isTargetKey =
-                      widget.scrollToKey != null && key == widget.scrollToKey;
+                  // Get flash animation value if this key is flashing
+                  final isFlashing = _flashingKey == key;
+                  final flashValue = isFlashing && _flashAnimation != null
+                      ? _flashAnimation!.value
+                      : 0.0;
 
-                  return Card(
-                    key: cardKey,
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 4,
-                    ),
-                    elevation: isTargetKey ? 5 : 3,
-                    color: isTargetKey ? Colors.blue[50] : Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(
-                        color: isTargetKey
-                            ? Colors.blue[400]!
-                            : Colors.grey[300]!,
-                        width: isTargetKey ? 2.5 : 1.5,
+                  // Calculate animated colors based on flash value
+                  final backgroundColor = isFlashing
+                      ? Color.lerp(
+                          Colors.white,
+                          Colors.blue[50]!,
+                          flashValue * 0.8,
+                        )!
+                      : Colors.white;
+
+                  final borderColor = isFlashing
+                      ? Color.lerp(
+                          Colors.grey[300]!,
+                          Colors.blue[400]!,
+                          flashValue,
+                        )!
+                      : Colors.grey[300]!;
+
+                  final borderWidth = isFlashing
+                      ? 1.5 + (flashValue * 1.5)
+                      : 1.5;
+
+                  final elevation = isFlashing ? 3.0 + (flashValue * 3.0) : 3.0;
+
+                  return GestureDetector(
+                    onTap: () => _onCardTap(key),
+                    child: Card(
+                      key: cardKey,
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 4,
                       ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Translation key
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: Colors.grey[300]!),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.tag,
-                                  size: 14,
-                                  color: Colors.grey[700],
-                                ),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    key,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Colors.grey[900],
-                                      fontWeight: FontWeight.w500,
-                                      fontFamily: 'monospace',
-                                    ),
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-
-                          // Default language translation
-                          if (targetValue is String)
+                      elevation: elevation,
+                      color: backgroundColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(
+                          color: borderColor,
+                          width: borderWidth,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Translation key
                             Container(
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.grey[100],
                                 borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: Colors.grey[300]!),
                               ),
-                              child: Column(
+                              child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    '${_defaultLanguage?.name ?? 'Default'}:',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[700],
-                                    ),
+                                  Icon(
+                                    Icons.tag,
+                                    size: 14,
+                                    color: Colors.grey[700],
                                   ),
-                                  const SizedBox(height: 4),
-                                  _ExpandableText(
-                                    text: defaultText,
-                                    style: const TextStyle(fontSize: 14),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      key,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.grey[900],
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: 'monospace',
+                                      ),
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                 ],
                               ),
-                            )
-                          else if (targetValue is LanguageConditions)
-                            // Show default LanguageConditions for reference
-                            Builder(
-                              builder: (context) {
-                                final defaultCondition =
-                                    _getDefaultLanguageCondition(key);
-                                if (defaultCondition != null) {
-                                  return Container(
-                                    padding: const EdgeInsets.all(8),
-                                    margin: const EdgeInsets.only(bottom: 8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: Colors.grey[300]!,
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Default language translation
+                            if (targetValue is String)
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${_defaultLanguage?.name ?? 'Default'}:',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[700],
                                       ),
                                     ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${_defaultLanguage?.name ?? 'Default'} (LanguageConditions):',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.grey[700],
-                                          ),
+                                    const SizedBox(height: 4),
+                                    _ExpandableText(
+                                      text: defaultText,
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            else if (targetValue is LanguageConditions)
+                              // Show default LanguageConditions for reference
+                              Builder(
+                                builder: (context) {
+                                  final defaultCondition =
+                                      _getDefaultLanguageCondition(key);
+                                  if (defaultCondition != null) {
+                                    return Container(
+                                      padding: const EdgeInsets.all(8),
+                                      margin: const EdgeInsets.only(bottom: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[100],
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: Colors.grey[300]!,
                                         ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Param: ${defaultCondition.param}',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.grey[700],
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        ...defaultCondition.conditions.entries.map((
-                                          e,
-                                        ) {
-                                          final isDefault =
-                                              e.key == '_' ||
-                                              e.key == 'default';
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                              bottom: 6,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${_defaultLanguage?.name ?? 'Default'} (LanguageConditions):',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey[700],
                                             ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 4,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    color: isDefault
-                                                        ? Colors.amber[100]
-                                                        : Colors.grey[200],
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          4,
-                                                        ),
-                                                  ),
-                                                  child: Text(
-                                                    e.key,
-                                                    style: TextStyle(
-                                                      fontSize: 11,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: isDefault
-                                                          ? Colors.amber[900]
-                                                          : Colors.grey[800],
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Expanded(
-                                                  child: Container(
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Param: ${defaultCondition.param}',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.grey[700],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          ...defaultCondition.conditions.entries.map((
+                                            e,
+                                          ) {
+                                            final isDefault =
+                                                e.key == '_' ||
+                                                e.key == 'default';
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                bottom: 6,
+                                              ),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
                                                     padding:
-                                                        const EdgeInsets.all(8),
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4,
+                                                        ),
                                                     decoration: BoxDecoration(
-                                                      color: Colors.white,
+                                                      color: isDefault
+                                                          ? Colors.amber[100]
+                                                          : Colors.grey[200],
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             4,
                                                           ),
-                                                      border: Border.all(
-                                                        color:
-                                                            Colors.grey[300]!,
-                                                      ),
                                                     ),
-                                                    child: _ExpandableText(
-                                                      text: e.value.toString(),
-                                                      style: const TextStyle(
-                                                        fontSize: 12,
+                                                    child: Text(
+                                                      e.key,
+                                                      style: TextStyle(
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: isDefault
+                                                            ? Colors.amber[900]
+                                                            : Colors.grey[800],
                                                       ),
-                                                      maxLines: 2,
                                                     ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }),
-                                      ],
-                                    ),
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-
-                          const SizedBox(height: 12),
-
-                          // Target language translation (editable)
-                          if (targetValue is String)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TextField(
-                                  controller: _controllers[key],
-                                  decoration: InputDecoration(
-                                    labelText:
-                                        '${_targetLanguage?.name ?? 'Target'}:',
-                                    border: const OutlineInputBorder(),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                  ),
-                                  maxLines: null,
-                                  minLines: 1,
-                                ),
-                                const SizedBox(height: 8),
-                                OutlinedButton.icon(
-                                  onPressed: () =>
-                                      _convertStringToLanguageCondition(
-                                        key,
-                                        targetValue,
+                                                  const SizedBox(width: 8),
+                                                  Expanded(
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            8,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              4,
+                                                            ),
+                                                        border: Border.all(
+                                                          color:
+                                                              Colors.grey[300]!,
+                                                        ),
+                                                      ),
+                                                      child: _ExpandableText(
+                                                        text: e.value
+                                                            .toString(),
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                        maxLines: 2,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }),
+                                        ],
                                       ),
-                                  icon: const Icon(
-                                    Icons.auto_awesome,
-                                    size: 16,
-                                  ),
-                                  label: const Text(
-                                    'Convert to LanguageConditions',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 12,
-                                    ),
-                                    minimumSize: Size.zero,
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                  ),
-                                ),
-                              ],
-                            )
-                          else if (targetValue is LanguageConditions)
-                            InkWell(
-                              onTap: () =>
-                                  _editLanguageCondition(key, targetValue),
-                              child: Column(
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                              ),
+
+                            const SizedBox(height: 12),
+
+                            // Target language translation (editable)
+                            if (targetValue is String)
+                              Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Target LanguageConditions
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue[50],
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: Colors.blue[200]!,
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              '${_targetLanguage?.name ?? 'Target'}:',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.blue[900],
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            const Icon(
-                                              Icons.edit,
-                                              size: 16,
-                                              color: Colors.blue,
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Param: ${targetValue.param}',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.blue[800],
+                                  TextField(
+                                    controller: _controllers[key],
+                                    decoration: InputDecoration(
+                                      labelText:
+                                          '${_targetLanguage?.name ?? 'Target'}:',
+                                      border: const OutlineInputBorder(),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
                                           ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        ...targetValue.conditions.entries.map((
-                                          e,
-                                        ) {
-                                          final isDefault =
-                                              e.key == '_' ||
-                                              e.key == 'default';
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                              bottom: 6,
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 4,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    color: isDefault
-                                                        ? Colors.blue[200]
-                                                        : Colors.blue[100],
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          4,
-                                                        ),
-                                                    border: Border.all(
-                                                      color: isDefault
-                                                          ? Colors.blue[400]!
-                                                          : Colors.blue[300]!,
-                                                      width: 1,
-                                                    ),
-                                                  ),
-                                                  child: Text(
-                                                    e.key,
-                                                    style: TextStyle(
-                                                      fontSize: 11,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: isDefault
-                                                          ? Colors.blue[900]
-                                                          : Colors.blue[800],
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Expanded(
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(8),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            4,
-                                                          ),
-                                                      border: Border.all(
-                                                        color:
-                                                            Colors.blue[200]!,
-                                                      ),
-                                                    ),
-                                                    child: _ExpandableText(
-                                                      text: e.value.toString(),
-                                                      style: const TextStyle(
-                                                        fontSize: 12,
-                                                      ),
-                                                      maxLines: 2,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }),
-                                      ],
                                     ),
+                                    maxLines: null,
+                                    minLines: 1,
                                   ),
-
                                   const SizedBox(height: 8),
                                   OutlinedButton.icon(
                                     onPressed: () =>
-                                        _convertLanguageConditionToString(
+                                        _convertStringToLanguageCondition(
                                           key,
                                           targetValue,
                                         ),
@@ -1388,7 +1367,7 @@ class _LanguageImproverState extends State<LanguageImprover> {
                                       size: 16,
                                     ),
                                     label: const Text(
-                                      'Convert to String',
+                                      'Convert to LanguageConditions',
                                       style: TextStyle(fontSize: 12),
                                     ),
                                     style: OutlinedButton.styleFrom(
@@ -1402,38 +1381,198 @@ class _LanguageImproverState extends State<LanguageImprover> {
                                     ),
                                   ),
                                 ],
-                              ),
-                            )
-                          else
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.amber[50],
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${_targetLanguage?.name ?? 'Target'}:',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.amber[900],
+                              )
+                            else if (targetValue is LanguageConditions)
+                              InkWell(
+                                onTap: () =>
+                                    _editLanguageCondition(key, targetValue),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Target LanguageConditions
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue[50],
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: Colors.blue[200]!,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                '${_targetLanguage?.name ?? 'Target'}:',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.blue[900],
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              const Icon(
+                                                Icons.edit,
+                                                size: 16,
+                                                color: Colors.blue,
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Param: ${targetValue.param}',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.blue[800],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          ...targetValue.conditions.entries.map((
+                                            e,
+                                          ) {
+                                            final isDefault =
+                                                e.key == '_' ||
+                                                e.key == 'default';
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                bottom: 6,
+                                              ),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: isDefault
+                                                          ? Colors.blue[200]
+                                                          : Colors.blue[100],
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            4,
+                                                          ),
+                                                      border: Border.all(
+                                                        color: isDefault
+                                                            ? Colors.blue[400]!
+                                                            : Colors.blue[300]!,
+                                                        width: 1,
+                                                      ),
+                                                    ),
+                                                    child: Text(
+                                                      e.key,
+                                                      style: TextStyle(
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: isDefault
+                                                            ? Colors.blue[900]
+                                                            : Colors.blue[800],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Expanded(
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            8,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              4,
+                                                            ),
+                                                        border: Border.all(
+                                                          color:
+                                                              Colors.blue[200]!,
+                                                        ),
+                                                      ),
+                                                      child: _ExpandableText(
+                                                        text: e.value
+                                                            .toString(),
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                        maxLines: 2,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    targetValue?.toString() ?? 'null',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.amber[800],
+
+                                    const SizedBox(height: 8),
+                                    OutlinedButton.icon(
+                                      onPressed: () =>
+                                          _convertLanguageConditionToString(
+                                            key,
+                                            targetValue,
+                                          ),
+                                      icon: const Icon(
+                                        Icons.auto_awesome,
+                                        size: 16,
+                                      ),
+                                      label: const Text(
+                                        'Convert to String',
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                      style: OutlinedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 12,
+                                        ),
+                                        minimumSize: Size.zero,
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                              )
+                            else
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.amber[50],
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${_targetLanguage?.name ?? 'Target'}:',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.amber[900],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      targetValue?.toString() ?? 'null',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.amber[800],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   );
