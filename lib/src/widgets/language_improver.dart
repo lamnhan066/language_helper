@@ -93,10 +93,8 @@ class _LanguageImproverState extends State<LanguageImprover>
   AnimationController? _flashAnimationController;
   Animation<double>? _flashAnimation;
   String? _flashingKey;
-  Timer? _flashTimeoutTimer;
   int _flashRepeatCount = 0;
   static const int _maxFlashRepeats = 10;
-  static const Duration _flashTimeout = Duration(seconds: 10);
 
   @override
   void initState() {
@@ -464,16 +462,6 @@ class _LanguageImproverState extends State<LanguageImprover>
       _flashRepeatCount = 0;
     });
 
-    // Cancel any existing timeout timer
-    _flashTimeoutTimer?.cancel();
-
-    // Set timeout to stop flashing after duration
-    _flashTimeoutTimer = Timer(_flashTimeout, () {
-      if (mounted && _flashingKey == key) {
-        _stopFlashAnimation();
-      }
-    });
-
     // Start the first flash
     _flashAnimationController?.reset();
     _flashAnimationController?.forward();
@@ -499,8 +487,6 @@ class _LanguageImproverState extends State<LanguageImprover>
   void _stopFlashAnimation() {
     if (!mounted) return;
 
-    _flashTimeoutTimer?.cancel();
-    _flashTimeoutTimer = null;
     _flashAnimationController?.stop();
     _flashAnimationController?.reset();
 
