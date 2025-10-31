@@ -10,3 +10,4 @@ export 'src/language_helper.dart';
 export 'src/models/language_conditions.dart';
 export 'src/models/language_data_provider.dart';
 export 'src/models/language_data_type.dart';
+export 'src/widgets/language_improver.dart';
