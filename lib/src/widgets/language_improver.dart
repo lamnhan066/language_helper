@@ -970,6 +970,7 @@ class _LanguageImproverState extends State<LanguageImprover>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Language Improver'),
+        automaticallyImplyLeading: false,
         elevation: 0,
         scrolledUnderElevation: 2,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
