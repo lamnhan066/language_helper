@@ -36,14 +36,6 @@ class LanguageImprover extends StatefulWidget {
   /// Callback called when the user cancels editing.
   final VoidCallback? onCancel;
 
-  /// Whether to show the save button.
-  /// Defaults to true.
-  final bool showSaveButton;
-
-  /// Whether to show the cancel button.
-  /// Defaults to true.
-  final bool showCancelButton;
-
   /// Initial default language code.
   /// If not provided, uses the first available language.
   final LanguageCodes? initialDefaultLanguage;
@@ -70,8 +62,6 @@ class LanguageImprover extends StatefulWidget {
     this.languageHelper,
     this.onTranslationsUpdated,
     this.onCancel,
-    this.showSaveButton = true,
-    this.showCancelButton = true,
     this.initialDefaultLanguage,
     this.initialTargetLanguage,
     this.scrollToKey,
@@ -1796,53 +1786,50 @@ class _LanguageImproverState extends State<LanguageImprover>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            if (widget.showCancelButton)
-              OutlinedButton.icon(
-                onPressed: _cancelEditing,
-                icon: const Icon(Icons.close, size: 20),
-                label: const Text(
-                  'Cancel',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 14,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  side: BorderSide(
-                    color: Theme.of(context).colorScheme.outline,
-                    width: 1.5,
-                  ),
-                  foregroundColor: Theme.of(context).colorScheme.outline,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                ),
+            OutlinedButton.icon(
+              onPressed: _cancelEditing,
+              icon: const Icon(Icons.close, size: 20),
+              label: const Text(
+                'Cancel',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
-            if (widget.showCancelButton && widget.showSaveButton)
-              const SizedBox(width: 12),
-            if (widget.showSaveButton)
-              ElevatedButton.icon(
-                onPressed: _saveTranslations,
-                icon: const Icon(Icons.save, size: 20),
-                label: const Text(
-                  'Save',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 14,
                 ),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 14,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outline,
+                  width: 1.5,
+                ),
+                foregroundColor: Theme.of(context).colorScheme.outline,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               ),
+            ),
+            const SizedBox(width: 12),
+            ElevatedButton.icon(
+              onPressed: _saveTranslations,
+              icon: const Icon(Icons.save, size: 20),
+              label: const Text(
+                'Save',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                elevation: 2,
+              ),
+            ),
           ],
         ),
       ),
