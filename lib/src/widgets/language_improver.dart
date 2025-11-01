@@ -948,7 +948,21 @@ class _LanguageImproverState extends State<LanguageImprover>
   Widget build(BuildContext context) {
     if (_helper.codes.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Language Improver')),
+        appBar: AppBar(
+          title: const Text('Language Improver'),
+          elevation: 0,
+          scrolledUnderElevation: 2,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.black.withValues(alpha: 0.08),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(12),
+              bottomRight: Radius.circular(12),
+            ),
+          ),
+        ),
         body: const Center(child: Text('No languages available')),
       );
     }
@@ -956,116 +970,182 @@ class _LanguageImproverState extends State<LanguageImprover>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Language Improver'),
+        elevation: 0,
+        scrolledUnderElevation: 2,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.black.withValues(alpha: 0.08),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(12),
+            bottomRight: Radius.circular(12),
+          ),
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(120),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButtonFormField<LanguageCodes>(
-                        initialValue: _defaultLanguage,
-                        decoration: const InputDecoration(
-                          labelText: 'Default Language',
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<LanguageCodes>(
+                          initialValue: _defaultLanguage,
+                          decoration: InputDecoration(
+                            labelText: 'Default Language',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Theme.of(context).dividerColor,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                           ),
-                        ),
-                        items: _helper.codes.map((code) {
-                          return DropdownMenuItem(
-                            value: code,
-                            child: Text(code.name),
-                          );
-                        }).toList(),
-                        onChanged: (value) async {
-                          if (value != null && value != _targetLanguage) {
-                            // Ensure data is loaded for the default language
-                            if (!_helper.data.containsKey(value)) {
-                              final currentCode = _helper.code;
-                              // Load data for the default language
-                              await _helper.change(value);
-                              // Restore original language if it was different
-                              if (currentCode != value) {
-                                await _helper.change(currentCode);
+                          items: _helper.codes.map((code) {
+                            return DropdownMenuItem(
+                              value: code,
+                              child: Text(code.name),
+                            );
+                          }).toList(),
+                          onChanged: (value) async {
+                            if (value != null && value != _targetLanguage) {
+                              // Ensure data is loaded for the default language
+                              if (!_helper.data.containsKey(value)) {
+                                final currentCode = _helper.code;
+                                // Load data for the default language
+                                await _helper.change(value);
+                                // Restore original language if it was different
+                                if (currentCode != value) {
+                                  await _helper.change(currentCode);
+                                }
                               }
+                              setState(() {
+                                _defaultLanguage = value;
+                              });
                             }
-                            setState(() {
-                              _defaultLanguage = value;
-                            });
-                          }
-                        },
+                          },
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: DropdownButtonFormField<LanguageCodes>(
-                        initialValue: _targetLanguage,
-                        decoration: const InputDecoration(
-                          labelText: 'Target Language',
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DropdownButtonFormField<LanguageCodes>(
+                          initialValue: _targetLanguage,
+                          decoration: InputDecoration(
+                            labelText: 'Target Language',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Theme.of(context).dividerColor,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                           ),
-                        ),
-                        items: _helper.codes
-                            .where((code) => code != _defaultLanguage)
-                            .map((code) {
-                              return DropdownMenuItem(
-                                value: code,
-                                child: Text(code.name),
-                              );
-                            })
-                            .toList(),
-                        onChanged: (value) async {
-                          if (value != null) {
-                            // Ensure data is loaded for the target language
-                            if (!_helper.data.containsKey(value)) {
-                              final currentCode = _helper.code;
-                              // Load data for the target language
-                              await _helper.change(value);
-                              // Restore original language if it was different
-                              if (currentCode != value) {
-                                await _helper.change(currentCode);
+                          items: _helper.codes
+                              .where((code) => code != _defaultLanguage)
+                              .map((code) {
+                                return DropdownMenuItem(
+                                  value: code,
+                                  child: Text(code.name),
+                                );
+                              })
+                              .toList(),
+                          onChanged: (value) async {
+                            if (value != null) {
+                              // Ensure data is loaded for the target language
+                              if (!_helper.data.containsKey(value)) {
+                                final currentCode = _helper.code;
+                                // Load data for the target language
+                                await _helper.change(value);
+                                // Restore original language if it was different
+                                if (currentCode != value) {
+                                  await _helper.change(currentCode);
+                                }
                               }
+                              setState(() {
+                                _targetLanguage = value;
+                                _initializeControllers();
+                              });
                             }
-                            setState(() {
-                              _targetLanguage = value;
-                              _initializeControllers();
-                            });
-                          }
-                        },
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search translations...',
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                            },
-                          )
-                        : null,
-                    border: const OutlineInputBorder(),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search translations...',
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                _searchController.clear();
+                              },
+                            )
+                          : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Theme.of(context).dividerColor,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
