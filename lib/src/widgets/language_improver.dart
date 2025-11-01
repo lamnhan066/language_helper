@@ -638,7 +638,7 @@ class _LanguageImproverState extends State<LanguageImprover>
             }
           },
           child: AlertDialog(
-            title: const Text('Convert to LanguageConditions'),
+            title: const Text('Convert to Condition'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -764,7 +764,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text(
-                              'Converted to LanguageConditions successfully',
+                              'Converted to Condition successfully',
                             ),
                             duration: Duration(seconds: 2),
                           ),
@@ -930,7 +930,7 @@ class _LanguageImproverState extends State<LanguageImprover>
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('LanguageConditions updated'),
+              content: Text('Condition updated'),
               duration: Duration(seconds: 2),
             ),
           );
@@ -1311,7 +1311,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '${_defaultLanguage?.name ?? 'Default'} (LanguageConditions):',
+                                            '${_defaultLanguage?.name ?? 'Default'} (with Condition):',
                                             style: TextStyle(
                                               fontSize: 11,
                                               fontWeight: FontWeight.bold,
@@ -1442,7 +1442,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                       size: 16,
                                     ),
                                     label: const Text(
-                                      'Convert to LanguageConditions',
+                                      'Convert to Condition',
                                       style: TextStyle(fontSize: 12),
                                     ),
                                     style: OutlinedButton.styleFrom(
@@ -1920,7 +1920,7 @@ class _LanguageConditionEditorDialogState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Edit LanguageConditions',
+                          'Edit Condition',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -2176,7 +2176,7 @@ class _LanguageConditionEditorDialogState
                                       color: Colors.red,
                                       onPressed: () =>
                                           _removeCondition(conditionKey),
-                                      tooltip: 'Remove condition',
+                                      tooltip: 'Remove Condition',
                                     ),
                                   ],
                                 ),
