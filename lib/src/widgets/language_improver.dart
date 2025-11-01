@@ -1339,9 +1339,11 @@ class _LanguageImproverState extends State<LanguageImprover>
                                               ),
                                               child: Row(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.center,
                                                 children: [
                                                   Container(
+                                                    width: 30,
+                                                    height: 30,
                                                     padding:
                                                         const EdgeInsets.symmetric(
                                                           horizontal: 8,
@@ -1349,22 +1351,26 @@ class _LanguageImproverState extends State<LanguageImprover>
                                                         ),
                                                     decoration: BoxDecoration(
                                                       color: isDefault
-                                                          ? Colors.amber[100]
-                                                          : Colors.grey[200],
+                                                          ? Colors.orange[200]
+                                                          : Colors.orange[100],
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             4,
                                                           ),
                                                     ),
-                                                    child: Text(
-                                                      e.key,
-                                                      style: TextStyle(
-                                                        fontSize: 11,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: isDefault
-                                                            ? Colors.amber[900]
-                                                            : Colors.grey[800],
+                                                    child: Center(
+                                                      child: Text(
+                                                        e.key,
+                                                        style: TextStyle(
+                                                          fontSize: 11,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: isDefault
+                                                              ? Colors
+                                                                    .orange[900]
+                                                              : Colors
+                                                                    .orange[800],
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -1518,9 +1524,11 @@ class _LanguageImproverState extends State<LanguageImprover>
                                               ),
                                               child: Row(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.center,
                                                 children: [
                                                   Container(
+                                                    width: 30,
+                                                    height: 30,
                                                     padding:
                                                         const EdgeInsets.symmetric(
                                                           horizontal: 8,
@@ -1541,15 +1549,18 @@ class _LanguageImproverState extends State<LanguageImprover>
                                                         width: 1,
                                                       ),
                                                     ),
-                                                    child: Text(
-                                                      e.key,
-                                                      style: TextStyle(
-                                                        fontSize: 11,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: isDefault
-                                                            ? Colors.blue[900]
-                                                            : Colors.blue[800],
+                                                    child: Center(
+                                                      child: Text(
+                                                        e.key,
+                                                        style: TextStyle(
+                                                          fontSize: 11,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: isDefault
+                                                              ? Colors.blue[900]
+                                                              : Colors
+                                                                    .blue[800],
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -2011,27 +2022,31 @@ class _LanguageConditionEditorDialogState
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 6),
                                 child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Container(
+                                      width: 40,
+                                      height: 40,
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 8,
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
                                         color: isDefault
-                                            ? Colors.amber[100]
+                                            ? Colors.orange[100]
                                             : Colors.grey[200],
                                         borderRadius: BorderRadius.circular(4),
                                       ),
-                                      child: Text(
-                                        e.key,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 11,
-                                          color: isDefault
-                                              ? Colors.amber[900]
-                                              : Colors.grey[900],
+                                      child: Center(
+                                        child: Text(
+                                          e.key,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 11,
+                                            color: isDefault
+                                                ? Colors.orange[900]
+                                                : Colors.grey[900],
+                                          ),
                                         ),
                                       ),
                                     ),
