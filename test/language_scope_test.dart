@@ -478,5 +478,418 @@ void main() {
       helper1.dispose();
       helper2.dispose();
     });
+
+    testWidgets('updateShouldNotify returns true when helper changes', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper1 = LanguageHelper('Helper1');
+      final helper2 = LanguageHelper('Helper2');
+      await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
+      await helper2.initial(data: dataList, initialCode: LanguageCodes.vi);
+
+      final scope1 = LanguageScope(
+        languageHelper: helper1,
+        child: const SizedBox(),
+      );
+      final scope2 = LanguageScope(
+        languageHelper: helper2,
+        child: const SizedBox(),
+      );
+
+      // updateShouldNotify should return true when helpers are different
+      expect(scope1.updateShouldNotify(scope2), isTrue);
+
+      helper1.dispose();
+      helper2.dispose();
+    });
+
+    testWidgets('updateShouldNotify returns false when helper is same', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper = LanguageHelper('Helper');
+      await helper.initial(data: dataList, initialCode: LanguageCodes.en);
+
+      final scope1 = LanguageScope(
+        languageHelper: helper,
+        child: const SizedBox(),
+      );
+      final scope2 = LanguageScope(
+        languageHelper: helper,
+        child: const SizedBox(),
+      );
+
+      // updateShouldNotify should return false when helpers are the same instance
+      expect(scope1.updateShouldNotify(scope2), isFalse);
+
+      helper.dispose();
+    });
+
+    testWidgets('updateShouldNotify triggers rebuild when helper changes', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper1 = LanguageHelper('Helper1');
+      final helper2 = LanguageHelper('Helper2');
+      await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
+      await helper2.initial(data: dataList, initialCode: LanguageCodes.vi);
+
+      int buildCount = 0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageScope(
+              languageHelper: helper1,
+              child: LanguageBuilder(
+                builder: (context) {
+                  buildCount++;
+                  final helper = LanguageScope.of(context);
+                  return Text(helper == helper1 ? 'Hello' : 'Xin Chào');
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(buildCount, greaterThan(0));
+      expect(find.text('Hello'), findsOneWidget);
+
+      // Update with different helper - should trigger rebuild
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageScope(
+              languageHelper: helper2, // Different helper
+              child: LanguageBuilder(
+                builder: (context) {
+                  buildCount++;
+                  final helper = LanguageScope.of(context);
+                  return Text(helper == helper1 ? 'Hello' : 'Xin Chào');
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Should have rebuilt and show Vietnamese text
+      expect(find.text('Xin Chào'), findsOneWidget);
+      expect(buildCount, greaterThan(1)); // Should have rebuilt
+
+      helper1.dispose();
+      helper2.dispose();
+    });
+
+    testWidgets('updateShouldNotify does not trigger rebuild when helper is same', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper = LanguageHelper('Helper');
+      await helper.initial(data: dataList, initialCode: LanguageCodes.en);
+
+      final oldScope = LanguageScope(
+        languageHelper: helper,
+        child: const SizedBox(),
+      );
+      final newScope = LanguageScope(
+        languageHelper: helper, // Same helper instance
+        child: const SizedBox(),
+      );
+
+      // updateShouldNotify should return false for same helper instance
+      expect(newScope.updateShouldNotify(oldScope), isFalse);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageScope(
+              languageHelper: helper,
+              child: LanguageBuilder(
+                builder: (context) {
+                  return Text('Hello'.tr);
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Hello'), findsOneWidget);
+
+      // Update with same helper instance - updateShouldNotify returns false
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageScope(
+              languageHelper: helper, // Same helper instance
+              child: LanguageBuilder(
+                builder: (context) {
+                  return Text('Hello'.tr);
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Widget should still render correctly
+      expect(find.text('Hello'), findsOneWidget);
+
+      helper.dispose();
+    });
+
+    testWidgets('maybeOf returns null in deeply nested structure without scope', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final languageHelper = LanguageHelper.instance;
+      await languageHelper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+      );
+
+      LanguageHelper? retrievedHelper;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                return Column(
+                  children: [
+                    Builder(
+                      builder: (innerContext) {
+                        return Builder(
+                          builder: (deepContext) {
+                            retrievedHelper =
+                                LanguageScope.maybeOf(deepContext);
+                            return const SizedBox();
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(retrievedHelper, isNull);
+    });
+
+    testWidgets('maybeOf finds scoped helper in deeply nested structure', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final scopedHelper = LanguageHelper('DeepScopedHelper');
+      await scopedHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+
+      LanguageHelper? retrievedHelper;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageScope(
+              languageHelper: scopedHelper,
+              child: Builder(
+                builder: (context) {
+                  return Column(
+                    children: [
+                      Builder(
+                        builder: (innerContext) {
+                          return Builder(
+                            builder: (deepContext) {
+                              retrievedHelper =
+                                  LanguageScope.maybeOf(deepContext);
+                              return const SizedBox();
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(retrievedHelper, equals(scopedHelper));
+
+      scopedHelper.dispose();
+    });
+
+    testWidgets('of finds scoped helper in deeply nested structure', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final scopedHelper = LanguageHelper('DeepScopedHelper');
+      await scopedHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+
+      LanguageHelper? retrievedHelper;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageScope(
+              languageHelper: scopedHelper,
+              child: Builder(
+                builder: (context) {
+                  return Column(
+                    children: [
+                      Builder(
+                        builder: (innerContext) {
+                          return Builder(
+                            builder: (deepContext) {
+                              retrievedHelper = LanguageScope.of(deepContext);
+                              return const SizedBox();
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(retrievedHelper, equals(scopedHelper));
+
+      scopedHelper.dispose();
+    });
+
+    testWidgets('of falls back to instance in deeply nested structure without scope', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final languageHelper = LanguageHelper.instance;
+      await languageHelper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+      );
+
+      LanguageHelper? retrievedHelper;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                return Column(
+                  children: [
+                    Builder(
+                      builder: (innerContext) {
+                        return Builder(
+                          builder: (deepContext) {
+                            retrievedHelper = LanguageScope.of(deepContext);
+                            return const SizedBox();
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(retrievedHelper, equals(LanguageHelper.instance));
+    });
+
+    testWidgets('LanguageScope with same helper instance does not notify', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper = LanguageHelper('SameHelper');
+      await helper.initial(data: dataList, initialCode: LanguageCodes.en);
+
+      final oldScope = LanguageScope(
+        languageHelper: helper,
+        child: const SizedBox(),
+      );
+      final newScope = LanguageScope(
+        languageHelper: helper,
+        child: const SizedBox(),
+      );
+
+      // Same instance should not notify
+      expect(newScope.updateShouldNotify(oldScope), isFalse);
+
+      helper.dispose();
+    });
+
+    testWidgets(
+      'Nested maybeOf returns child scope, not parent scope',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+
+        final parentHelper = LanguageHelper('ParentHelper');
+        final childHelper = LanguageHelper('ChildHelper');
+        await parentHelper.initial(data: dataList, initialCode: LanguageCodes.en);
+        await childHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+
+        LanguageHelper? parentRetrieved;
+        LanguageHelper? childRetrieved;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: LanguageScope(
+                languageHelper: parentHelper,
+                child: Builder(
+                  builder: (parentContext) {
+                    parentRetrieved = LanguageScope.maybeOf(parentContext);
+                    return LanguageScope(
+                      languageHelper: childHelper,
+                      child: Builder(
+                        builder: (childContext) {
+                          childRetrieved = LanguageScope.maybeOf(childContext);
+                          return const SizedBox();
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(parentRetrieved, equals(parentHelper));
+        expect(childRetrieved, equals(childHelper));
+
+        parentHelper.dispose();
+        childHelper.dispose();
+      },
+    );
   });
 }
