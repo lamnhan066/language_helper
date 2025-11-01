@@ -61,6 +61,10 @@ class LanguageImprover extends StatefulWidget {
   /// Defaults to true.
   final bool autoSearchOnScroll;
 
+  /// Whether to show the translation key. If false, only shows default and target translations.
+  /// Defaults to true.
+  final bool showKey;
+
   const LanguageImprover({
     super.key,
     this.languageHelper,
@@ -72,6 +76,7 @@ class LanguageImprover extends StatefulWidget {
     this.initialTargetLanguage,
     this.scrollToKey,
     this.autoSearchOnScroll = true,
+    this.showKey = true,
   });
 
   @override
@@ -1155,68 +1160,70 @@ class _LanguageImproverState extends State<LanguageImprover>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Translation key
-                            Builder(
-                              builder: (context) {
-                                final theme = Theme.of(context);
-                                final colorScheme = theme.colorScheme;
-                                final isDark =
-                                    colorScheme.brightness == Brightness.dark;
+                            // Translation key - only show if showKey is true
+                            if (widget.showKey) ...[
+                              Builder(
+                                builder: (context) {
+                                  final theme = Theme.of(context);
+                                  final colorScheme = theme.colorScheme;
+                                  final isDark =
+                                      colorScheme.brightness == Brightness.dark;
 
-                                // Use a distinctive blue tint for the key container
-                                // Complements the blue flash animation
-                                final keyBgColor = isDark
-                                    ? Colors.blue.withValues(alpha: 0.15)
-                                    : Colors.blue.withValues(alpha: 0.08);
-                                final keyTextColor = isDark
-                                    ? Colors.blue.shade200
-                                    : Colors.blue.shade700;
-                                final keyBorderColor = isDark
-                                    ? Colors.blue.withValues(alpha: 0.3)
-                                    : Colors.blue.withValues(alpha: 0.2);
+                                  // Use a distinctive blue tint for the key container
+                                  // Complements the blue flash animation
+                                  final keyBgColor = isDark
+                                      ? Colors.blue.withValues(alpha: 0.15)
+                                      : Colors.blue.withValues(alpha: 0.08);
+                                  final keyTextColor = isDark
+                                      ? Colors.blue.shade200
+                                      : Colors.blue.shade700;
+                                  final keyBorderColor = isDark
+                                      ? Colors.blue.withValues(alpha: 0.3)
+                                      : Colors.blue.withValues(alpha: 0.2);
 
-                                return Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: keyBgColor,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: keyBorderColor),
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Key:',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: keyTextColor,
+                                  return Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: keyBgColor,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: keyBorderColor),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Key:',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: keyTextColor,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        key,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: keyTextColor,
-                                          fontWeight: FontWeight.w500,
-                                          fontFamily: 'monospace',
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          key,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: keyTextColor,
+                                            fontWeight: FontWeight.w500,
+                                            fontFamily: 'monospace',
+                                          ),
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 12),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                            ],
 
                             // Default language translation
                             if (targetValue is String)
