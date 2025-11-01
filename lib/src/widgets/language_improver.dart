@@ -1418,53 +1418,94 @@ class _LanguageImproverState extends State<LanguageImprover>
 
                             // Target language translation (editable)
                             if (targetValue is String)
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextField(
-                                    controller: _controllers[key],
-                                    decoration: InputDecoration(
-                                      labelText:
+                              Builder(
+                                builder: (context) {
+                                  final theme = Theme.of(context);
+                                  final colorScheme = theme.colorScheme;
+                                  final isDark =
+                                      colorScheme.brightness == Brightness.dark;
+
+                                  // Use a warm amber/orange tint for default translations
+                                  // Creates nice contrast with blue flash
+                                  final defaultBgColor = isDark
+                                      ? Colors.blue.withValues(alpha: 0.15)
+                                      : Colors.blue.withValues(alpha: 0.08);
+                                  final defaultTextColor = isDark
+                                      ? Colors.blue.shade200
+                                      : Colors.blue.shade800;
+                                  final defaultBorderColor = isDark
+                                      ? Colors.blue.withValues(alpha: 0.3)
+                                      : Colors.blue.withValues(alpha: 0.2);
+                                  return Container(
+                                    padding: const EdgeInsets.all(8),
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    decoration: BoxDecoration(
+                                      color: defaultBgColor,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: defaultBorderColor,
+                                      ),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
                                           '${_targetLanguage?.name ?? 'Target'}:',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 8,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: defaultTextColor,
                                           ),
-                                    ),
-                                    style: const TextStyle(fontSize: 14),
-                                    maxLines: null,
-                                    minLines: 1,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  OutlinedButton.icon(
-                                    onPressed: () =>
-                                        _convertStringToLanguageCondition(
-                                          key,
-                                          targetValue,
                                         ),
-                                    icon: const Icon(
-                                      Icons.auto_awesome,
-                                      size: 16,
+                                        const SizedBox(height: 4),
+                                        TextField(
+                                          controller: _controllers[key],
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            isDense: true,
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                  horizontal: 6,
+                                                  vertical: 12,
+                                                ),
+                                          ),
+                                          style: const TextStyle(fontSize: 14),
+                                          maxLines: null,
+                                          minLines: 1,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        OutlinedButton.icon(
+                                          onPressed: () =>
+                                              _convertStringToLanguageCondition(
+                                                key,
+                                                targetValue,
+                                              ),
+                                          icon: const Icon(
+                                            Icons.auto_awesome,
+                                            size: 16,
+                                          ),
+                                          label: const Text(
+                                            'Convert to Condition',
+                                            style: TextStyle(fontSize: 12),
+                                          ),
+                                          style: OutlinedButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 12,
+                                            ),
+                                            minimumSize: Size.zero,
+                                            tapTargetSize: MaterialTapTargetSize
+                                                .shrinkWrap,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    label: const Text(
-                                      'Convert to Condition',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                    style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 12,
-                                      ),
-                                      minimumSize: Size.zero,
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                    ),
-                                  ),
-                                ],
+                                  );
+                                },
                               )
                             else if (targetValue is LanguageConditions)
                               InkWell(
