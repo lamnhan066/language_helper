@@ -1183,7 +1183,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                   ),
                                   decoration: BoxDecoration(
                                     color: keyBgColor,
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius: BorderRadius.circular(8),
                                     border: Border.all(color: keyBorderColor),
                                   ),
                                   child: Column(
@@ -1244,7 +1244,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                     width: double.infinity,
                                     decoration: BoxDecoration(
                                       color: defaultBgColor,
-                                      borderRadius: BorderRadius.circular(4),
+                                      borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
                                         color: defaultBorderColor,
                                       ),
@@ -1301,7 +1301,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                       margin: const EdgeInsets.only(bottom: 8),
                                       decoration: BoxDecoration(
                                         color: defaultBgColor,
-                                        borderRadius: BorderRadius.circular(4),
+                                        borderRadius: BorderRadius.circular(8),
                                         border: Border.all(
                                           color: defaultBorderColor,
                                         ),
@@ -1355,7 +1355,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                                           : Colors.orange[100],
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                            4,
+                                                            8,
                                                           ),
                                                     ),
                                                     child: Center(
@@ -1385,7 +1385,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                                         color: Colors.white,
                                                         borderRadius:
                                                             BorderRadius.circular(
-                                                              4,
+                                                              8,
                                                             ),
                                                         border: Border.all(
                                                           color:
@@ -1426,7 +1426,9 @@ class _LanguageImproverState extends State<LanguageImprover>
                                     decoration: InputDecoration(
                                       labelText:
                                           '${_targetLanguage?.name ?? 'Target'}:',
-                                      border: const OutlineInputBorder(),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
                                       contentPadding:
                                           const EdgeInsets.symmetric(
                                             horizontal: 12,
@@ -1475,7 +1477,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
                                         color: Colors.blue[50],
-                                        borderRadius: BorderRadius.circular(4),
+                                        borderRadius: BorderRadius.circular(8),
                                         border: Border.all(
                                           color: Colors.blue[200]!,
                                         ),
@@ -1540,14 +1542,8 @@ class _LanguageImproverState extends State<LanguageImprover>
                                                           : Colors.blue[100],
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                            4,
+                                                            8,
                                                           ),
-                                                      border: Border.all(
-                                                        color: isDefault
-                                                            ? Colors.blue[400]!
-                                                            : Colors.blue[300]!,
-                                                        width: 1,
-                                                      ),
                                                     ),
                                                     child: Center(
                                                       child: Text(
@@ -1575,7 +1571,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                                         color: Colors.white,
                                                         borderRadius:
                                                             BorderRadius.circular(
-                                                              4,
+                                                              8,
                                                             ),
                                                         border: Border.all(
                                                           color:
@@ -1633,7 +1629,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   color: Colors.amber[50],
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -2035,7 +2031,7 @@ class _LanguageConditionEditorDialogState
                                         color: isDefault
                                             ? Colors.orange[100]
                                             : Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(4),
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Center(
                                         child: Text(
@@ -2057,7 +2053,7 @@ class _LanguageConditionEditorDialogState
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                           borderRadius: BorderRadius.circular(
-                                            4,
+                                            8,
                                           ),
                                           border: Border.all(
                                             color: Colors.grey[300]!,
@@ -2149,7 +2145,7 @@ class _LanguageConditionEditorDialogState
                                         color: isDefault
                                             ? Colors.blue[100]
                                             : Colors.green[100],
-                                        borderRadius: BorderRadius.circular(4),
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
                                         conditionKey,
@@ -2172,7 +2168,7 @@ class _LanguageConditionEditorDialogState
                                         decoration: BoxDecoration(
                                           color: Colors.blue[200],
                                           borderRadius: BorderRadius.circular(
-                                            4,
+                                            8,
                                           ),
                                         ),
                                         child: const Text(
@@ -2318,7 +2314,7 @@ class _ExpandableTextState extends State<_ExpandableText> {
                   ),
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     '$textLength chars',
