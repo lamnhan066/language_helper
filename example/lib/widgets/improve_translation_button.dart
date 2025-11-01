@@ -46,6 +46,7 @@ class ImproveTranslationButton extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => LanguageImprover(
                 languageHelper: helper,
+                showKey: false,
                 scrollToKey: translationKey,
                 onTranslationsUpdated: (updatedTranslations) async {
                   // Apply the updated translations to LanguageHelper
