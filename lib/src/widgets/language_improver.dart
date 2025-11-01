@@ -1790,27 +1790,60 @@ class _LanguageImproverState extends State<LanguageImprover>
                 },
               ),
             ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          if (widget.showCancelButton)
-            FloatingActionButton.extended(
-              onPressed: _cancelEditing,
-              heroTag: 'cancel',
-              backgroundColor: Colors.grey,
-              icon: const Icon(Icons.cancel),
-              label: const Text('Cancel'),
-            ),
-          if (widget.showCancelButton && widget.showSaveButton)
-            const SizedBox(width: 8),
-          if (widget.showSaveButton)
-            FloatingActionButton.extended(
-              onPressed: _saveTranslations,
-              heroTag: 'save',
-              icon: const Icon(Icons.save),
-              label: const Text('Save'),
-            ),
-        ],
+      floatingActionButton: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (widget.showCancelButton)
+              OutlinedButton.icon(
+                onPressed: _cancelEditing,
+                icon: const Icon(Icons.close, size: 20),
+                label: const Text(
+                  'Cancel',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.outline,
+                    width: 1.5,
+                  ),
+                  foregroundColor: Theme.of(context).colorScheme.outline,
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                ),
+              ),
+            if (widget.showCancelButton && widget.showSaveButton)
+              const SizedBox(width: 12),
+            if (widget.showSaveButton)
+              ElevatedButton.icon(
+                onPressed: _saveTranslations,
+                icon: const Icon(Icons.save, size: 20),
+                label: const Text(
+                  'Save',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  elevation: 2,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
