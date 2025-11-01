@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:language_code/language_code.dart';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper/src/utils/print_debug.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,8 +46,9 @@ void main() {
       scopedHelper.dispose();
     });
 
-    testWidgets('LanguageScope.of falls back to instance when no scope',
-        (tester) async {
+    testWidgets('LanguageScope.of falls back to instance when no scope', (
+      tester,
+    ) async {
       SharedPreferences.setMockInitialValues({});
 
       final languageHelper = LanguageHelper.instance;
@@ -108,8 +108,9 @@ void main() {
       scopedHelper.dispose();
     });
 
-    testWidgets('LanguageScope.maybeOf returns null when no scope',
-        (tester) async {
+    testWidgets('LanguageScope.maybeOf returns null when no scope', (
+      tester,
+    ) async {
       SharedPreferences.setMockInitialValues({});
 
       final languageHelper = LanguageHelper.instance;
@@ -138,8 +139,9 @@ void main() {
       expect(find.text('Hello'), findsOneWidget);
     });
 
-    testWidgets('Nested LanguageScope - child overrides parent',
-        (tester) async {
+    testWidgets('Nested LanguageScope - child overrides parent', (
+      tester,
+    ) async {
       SharedPreferences.setMockInitialValues({});
 
       final parentHelper = LanguageHelper('ParentHelper');
@@ -194,9 +196,7 @@ void main() {
           home: Scaffold(
             body: LanguageScope(
               languageHelper: scopedHelper,
-              child: LanguageBuilder(
-                builder: (_) => Text('Hello'.tr),
-              ),
+              child: LanguageBuilder(builder: (_) => Text('Hello'.tr)),
             ),
           ),
         ),
@@ -218,41 +218,45 @@ void main() {
     });
 
     testWidgets(
-        'LanguageBuilder priority: explicit > LanguageScope > instance',
-        (tester) async {
-      SharedPreferences.setMockInitialValues({});
+      'LanguageBuilder priority: explicit > LanguageScope > instance',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
 
-      final explicitHelper = LanguageHelper('ExplicitHelper');
-      final scopedHelper = LanguageHelper('ScopedHelper');
-      await explicitHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.en,
-      );
-      await scopedHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+        final explicitHelper = LanguageHelper('ExplicitHelper');
+        final scopedHelper = LanguageHelper('ScopedHelper');
+        await explicitHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.en,
+        );
+        await scopedHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+        );
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: LanguageScope(
-              languageHelper: scopedHelper,
-              child: LanguageBuilder(
-                // Explicit helper should take priority over scope
-                languageHelper: explicitHelper,
-                builder: (_) => Text('Hello'.tr),
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: LanguageScope(
+                languageHelper: scopedHelper,
+                child: LanguageBuilder(
+                  // Explicit helper should take priority over scope
+                  languageHelper: explicitHelper,
+                  builder: (_) => Text('Hello'.tr),
+                ),
               ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      // Should use explicit helper (English)
-      expect(find.text('Hello'), findsOneWidget);
-      expect(find.text('Xin Chào'), findsNothing);
+        // Should use explicit helper (English)
+        expect(find.text('Hello'), findsOneWidget);
+        expect(find.text('Xin Chào'), findsNothing);
 
-      explicitHelper.dispose();
-      scopedHelper.dispose();
-    });
+        explicitHelper.dispose();
+        scopedHelper.dispose();
+      },
+    );
 
     testWidgets('Tr widget inherits from LanguageScope', (tester) async {
       SharedPreferences.setMockInitialValues({});
@@ -279,43 +283,49 @@ void main() {
       scopedHelper.dispose();
     });
 
-    testWidgets('Extension methods tr, trP use scoped helper in LanguageBuilder',
-        (tester) async {
-      SharedPreferences.setMockInitialValues({});
+    testWidgets(
+      'Extension methods tr, trP use scoped helper in LanguageBuilder',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
 
-      final scopedHelper = LanguageHelper('ScopedHelper');
-      await scopedHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+        final scopedHelper = LanguageHelper('ScopedHelper');
+        await scopedHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+        );
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: LanguageScope(
-              languageHelper: scopedHelper,
-              child: LanguageBuilder(
-                builder: (_) => Column(
-                  children: [
-                    Text('Hello'.tr),
-                    Text('You have @number dollars'.trP({'number': 100})),
-                  ],
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: LanguageScope(
+                languageHelper: scopedHelper,
+                child: LanguageBuilder(
+                  builder: (_) => Column(
+                    children: [
+                      Text('Hello'.tr),
+                      Text('You have @number dollars'.trP({'number': 100})),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      // Should use scoped helper (Vietnamese)
-      expect(find.text('Xin Chào'), findsOneWidget);
-      expect(find.text('Bạn có 100 đô-la'), findsOneWidget);
-      expect(find.text('Hello'), findsNothing);
-      expect(find.text('You have 100 dollars'), findsNothing);
+        // Should use scoped helper (Vietnamese)
+        expect(find.text('Xin Chào'), findsOneWidget);
+        expect(find.text('Bạn có 100 đô-la'), findsOneWidget);
+        expect(find.text('Hello'), findsNothing);
+        expect(find.text('You have 100 dollars'), findsNothing);
 
-      scopedHelper.dispose();
-    });
+        scopedHelper.dispose();
+      },
+    );
 
-    testWidgets('Extension methods trT uses scoped helper in LanguageBuilder',
-        (tester) async {
+    testWidgets('Extension methods trT uses scoped helper in LanguageBuilder', (
+      tester,
+    ) async {
       SharedPreferences.setMockInitialValues({});
 
       final scopedHelper = LanguageHelper('ScopedHelper');
@@ -348,9 +358,9 @@ void main() {
       scopedHelper.dispose();
     });
 
-    testWidgets(
-        'Extension methods trF uses scoped helper in LanguageBuilder',
-        (tester) async {
+    testWidgets('Extension methods trF uses scoped helper in LanguageBuilder', (
+      tester,
+    ) async {
       SharedPreferences.setMockInitialValues({});
 
       final scopedHelper = LanguageHelper('ScopedHelper');
@@ -363,8 +373,10 @@ void main() {
               languageHelper: scopedHelper,
               child: LanguageBuilder(
                 builder: (_) => Text(
-                  'You have @number dollars'
-                      .trF(params: {'number': 200}, toCode: LanguageCodes.en),
+                  'You have @number dollars'.trF(
+                    params: {'number': 200},
+                    toCode: LanguageCodes.en,
+                  ),
                 ),
               ),
             ),
@@ -433,9 +445,7 @@ void main() {
           home: Scaffold(
             body: LanguageScope(
               languageHelper: helper1,
-              child: LanguageBuilder(
-                builder: (_) => Text('Hello'.tr),
-              ),
+              child: LanguageBuilder(builder: (_) => Text('Hello'.tr)),
             ),
           ),
         ),
@@ -452,9 +462,7 @@ void main() {
           home: Scaffold(
             body: LanguageScope(
               languageHelper: helper2,
-              child: LanguageBuilder(
-                builder: (_) => Text('Hello'.tr),
-              ),
+              child: LanguageBuilder(builder: (_) => Text('Hello'.tr)),
             ),
           ),
         ),
@@ -472,4 +480,3 @@ void main() {
     });
   });
 }
-
