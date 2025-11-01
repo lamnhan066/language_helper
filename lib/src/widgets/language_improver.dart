@@ -1435,6 +1435,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                             vertical: 8,
                                           ),
                                     ),
+                                    style: const TextStyle(fontSize: 14),
                                     maxLines: null,
                                     minLines: 1,
                                   ),
