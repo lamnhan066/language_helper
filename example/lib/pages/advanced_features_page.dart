@@ -118,10 +118,10 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Language changed from @{from} to @{to}'.trC(
-                _languageHelper,
-                params: {'from': _previousLanguage!.name, 'to': newCode.name},
-              ),
+              'Language changed from @{from} to @{to}'.trP({
+                'from': _previousLanguage!.name,
+                'to': newCode.name,
+              }),
             ),
             backgroundColor: Colors.blue,
             duration: const Duration(seconds: 2),
@@ -138,22 +138,24 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Advanced Features'.tr),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+    return LanguageScope(
+      languageHelper: _languageHelper,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Advanced Features'.tr),
+          elevation: 0,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black87,
+        ),
+        body: !_isLoaded
+            ? const Center(child: CircularProgressIndicator())
+            : _body(),
       ),
-      body: !_isLoaded
-          ? const Center(child: CircularProgressIndicator())
-          : _body(),
     );
   }
 
   LanguageBuilder _body() {
     return LanguageBuilder(
-      languageHelper: _languageHelper,
       builder: (context) {
         return SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -185,7 +187,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Advanced Language Features'.trC(_languageHelper),
+                            'Advanced Language Features'.tr,
                             style: Theme.of(context).textTheme.titleLarge
                                 ?.copyWith(
                                   color: Colors.white,
@@ -199,7 +201,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                     Text(
                       'Master complex conditions, dynamic parameters, '
                               'and language change listeners.'
-                          .trC(_languageHelper),
+                          .tr,
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
@@ -228,9 +230,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            'Complex Conditional Translations'.trC(
-                              _languageHelper,
-                            ),
+                            'Complex Conditional Translations'.tr,
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),
@@ -238,104 +238,62 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                       ),
                       const SizedBox(height: 16),
 
-                      _buildConditionSection(
-                        'Notifications'.trC(_languageHelper),
-                        [
-                          _buildTranslationExample(
-                            '',
-                            'You have @{count} notification'.trC(
-                              _languageHelper,
-                              params: {'count': 0},
-                            ),
-                          ),
-                          _buildTranslationExample(
-                            '',
-                            'You have @{count} notification'.trC(
-                              _languageHelper,
-                              params: {'count': 1},
-                            ),
-                          ),
-                          _buildTranslationExample(
-                            '',
-                            'You have @{count} notification'.trC(
-                              _languageHelper,
-                              params: {'count': 5},
-                            ),
-                          ),
-                        ],
-                      ),
+                      _buildConditionSection('Notifications'.tr, [
+                        _buildTranslationExample(
+                          '',
+                          'You have @{count} notification'.trP({'count': 0}),
+                        ),
+                        _buildTranslationExample(
+                          '',
+                          'You have @{count} notification'.trP({'count': 1}),
+                        ),
+                        _buildTranslationExample(
+                          '',
+                          'You have @{count} notification'.trP({'count': 5}),
+                        ),
+                      ]),
 
                       const SizedBox(height: 12),
 
-                      _buildConditionSection(
-                        'Time Format'.trC(_languageHelper),
-                        [
-                          _buildTranslationExample(
-                            '',
-                            'Time format'.trC(
-                              _languageHelper,
-                              params: {'hours': 0},
-                            ),
-                          ),
-                          _buildTranslationExample(
-                            '',
-                            'Time format'.trC(
-                              _languageHelper,
-                              params: {'hours': 1},
-                            ),
-                          ),
-                          _buildTranslationExample(
-                            '',
-                            'Time format'.trC(
-                              _languageHelper,
-                              params: {'hours': 12},
-                            ),
-                          ),
-                          _buildTranslationExample(
-                            '',
-                            'Time format'.trC(
-                              _languageHelper,
-                              params: {'hours': 15},
-                            ),
-                          ),
-                        ],
-                      ),
+                      _buildConditionSection('Time Format'.tr, [
+                        _buildTranslationExample(
+                          '',
+                          'Time format'.trP({'hours': 0}),
+                        ),
+                        _buildTranslationExample(
+                          '',
+                          'Time format'.trP({'hours': 1}),
+                        ),
+                        _buildTranslationExample(
+                          '',
+                          'Time format'.trP({'hours': 12}),
+                        ),
+                        _buildTranslationExample(
+                          '',
+                          'Time format'.trP({'hours': 15}),
+                        ),
+                      ]),
 
                       const SizedBox(height: 12),
 
-                      _buildConditionSection(
-                        'Plural Items'.trC(_languageHelper),
-                        [
-                          _buildTranslationExample(
-                            '',
-                            'Plural items'.trC(
-                              _languageHelper,
-                              params: {'count': 0},
-                            ),
-                          ),
-                          _buildTranslationExample(
-                            '',
-                            'Plural items'.trC(
-                              _languageHelper,
-                              params: {'count': 1},
-                            ),
-                          ),
-                          _buildTranslationExample(
-                            '',
-                            'Plural items'.trC(
-                              _languageHelper,
-                              params: {'count': 3},
-                            ),
-                          ),
-                          _buildTranslationExample(
-                            '',
-                            'Plural items'.trC(
-                              _languageHelper,
-                              params: {'count': 5},
-                            ),
-                          ),
-                        ],
-                      ),
+                      _buildConditionSection('Plural Items'.tr, [
+                        _buildTranslationExample(
+                          '',
+                          'Plural items'.trP({'count': 0}),
+                        ),
+                        _buildTranslationExample(
+                          '',
+                          'Plural items'.trP({'count': 1}),
+                        ),
+                        _buildTranslationExample(
+                          '',
+                          'Plural items'.trP({'count': 3}),
+                        ),
+                        _buildTranslationExample(
+                          '',
+                          'Plural items'.trP({'count': 5}),
+                        ),
+                      ]),
                     ],
                   ),
                 ),
@@ -360,7 +318,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            'Dynamic Parameter Injection'.trC(_languageHelper),
+                            'Dynamic Parameter Injection'.tr,
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),
@@ -368,30 +326,24 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                       ),
                       const SizedBox(height: 16),
                       _buildTranslationExample(
-                        'Welcome Message'.trC(_languageHelper),
-                        'Welcome @{name}'.trC(
-                          _languageHelper,
-                          params: {'name': 'Advanced User'},
-                        ),
+                        'Welcome Message'.tr,
+                        'Welcome @{name}'.trP({'name': 'Advanced User'}),
                       ),
                       _buildTranslationExample(
-                        'Timestamp'.trC(_languageHelper),
-                        'Current timestamp'.trC(
-                          _languageHelper,
-                          params: {
-                            'timestamp': DateTime.now().toString().substring(
-                              11,
-                              19,
-                            ),
-                          },
-                        ),
+                        'Timestamp'.tr,
+                        'Current timestamp'.trP({
+                          'timestamp': DateTime.now().toString().substring(
+                            11,
+                            19,
+                          ),
+                        }),
                       ),
                       _buildTranslationExample(
-                        'Device Info'.trC(_languageHelper),
-                        'Device info'.trC(
-                          _languageHelper,
-                          params: {'device': 'iPhone 15', 'platform': 'iOS'},
-                        ),
+                        'Device Info'.tr,
+                        'Device info'.trP({
+                          'device': 'iPhone 15',
+                          'platform': 'iOS',
+                        }),
                       ),
                     ],
                   ),
@@ -420,7 +372,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            'Language Change Listener'.trC(_languageHelper),
+                            'Language Change Listener'.tr,
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),
@@ -428,9 +380,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Change language to see listener notifications.'.trC(
-                          _languageHelper,
-                        ),
+                        'Change language to see listener notifications.'.tr,
                         style: Theme.of(
                           context,
                         ).textTheme.bodySmall?.copyWith(color: Colors.grey),
@@ -484,7 +434,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            'Language Statistics'.trC(_languageHelper),
+                            'Language Statistics'.tr,
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),
@@ -492,19 +442,19 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                       ),
                       const SizedBox(height: 12),
                       _buildInfoRow(
-                        'Current Language'.trC(_languageHelper),
+                        'Current Language'.tr,
                         _languageHelper.code.name,
                       ),
                       _buildInfoRow(
-                        'Supported Languages'.trC(_languageHelper),
+                        'Supported Languages'.tr,
                         _languageHelper.codes.map((e) => e.name).join(', '),
                       ),
                       _buildInfoRow(
-                        'Is Initialized'.trC(_languageHelper),
+                        'Is Initialized'.tr,
                         _languageHelper.isInitialized.toString(),
                       ),
                       _buildInfoRow(
-                        'Data Sources'.trC(_languageHelper),
+                        'Data Sources'.tr,
                         _languageHelper.data.length.toString(),
                       ),
                     ],
@@ -534,7 +484,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            'Language Improver'.trC(_languageHelper),
+                            'Language Improver'.tr,
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),
@@ -545,7 +495,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                         'Improve translations by comparing with a default '
                                 'language and editing them directly in a '
                                 'user-friendly interface.'
-                            .trC(_languageHelper),
+                            .tr,
                         style: Theme.of(
                           context,
                         ).textTheme.bodySmall?.copyWith(color: Colors.grey),
@@ -588,7 +538,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                                                           'Check the callback '
                                                           'data to '
                                                           'see the changes.'
-                                                      .trC(_languageHelper),
+                                                      .tr,
                                                 ),
                                                 backgroundColor: Colors.green,
                                                 duration: const Duration(
@@ -613,9 +563,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        'Translation editing cancelled.'.trC(
-                                          _languageHelper,
-                                        ),
+                                        'Translation editing cancelled.'.tr,
                                       ),
                                       duration: const Duration(seconds: 2),
                                     ),
@@ -626,9 +574,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                           );
                         },
                         icon: const Icon(Icons.edit),
-                        label: Text(
-                          'Open Language Improver'.trC(_languageHelper),
-                        ),
+                        label: Text('Open Language Improver'.tr),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF2563EB),
                           foregroundColor: Colors.white,
@@ -662,7 +608,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            'Code Example'.trC(_languageHelper),
+                            'Code Example'.tr,
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),
@@ -789,13 +735,13 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
   String _getLanguageName(LanguageCodes code) {
     switch (code) {
       case LanguageCodes.en:
-        return 'English'.trC(_languageHelper);
+        return 'English'.tr;
       case LanguageCodes.vi:
-        return 'Vietnamese'.trC(_languageHelper);
+        return 'Vietnamese'.tr;
       case LanguageCodes.es:
-        return 'Spanish'.trC(_languageHelper);
+        return 'Spanish'.tr;
       case LanguageCodes.fr:
-        return 'French'.trC(_languageHelper);
+        return 'French'.tr;
       default:
         return code.name;
     }
