@@ -612,6 +612,8 @@ class _LanguageImproverState extends State<LanguageImprover>
           duration: Duration(seconds: 2),
         ),
       );
+
+      Navigator.of(context).pop();
     }
   }
 
