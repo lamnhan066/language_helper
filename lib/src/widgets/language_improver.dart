@@ -1097,22 +1097,22 @@ class _LanguageImproverState extends State<LanguageImprover>
                   final colorScheme = theme.colorScheme;
                   final isDark = colorScheme.brightness == Brightness.dark;
 
-                  // Flash highlight color - use blue with appropriate opacity for dark/light theme
+                  // Flash highlight color - use blue with higher opacity for clearer visibility
                   final flashBlue = isDark
                       ? Colors.blue.withValues(
-                          alpha: 0.3,
+                          alpha: 0.5,
                         ) // More visible in dark
-                      : Colors.blue.shade50; // Subtle in light
+                      : Colors.blue.shade100; // Clearer in light
 
                   final flashBorderBlue = isDark
                       ? Colors
                             .blue
-                            .shade400 // Bright blue in dark
-                      : Colors.blue.shade400; // Same bright blue
+                            .shade300 // Brighter blue in dark
+                      : Colors.blue.shade500; // Brighter blue in light
 
                   // Calculate animated colors based on flash value
                   final backgroundColor = isFlashing
-                      ? Color.lerp(cardColor, flashBlue, flashValue * 0.9)!
+                      ? Color.lerp(cardColor, flashBlue, flashValue)!
                       : cardColor;
 
                   final borderColor = isFlashing
