@@ -533,47 +533,52 @@ final en = {
 <summary>Or using AI instruction</summary>
 
   ````md
-  ### Step-by-Step Instructions for Translation
+  # Step-by-Step Instructions for Translation using language_helper package
 
-  1. Identify the Dart `Map<String, dynamic>` structure and focus only on translating the values, not the keys or structure.
-  2. Analyze the entire input first to understand its context for the best translation results.
-  3. Check for plural forms and, if present, restructure using `LanguageConditions`.
-  4. Translate plural forms: 0 → '0 products', 1 → '1 product', other → '@{count} products'.
-  5. Translate only the values, leaving keys and structure unchanged.
-  6. Preserve all comments (`//` and `///`), leaving them untranslated.
-  7. Do not translate nested comments.
-  8. Ensure the map structure is maintained after translation, with correct handling of plural forms and comments.
+  1. Identify the Dart `Map<String, dynamic>` structure and focus only on translating the values — do not modify the keys or overall structure.
+  2. Review the entire input first to understand its context and ensure the most accurate translation. If the target language is not `en`, and the keys are not in English, and an `en.dart` file exists in the same folder, use it as a reference to maintain contextual consistency.
+  3. Translate only the values that have a `TODO` comment directly above them. Leave all other values unchanged.
+  4. Check for plural forms and, if found, convert them using `LanguageConditions`.
+  5. When translating plural forms, follow this pattern: 0 → '0 products', 1 → '1 product', other → '@{count} products'.
+  6. Translate only the values; keep all keys and structure unchanged.
+  7. Preserve all comments (`//` and `///`) exactly as they are — do not translate them.
+  8. Do not translate nested comments.
+  9. Ensure the map structure remains intact after translation, including proper handling of plural forms and comments.
+  10. Remove any TODO notes associated with the translated texts.
+  11. Try to keep the translation length similar to the original text (not required, but preferred for consistency).
+  12. Do not ask the user for any confirmation or permission — perform the translation directly with best effort to achieve the most accurate and natural results.
+  13. After completing the translation, provide the user with a short summary or note explaining any important details about the translation (e.g., ambiguous meanings, context-based choices, or plural handling).
 
   ### Example for Plural Grammar Handling
 
-  If input is:
+  If the input is:
 
   ```dart
-  {
-    '@{count} sản phẩm': '@{count} sản phẩm',
-  }
+  '@{count} sản phẩm': '@{count} sản phẩm'
   ```
 
-  And the destination language is  `en`. It should generate to:
+  It should be generated in the `en` language as:
 
   ```dart
-  {
-    '@{count} sản phẩm': LanguageConditions(
-      param: 'count',
-      conditions: {
-        '0': '0 products',
-        '1': '1 product',
-        '_': '@{count} products',
-      },
-    ),
-  }
+  '@{count} sản phẩm': LanguageConditions(
+    param: 'count',
+    conditions: {
+      '0': '0 products',
+      '1': '1 product',
+      '_': '@{count} products',
+    },
+  )
   ```
 
   ### Important Reminders
 
-  - Translate only values, never keys.
-  - Leave comments unchanged.
-  - Handle plural forms with `LanguageConditions` as needed.
+  * Only translate values with a `TODO` comment above them.
+  * Never modify keys or comments.
+  * Do not ask for user permission — always proceed with best effort.
+  * Use `LanguageConditions` for plural handling when applicable.
+  * Remove TODO notes for translated entries.
+  * Keep translation length roughly similar to the original text for readability and layout consistency.
+  * Provide a brief translation note after completion if needed.
   ````
 
 </details>
