@@ -80,6 +80,7 @@ class _LanguageImproverState extends State<LanguageImprover>
   LanguageCodes? _targetLanguage;
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, dynamic> _editedTranslations = {};
+  final Map<String, dynamic> _originalTranslations = {};
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   final Set<String> _allKeys = {};
@@ -404,6 +405,7 @@ class _LanguageImproverState extends State<LanguageImprover>
   void _initializeControllers() {
     _controllers.clear();
     _editedTranslations.clear();
+    _originalTranslations.clear();
 
     if (_targetLanguage == null) return;
 
@@ -426,12 +428,20 @@ class _LanguageImproverState extends State<LanguageImprover>
         });
         _controllers[key] = controller;
         _editedTranslations[key] = value;
+        // Store original value for comparison
+        _originalTranslations[key] = value;
       } else if (value is LanguageConditions) {
         // Store LanguageConditions as-is for editing
+        // For LanguageConditions, we need to store a deep copy for comparison
         _editedTranslations[key] = value;
+        _originalTranslations[key] = LanguageConditions(
+          param: value.param,
+          conditions: Map<String, dynamic>.from(value.conditions),
+        );
       } else if (value != null) {
         // For other types, store as-is
         _editedTranslations[key] = value;
+        _originalTranslations[key] = value;
       }
       // If value is null, don't add it to editedTranslations
     }
@@ -577,9 +587,73 @@ class _LanguageImproverState extends State<LanguageImprover>
     return null;
   }
 
+  /// Compare two values to check if they are different
+  bool _hasValueChanged(dynamic original, dynamic current) {
+    // Handle null cases
+    if (original == null && current == null) return false;
+    if (original == null || current == null) return true;
+
+    // If types are different, consider it changed (e.g., String -> LanguageConditions)
+    if (original.runtimeType != current.runtimeType) return true;
+
+    // Handle String comparison
+    if (original is String && current is String) {
+      return original != current;
+    }
+
+    // Handle LanguageConditions comparison
+    if (original is LanguageConditions && current is LanguageConditions) {
+      if (original.param != current.param) return true;
+      if (original.conditions.length != current.conditions.length) return true;
+
+      // Compare each condition
+      for (final entry in original.conditions.entries) {
+        final currentValue = current.conditions[entry.key];
+        if (currentValue != entry.value) return true;
+      }
+
+      // Check for new conditions in current
+      for (final entry in current.conditions.entries) {
+        if (!original.conditions.containsKey(entry.key)) return true;
+      }
+
+      return false;
+    }
+
+    // For other types, use equality check
+    return original != current;
+  }
+
   Future<void> _saveTranslations() async {
+    // Only include translations that have actually changed
+    final changedTranslations = <String, dynamic>{};
+
+    for (final entry in _editedTranslations.entries) {
+      final key = entry.key;
+      final currentValue = entry.value;
+      final originalValue = _originalTranslations[key];
+
+      // Check if the value has changed
+      if (_hasValueChanged(originalValue, currentValue)) {
+        changedTranslations[key] = currentValue;
+      }
+    }
+
+    // If no changes were made, show message and return
+    if (changedTranslations.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No changes to save'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+      return;
+    }
+
     final updatedTranslations = <LanguageCodes, Map<String, dynamic>>{
-      _targetLanguage!: Map<String, dynamic>.from(_editedTranslations),
+      _targetLanguage!: changedTranslations,
     };
 
     // Call the callback and wait for it to complete if it's async
@@ -590,9 +664,11 @@ class _LanguageImproverState extends State<LanguageImprover>
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Translations saved successfully'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text(
+            '${changedTranslations.length} translation${changedTranslations.length == 1 ? '' : 's'} saved successfully',
+          ),
+          duration: const Duration(seconds: 2),
         ),
       );
 
