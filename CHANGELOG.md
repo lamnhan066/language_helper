@@ -1,3 +1,8 @@
+## 0.13.0-rc.5
+
+* Add `LanguageScope` to scoped LanguageHelper instances,  enabling localized translations within specific widget trees. So we can use `tr`, `trP` with a custom LanguageHelper without the need of `translate` or `.trC`.
+* Add `LanguageImprover` as a stateful widget to let users improving the current translation.
+
 ## 0.13.0-rc.4
 
 * Add more tests.
