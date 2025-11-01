@@ -1445,7 +1445,6 @@ class _LanguageImproverState extends State<LanguageImprover>
                                       : Colors.blue.withValues(alpha: 0.2);
                                   return Container(
                                     padding: const EdgeInsets.all(8),
-                                    margin: const EdgeInsets.only(bottom: 8),
                                     decoration: BoxDecoration(
                                       color: defaultBgColor,
                                       borderRadius: BorderRadius.circular(8),
