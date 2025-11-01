@@ -1203,7 +1203,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                       Text(
                                         key,
                                         style: TextStyle(
-                                          fontSize: 11,
+                                          fontSize: 14,
                                           color: keyTextColor,
                                           fontWeight: FontWeight.w500,
                                           fontFamily: 'monospace',
