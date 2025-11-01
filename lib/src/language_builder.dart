@@ -59,16 +59,45 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
     return root;
   }
 
+  /// Get the LanguageHelper based on priority:
+  /// 1. Explicit languageHelper parameter
+  /// 2. LanguageScope from widget tree
+  /// 3. LanguageHelper.instance
+  LanguageHelper _getLanguageHelper() {
+    return widget.languageHelper ??
+        LanguageScope.maybeOf(context) ??
+        LanguageHelper.instance;
+  }
+
   @override
   void initState() {
     super.initState();
+    // Initialize with fallback, will be updated in didChangeDependencies
     _languageHelper = widget.languageHelper ?? LanguageHelper.instance;
+  }
 
-    if (_languageHelper._states.add(this)) {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Update languageHelper from LanguageScope if needed
+    final newHelper = _getLanguageHelper();
+    if (_languageHelper != newHelper) {
+      // Remove from old helper's states
+      _languageHelper._states.remove(this);
+      // Add to new helper's states
+      _languageHelper = newHelper;
+      if (_languageHelper._states.add(this)) {
+        printDebug(() => 'Added $this to the states');
+      }
+      printDebug(
+        () => 'Length of the states: ${_languageHelper._states.length}',
+      );
+    } else if (_languageHelper._states.add(this)) {
       printDebug(() => 'Added $this to the states');
+      printDebug(
+        () => 'Length of the states: ${_languageHelper._states.length}',
+      );
     }
-
-    printDebug(() => 'Length of the states: ${_languageHelper._states.length}');
   }
 
   @override
@@ -80,12 +109,20 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
 
   @override
   Widget build(BuildContext context) {
-    return widget.refreshTree
-        ? KeyedSubtree(
-            key: ValueKey(_languageHelper.locale),
-            child: widget.builder(context),
-          )
-        : widget.builder(context);
+    // Push the current helper to the scope stack so extension methods can access it
+    LanguageHelperScope().push(_languageHelper);
+    try {
+      final result = widget.refreshTree
+          ? KeyedSubtree(
+              key: ValueKey(_languageHelper.locale),
+              child: widget.builder(context),
+            )
+          : widget.builder(context);
+      return result;
+    } finally {
+      // Pop the helper from the stack after build completes
+      LanguageHelperScope().pop();
+    }
   }
 }
 

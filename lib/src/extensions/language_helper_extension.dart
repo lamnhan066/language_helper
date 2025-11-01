@@ -1,29 +1,52 @@
 import '../../language_helper.dart';
+import '../language_helper.dart' show LanguageHelperScope, LanguageHelper;
 
 extension LanguageHelperEx on String {
   /// Translate the current text wih default parameters.
-  String get tr => LanguageHelper.instance.translate(this);
+  ///
+  /// If called within a [LanguageBuilder] that uses a scoped [LanguageHelper]
+  /// (from [LanguageScope]), that helper will be used. Otherwise, falls back
+  /// to [LanguageHelper.instance].
+  String get tr {
+    final scope = LanguageHelperScope().current;
+    return (scope ?? LanguageHelper.instance).translate(this);
+  }
 
   /// Translate with only [params] parammeter
+  ///
+  /// If called within a [LanguageBuilder] that uses a scoped [LanguageHelper]
+  /// (from [LanguageScope]), that helper will be used. Otherwise, falls back
+  /// to [LanguageHelper.instance].
   /// ``` dart
   /// final text = 'result is @{param}'.trP({'param' : 'zero'});
   /// print(text); // -> 'result is zero'
   /// ```
   String trP(Map<String, dynamic> params) {
-    return LanguageHelper.instance.translate(this, params: params);
+    final scope = LanguageHelperScope().current;
+    return (scope ?? LanguageHelper.instance).translate(this, params: params);
   }
 
   /// Translate with only [toCode] parammeter
+  ///
+  /// If called within a [LanguageBuilder] that uses a scoped [LanguageHelper]
+  /// (from [LanguageScope]), that helper will be used. Otherwise, falls back
+  /// to [LanguageHelper.instance].
   /// ``` dart
   /// final text = 'result is something'.trT(LanguageCodes.en);
   /// ```
   String trT(LanguageCodes toCode) {
-    return LanguageHelper.instance.translate(this, toCode: toCode);
+    final scope = LanguageHelperScope().current;
+    return (scope ?? LanguageHelper.instance).translate(this, toCode: toCode);
   }
 
   /// Full version of the translation, includes all parameters.
+  ///
+  /// If called within a [LanguageBuilder] that uses a scoped [LanguageHelper]
+  /// (from [LanguageScope]), that helper will be used. Otherwise, falls back
+  /// to [LanguageHelper.instance].
   String trF({Map<String, dynamic> params = const {}, LanguageCodes? toCode}) {
-    return LanguageHelper.instance.translate(
+    final scope = LanguageHelperScope().current;
+    return (scope ?? LanguageHelper.instance).translate(
       this,
       params: params,
       toCode: toCode,

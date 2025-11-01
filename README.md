@@ -12,6 +12,7 @@ A Flutter package for easy multi-language app localization with automatic text e
 - 🌐 **Multiple Sources**: Support for Dart maps, JSON files, assets, and network data
 - 📱 **Device Locale**: Automatically uses device locale on first launch
 - 🔧 **AI Integration**: Custom translator for easy language conversion
+- 🎨 **LanguageScope**: Provide scoped `LanguageHelper` instances to specific widget trees
 
 ## Quick Start
 
@@ -379,6 +380,141 @@ LanguageBuilder(
 > **💡 Note**: If you use `const` widgets nested inside a `LanguageBuilder`, they may not rebuild automatically when the root rebuilds. To ensure these widgets update on language change (without using `refreshTree`), wrap them in their own `LanguageBuilder` with `forceRebuild: true`.
 
 Use `refreshTree` only when you specifically need to reset widget state or when dealing with widgets that don't properly handle language changes.
+
+### LanguageScope - Scoped LanguageHelper
+
+`LanguageScope` allows you to provide a custom `LanguageHelper` instance to a specific part of your widget tree. When you wrap a widget tree with `LanguageScope`, all `tr`, `trP`, `LanguageBuilder`, and `Tr` widgets within that scope will automatically use the scoped helper instead of `LanguageHelper.instance`.
+
+#### Basic Usage
+
+```dart
+final customHelper = LanguageHelper('CustomHelper');
+await customHelper.initial(
+  data: customLanguageData,
+  initialCode: LanguageCodes.es,
+);
+
+LanguageScope(
+  languageHelper: customHelper,
+  child: MyWidget(),
+)
+```
+
+#### How It Works
+
+When `LanguageScope` is present in the widget tree:
+
+1. **LanguageBuilder and Tr** - Automatically inherit the scoped helper (unless an explicit `languageHelper` is provided)
+2. **Extension methods** (`tr`, `trP`, `trT`, `trF`) - Use the scoped helper when called within a `LanguageBuilder`
+3. **Priority order**: Explicit `languageHelper` parameter > `LanguageScope` > `LanguageHelper.instance`
+
+#### Example: Scoped Translation
+
+```dart
+final adminHelper = LanguageHelper('AdminHelper');
+final userHelper = LanguageHelper('UserHelper');
+
+await adminHelper.initial(data: adminTranslations, initialCode: LanguageCodes.en);
+await userHelper.initial(data: userTranslations, initialCode: LanguageCodes.vi);
+
+// Admin section uses admin translations
+LanguageScope(
+  languageHelper: adminHelper,
+  child: LanguageBuilder(
+    builder: (context) => Column(
+      children: [
+        Text('Admin Panel'.tr), // Uses adminHelper
+        Text('Manage Users'.trP({'count': 5})), // Uses adminHelper
+      ],
+    ),
+  ),
+)
+
+// User section uses user translations
+LanguageScope(
+  languageHelper: userHelper,
+  child: LanguageBuilder(
+    builder: (context) => Column(
+      children: [
+        Text('Dashboard'.tr), // Uses userHelper
+        Text('Welcome @{name}'.trP({'name': 'John'})), // Uses userHelper
+      ],
+    ),
+  ),
+)
+```
+
+#### Accessing Scoped Helper
+
+You can access the scoped helper directly from context:
+
+```dart
+// Gets the scoped helper or falls back to LanguageHelper.instance
+final helper = LanguageScope.of(context);
+final translated = helper.translate('Hello');
+
+// Gets the scoped helper or returns null
+final helper = LanguageScope.maybeOf(context);
+if (helper != null) {
+  final translated = helper.translate('Hello');
+}
+```
+
+#### Priority with Explicit Helper
+
+If you provide an explicit `languageHelper` parameter, it takes priority over the scope:
+
+```dart
+LanguageScope(
+  languageHelper: scopedHelper, // This will be ignored
+  child: LanguageBuilder(
+    languageHelper: explicitHelper, // This takes priority
+    builder: (_) => Text('Hello'.tr), // Uses explicitHelper
+  ),
+)
+```
+
+#### Nested Scopes
+
+Child scopes override parent scopes for their subtree:
+
+```dart
+LanguageScope(
+  languageHelper: parentHelper, // Parent scope
+  child: LanguageBuilder(
+    builder: (_) => Column(
+      children: [
+        Text('Hello'.tr), // Uses parentHelper
+        LanguageScope(
+          languageHelper: childHelper, // Child scope overrides parent
+          child: LanguageBuilder(
+            builder: (_) => Text('Hello'.tr), // Uses childHelper
+          ),
+        ),
+      ],
+    ),
+  ),
+)
+```
+
+#### Tr Widget with Scope
+
+The `Tr` widget also inherits from `LanguageScope`:
+
+```dart
+LanguageScope(
+  languageHelper: scopedHelper,
+  child: Tr((_) => Text('Hello'.tr)), // Uses scopedHelper
+)
+```
+
+#### Use Cases
+
+- **Multi-tenant apps**: Different translation sets for different user types
+- **Feature modules**: Separate translations for different app modules
+- **A/B testing**: Different translations for different user groups
+- **Admin panels**: Specialized translations for admin interfaces
+- **Overrides**: Temporarily override translations in specific sections
 
 ## AI Translator
 
