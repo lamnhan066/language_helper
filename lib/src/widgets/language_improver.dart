@@ -1477,7 +1477,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                           maxLines: null,
                                           minLines: 1,
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 12),
                                         OutlinedButton.icon(
                                           onPressed: () =>
                                               _convertStringToLanguageCondition(
@@ -1634,33 +1634,34 @@ class _LanguageImproverState extends State<LanguageImprover>
                                               ),
                                             );
                                           }),
-                                        ],
-                                      ),
-                                    ),
-
-                                    const SizedBox(height: 8),
-                                    OutlinedButton.icon(
-                                      onPressed: () =>
-                                          _convertLanguageConditionToString(
-                                            key,
-                                            targetValue,
+                                          const SizedBox(height: 6),
+                                          OutlinedButton.icon(
+                                            onPressed: () =>
+                                                _convertLanguageConditionToString(
+                                                  key,
+                                                  targetValue,
+                                                ),
+                                            icon: const Icon(
+                                              Icons.auto_awesome,
+                                              size: 16,
+                                            ),
+                                            label: const Text(
+                                              'Convert to String',
+                                              style: TextStyle(fontSize: 12),
+                                            ),
+                                            style: OutlinedButton.styleFrom(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 12,
+                                                  ),
+                                              minimumSize: Size.zero,
+                                              tapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                            ),
                                           ),
-                                      icon: const Icon(
-                                        Icons.auto_awesome,
-                                        size: 16,
-                                      ),
-                                      label: const Text(
-                                        'Convert to String',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 12,
-                                        ),
-                                        minimumSize: Size.zero,
-                                        tapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
+                                        ],
                                       ),
                                     ),
                                   ],
