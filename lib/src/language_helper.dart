@@ -8,7 +8,7 @@ import '../language_helper.dart';
 import 'mixins/update_language.dart';
 import 'utils/print_debug.dart';
 
-part 'language_builder.dart';
+part 'widgets/language_builder.dart';
 
 /// Internal helper to manage the current scoped LanguageHelper for extension methods.
 ///

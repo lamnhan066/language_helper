@@ -1,4 +1,4 @@
-part of 'language_helper.dart';
+part of '../language_helper.dart';
 
 /// @Source https://hillel.dev/2018/08/15/flutter-how-to-rebuild-the-entire-app-to-change-the-theme-or-locale/
 
