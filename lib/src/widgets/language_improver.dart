@@ -1121,6 +1121,9 @@ class _LanguageImproverState extends State<LanguageImprover>
                       Expanded(
                         child: DropdownButtonFormField<LanguageCodes>(
                           initialValue: _defaultLanguage,
+                          dropdownColor: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(12),
+                          menuMaxHeight: 300,
                           decoration: InputDecoration(
                             labelText: 'Default Language',
                             border: OutlineInputBorder(
@@ -1145,9 +1148,21 @@ class _LanguageImproverState extends State<LanguageImprover>
                             ),
                           ),
                           items: _helper.codes.map((code) {
+                            final isSelected = code == _defaultLanguage;
                             return DropdownMenuItem(
                               value: code,
-                              child: Text(code.name),
+                              child: Text(
+                                code.name,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                              ),
                             );
                           }).toList(),
                           onChanged: (value) async {
@@ -1173,6 +1188,9 @@ class _LanguageImproverState extends State<LanguageImprover>
                       Expanded(
                         child: DropdownButtonFormField<LanguageCodes>(
                           initialValue: _targetLanguage,
+                          dropdownColor: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(12),
+                          menuMaxHeight: 300,
                           decoration: InputDecoration(
                             labelText: 'Target Language',
                             border: OutlineInputBorder(
@@ -1199,9 +1217,21 @@ class _LanguageImproverState extends State<LanguageImprover>
                           items: _helper.codes
                               .where((code) => code != _defaultLanguage)
                               .map((code) {
+                                final isSelected = code == _targetLanguage;
                                 return DropdownMenuItem(
                                   value: code,
-                                  child: Text(code.name),
+                                  child: Text(
+                                    code.name,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                                  ),
                                 );
                               })
                               .toList(),
