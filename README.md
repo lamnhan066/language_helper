@@ -13,6 +13,7 @@ A Flutter package for easy multi-language app localization with automatic text e
 - 📱 **Device Locale**: Automatically uses device locale on first launch
 - 🔧 **AI Integration**: Custom translator for easy language conversion
 - 🎨 **LanguageScope**: Provide scoped `LanguageHelper` instances to specific widget trees
+- ✏️ **LanguageImprover**: Visual translation editor for on-device translation improvement
 
 ## Quick Start
 
@@ -515,6 +516,133 @@ LanguageScope(
 - **A/B testing**: Different translations for different user groups
 - **Admin panels**: Specialized translations for admin interfaces
 - **Overrides**: Temporarily override translations in specific sections
+
+### LanguageImprover - Visual Translation Editor
+
+`LanguageImprover` is a widget that provides a user-friendly interface for viewing, comparing, and editing translations. It's perfect for translators, QA teams, or anyone who needs to improve translations directly in the app.
+
+#### Features
+
+- 📝 **Side-by-side comparison**: View reference and target translations together
+- 🔍 **Search functionality**: Quickly find translations by key or content
+- ✏️ **Inline editing**: Edit translations directly in the interface
+- 📌 **Auto-scroll**: Automatically scroll to specific translation keys
+- 💾 **Update callback**: Receive updated translations via callback
+- 🎯 **Flash animation**: Visual highlight for keys being focused
+
+#### Basic Usage
+
+```dart
+LanguageImprover(
+  languageHelper: LanguageHelper.instance,
+  onTranslationsUpdated: (updatedTranslations) {
+    // Handle the improved translations
+    // updatedTranslations: Map<LanguageCodes, Map<String, dynamic>>
+    for (final entry in updatedTranslations.entries) {
+      final code = entry.key;
+      final translations = entry.value;
+      
+      // Create a LanguageDataProvider from updated translations
+      final provider = LanguageDataProvider.data({
+        code: translations,
+      });
+      
+      // Add translations as overrides
+      LanguageHelper.instance.addDataOverrides(provider);
+    }
+  },
+)
+```
+
+#### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `languageHelper` | `LanguageHelper?` | The LanguageHelper instance to use. Defaults to `LanguageHelper.instance` |
+| `onTranslationsUpdated` | `FutureOr<void> Function(Map<LanguageCodes, Map<String, dynamic>>)?` | Callback called when translations are saved. Receives a map of language codes to updated translations |
+| `onCancel` | `VoidCallback?` | Callback called when the user cancels editing |
+| `initialDefaultLanguage` | `LanguageCodes?` | Initial reference language. Defaults to first available language |
+| `initialTargetLanguage` | `LanguageCodes?` | Initial target language to improve. Defaults to current language |
+| `scrollToKey` | `String?` | Key to automatically scroll to and focus on |
+| `autoSearchOnScroll` | `bool` | Whether to automatically search for `scrollToKey`. Defaults to `true` |
+| `showKey` | `bool` | Whether to show the translation key. Defaults to `true` |
+
+#### Example: Navigate and Open
+
+```dart
+ElevatedButton(
+  onPressed: () {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LanguageImprover(
+          languageHelper: LanguageHelper.instance,
+          initialDefaultLanguage: LanguageCodes.en,
+          initialTargetLanguage: LanguageCodes.vi,
+          scrollToKey: 'Hello World', // Automatically scroll to this key
+          onTranslationsUpdated: (updatedTranslations) {
+            // Apply updated translations
+            for (final entry in updatedTranslations.entries) {
+              final provider = LanguageDataProvider.data({
+                entry.key: entry.value,
+              });
+              LanguageHelper.instance.addDataOverrides(provider);
+            }
+            
+            // Show success message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Translations updated!'.tr),
+                backgroundColor: Colors.green,
+              ),
+            );
+          },
+          onCancel: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Translation editing cancelled.'.tr),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  },
+  child: Text('Improve Translations'.tr),
+)
+```
+
+#### Example: Scroll to Specific Key
+
+```dart
+LanguageImprover(
+  languageHelper: LanguageHelper.instance,
+  scrollToKey: 'Welcome Message', // Scrolls to this key on load
+  autoSearchOnScroll: true, // Automatically filters to this key
+  onTranslationsUpdated: (translations) {
+    // Handle updates
+  },
+)
+```
+
+#### Example: Hide Translation Keys
+
+```dart
+LanguageImprover(
+  languageHelper: LanguageHelper.instance,
+  showKey: false, // Hide translation keys, only show translations
+  onTranslationsUpdated: (translations) {
+    // Handle updates
+  },
+)
+```
+
+#### Use Cases
+
+- **Translation QA**: Review and improve translations before release
+- **On-device editing**: Allow translators to edit translations directly on device
+- **Debugging**: Quickly find and fix translation issues
+- **Localization workflows**: Integrate translation improvement into your workflow
+- **User feedback**: Let users suggest translation improvements
 
 ## AI Translator
 
