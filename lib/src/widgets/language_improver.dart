@@ -1227,7 +1227,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                           ? Colors.blue.withValues(alpha: 0.3)
                           : Colors.black.withValues(alpha: 0.08),
                       child: Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
