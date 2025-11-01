@@ -1151,9 +1151,11 @@ class _LanguageImproverState extends State<LanguageImprover>
                 separatorBuilder: (context, index) =>
                     const SizedBox(height: 16),
                 controller: _scrollController,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 8,
+                padding: const EdgeInsets.only(
+                  top: 12,
+                  left: 8,
+                  right: 8,
+                  bottom: 80,
                 ),
                 itemCount: _filteredKeys.length,
                 itemBuilder: (context, index) {
