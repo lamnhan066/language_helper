@@ -1069,9 +1069,14 @@ class _LanguageImproverState extends State<LanguageImprover>
           ? const Center(child: Text('No translations found'))
           : Container(
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
+              child: ListView.separated(
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 16),
                 controller: _scrollController,
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 8,
+                ),
                 itemCount: _filteredKeys.length,
                 itemBuilder: (context, index) {
                   final key = _filteredKeys[index];
@@ -1120,30 +1125,33 @@ class _LanguageImproverState extends State<LanguageImprover>
                       : dividerColor;
 
                   final borderWidth = isFlashing
-                      ? 1.5 + (flashValue * 1.5)
-                      : 1.5;
+                      ? 2.0 + (flashValue * 2.0)
+                      : 1.0;
 
-                  final elevation = isFlashing ? 3.0 + (flashValue * 3.0) : 3.0;
+                  final elevation = isFlashing ? 4.0 + (flashValue * 4.0) : 2.0;
 
                   return GestureDetector(
                     onTap: () => _onCardTap(key),
                     child: Card(
                       key: cardKey,
                       margin: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 4,
+                        vertical: 4,
+                        horizontal: 12,
                       ),
                       elevation: elevation,
                       color: backgroundColor,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                         side: BorderSide(
                           color: borderColor,
                           width: borderWidth,
                         ),
                       ),
+                      shadowColor: isFlashing
+                          ? Colors.blue.withValues(alpha: 0.3)
+                          : Colors.black.withValues(alpha: 0.08),
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1152,44 +1160,56 @@ class _LanguageImproverState extends State<LanguageImprover>
                               builder: (context) {
                                 final theme = Theme.of(context);
                                 final colorScheme = theme.colorScheme;
-                                final surfaceVariant =
-                                    colorScheme.surfaceContainerHighest;
-                                final onSurfaceVariant =
-                                    colorScheme.onSurfaceVariant;
-                                final dividerColor = theme.dividerColor;
+                                final isDark =
+                                    colorScheme.brightness == Brightness.dark;
+
+                                // Use a distinctive blue tint for the key container
+                                // Complements the blue flash animation
+                                final keyBgColor = isDark
+                                    ? Colors.blue.withValues(alpha: 0.15)
+                                    : Colors.blue.withValues(alpha: 0.08);
+                                final keyTextColor = isDark
+                                    ? Colors.blue.shade200
+                                    : Colors.blue.shade700;
+                                final keyBorderColor = isDark
+                                    ? Colors.blue.withValues(alpha: 0.3)
+                                    : Colors.blue.withValues(alpha: 0.2);
 
                                 return Container(
+                                  width: double.infinity,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8,
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: surfaceVariant,
+                                    color: keyBgColor,
                                     borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: dividerColor),
+                                    border: Border.all(color: keyBorderColor),
                                   ),
-                                  child: Row(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Icon(
-                                        Icons.tag,
-                                        size: 14,
-                                        color: onSurfaceVariant,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Expanded(
-                                        child: Text(
-                                          key,
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: onSurfaceVariant,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: 'monospace',
-                                          ),
-                                          maxLines: 3,
-                                          overflow: TextOverflow.ellipsis,
+                                      Text(
+                                        'Key:',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: keyTextColor,
                                         ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        key,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: keyTextColor,
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: 'monospace',
+                                        ),
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ],
                                   ),
@@ -1204,16 +1224,30 @@ class _LanguageImproverState extends State<LanguageImprover>
                                 builder: (context) {
                                   final theme = Theme.of(context);
                                   final colorScheme = theme.colorScheme;
-                                  final surfaceVariant =
-                                      colorScheme.surfaceContainerHighest;
-                                  final onSurfaceVariant =
-                                      colorScheme.onSurfaceVariant;
+                                  final isDark =
+                                      colorScheme.brightness == Brightness.dark;
+
+                                  // Use a warm amber/orange tint for default translations
+                                  // Creates nice contrast with blue flash
+                                  final defaultBgColor = isDark
+                                      ? Colors.orange.withValues(alpha: 0.15)
+                                      : Colors.orange.withValues(alpha: 0.08);
+                                  final defaultTextColor = isDark
+                                      ? Colors.orange.shade200
+                                      : Colors.orange.shade800;
+                                  final defaultBorderColor = isDark
+                                      ? Colors.orange.withValues(alpha: 0.3)
+                                      : Colors.orange.withValues(alpha: 0.2);
 
                                   return Container(
                                     padding: const EdgeInsets.all(8),
+                                    width: double.infinity,
                                     decoration: BoxDecoration(
-                                      color: surfaceVariant,
+                                      color: defaultBgColor,
                                       borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: defaultBorderColor,
+                                      ),
                                     ),
                                     child: Column(
                                       crossAxisAlignment:
@@ -1224,7 +1258,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
-                                            color: onSurfaceVariant,
+                                            color: defaultTextColor,
                                           ),
                                         ),
                                         const SizedBox(height: 4),
@@ -1246,16 +1280,30 @@ class _LanguageImproverState extends State<LanguageImprover>
                                   if (defaultCondition != null) {
                                     final theme = Theme.of(context);
                                     final colorScheme = theme.colorScheme;
+                                    final isDark =
+                                        colorScheme.brightness ==
+                                        Brightness.dark;
+
+                                    // Use a warm amber/orange tint for default translations
+                                    // Creates nice contrast with blue flash
+                                    final defaultBgColor = isDark
+                                        ? Colors.orange.withValues(alpha: 0.15)
+                                        : Colors.orange.withValues(alpha: 0.08);
+                                    final defaultTextColor = isDark
+                                        ? Colors.orange.shade200
+                                        : Colors.orange.shade800;
+                                    final defaultBorderColor = isDark
+                                        ? Colors.orange.withValues(alpha: 0.3)
+                                        : Colors.orange.withValues(alpha: 0.2);
 
                                     return Container(
                                       padding: const EdgeInsets.all(8),
                                       margin: const EdgeInsets.only(bottom: 8),
                                       decoration: BoxDecoration(
-                                        color:
-                                            colorScheme.surfaceContainerHighest,
+                                        color: defaultBgColor,
                                         borderRadius: BorderRadius.circular(4),
                                         border: Border.all(
-                                          color: theme.dividerColor,
+                                          color: defaultBorderColor,
                                         ),
                                       ),
                                       child: Column(
@@ -1267,7 +1315,7 @@ class _LanguageImproverState extends State<LanguageImprover>
                                             style: TextStyle(
                                               fontSize: 11,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.grey[700],
+                                              color: defaultTextColor,
                                             ),
                                           ),
                                           const SizedBox(height: 4),
