@@ -8,37 +8,28 @@ import '../language_helper.dart';
 import 'mixins/update_language.dart';
 import 'utils/print_debug.dart';
 
+part 'extensions/language_helper_extension.dart';
 part 'widgets/language_builder.dart';
-
-/// Internal helper to manage the current scoped LanguageHelper for extension methods.
-///
-/// This allows String extension methods (tr, trP, etc.) to access the scoped helper
-/// from the nearest LanguageBuilder that wraps them.
-class LanguageHelperScope {
-  static final LanguageHelperScope instance = LanguageHelperScope._();
-  factory LanguageHelperScope() => instance;
-  LanguageHelperScope._();
-
-  /// Stack of LanguageHelpers, with the most recent one on top.
-  /// This allows nested LanguageBuilders to work correctly.
-  final List<LanguageHelper> _stack = [];
-
-  /// Gets the current scoped LanguageHelper, or null if none is active.
-  LanguageHelper? get current => _stack.isEmpty ? null : _stack.last;
-
-  /// Pushes a LanguageHelper onto the stack (called by LanguageBuilder during build).
-  void push(LanguageHelper helper) => _stack.add(helper);
-
-  /// Pops a LanguageHelper from the stack (called by LanguageBuilder after build).
-  void pop() {
-    if (_stack.isNotEmpty) _stack.removeLast();
-  }
-}
 
 /// Make it easier for you to control multiple languages in your app
 class LanguageHelper {
   // Get the LanguageHelper instance
   static final LanguageHelper instance = LanguageHelper('LanguageHelper');
+
+  /// Stack of LanguageHelpers, with the most recent one on top.
+  /// This allows nested LanguageBuilders to work correctly.
+  static final List<LanguageHelper> _stack = [];
+
+  /// Gets the current scoped LanguageHelper, or null if none is active.
+  static LanguageHelper? get _current => _stack.isEmpty ? null : _stack.last;
+
+  /// Pushes a LanguageHelper onto the stack (called by LanguageBuilder during build).
+  static void _push(LanguageHelper helper) => _stack.add(helper);
+
+  /// Pops a LanguageHelper from the stack (called by LanguageBuilder after build).
+  static void _pop() {
+    if (_stack.isNotEmpty) _stack.removeLast();
+  }
 
   /// To control [LanguageBuilder]
   final Set<_LanguageBuilderState> _states = {};

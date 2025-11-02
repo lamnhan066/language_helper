@@ -110,7 +110,7 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   @override
   Widget build(BuildContext context) {
     // Push the current helper to the scope stack so extension methods can access it
-    LanguageHelperScope().push(_languageHelper);
+    LanguageHelper._push(_languageHelper);
     try {
       final result = widget.refreshTree
           ? KeyedSubtree(
@@ -121,7 +121,7 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
       return result;
     } finally {
       // Pop the helper from the stack after build completes
-      LanguageHelperScope().pop();
+      LanguageHelper._pop();
     }
   }
 }

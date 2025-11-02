@@ -1,5 +1,4 @@
-import '../../language_helper.dart';
-import '../language_helper.dart' show LanguageHelperScope, LanguageHelper;
+part of '../language_helper.dart';
 
 extension LanguageHelperEx on String {
   /// Translate the current text wih default parameters.
@@ -8,7 +7,7 @@ extension LanguageHelperEx on String {
   /// (from [LanguageScope]), that helper will be used. Otherwise, falls back
   /// to [LanguageHelper.instance].
   String get tr {
-    final scope = LanguageHelperScope().current;
+    final scope = LanguageHelper._current;
     return (scope ?? LanguageHelper.instance).translate(this);
   }
 
@@ -22,7 +21,7 @@ extension LanguageHelperEx on String {
   /// print(text); // -> 'result is zero'
   /// ```
   String trP(Map<String, dynamic> params) {
-    final scope = LanguageHelperScope().current;
+    final scope = LanguageHelper._current;
     return (scope ?? LanguageHelper.instance).translate(this, params: params);
   }
 
@@ -35,7 +34,7 @@ extension LanguageHelperEx on String {
   /// final text = 'result is something'.trT(LanguageCodes.en);
   /// ```
   String trT(LanguageCodes toCode) {
-    final scope = LanguageHelperScope().current;
+    final scope = LanguageHelper._current;
     return (scope ?? LanguageHelper.instance).translate(this, toCode: toCode);
   }
 
@@ -45,7 +44,7 @@ extension LanguageHelperEx on String {
   /// (from [LanguageScope]), that helper will be used. Otherwise, falls back
   /// to [LanguageHelper.instance].
   String trF({Map<String, dynamic> params = const {}, LanguageCodes? toCode}) {
-    final scope = LanguageHelperScope().current;
+    final scope = LanguageHelper._current;
     return (scope ?? LanguageHelper.instance).translate(
       this,
       params: params,
