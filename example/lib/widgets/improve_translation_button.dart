@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
+import 'package:language_improver/language_improver.dart';
 
 /// A small button widget that opens LanguageImprover for a specific
 /// translation key.

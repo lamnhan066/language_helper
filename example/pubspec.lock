@@ -187,7 +187,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.13.0-rc.3"
+    version: "0.13.0-rc.5"
   language_helper_generator:
     dependency: "direct overridden"
     description:
@@ -196,6 +196,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.1"
+  language_improver:
+    dependency: "direct main"
+    description:
+      name: language_improver
+      sha256: "8015c3cf5889f6143032080af5c464475c1e91412ac1f1baed1a34babfcf3528"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   leak_tracker:
     dependency: transitive
     description:

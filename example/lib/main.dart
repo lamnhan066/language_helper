@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
+import 'package:language_improver/language_improver.dart';
 
 import 'languages/codes.dart';
 import 'pages/advanced_features_page.dart';
