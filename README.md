@@ -519,7 +519,7 @@ LanguageScope(
 
 ### LanguageImprover - Visual Translation Editor
 
-`LanguageImprover` is a widget that provides a user-friendly interface for viewing, comparing, and editing translations. It's perfect for translators, QA teams, or anyone who needs to improve translations directly in the app.
+[`LanguageImprover`](https://pub.dev/packages/language_improver) is a widget that provides a user-friendly interface for viewing, comparing, and editing translations. It's perfect for translators, QA teams, or anyone who needs to improve translations directly in the app.
 
 #### Features
 
@@ -531,6 +531,10 @@ LanguageScope(
 - 🎯 **Flash animation**: Visual highlight for keys being focused
 
 #### Basic Usage
+
+```cmd
+dart pub add language_improver
+```
 
 ```dart
 LanguageImprover(
