@@ -74,7 +74,32 @@ extension LanguageHelperEx on String {
     );
   }
 
-  /// Translate with custom instance of `LanguageHelper`.
+  /// Translates with a custom instance of [LanguageHelper].
+  ///
+  /// Unlike other extension methods (`tr`, `trP`, etc.), this method requires you to
+  /// explicitly pass a [LanguageHelper] instance. This is useful when you want to use
+  /// a specific helper outside of a [LanguageBuilder] context.
+  ///
+  /// This method is always available and does not rely on the helper stack or
+  /// [LanguageScope]. It uses the provided [helper] directly.
+  ///
+  /// Example:
+  /// ```dart
+  /// final customHelper = LanguageHelper('CustomHelper');
+  /// await customHelper.initial(data: myData);
+  ///
+  /// // Use trC outside of LanguageBuilder
+  /// final text = 'Hello'.trC(customHelper);
+  ///
+  /// // With parameters
+  /// final text2 = 'Welcome @{name}'.trC(
+  ///   customHelper,
+  ///   params: {'name': 'John'},
+  /// );
+  ///
+  /// // Translate to specific language
+  /// final text3 = 'Hello'.trC(customHelper, toCode: LanguageCodes.es);
+  /// ```
   String trC(
     LanguageHelper helper, {
     Map<String, dynamic> params = const {},

@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:language_helper/src/language_helper.dart';
 
 extension LanguageLocalizations on LanguageHelper {
-  /// Get the flutter default localizations
+  /// Gets the Flutter default localizations.
   ///
   /// Includes:
   ///     GlobalMaterialLocalizations.delegate

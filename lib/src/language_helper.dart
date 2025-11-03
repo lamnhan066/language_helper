@@ -185,20 +185,20 @@ class LanguageHelper {
   /// text is missing in your language data.
   Iterable<String> _analysisKeys = const {};
 
-  /// Get list of [LanguageCodes] of the [data] and [dataOverrides]
+  /// Gets the list of [LanguageCodes] from both [data] and [dataOverrides].
   Set<LanguageCodes> get codes => {..._codes, ..._codesOverrides}.toSet();
   Set<LanguageCodes> _codes = {};
 
-  /// Get list of [LanguageCodes] of the [dataOverrides]
+  /// Gets the list of [LanguageCodes] from [dataOverrides].
   Set<LanguageCodes> get codesOverrides => _codesOverrides;
   Set<LanguageCodes> _codesOverrides = {};
 
-  /// Get list of language as [Locale]
+  /// Gets the list of languages as [Locale].
   Set<Locale> get locales => codes.map((e) => e.locale).toSet();
 
-  /// Get current language as [LanguageCodes]
+  /// Gets the current language as [LanguageCodes].
   ///
-  /// You must be `await initial()` before using this variable.
+  /// You must call `await initial()` before using this getter.
   LanguageCodes get code => _currentCode!;
 
   /// The current language code being used.
@@ -206,9 +206,9 @@ class LanguageHelper {
   /// This is set after [initial] is called and updated when [change] is called.
   LanguageCodes? _currentCode;
 
-  /// Get current language as [Locale]
+  /// Gets the current language as [Locale].
   ///
-  /// You must be `await initial()` before using this variable.
+  /// You must call `await initial()` before using this getter.
   Locale get locale => code.locale;
 
   /// The initial language code specified during initialization.
@@ -290,7 +290,7 @@ class LanguageHelper {
   /// Format: `$prefix.DeviceCode`
   String get _deviceCodeKey => '$prefix.DeviceCode';
 
-  /// Return `true` if the `initial` method is completed.
+  /// Returns `true` if the `initial` method has been completed.
   bool get isInitialized => _ensureInitialized.isCompleted;
 
   /// Wait until the `initial` method is completed.

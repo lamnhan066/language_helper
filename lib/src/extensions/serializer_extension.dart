@@ -7,7 +7,7 @@ extension LanguageDataSerializer on LanguageData {
   /// Convert this [LanguageData] to JSON
   String toJson() => jsonEncode(toMap());
 
-  /// Conver this [LanguageData] to Map
+  /// Convert this [LanguageData] to Map
   Map<String, dynamic> toMap() => s.languageDataToMap(this);
 
   /// Convert the JSON back to the [LanguageData]

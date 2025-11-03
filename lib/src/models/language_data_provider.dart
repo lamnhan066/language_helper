@@ -17,12 +17,12 @@ class LanguageDataProvider {
     return Future.value('');
   }
 
-  /// Get the `LanguageData` based on the `code`.
+  /// Gets the `LanguageData` based on the `code`.
   FutureOr<LanguageData> Function(LanguageCodes code) get getData =>
       _getData ?? (code) => Future.value({});
   final FutureOr<LanguageData> Function(LanguageCodes code)? _getData;
 
-  /// Get all supported `LanguageCodes`.
+  /// Gets all supported `LanguageCodes`.
   FutureOr<Set<LanguageCodes>> Function() get getSupportedCodes =>
       _getSupportedCodes ?? () => Future.value({});
   final FutureOr<Set<LanguageCodes>> Function()? _getSupportedCodes;

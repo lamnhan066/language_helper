@@ -15,19 +15,21 @@ class LanguageConditions {
   /// (which is specified by the @ or @{}).
   ///
   /// [conditions] is a Map of key and value that you want to apply for each
-  /// condition. There is a `default` key to let you set the default return if
-  /// there is no matched condition.
+  /// condition. There are two keys for the default return value when there is
+  /// no matched condition:
+  /// - `'default'` - Legacy key for backward compatibility
+  /// - `'_'` - Recommended key for the default case
   ///
-  /// Eg.
-  /// ``` dart
+  /// Example:
+  /// ```dart
   /// LanguageData data = {
   ///   LanguageCodes.en : {
-  ///     'This is @number dollar' : LanguageConditions(
-  ///       param: 'number',
+  ///     'You have @{count} item' : LanguageConditions(
+  ///       param: 'count',
   ///       conditions: {
-  ///         '0' : 'This is zero dollar',
-  ///         '1' : 'This is one dollar',
-  ///         'default' : 'This is @number dollars',
+  ///         '0' : 'You have 0 items',
+  ///         '1' : 'You have one item',
+  ///         '_' : 'You have @{count} items', // Default case
   ///       }
   ///     ),
   ///   }

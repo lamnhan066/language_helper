@@ -106,7 +106,7 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
     }
   }
 
-  /// Get the root state
+  /// Gets the root state from the widget tree.
   _LanguageBuilderState? _of() {
     final root = context.findRootAncestorStateOfType<_LanguageBuilderState>();
     if (root == null ||
