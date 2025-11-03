@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:language_helper/language_helper.dart';
-import 'package:language_helper/src/utils/print_debug.dart';
 import 'package:language_helper/src/utils/serializer.dart';
+import 'package:lite_logger/lite_logger.dart';
 
 extension ExportLanguageData on LanguageData {
   /// Export to json files for `LanguageDataProvider`. Default `path` is set to './assets/languages'.
@@ -72,20 +72,22 @@ extension ExportLazyLanguageData on LazyLanguageData {
 ///  |  |  |  |- en.json
 ///  |  |  |  |- vi.json
 void _exportJson(LanguageData data, String path) {
-  printDebug(
+  final logger = LiteLogger(enabled: true, minLevel: LogLevel.debug);
+  logger.debug(
     () => '===========================================================',
   );
-  printDebug(() => 'Exporting Json...');
+  logger.debug(() => 'Exporting Json...');
   _exportJsonCodes(data, path);
   _exportJsonLanguages(data, path);
-  printDebug(() => 'Exported Json');
-  printDebug(
+  logger.debug(() => 'Exported Json');
+  logger.debug(
     () => '===========================================================',
   );
 }
 
 void _exportJsonCodes(LanguageData data, String path) {
-  printDebug(() => 'Creating codes.json...');
+  final logger = LiteLogger(enabled: true, minLevel: LogLevel.debug);
+  logger.debug(() => 'Creating codes.json...');
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
@@ -94,11 +96,12 @@ void _exportJsonCodes(LanguageData data, String path) {
   final codes = data.keys.map((e) => e.code).toList();
   desFile.writeAsStringSync(encoder.convert(codes));
 
-  printDebug(() => 'Created codes.json');
+  logger.debug(() => 'Created codes.json');
 }
 
 void _exportJsonLanguages(LanguageData data, String path) {
-  printDebug(() => 'Creating languages json files...');
+  final logger = LiteLogger(enabled: true, minLevel: LogLevel.debug);
+  logger.debug(() => 'Creating languages json files...');
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
@@ -111,5 +114,5 @@ void _exportJsonLanguages(LanguageData data, String path) {
     desFile.writeAsStringSync(data);
   }
 
-  printDebug(() => 'Created languages json files');
+  logger.debug(() => 'Created languages json files');
 }

@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:language_code/language_code.dart';
+import 'package:lite_logger/lite_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../language_helper.dart';
 import 'mixins/update_language.dart';
-import 'utils/print_debug.dart';
 
 part 'extensions/language_helper_extension.dart';
 part 'widgets/language_builder.dart';
@@ -264,9 +264,28 @@ class LanguageHelper {
   /// Whether debug logging is enabled.
   ///
   /// When `true`, the helper prints debug information about language changes,
-  /// translation lookups, and other operations to the console.
+  /// translation lookups, and other operations to the console using [lite_logger].
+  ///
+  /// Debug logs include:
+  /// - Language initialization and changes
+  /// - Translation lookups and missing translations
+  /// - Data synchronization with device language
+  /// - Analysis results when enabled
+  ///
+  /// The logger is configured with colored output and timestamps for better
+  /// readability during development and debugging.
   bool get isDebug => _isDebug;
   bool _isDebug = false;
+
+  /// Internal logger instance for debug logging.
+  ///
+  /// Uses [lite_logger] for formatted, colored debug output. The logger is
+  /// initialized when [initial] is called and is configured based on the
+  /// [isDebug] parameter. Logs are only emitted when [isDebug] is `true`.
+  ///
+  /// This logger instance is shared across all debug logging within this
+  /// [LanguageHelper] instance and respects the instance's [isDebug] setting.
+  LiteLogger? _logger;
 
   /// The SharedPreferences key used to store the saved language code.
   ///
@@ -327,11 +346,30 @@ class LanguageHelper {
       LanguageDataProvider.empty(),
     ],
 
-    /// List of all the keys of text in your project.
+    /// Keys to analyze for missing translations.
     ///
-    /// You can maintain it by yourself or using [language_helper_generator](https://pub.dev/packages/language_helper_generator).
-    /// This value will be used by `analyze` method to let you know that which
-    /// text is missing in your language data.
+    /// List of all the keys of text in your project. You can maintain it by
+    /// yourself or using [language_helper_generator](https://pub.dev/packages/language_helper_generator).
+    ///
+    /// When provided, the [analyze] method will compare these keys against
+    /// the keys in your [data] to identify:
+    /// - Missing keys: in [analysisKeys] but not in [data]
+    /// - Deprecated keys: in [data] but not in [analysisKeys]
+    ///
+    /// These keys are typically extracted from your source code using the
+    /// language_helper generator, which scans for `.tr`, `.trP`, `.trT`, and
+    /// `.translate()` usage.
+    ///
+    /// If empty (default), the analyzer will only check for missing translations
+    /// across different languages without checking against a reference set.
+    ///
+    /// Example:
+    /// ```dart
+    /// await languageHelper.initial(
+    ///   data: [myData],
+    ///   analysisKeys: {'Hello', 'Goodbye', 'Welcome'}, // Your app's text keys
+    /// );
+    /// ```
     Iterable<String> analysisKeys = const {},
 
     /// Firstly, the app will try to use this [initialCode]. If [initialCode] is null,
@@ -373,7 +411,25 @@ class LanguageHelper {
     /// Callback on language changed.
     void Function(LanguageCodes code)? onChanged,
 
-    /// Print the debug log.
+    /// Enable debug logging.
+    ///
+    /// When `true`, debug information is printed to the console using [lite_logger]
+    /// with colored output and timestamps. Debug logs include:
+    /// - Language initialization and code changes
+    /// - Translation lookups and missing text warnings
+    /// - Device language synchronization events
+    /// - Data provider operations
+    /// - Analysis results when [analysisKeys] are provided
+    ///
+    /// Defaults to `false` to avoid console noise in production.
+    ///
+    /// Example:
+    /// ```dart
+    /// await languageHelper.initial(
+    ///   data: [myData],
+    ///   isDebug: !kReleaseMode, // Enable in debug builds only
+    /// );
+    /// ```
     bool isDebug = false,
   }) async {
     _data.clear();
@@ -388,10 +444,11 @@ class LanguageHelper {
     _syncWithDevice = syncWithDevice;
     _analysisKeys = analysisKeys;
     _initialCode = initialCode;
+    _logger ??= LiteLogger(enabled: isDebug, minLevel: LogLevel.debug);
 
     // When the `data` is empty, a temporary data will be added.
     if (_dataProviders.isEmpty) {
-      printDebug(
+      _logger?.debug(
         () =>
             'The `data` is empty, we will use a temporary `data` for the developing state',
       );
@@ -439,7 +496,7 @@ class LanguageHelper {
         // Sync with device only track the changing of the device language,
         // so it will not use the device language for the app at the first time.
         prefs.setString(_deviceCodeKey, currentCode.code);
-        printDebug(
+        _logger?.debug(
           () =>
               'Sync with device saved the current language to local database.',
         );
@@ -450,9 +507,13 @@ class LanguageHelper {
         if (currentCode != prefCode) {
           finalCode = currentCode;
           prefs.setString(_deviceCodeKey, currentCode.code);
-          printDebug(() => 'Sync with device applied the new device language');
+          _logger?.debug(
+            () => 'Sync with device applied the new device language',
+          );
         } else {
-          printDebug(() => 'Sync with device used the current app language');
+          _logger?.debug(
+            () => 'Sync with device used the current app language',
+          );
         }
       }
     }
@@ -462,7 +523,7 @@ class LanguageHelper {
       if (isOptionalCountryCode && finalCode.locale.countryCode != null) {
         // Try to use the `languageCode` only if the `languageCode_countryCode`
         // is not available
-        printDebug(
+        _logger?.debug(
           () =>
               'language does not contain the $finalCode => Try to use the `languageCode` only..',
         );
@@ -475,12 +536,12 @@ class LanguageHelper {
       }
 
       if (tempCode == null) {
-        printDebug(
+        _logger?.debug(
           () =>
               'Unable to use the `languageCode` only => Change the code to ${codes.first}',
         );
       } else {
-        printDebug(
+        _logger?.debug(
           () =>
               'Able to use the `languageCode` only => Change the code to $tempCode',
         );
@@ -489,7 +550,7 @@ class LanguageHelper {
       finalCode = tempCode ?? codes.first;
     }
 
-    printDebug(() => 'Set `currentCode` to $finalCode');
+    _logger?.debug(() => 'Set `currentCode` to $finalCode');
     _currentCode = finalCode;
 
     _data.addAll(await _dataProvider.getData(code));
@@ -525,7 +586,7 @@ class LanguageHelper {
     _addData(data: getData, database: _data, overwrite: overwrite);
     _codes.addAll(await data.getSupportedCodes());
     if (activate) change(code);
-    printDebug(
+    _logger?.debug(
       () =>
           'The new `data` is added and activated with overwrite is $overwrite',
     );
@@ -547,7 +608,7 @@ class LanguageHelper {
     _addData(data: getData, database: _dataOverrides, overwrite: overwrite);
     _codesOverrides.addAll(await dataOverrides.getSupportedCodes());
     if (activate) change(code);
-    printDebug(
+    _logger?.debug(
       () =>
           'The new `dataOverrides` is added and activated with overwrite is $overwrite',
     );
@@ -574,7 +635,7 @@ class LanguageHelper {
     final stringParams = params.map((key, value) => MapEntry(key, '$value'));
 
     if (!codes.contains(toCode) && !codesOverrides.contains(toCode)) {
-      printDebug(
+      _logger?.debug(
         () =>
             'Cannot translate this text because $toCode is not available in `data` and `dataOverrides` ($text)',
       );
@@ -583,7 +644,9 @@ class LanguageHelper {
 
     final translated = _dataOverrides[toCode]?[text] ?? _data[toCode]?[text];
     if (translated == null) {
-      printDebug(() => 'This text is not contained in current $toCode ($text)');
+      _logger?.debug(
+        () => 'This text is not contained in current $toCode ($text)',
+      );
       return _replaceParams(text, stringParams);
     }
 
@@ -600,23 +663,25 @@ class LanguageHelper {
   /// Change the language to this [code]
   Future<void> change(LanguageCodes toCode) async {
     if (!codes.contains(toCode)) {
-      printDebug(() => '$toCode is not available in `data` or `dataOverrides`');
+      _logger?.debug(
+        () => '$toCode is not available in `data` or `dataOverrides`',
+      );
 
       if (!_useInitialCodeWhenUnavailable) {
-        printDebug(
+        _logger?.debug(
           () =>
               'Does not allow using the initial code => Cannot change the language.',
         );
         return;
       } else {
         if (codes.contains(_initialCode)) {
-          printDebug(
+          _logger?.debug(
             () =>
                 '`useInitialCodeWhenUnavailable` is true => Change the language to $_initialCode',
           );
           _currentCode = _initialCode;
         } else {
-          printDebug(
+          _logger?.debug(
             () =>
                 '`useInitialCodeWhenUnavailable` is true but the `initialCode` is not available in `data` or `dataOverrides` => Cannot change the language',
           );
@@ -624,7 +689,7 @@ class LanguageHelper {
         }
       }
     } else {
-      printDebug(() => 'Set currentCode to $toCode');
+      _logger?.debug(() => 'Set currentCode to $toCode');
       _currentCode = toCode;
     }
 
@@ -641,7 +706,9 @@ class LanguageHelper {
       _dataOverrides.addAll(dataOverrides);
     }
 
-    printDebug(() => 'Change language to $toCode for ${_states.length} states');
+    _logger?.debug(
+      () => 'Change language to $toCode for ${_states.length} states',
+    );
     Set<_LanguageBuilderState> needToUpdate = {};
     for (var state in _states) {
       if (state._forceRebuild) {
@@ -657,7 +724,7 @@ class LanguageHelper {
       }
     }
 
-    printDebug(() => 'Need to update ${needToUpdate.length} states');
+    _logger?.debug(() => 'Need to update ${needToUpdate.length} states');
 
     for (var state in needToUpdate) {
       state.updateLanguage();
@@ -670,13 +737,13 @@ class LanguageHelper {
 
     // Save to local memory
     if (_isAutoSave) {
-      printDebug(() => 'Save this $toCode to local memory');
+      _logger?.debug(() => 'Save this $toCode to local memory');
       SharedPreferences.getInstance().then((pref) {
         pref.setString(_autoSaveCodeKey, toCode.code);
       });
     }
 
-    printDebug(() => 'Changing completed!');
+    _logger?.debug(() => 'Changing completed!');
   }
 
   /// Change the [useInitialCodeWhenUnavailable] value
@@ -684,17 +751,43 @@ class LanguageHelper {
     _useInitialCodeWhenUnavailable = newValue;
   }
 
-  /// Analyze the [_data] so you can know which ones are missing what text.
-  /// The results will be print in the console log with the below format:
-
+  /// Analyze the [_data] to identify missing or deprecated translation keys.
   ///
-  /// Result:
-  ///   LanguageCodes.en:
-  ///     some thing 1
-  ///     some thing 2
-  ///   LanguageCodes.vi:
-  ///     some thing 3
-  ///     some thing 4
+  /// Compares the keys in your [data] with the [analysisKeys] provided during
+  /// [initial] to identify:
+  /// - Missing keys: keys in [analysisKeys] but not in any language's [data]
+  /// - Deprecated keys: keys in [data] but not in [analysisKeys]
+  /// - Missing translations: keys present in one language but missing in others
+  ///
+  /// When [isDebug] is `true`, the analysis results are automatically logged
+  /// to the console using the debug logger with colored output.
+  ///
+  /// Returns a formatted string with the analysis results. The output format:
+  ///
+  /// ```
+  /// ==================================================
+  /// Analyze all languages...
+  /// Missing keys:
+  ///   >> Key name 1
+  ///   >> Key name 2
+  /// Deprecated keys:
+  ///   >> Old key name 1
+  /// Specific text missing results:
+  ///   >> LanguageCodes.en:
+  ///       >> Text is missed in vi
+  ///   >> LanguageCodes.vi:
+  ///       >> Text is missed in en
+  /// ==================================================
+  /// ```
+  ///
+  /// Note: This method only works with data from [LanguageDataProvider.data].
+  /// It cannot analyze data from assets or network providers.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = languageHelper.analyze();
+  /// print(result);
+  /// ```
   String analyze() {
     final List<String> keys = [];
     StringBuffer buffer = StringBuffer('');
@@ -771,7 +864,7 @@ class LanguageHelper {
     buffer.write('==================================================');
     buffer.write('\n');
 
-    printDebug(() => buffer.toString());
+    _logger?.debug(() => buffer.toString());
 
     return buffer.toString();
   }
@@ -847,7 +940,7 @@ class LanguageHelper {
     String fallback,
   ) {
     if (!params.containsKey(translateCondition.param)) {
-      printDebug(
+      _logger?.debug(
         () =>
             'The params does not contain the condition param: ${translateCondition.param}',
       );
@@ -860,7 +953,7 @@ class LanguageHelper {
         conditions[param] ?? conditions['default'] ?? conditions['_'];
 
     if (translated == null) {
-      printDebug(
+      _logger?.debug(
         () =>
             'There is no result for key $param of condition ${translateCondition.param}',
       );

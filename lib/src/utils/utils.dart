@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:language_helper/src/utils/print_debug.dart';
+import 'package:lite_logger/lite_logger.dart';
 
 class Utils {
   static String removeLastSlash(String path) {
@@ -17,6 +17,7 @@ class Utils {
     Map<String, String>? headers,
     http.Client? client,
   }) async {
+    final logger = LiteLogger(enabled: true, minLevel: LogLevel.debug);
     client ??= http.Client();
     try {
       final response = await client.get(uri, headers: headers);
@@ -24,13 +25,13 @@ class Utils {
       if (response.statusCode == 200) {
         return utf8.decode(response.bodyBytes);
       } else {
-        printDebug(
+        logger.debug(
           () =>
               'Failed to load data from URL. Status code: ${response.statusCode}',
         );
       }
     } catch (e) {
-      printDebug(() => 'Error fetching data from URL: $e');
+      logger.debug(() => 'Error fetching data from URL: $e');
     }
 
     return '';

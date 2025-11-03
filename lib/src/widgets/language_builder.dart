@@ -144,14 +144,14 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
       // Add to new helper's states
       _languageHelper = newHelper;
       if (_languageHelper._states.add(this)) {
-        printDebug(() => 'Added $this to the states');
+        _languageHelper._logger?.debug(() => 'Added $this to the states');
       }
-      printDebug(
+      _languageHelper._logger?.debug(
         () => 'Length of the states: ${_languageHelper._states.length}',
       );
     } else if (_languageHelper._states.add(this)) {
-      printDebug(() => 'Added $this to the states');
-      printDebug(
+      _languageHelper._logger?.debug(() => 'Added $this to the states');
+      _languageHelper._logger?.debug(
         () => 'Length of the states: ${_languageHelper._states.length}',
       );
     }
@@ -159,7 +159,7 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
 
   @override
   void dispose() {
-    printDebug(() => 'Removed $this from the states');
+    _languageHelper._logger?.debug(() => 'Removed $this from the states');
     _languageHelper._states.remove(this);
     super.dispose();
   }

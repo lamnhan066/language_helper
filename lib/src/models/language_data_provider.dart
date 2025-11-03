@@ -4,15 +4,18 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:language_helper/language_helper.dart';
-import 'package:language_helper/src/utils/print_debug.dart';
 import 'package:language_helper/src/utils/utils.dart';
+import 'package:lite_logger/lite_logger.dart';
 
 class LanguageDataProvider {
   static Future<String> _loadAsset(String path) async {
     try {
       return await rootBundle.loadString(path);
     } catch (_) {
-      printDebug(() => 'The $path does not exist in the assets');
+      LiteLogger(
+        enabled: true,
+        minLevel: LogLevel.debug,
+      ).debug(() => 'The $path does not exist in the assets');
     }
     return Future.value('');
   }
