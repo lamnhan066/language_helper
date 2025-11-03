@@ -1,3 +1,7 @@
+## 0.13.0-rc.8
+
+* Show warning if `LanguageHelper.of` cannot find the `LanguageScope`.
+
 ## 0.13.0-rc.7
 
 * Debug will show correctly for each instance.
