@@ -29,6 +29,7 @@ dependencies:
   language_code: ^0.6.0-rc.3
   shared_preferences: ^2.0.0
   http: ^1.0.0
+  lite_logger: ^0.1.2
 
 dev_dependencies:
   flutter_test:
