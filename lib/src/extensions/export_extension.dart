@@ -87,6 +87,7 @@ void _exportJson(LanguageData data, String path) {
     name: 'ExportJson',
     enabled: true,
     minLevel: LogLevel.debug,
+    usePrint: false,
   );
   logger.step(
     () => '===========================================================',
@@ -112,6 +113,7 @@ void _exportJsonCodes(LanguageData data, String path) {
     name: 'ExportJsonCodes',
     enabled: true,
     minLevel: LogLevel.debug,
+    usePrint: false,
   );
   logger.info(() => 'Creating codes.json...');
 
@@ -138,6 +140,7 @@ void _exportJsonLanguages(LanguageData data, String path) {
     name: 'ExportJsonLanguages',
     enabled: true,
     minLevel: LogLevel.debug,
+    usePrint: false,
   );
   logger.info(() => 'Creating languages json files...');
 

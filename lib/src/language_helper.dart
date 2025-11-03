@@ -87,11 +87,18 @@ class LanguageHelper {
       final contextId = identityHashCode(context);
       if (!_noScopeLoggedContexts.contains(contextId)) {
         _noScopeLoggedContexts.add(contextId);
-        LanguageHelper.instance._logger?.warning(
-          () =>
+
+        LiteLogger(
+          name: 'LanguageHelper',
+          enabled: true,
+          minLevel: LogLevel.debug,
+          usePrint: false,
+        ).warning(() {
+          final message =
               'No LanguageScope found in widget tree. Using default LanguageHelper.instance. '
-              'Wrap your app with LanguageScope to provide a custom helper.',
-        );
+              'Wrap your app with LanguageScope to provide a custom helper.';
+          return message;
+        });
       }
       return LanguageHelper.instance;
     }
@@ -469,6 +476,7 @@ class LanguageHelper {
       name: prefix,
       enabled: isDebug,
       minLevel: LogLevel.debug,
+      usePrint: false,
     );
 
     // When the `data` is empty, a temporary data will be added.

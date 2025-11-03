@@ -67,6 +67,7 @@ class Utils {
       name: 'GetUrl',
       enabled: true,
       minLevel: LogLevel.debug,
+      usePrint: false,
     );
     client ??= http.Client();
     try {

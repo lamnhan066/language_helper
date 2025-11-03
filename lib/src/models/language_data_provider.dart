@@ -48,6 +48,7 @@ class LanguageDataProvider {
         name: 'LoadAsset',
         enabled: true,
         minLevel: LogLevel.debug,
+        usePrint: false,
       ).warning(() => 'The $path does not exist in the assets');
     }
     return Future.value('');
