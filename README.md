@@ -451,11 +451,11 @@ You can access the scoped helper directly from context:
 
 ```dart
 // Gets the scoped helper or falls back to LanguageHelper.instance
-final helper = LanguageScope.of(context);
+final helper = LanguageHelper.of(context);
 final translated = helper.translate('Hello');
 
 // Gets the scoped helper or returns null
-final helper = LanguageScope.maybeOf(context);
+final helper = LanguageHelper.maybeOf(context);
 if (helper != null) {
   final translated = helper.translate('Hello');
 }
