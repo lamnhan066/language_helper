@@ -37,12 +37,37 @@ class LanguageConditions {
   /// ```
   const LanguageConditions({required this.param, required this.conditions});
 
-  /// Convert to Map
+  /// Converts this [LanguageConditions] to a serializable map.
+  ///
+  /// Returns a map with `param` and `conditions` keys, suitable for JSON
+  /// serialization or storage.
+  ///
+  /// Example:
+  /// ```dart
+  /// final condition = LanguageConditions(
+  ///   param: 'count',
+  ///   conditions: {'1': 'one', '_': 'many'},
+  /// );
+  /// final map = condition.toMap();
+  /// // map = {'param': 'count', 'conditions': {'1': 'one', '_': 'many'}}
+  /// ```
   Map<String, dynamic> toMap() {
     return {'param': param, 'conditions': conditions};
   }
 
-  /// Convert to LanguageConditions from Map
+  /// Creates a [LanguageConditions] instance from a map structure.
+  ///
+  /// This factory method deserializes a map (typically from JSON) back into
+  /// a [LanguageConditions] object. The map must contain `param` and `conditions`
+  /// keys.
+  ///
+  /// If `param` is missing from the map, it defaults to an empty string.
+  ///
+  /// Example:
+  /// ```dart
+  /// final map = {'param': 'count', 'conditions': {'1': 'one', '_': 'many'}};
+  /// final condition = LanguageConditions.fromMap(map);
+  /// ```
   factory LanguageConditions.fromMap(Map<String, dynamic> map) {
     return LanguageConditions(
       param: map['param'] ?? '',
@@ -50,10 +75,40 @@ class LanguageConditions {
     );
   }
 
-  /// Convert to JSON
+  /// Converts this [LanguageConditions] to a JSON string.
+  ///
+  /// Serializes the condition to a JSON string representation. This is the
+  /// inverse operation of [fromJson].
+  ///
+  /// Example:
+  /// ```dart
+  /// final condition = LanguageConditions(param: 'count', conditions: {'1': 'one'});
+  /// final json = condition.toJson();
+  /// // json = '{"param":"count","conditions":{"1":"one"}}'
+  /// ```
   String toJson() => json.encode(toMap());
 
-  /// Convert to LanguageConditions from JSON
+  /// Creates a [LanguageConditions] instance from a JSON string.
+  ///
+  /// Parses a JSON string and converts it to [LanguageConditions]. This is
+  /// the inverse operation of [toJson].
+  ///
+  /// **JSON format:**
+  /// ```json
+  /// {
+  ///   "param": "count",
+  ///   "conditions": {
+  ///     "1": "one",
+  ///     "_": "many"
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// Example:
+  /// ```dart
+  /// final jsonString = '{"param":"count","conditions":{"1":"one","_":"many"}}';
+  /// final condition = LanguageConditions.fromJson(jsonString);
+  /// ```
   factory LanguageConditions.fromJson(String source) =>
       LanguageConditions.fromMap(json.decode(source));
 

@@ -190,13 +190,51 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   }
 }
 
+/// A shorthand widget for simple translation-based widgets.
+///
+/// [Tr] is a convenience wrapper around [LanguageBuilder] that provides a
+/// simpler API for widgets that only need to translate text. It's useful
+/// for quick translations without wrapping in a full [LanguageBuilder].
+///
+/// **Behavior:**
+/// - Automatically rebuilds when the language changes (unless [forceRebuild] is set)
+/// - Uses [LanguageScope] if available, otherwise falls back to [LanguageHelper.instance]
+/// - Respects [refreshTree] to completely refresh the widget tree when needed
+///
+/// **When to use:**
+/// - For simple text translations that don't need a full [LanguageBuilder]
+/// - When you want a concise API for translation widgets
+/// - For inline translations within larger widget trees
+///
+/// **When not to use:**
+/// - When you need to access [LanguageHelper] directly in the builder
+/// - For complex widget trees that need multiple language-aware widgets
+/// - When you need to pass the helper instance explicitly
+///
+/// Example:
+/// ```dart
+/// // Simple translation
+/// Tr((_) => Text('Hello'.tr)),
+///
+/// // With force rebuild
+/// Tr(
+///   (_) => Text('Hello'.tr),
+///   forceRebuild: true,
+/// ),
+///
+/// // With custom helper
+/// final customHelper = LanguageHelper('Custom');
+/// Tr(
+///   (_) => Text('Hello'.tr),
+///   languageHelper: customHelper,
+/// ),
+/// ```
 class Tr extends StatelessWidget {
-  /// A shorthand version of [LanguageBuilder].
+  /// Creates a [Tr] widget that builds its child with translation support.
   ///
-  /// Example:
-  /// ```dart
-  /// Tr((_) => 'hello world'.tr),
-  /// ```
+  /// The [builder] function will be called to build the widget whenever the
+  /// language changes. Extension methods (`tr`, `trP`, etc.) will work
+  /// within this builder.
   const Tr(
     this.builder, {
     super.key,
@@ -205,21 +243,37 @@ class Tr extends StatelessWidget {
     this.refreshTree = false,
   });
 
-  /// Add your builder
+  /// The builder function that creates the widget tree.
+  ///
+  /// This function is called during build and whenever the language changes.
+  /// Extension methods (`tr`, `trP`, etc.) called within this builder will
+  /// use the helper associated with this [Tr] widget.
   final Widget Function(BuildContext _) builder;
 
-  /// Controls when to rebuild.
+  /// Controls when this widget rebuilds on language change.
   ///
-  /// - `true`  → always rebuild this widget when the language is changed.
-  /// - `false` → only rebuild the root widget.
-  /// - `null`  → fallback to `LanguageHelper.forceRebuild` default.
+  /// When you have multiple [LanguageBuilder] or [Tr] widgets in your tree,
+  /// only the root widget typically rebuilds by default.
+  ///
+  /// - `true`  → always rebuild this widget when the language is changed
+  /// - `false` → only rebuild the root widget (default behavior)
+  /// - `null`  → fallback to [LanguageHelper.forceRebuild] default
   final bool? forceRebuild;
 
-  /// If `true`, the widget will be refreshed when the language is changed.
-  /// It will rebuild the entire tree of the widget.
+  /// If `true`, the widget tree will be completely refreshed when the language changes.
+  ///
+  /// When enabled, the entire widget tree will be destroyed and recreated using
+  /// [KeyedSubtree]. This can be expensive but may be necessary for widgets that
+  /// don't properly handle language changes or need to reset their state.
+  ///
+  /// Defaults to `false`. Use only when specifically needed.
   final bool refreshTree;
 
-  /// Add the custom instance of `LanguageHelper`.
+  /// An explicit [LanguageHelper] instance to use for this widget.
+  ///
+  /// If provided, this takes priority over any [LanguageScope] in the widget tree.
+  /// If `null`, the widget will look for a [LanguageScope] ancestor, and if none
+  /// is found, it will fall back to [LanguageHelper.instance].
   final LanguageHelper? languageHelper;
 
   @override

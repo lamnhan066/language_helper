@@ -569,18 +569,65 @@ class LanguageHelper {
     }
   }
 
-  /// Dispose all the controllers
+  /// Disposes all resources used by this [LanguageHelper] instance.
+  ///
+  /// Closes the [stream] controller, which will cancel all active stream
+  /// subscriptions. After calling this method, the helper should not be used
+  /// for language changes or translations.
+  ///
+  /// **Important**: Only call this method when you're certain the helper
+  /// instance will no longer be used, typically when the app is shutting down
+  /// or when removing a scoped helper that's no longer needed.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Only dispose custom instances, not LanguageHelper.instance
+  /// final helper = LanguageHelper('CustomHelper');
+  /// // ... use helper ...
+  /// helper.dispose();
+  /// ```
   void dispose() {
     _streamController.close();
   }
 
-  /// Add new data to the current [data].
+  /// Adds new translation data to the current [data].
   ///
-  /// If [overwrite] is `true`, the available translation will be overwritten.
+  /// This method allows you to dynamically add translations from a [LanguageDataProvider]
+  /// at runtime, useful for loading translations from a network source, user-generated
+  /// content, or A/B testing scenarios.
   ///
-  /// If the [activate] is `true`, all the visible [LanguageBuilder]s will be rebuilt
-  /// automatically, **notice that you may get the `setState` issue
-  /// because of the rebuilding of the [LanguageBuilder] when it's still building.**
+  /// The [overwrite] parameter controls whether existing translations are replaced:
+  /// - `true` (default): New translations will overwrite existing ones with the same keys
+  /// - `false`: Existing translations are preserved, only new keys are added
+  ///
+  /// The [activate] parameter controls whether widgets are updated immediately:
+  /// - `true` (default): All [LanguageBuilder] widgets will rebuild automatically
+  /// - `false`: Data is added but widgets won't update until [reload] or [change] is called
+  ///
+  /// **Warning**: When [activate] is `true`, be careful not to call this during widget
+  /// build as it may cause `setState` errors. Consider setting [activate] to `false`
+  /// and calling [reload] manually after the build completes.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Load translations from network
+  /// final networkProvider = LanguageDataProvider.network('https://api.example.com/translations');
+  /// await languageHelper.addData(networkProvider);
+  ///
+  /// // Add translations without overwriting existing ones
+  /// await languageHelper.addData(
+  ///   LanguageDataProvider.data(newTranslations),
+  ///   overwrite: false,
+  /// );
+  ///
+  /// // Add data without triggering rebuilds immediately
+  /// await languageHelper.addData(
+  ///   additionalData,
+  ///   activate: false,
+  /// );
+  /// // ... do other operations ...
+  /// await languageHelper.reload(); // Update widgets now
+  /// ```
   Future<void> addData(
     LanguageDataProvider data, {
     bool overwrite = true,
@@ -596,13 +643,39 @@ class LanguageHelper {
     );
   }
 
-  /// Add new data to the current [dataOverrides].
+  /// Adds new translation data to the current [dataOverrides].
   ///
-  /// If [overwrite] is `true`, the available translation will be overwritten.
+  /// Override data takes precedence over regular [data] when both contain the same
+  /// translation key. This is useful for:
+  /// - User-customized translations
+  /// - A/B testing different translation variants
+  /// - Temporarily overriding translations for specific contexts
   ///
-  /// If the [activate] is `true`, all the visible [LanguageBuilder]s will be rebuilt
-  /// automatically, **notice that you may get the `setState` issue
-  /// because of the rebuilding of the [LanguageBuilder] when it's still building.**
+  /// The [overwrite] parameter controls whether existing overrides are replaced:
+  /// - `true` (default): New overrides will overwrite existing ones with the same keys
+  /// - `false`: Existing overrides are preserved, only new keys are added
+  ///
+  /// The [activate] parameter controls whether widgets are updated immediately:
+  /// - `true` (default): All [LanguageBuilder] widgets will rebuild automatically
+  /// - `false`: Data is added but widgets won't update until [reload] or [change] is called
+  ///
+  /// **Warning**: When [activate] is `true`, be careful not to call this during widget
+  /// build as it may cause `setState` errors. Consider setting [activate] to `false`
+  /// and calling [reload] manually after the build completes.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Add user customizations that override default translations
+  /// await languageHelper.addDataOverrides(
+  ///   LanguageDataProvider.data(userCustomizations),
+  /// );
+  ///
+  /// // Add test translations without affecting widgets immediately
+  /// await languageHelper.addDataOverrides(
+  ///   testTranslations,
+  ///   activate: false,
+  /// );
+  /// ```
   Future<void> addDataOverrides(
     LanguageDataProvider dataOverrides, {
     bool overwrite = true,
@@ -618,7 +691,44 @@ class LanguageHelper {
     );
   }
 
-  /// Translate this [text] to the destination language
+  /// Translates [text] to the current or specified language.
+  ///
+  /// This method looks up the translation for [text] in the current language
+  /// (or [toCode] if provided) and replaces any parameters in the translated
+  /// text using [params].
+  ///
+  /// The translation lookup follows this priority:
+  /// 1. [dataOverrides] for the target language
+  /// 2. [data] for the target language
+  /// 3. Returns the original [text] with parameters replaced if no translation is found
+  ///
+  /// If the translation is a [LanguageConditions], it will evaluate the condition
+  /// based on the parameter value and select the appropriate translation.
+  ///
+  /// Parameter replacement supports two formats:
+  /// - `@{paramName}` - Recommended format (e.g., "Hello @{name}")
+  /// - `@paramName` - Legacy format (must be followed by space, end of line, or newline)
+  ///
+  /// Returns the translated text with parameters replaced, or the original
+  /// text if no translation is found.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Simple translation
+  /// final text = languageHelper.translate('Hello');
+  ///
+  /// // Translation with parameters
+  /// final text = languageHelper.translate(
+  ///   'Hello @{name}',
+  ///   params: {'name': 'John'},
+  /// );
+  ///
+  /// // Translation to specific language
+  /// final text = languageHelper.translate(
+  ///   'Hello',
+  ///   toCode: LanguageCodes.vi,
+  /// );
+  /// ```
   String translate(
     /// Text that you want to translate
     String text, {
@@ -661,10 +771,52 @@ class LanguageHelper {
     return _replaceParams(translated, stringParams);
   }
 
-  /// Reload all the `LanguageBuilder` to apply the new data.
+  /// Reloads all [LanguageBuilder] widgets to apply updated translation data.
+  ///
+  /// This is a convenience method that calls [change] with the current [code].
+  /// Use this after modifying translation data (e.g., via [addData] or
+  /// [addDataOverrides]) to refresh all visible text in the app without
+  /// changing the language.
+  ///
+  /// All [LanguageBuilder] widgets in the widget tree will be notified to
+  /// rebuild with the updated translations.
+  ///
+  /// Example:
+  /// ```dart
+  /// await languageHelper.addData(newDataProvider);
+  /// await languageHelper.reload(); // Refresh all visible translations
+  /// ```
   Future<void> reload() => change(code);
 
-  /// Change the language to this [code]
+  /// Changes the application language to [toCode].
+  ///
+  /// This method updates the current language code and triggers all
+  /// [LanguageBuilder] widgets to rebuild with new translations. The change
+  /// will be persisted to local storage if [isAutoSave] was enabled during
+  /// [initial].
+  ///
+  /// **Behavior when [toCode] is unavailable:**
+  /// - If [useInitialCodeWhenUnavailable] is `false`: The change is ignored
+  ///   and the current language remains unchanged.
+  /// - If [useInitialCodeWhenUnavailable] is `true`: Falls back to [initialCode]
+  ///   if it's available in the data.
+  ///
+  /// The method will:
+  /// 1. Validate that [toCode] exists in [codes] or [codesOverrides]
+  /// 2. Load translation data if not already cached for the new language
+  /// 3. Update all [LanguageBuilder] widgets to reflect the new language
+  /// 4. Save the new language code to SharedPreferences (if [isAutoSave] is enabled)
+  /// 5. Emit events via [stream] and call [onChanged] callback
+  ///
+  /// Returns a [Future] that completes when all updates are finished.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Change to Vietnamese
+  /// await languageHelper.change(LanguageCodes.vi);
+  ///
+  /// // All widgets will automatically update to show Vietnamese text
+  /// ```
   Future<void> change(LanguageCodes toCode) async {
     if (!codes.contains(toCode)) {
       _logger?.debug(
@@ -750,7 +902,32 @@ class LanguageHelper {
     _logger?.debug(() => 'Changing completed!');
   }
 
-  /// Change the [useInitialCodeWhenUnavailable] value
+  /// Updates whether to use [initialCode] when an unavailable language is requested.
+  ///
+  /// When [newValue] is `true`, calling [change] with a language code that
+  /// doesn't exist in [codes] or [codesOverrides] will fall back to [initialCode]
+  /// if it's available.
+  ///
+  /// When `false` (default), requests to change to unavailable languages are
+  /// ignored and the current language remains unchanged.
+  ///
+  /// This can be changed at runtime to provide more or less strict language
+  /// switching behavior.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Allow fallback to initial code
+  /// languageHelper.setUseInitialCodeWhenUnavailable(true);
+  ///
+  /// // User tries to change to unavailable language
+  /// await languageHelper.change(LanguageCodes.zh);
+  /// // Falls back to initialCode (e.g., LanguageCodes.en) if available
+  ///
+  /// // Disable fallback
+  /// languageHelper.setUseInitialCodeWhenUnavailable(false);
+  /// await languageHelper.change(LanguageCodes.zh);
+  /// // Change is ignored, current language unchanged
+  /// ```
   void setUseInitialCodeWhenUnavailable(bool newValue) {
     _useInitialCodeWhenUnavailable = newValue;
   }
@@ -873,6 +1050,16 @@ class LanguageHelper {
     return buffer.toString();
   }
 
+  /// Selects the first available data provider from [providers] that has translations.
+  ///
+  /// This internal method iterates through [providers] and returns the first one
+  /// that supports at least one language code. Used during [initial] to select
+  /// which provider to use for loading translation data.
+  ///
+  /// Returns an empty [LanguageDataProvider] if no provider has available data.
+  ///
+  /// The [isOverrides] parameter is used for logging purposes to distinguish
+  /// between regular data providers and override providers.
   Future<LanguageDataProvider> _chooseTheBestDataProvider(
     Iterable<LanguageDataProvider> providers,
     bool isOverrides,
@@ -890,7 +1077,17 @@ class LanguageHelper {
     return result ?? LanguageDataProvider.data({});
   }
 
-  /// Replace @{param} or @param with the real text
+  /// Replaces parameter placeholders in [input] with values from [params].
+  ///
+  /// Supports two placeholder formats:
+  /// - `@{paramName}` - Recommended format (e.g., "Hello @{name}" → "Hello John")
+  /// - `@paramName` - Legacy format (must be followed by space, end of line, or newline)
+  ///
+  /// This is an internal method used by [translate] to process parameterized
+  /// translation strings.
+  ///
+  /// Returns [input] as a string with all matching parameters replaced, or
+  /// the original string if [params] is empty.
   String _replaceParams(dynamic input, Map<String, dynamic> params) {
     if (params.isEmpty) return '$input';
 
@@ -903,7 +1100,19 @@ class LanguageHelper {
     return input as String;
   }
 
-  /// Add the [data] to the [database] with [overwrite] option.
+  /// Merges [data] into [database] with optional overwrite behavior.
+  ///
+  /// This internal method handles merging translation data from multiple sources.
+  /// When [overwrite] is `true`, existing translations for the same keys will
+  /// be replaced with new values. When `false`, existing translations are preserved.
+  ///
+  /// The merging process:
+  /// 1. Adds new language codes to [database] if they don't exist
+  /// 2. Adds new translation keys within existing languages
+  /// 3. Optionally overwrites existing keys based on [overwrite] parameter
+  ///
+  /// This is used internally by [addData] and [addDataOverrides] to manage
+  /// translation data from multiple providers.
   void _addData({
     required LanguageData data,
     required LanguageData database,
@@ -937,7 +1146,17 @@ class LanguageHelper {
     }
   }
 
-  /// Replace @{param} or @param with the real text with [LanguageConditions]
+  /// Evaluates [LanguageConditions] and replaces parameters in the selected translation.
+  ///
+  /// This internal method handles translations that use conditional logic based
+  /// on parameter values. It:
+  /// 1. Extracts the condition parameter value from [params]
+  /// 2. Looks up the matching condition in [translateCondition.conditions]
+  /// 3. Falls back to 'default' or '_' if the exact value isn't found
+  /// 4. Replaces all parameters in the selected translation string
+  /// 5. Returns [fallback] with parameters replaced if no condition matches
+  ///
+  /// Used internally by [translate] when processing [LanguageConditions] translations.
   String _replaceParamsCondition(
     LanguageConditions translateCondition,
     Map<String, dynamic> params,
@@ -967,6 +1186,11 @@ class LanguageHelper {
     return _replaceParams(translated, params);
   }
 
+  /// Replaces newline characters in [text] with a visible symbol for analysis output.
+  ///
+  /// This internal utility method converts newlines to ' ⏎ ' (space-return-arrow-space)
+  /// to make multi-line translation keys visible in analysis reports. Used by [analyze]
+  /// to format output when translation keys contain line breaks.
   String _removeNewline(String text) {
     return text.replaceAll('\n', ' ⏎ ');
   }
