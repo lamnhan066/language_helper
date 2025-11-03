@@ -445,7 +445,7 @@ class LanguageHelper {
     _analysisKeys = analysisKeys;
     _initialCode = initialCode;
     _logger ??= LiteLogger(
-      name: 'LanguageHelper',
+      name: prefix,
       enabled: isDebug,
       minLevel: LogLevel.debug,
     );
