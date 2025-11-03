@@ -67,6 +67,10 @@ class LanguageHelper {
   /// a different helper instance is provided), wrap your widget in a [LanguageBuilder]
   /// instead of using this method directly.
   ///
+  /// When no [LanguageScope] is found in the widget tree, this method logs an informational
+  /// message (if debug logging is enabled) to help developers understand that the default
+  /// [LanguageHelper.instance] is being used.
+  ///
   /// Example:
   /// ```dart
   /// Builder(
@@ -78,8 +82,25 @@ class LanguageHelper {
   /// ```
   static LanguageHelper of(BuildContext context) {
     final scope = context.getInheritedWidgetOfExactType<LanguageScope>();
-    return scope?.languageHelper ?? LanguageHelper.instance;
+    if (scope == null) {
+      // Log once per context to avoid spam
+      final contextId = identityHashCode(context);
+      if (!_noScopeLoggedContexts.contains(contextId)) {
+        _noScopeLoggedContexts.add(contextId);
+        LanguageHelper.instance._logger?.warning(
+          () =>
+              'No LanguageScope found in widget tree. Using default LanguageHelper.instance. '
+              'Wrap your app with LanguageScope to provide a custom helper.',
+        );
+      }
+      return LanguageHelper.instance;
+    }
+    return scope.languageHelper;
   }
+
+  /// Tracks contexts where we've already logged the "no scope" message.
+  /// Uses context identity hash codes to prevent duplicate logs.
+  static final Set<int> _noScopeLoggedContexts = {};
 
   /// To control [LanguageBuilder]
   final Set<_LanguageBuilderState> _states = {};
