@@ -1,3 +1,9 @@
+## 0.13.0-rc.7
+
+* Debug will show correctly for each instance.
+* Use `lite_logger` for logging.
+* Improve docs.
+
 ## 0.13.0-rc.6
 
 * Change from `LanguageScope.of` to `LanguageHelper.of`.
