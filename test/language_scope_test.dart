@@ -887,5 +887,228 @@ void main() {
       parentHelper.dispose();
       childHelper.dispose();
     });
+
+    testWidgets(
+      'showDialog can access same LanguageHelper instance from parent LanguageScope',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+
+        final scopedHelper = LanguageHelper('ScopedHelper');
+        await scopedHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+        );
+
+        LanguageHelper? languageHelper1;
+        LanguageHelper? languageHelper2;
+
+        await tester.pumpWidget(
+          LanguageScope(
+            languageHelper: scopedHelper,
+            child: MaterialApp(
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) {
+                    languageHelper1 = LanguageHelper.of(context);
+                    return ElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (dialogContext) {
+                            languageHelper2 = LanguageHelper.of(dialogContext);
+                            return AlertDialog(
+                              title: Text('Hello'.tr),
+                              content: const Text('Test Dialog'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(dialogContext).pop(),
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: const Text('Open Dialog'),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(languageHelper1, equals(scopedHelper));
+        expect(languageHelper1, isNotNull);
+
+        // Tap button to show dialog
+        await tester.tap(find.text('Open Dialog'));
+        await tester.pumpAndSettle();
+
+        // Verify the dialog is shown and can access the same LanguageHelper
+        expect(languageHelper2, isNotNull);
+        expect(languageHelper1, equals(languageHelper2));
+        expect(languageHelper2, equals(scopedHelper));
+
+        scopedHelper.dispose();
+      },
+    );
+
+    testWidgets(
+      'showDialog can access LanguageHelper from LanguageScope with nested MaterialApp when scope wraps outer app',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+
+        final scopedHelper = LanguageHelper('ScopedHelper');
+        await scopedHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+        );
+
+        LanguageHelper? languageHelper1;
+        LanguageHelper? languageHelper2;
+
+        // When there's an outer MaterialApp, LanguageScope should wrap the outer MaterialApp
+        // so that dialogs shown from the inner MaterialApp can access it
+        await tester.pumpWidget(
+          LanguageScope(
+            languageHelper: scopedHelper,
+            child: MaterialApp(
+              home: MaterialApp(
+                home: Scaffold(
+                  body: LanguageBuilder(
+                    builder: (context) {
+                      languageHelper1 = LanguageHelper.of(context);
+                      return ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (dialogContext) {
+                              languageHelper2 = LanguageHelper.of(
+                                dialogContext,
+                              );
+                              return AlertDialog(
+                                title: Text('Hello'.tr),
+                                content: const Text('Test Dialog'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(dialogContext).pop(),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: const Text('Open Dialog'),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(languageHelper1, equals(scopedHelper));
+        expect(languageHelper1, isNotNull);
+
+        // Tap button to show dialog
+        await tester.tap(find.text('Open Dialog'));
+        await tester.pumpAndSettle();
+
+        // Verify the dialog is shown and can access the same LanguageHelper
+        expect(languageHelper2, isNotNull);
+        expect(languageHelper1, equals(languageHelper2));
+        expect(languageHelper2, equals(scopedHelper));
+
+        scopedHelper.dispose();
+      },
+    );
+
+    testWidgets(
+      'showDialog cannot access LanguageHelper when LanguageScope is between nested MaterialApps',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+
+        final scopedHelper = LanguageHelper('ScopedHelper');
+        await scopedHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+        );
+
+        LanguageHelper? languageHelper1;
+        LanguageHelper? languageHelper2;
+
+        // This pattern does NOT work correctly because dialogs shown from the inner MaterialApp
+        // are shown in the outer MaterialApp's overlay, which doesn't have access to
+        // the LanguageScope that's between the two MaterialApps.
+        // Solution: Wrap the outermost MaterialApp with LanguageScope.
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LanguageScope(
+              languageHelper: scopedHelper,
+              child: MaterialApp(
+                home: Scaffold(
+                  body: LanguageBuilder(
+                    builder: (context) {
+                      languageHelper1 = LanguageHelper.of(context);
+                      return ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (dialogContext) {
+                              // The dialog context cannot access LanguageScope
+                              // because it's shown in the outer MaterialApp's overlay
+                              languageHelper2 = LanguageHelper.of(
+                                dialogContext,
+                              );
+                              return AlertDialog(
+                                title: const Text('Test Dialog'),
+                                content: const Text('Dialog Content'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(dialogContext).pop(),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: const Text('Open Dialog'),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(languageHelper1, equals(scopedHelper));
+        expect(languageHelper1, isNotNull);
+
+        // Tap button to show dialog
+        await tester.tap(find.text('Open Dialog'));
+        await tester.pumpAndSettle();
+
+        // When LanguageScope is between nested MaterialApps, the dialog context
+        // cannot access it because the dialog is shown in the outer MaterialApp's overlay,
+        // which is above the LanguageScope in the widget tree.
+        // The dialog falls back to LanguageHelper.instance instead of the scoped helper.
+        expect(languageHelper2, isNotNull);
+        expect(languageHelper2, isNot(equals(scopedHelper)));
+        expect(languageHelper2, equals(LanguageHelper.instance));
+
+        scopedHelper.dispose();
+      },
+    );
   });
 }
