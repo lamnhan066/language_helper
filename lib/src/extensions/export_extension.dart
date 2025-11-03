@@ -88,14 +88,14 @@ void _exportJson(LanguageData data, String path) {
     enabled: true,
     minLevel: LogLevel.debug,
   );
-  logger.debug(
+  logger.step(
     () => '===========================================================',
   );
-  logger.debug(() => 'Exporting Json...');
+  logger.step(() => 'Exporting Json...');
   _exportJsonCodes(data, path);
   _exportJsonLanguages(data, path);
-  logger.debug(() => 'Exported Json');
-  logger.debug(
+  logger.step(() => 'Exported Json');
+  logger.step(
     () => '===========================================================',
   );
 }
@@ -113,7 +113,7 @@ void _exportJsonCodes(LanguageData data, String path) {
     enabled: true,
     minLevel: LogLevel.debug,
   );
-  logger.debug(() => 'Creating codes.json...');
+  logger.info(() => 'Creating codes.json...');
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
@@ -122,7 +122,7 @@ void _exportJsonCodes(LanguageData data, String path) {
   final codes = data.keys.map((e) => e.code).toList();
   desFile.writeAsStringSync(encoder.convert(codes));
 
-  logger.debug(() => 'Created codes.json');
+  logger.step(() => 'Created codes.json');
 }
 
 /// Exports translation data for each language to individual JSON files.
@@ -139,7 +139,7 @@ void _exportJsonLanguages(LanguageData data, String path) {
     enabled: true,
     minLevel: LogLevel.debug,
   );
-  logger.debug(() => 'Creating languages json files...');
+  logger.info(() => 'Creating languages json files...');
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
@@ -152,5 +152,5 @@ void _exportJsonLanguages(LanguageData data, String path) {
     desFile.writeAsStringSync(data);
   }
 
-  logger.debug(() => 'Created languages json files');
+  logger.step(() => 'Created languages json files');
 }

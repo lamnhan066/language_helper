@@ -75,13 +75,13 @@ class Utils {
       if (response.statusCode == 200) {
         return utf8.decode(response.bodyBytes);
       } else {
-        logger.debug(
+        logger.warning(
           () =>
               'Failed to load data from URL. Status code: ${response.statusCode}',
         );
       }
     } catch (e) {
-      logger.debug(() => 'Error fetching data from URL: $e');
+      logger.error(() => 'Error fetching data from URL: $e');
     }
 
     return '';

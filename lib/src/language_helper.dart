@@ -452,7 +452,7 @@ class LanguageHelper {
 
     // When the `data` is empty, a temporary data will be added.
     if (_dataProviders.isEmpty) {
-      _logger?.debug(
+      _logger?.info(
         () =>
             'The `data` is empty, we will use a temporary `data` for the developing state',
       );
@@ -500,7 +500,7 @@ class LanguageHelper {
         // Sync with device only track the changing of the device language,
         // so it will not use the device language for the app at the first time.
         prefs.setString(_deviceCodeKey, currentCode.code);
-        _logger?.debug(
+        _logger?.info(
           () =>
               'Sync with device saved the current language to local database.',
         );
@@ -511,7 +511,7 @@ class LanguageHelper {
         if (currentCode != prefCode) {
           finalCode = currentCode;
           prefs.setString(_deviceCodeKey, currentCode.code);
-          _logger?.debug(
+          _logger?.step(
             () => 'Sync with device applied the new device language',
           );
         } else {
@@ -527,7 +527,7 @@ class LanguageHelper {
       if (isOptionalCountryCode && finalCode.locale.countryCode != null) {
         // Try to use the `languageCode` only if the `languageCode_countryCode`
         // is not available
-        _logger?.debug(
+        _logger?.info(
           () =>
               'language does not contain the $finalCode => Try to use the `languageCode` only..',
         );
@@ -540,12 +540,12 @@ class LanguageHelper {
       }
 
       if (tempCode == null) {
-        _logger?.debug(
+        _logger?.info(
           () =>
               'Unable to use the `languageCode` only => Change the code to ${codes.first}',
         );
       } else {
-        _logger?.debug(
+        _logger?.info(
           () =>
               'Able to use the `languageCode` only => Change the code to $tempCode',
         );
@@ -554,7 +554,7 @@ class LanguageHelper {
       finalCode = tempCode ?? codes.first;
     }
 
-    _logger?.debug(() => 'Set `currentCode` to $finalCode');
+    _logger?.step(() => 'Set `currentCode` to $finalCode');
     _currentCode = finalCode;
 
     _data.addAll(await _dataProvider.getData(code));
@@ -637,7 +637,7 @@ class LanguageHelper {
     _addData(data: getData, database: _data, overwrite: overwrite);
     _codes.addAll(await data.getSupportedCodes());
     if (activate) change(code);
-    _logger?.debug(
+    _logger?.info(
       () =>
           'The new `data` is added and activated with overwrite is $overwrite',
     );
@@ -685,7 +685,7 @@ class LanguageHelper {
     _addData(data: getData, database: _dataOverrides, overwrite: overwrite);
     _codesOverrides.addAll(await dataOverrides.getSupportedCodes());
     if (activate) change(code);
-    _logger?.debug(
+    _logger?.info(
       () =>
           'The new `dataOverrides` is added and activated with overwrite is $overwrite',
     );
@@ -749,7 +749,7 @@ class LanguageHelper {
     final stringParams = params.map((key, value) => MapEntry(key, '$value'));
 
     if (!codes.contains(toCode) && !codesOverrides.contains(toCode)) {
-      _logger?.debug(
+      _logger?.warning(
         () =>
             'Cannot translate this text because $toCode is not available in `data` and `dataOverrides` ($text)',
       );
@@ -758,7 +758,7 @@ class LanguageHelper {
 
     final translated = _dataOverrides[toCode]?[text] ?? _data[toCode]?[text];
     if (translated == null) {
-      _logger?.debug(
+      _logger?.warning(
         () => 'This text is not contained in current $toCode ($text)',
       );
       return _replaceParams(text, stringParams);
@@ -819,25 +819,25 @@ class LanguageHelper {
   /// ```
   Future<void> change(LanguageCodes toCode) async {
     if (!codes.contains(toCode)) {
-      _logger?.debug(
+      _logger?.warning(
         () => '$toCode is not available in `data` or `dataOverrides`',
       );
 
       if (!_useInitialCodeWhenUnavailable) {
-        _logger?.debug(
+        _logger?.info(
           () =>
               'Does not allow using the initial code => Cannot change the language.',
         );
         return;
       } else {
         if (codes.contains(_initialCode)) {
-          _logger?.debug(
+          _logger?.step(
             () =>
                 '`useInitialCodeWhenUnavailable` is true => Change the language to $_initialCode',
           );
           _currentCode = _initialCode;
         } else {
-          _logger?.debug(
+          _logger?.warning(
             () =>
                 '`useInitialCodeWhenUnavailable` is true but the `initialCode` is not available in `data` or `dataOverrides` => Cannot change the language',
           );
@@ -845,7 +845,7 @@ class LanguageHelper {
         }
       }
     } else {
-      _logger?.debug(() => 'Set currentCode to $toCode');
+      _logger?.step(() => 'Set currentCode to $toCode');
       _currentCode = toCode;
     }
 
@@ -862,7 +862,7 @@ class LanguageHelper {
       _dataOverrides.addAll(dataOverrides);
     }
 
-    _logger?.debug(
+    _logger?.step(
       () => 'Change language to $toCode for ${_states.length} states',
     );
     Set<_LanguageBuilderState> needToUpdate = {};
@@ -899,7 +899,7 @@ class LanguageHelper {
       });
     }
 
-    _logger?.debug(() => 'Changing completed!');
+    _logger?.step(() => 'Changing completed!');
   }
 
   /// Updates whether to use [initialCode] when an unavailable language is requested.
@@ -1163,7 +1163,7 @@ class LanguageHelper {
     String fallback,
   ) {
     if (!params.containsKey(translateCondition.param)) {
-      _logger?.debug(
+      _logger?.warning(
         () =>
             'The params does not contain the condition param: ${translateCondition.param}',
       );
@@ -1176,7 +1176,7 @@ class LanguageHelper {
         conditions[param] ?? conditions['default'] ?? conditions['_'];
 
     if (translated == null) {
-      _logger?.debug(
+      _logger?.warning(
         () =>
             'There is no result for key $param of condition ${translateCondition.param}',
       );
