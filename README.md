@@ -406,8 +406,17 @@ LanguageScope(
 When `LanguageScope` is present in the widget tree:
 
 1. **LanguageBuilder and Tr** - Automatically inherit the scoped helper (unless an explicit `languageHelper` is provided)
-2. **Extension methods** (`tr`, `trP`, `trT`, `trF`) - Use the scoped helper when called within a `LanguageBuilder`
+2. **Extension methods** (`tr`, `trP`, `trT`, `trF`) - Use the scoped helper when called within a `LanguageBuilder`. When called outside a `LanguageBuilder`, they fall back to `LanguageHelper.instance` (which is always available)
 3. **Priority order**: Explicit `languageHelper` parameter > `LanguageScope` > `LanguageHelper.instance`
+
+#### Extension Methods Behavior
+
+Extension methods (`tr`, `trP`, `trT`, `trF`) always use a valid `LanguageHelper` instance:
+
+- **Inside `LanguageBuilder`**: Use the helper associated with that builder (from `LanguageScope`, explicit parameter, or `LanguageHelper.instance`)
+- **Outside `LanguageBuilder`**: Fall back to `LanguageHelper.instance` (always available)
+
+This ensures that extension methods never fail and always have a helper to work with, making them safe to use anywhere in your code.
 
 #### Example: Scoped Translation
 
