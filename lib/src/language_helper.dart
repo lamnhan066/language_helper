@@ -16,17 +16,36 @@ class LanguageHelper {
   // Get the LanguageHelper instance
   static final LanguageHelper instance = LanguageHelper('LanguageHelper');
 
-  /// Stack of LanguageHelpers, with the most recent one on top.
-  /// This allows nested LanguageBuilders to work correctly.
+  /// Stack of [LanguageHelper] instances, with the most recent one on top.
+  ///
+  /// This stack is used by [LanguageBuilder] to make helpers available to extension
+  /// methods (`tr`, `trP`, etc.) during the build phase. Since extension methods
+  /// don't have [BuildContext], they rely on this stack to find the current helper.
+  ///
+  /// The helper pushed onto the stack comes from [LanguageBuilder], which may be:
+  /// - An explicit `languageHelper` parameter
+  /// - A helper from [LanguageScope] (via [LanguageScope.maybeOf])
+  /// - [LanguageHelper.instance] (fallback)
+  ///
+  /// The stack allows nested [LanguageBuilder] widgets to work correctly, with each
+  /// builder pushing its helper during build and popping it after.
   static final List<LanguageHelper> _stack = [];
 
-  /// Gets the current scoped LanguageHelper, or null if none is active.
+  /// Gets the current scoped [LanguageHelper] from the stack, or null if none is active.
+  ///
+  /// This is used by extension methods to find which helper to use. The helper at the
+  /// top of the stack is the one from the most recently built [LanguageBuilder].
   static LanguageHelper? get _current => _stack.isEmpty ? null : _stack.last;
 
-  /// Pushes a LanguageHelper onto the stack (called by LanguageBuilder during build).
+  /// Pushes a [LanguageHelper] onto the stack.
+  ///
+  /// Called by [LanguageBuilder] during its build method to make the helper available
+  /// to extension methods during the synchronous build phase.
   static void _push(LanguageHelper helper) => _stack.add(helper);
 
-  /// Pops a LanguageHelper from the stack (called by LanguageBuilder after build).
+  /// Pops a [LanguageHelper] from the stack.
+  ///
+  /// Called by [LanguageBuilder] after its build completes to clean up the stack.
   static void _pop() {
     if (_stack.isNotEmpty) _stack.removeLast();
   }
@@ -42,59 +61,90 @@ class LanguageHelper {
   /// and builder widgets (like `LanguageBuilder` and `Tr`) without the need to pass the instance explicitly to each.
   /// This approach simplifies usage and ensures consistency across your application.
   ///
-  /// When creating a custom instance of `LanguageHelper`, be aware that its use is limited to `.trC` and
-  /// `languageHelper.translate` for text translations. The convenience extensions (`tr`, `trP`, `trT`, `trF`)
-  /// are not available with custom instances, restricting the ease of use and integration with the rest of your application.
+  /// When creating a custom instance of `LanguageHelper`, you can use it in several ways:
   ///
-  /// For instance:
-  ///
+  /// 1. **With `.trC()` extension method** (always available):
+  /// ```dart
   /// final helper = LanguageHelper('CustomLanguageHelper');
+  /// await helper.initial(data: myData);
   ///
   /// // String
   /// final translated = 'Translate this text'.trC(helper);
   ///
   /// // Widget
   /// final text = Text('Translate this text'.trC(helper));
+  /// ```
   ///
-  /// // Builder
+  /// 2. **With `LanguageBuilder` or `LanguageScope`** (extension methods work):
+  /// When a custom helper is used with [LanguageBuilder] or [LanguageScope], the convenience
+  /// extensions (`tr`, `trP`, `trT`, `trF`) become available within that builder/scope:
+  /// ```dart
+  /// final helper = LanguageHelper('CustomLanguageHelper');
+  /// await helper.initial(data: myData);
+  ///
+  /// // Using LanguageBuilder with explicit helper
   /// LanguageBuilder(
   ///   languageHelper: helper,
   ///   builder: (context) {
-  ///     return Text('Translate this text'.trC(helper)),
-  ///   }
+  ///     return Text('Hello'.tr), // Works! Uses helper
+  ///   },
   /// )
   ///
-  /// // Tr
-  /// Tr(
-  ///   (_) => Text('Translate this text'.trC(helper)),
+  /// // Using LanguageScope
+  /// LanguageScope(
   ///   languageHelper: helper,
+  ///   child: LanguageBuilder(
+  ///     builder: (context) {
+  ///       return Text('Hello'.tr), // Works! Uses helper from scope
+  ///     },
+  ///   ),
   /// )
+  /// ```
+  ///
+  /// 3. **Direct translation** (always available):
+  /// ```dart
+  /// final translated = helper.translate('Hello');
+  /// ```
+  ///
+  /// **Note**: Extension methods (`tr`, `trP`, etc.) only work with custom instances when called
+  /// within a [LanguageBuilder] that uses that instance (either explicitly or via [LanguageScope]).
+  /// Outside of [LanguageBuilder], extension methods fall back to [LanguageHelper.instance].
   ///
   LanguageHelper(this.prefix);
 
   /// Prefix of the key to save the data to `SharedPreferences`.
   final String prefix;
 
-  /// Get all languages
+  /// Storage for all language data.
   final LanguageData _data = {};
 
-  /// Get all languages
+  /// Provider for language data.
   late LanguageDataProvider _dataProvider;
 
+  /// Collection of data providers.
   Iterable<LanguageDataProvider> _dataProviders = [];
 
-  /// Get the current `data` as [LanguageData].
+  /// Gets the current language data as [LanguageData].
+  ///
+  /// This returns all translations for all languages currently loaded.
   LanguageData get data => _data;
 
-  /// Get all languages
+  /// Storage for language data overrides.
+  ///
+  /// Overrides take precedence over regular [data] when both contain
+  /// the same translation key.
   final LanguageData _dataOverrides = {};
 
-  /// Get all languages
+  /// Provider for language data overrides.
   late LanguageDataProvider _dataOverridesProvider;
 
+  /// Collection of data override providers.
   Iterable<LanguageDataProvider> _dataOverridesProviders = [];
 
-  /// Get the current `dataOverrides` as [LanguageData].
+  /// Gets the current language data overrides as [LanguageData].
+  ///
+  /// Overrides take precedence over regular [data] when both contain
+  /// the same translation key.
   LanguageData get dataOverrides => _dataOverrides;
 
   /// List of all the keys of text in your project.
@@ -120,7 +170,9 @@ class LanguageHelper {
   /// You must be `await initial()` before using this variable.
   LanguageCodes get code => _currentCode!;
 
-  /// Get current code
+  /// The current language code being used.
+  ///
+  /// This is set after [initial] is called and updated when [change] is called.
   LanguageCodes? _currentCode;
 
   /// Get current language as [Locale]
@@ -128,25 +180,48 @@ class LanguageHelper {
   /// You must be `await initial()` before using this variable.
   Locale get locale => code.locale;
 
-  /// Initial code
+  /// The initial language code specified during initialization.
+  ///
+  /// This is used as a fallback when [useInitialCodeWhenUnavailable] is `true`
+  /// and an unavailable language code is requested.
   LanguageCodes? _initialCode;
 
-  /// When you change the [LanguageCodes] by using [change] method, the app will
-  /// change to the [_initialCode] if the code is unavailable. If not, the app
-  /// will use keep using the last code.
+  /// Whether to fall back to the initial code when an unavailable language is requested.
+  ///
+  /// When `true`, if [change] is called with a language code that's not in [codes],
+  /// the helper will change to [initialCode] instead of keeping the current language.
+  /// When `false`, the helper will keep using the current language if the requested
+  /// code is unavailable.
+  ///
+  /// This can be changed at runtime using [setUseInitialCodeWhenUnavailable].
   bool _useInitialCodeWhenUnavailable = false;
 
-  /// Auto save and load [LanguageCodes] from memory
+  /// Whether to automatically save and restore the current language code.
+  ///
+  /// When `true`, the current language code is saved to `SharedPreferences` whenever
+  /// it changes, and restored when [initial] is called.
   bool _isAutoSave = false;
 
-  /// Sync with the device language
+  /// Whether to sync with the device language when it changes.
+  ///
+  /// When `true`, the app language will automatically update when the device
+  /// language changes. When `false`, the app language remains independent of
+  /// the device language.
   bool _syncWithDevice = true;
 
-  /// Force rebuilds all widgets instead of only root widget. You can try to use
-  /// this value if the widgets don't rebuild as your wish.
+  /// Whether to force rebuild all [LanguageBuilder] widgets instead of only the root.
+  ///
+  /// When `true`, all [LanguageBuilder] widgets rebuild when the language changes.
+  /// When `false`, only the root [LanguageBuilder] rebuilds (better performance).
+  ///
+  /// You can override this per-widget using the `forceRebuild` parameter in
+  /// [LanguageBuilder] or [Tr].
   bool _forceRebuild = false;
 
-  /// On changed callback
+  /// Callback function called when the language changes.
+  ///
+  /// This is set via the `onChanged` parameter in [initial] and is called
+  /// whenever [change] successfully updates the language.
   void Function(LanguageCodes code)? _onChanged;
 
   /// Stream on changed. Please remember to close this stream subscription
@@ -155,22 +230,33 @@ class LanguageHelper {
   final StreamController<LanguageCodes> _streamController =
       StreamController.broadcast();
 
-  /// Print debug log
+  /// Whether debug logging is enabled.
+  ///
+  /// When `true`, the helper prints debug information about language changes,
+  /// translation lookups, and other operations to the console.
   bool get isDebug => _isDebug;
   bool _isDebug = false;
 
-  /// Language code preferences key
+  /// The SharedPreferences key used to store the saved language code.
+  ///
+  /// Visible for testing purposes.
   @visibleForTesting
   String get codeKey => _autoSaveCodeKey;
 
-  /// Language code preferences key
+  /// The SharedPreferences key used to store the saved language code.
+  ///
+  /// Format: `$prefix.AutoSaveCode`
   String get _autoSaveCodeKey => '$prefix.AutoSaveCode';
 
-  /// Language code of the device
+  /// The SharedPreferences key used to store the device language code.
+  ///
+  /// Visible for testing purposes.
   @visibleForTesting
   String get deviceCodeKey => _deviceCodeKey;
 
-  /// Language code of the device
+  /// The SharedPreferences key used to store the device language code.
+  ///
+  /// Format: `$prefix.DeviceCode`
   String get _deviceCodeKey => '$prefix.DeviceCode';
 
   /// Return `true` if the `initial` method is completed.
@@ -180,23 +266,21 @@ class LanguageHelper {
   Future<void> get ensureInitialized => _ensureInitialized.future;
   final _ensureInitialized = Completer<void>();
 
-  /// Initialize the plugin with the List of [data] that you have created,
-  /// you can set the [initialCode] for this app or it will get the first
-  /// language in [data], the [LanguageCodes.en] will be added when the `data` is empty. You can also set
-  /// the [forceRebuild] to `true` if you want to rebuild all the [LanguageBuilder]
-  /// widgets, not only the root widget (it will decreases the performance of the app).
-  /// The [onChanged] callback will be called when the language is changed.
-  /// Set the [isDebug] to `true` to show debug log.
+  /// Initializes the helper with language data.
   ///
-  /// [analysisKeys] is the List of keys of the [LanguageData]. This data will
-  /// be used by [analyze] to get the missing text of the specified language.
+  /// This method must be called before using the helper. It sets up the language
+  /// data, determines the initial language, and configures various options.
   ///
-  /// [useInitialCodeWhenUnavailable] : If `true`, when you change the [LanguageCodes] by
-  /// using [change] method, the app will change to the [initialCode] if
-  /// the new code is unavailable. If `false`, the app will use keep using the last code.
+  /// The initial language is determined in this order:
+  /// 1. [initialCode] parameter (if provided)
+  /// 2. Saved language from `SharedPreferences` (if [isAutoSave] is `true`)
+  /// 3. Device language (if [syncWithDevice] is `true` and has changed)
+  /// 4. First language in [data]
+  /// 5. [LanguageCodes.en] (if [data] is empty)
   ///
-  /// The plugin also supports auto save the [LanguageCodes] when changed and
-  /// reload it from memory in the next opening.
+  /// After initialization, all [LanguageBuilder] widgets will rebuild when the
+  /// language changes. Set [forceRebuild] to `true` to force all builders to
+  /// rebuild (may decrease performance).
   Future<void> initial({
     /// Data of languages. If this value is empty, a temporary data ([LanguageDataProvider.data({LanguagesCode.en: {}})])
     /// will be added to let make it easier to develop the app.
