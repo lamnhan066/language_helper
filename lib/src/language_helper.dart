@@ -444,7 +444,11 @@ class LanguageHelper {
     _syncWithDevice = syncWithDevice;
     _analysisKeys = analysisKeys;
     _initialCode = initialCode;
-    _logger ??= LiteLogger(enabled: isDebug, minLevel: LogLevel.debug);
+    _logger ??= LiteLogger(
+      name: 'LanguageHelper',
+      enabled: isDebug,
+      minLevel: LogLevel.debug,
+    );
 
     // When the `data` is empty, a temporary data will be added.
     if (_dataProviders.isEmpty) {

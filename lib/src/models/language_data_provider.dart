@@ -13,6 +13,7 @@ class LanguageDataProvider {
       return await rootBundle.loadString(path);
     } catch (_) {
       LiteLogger(
+        name: 'LoadAsset',
         enabled: true,
         minLevel: LogLevel.debug,
       ).debug(() => 'The $path does not exist in the assets');

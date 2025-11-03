@@ -72,7 +72,11 @@ extension ExportLazyLanguageData on LazyLanguageData {
 ///  |  |  |  |- en.json
 ///  |  |  |  |- vi.json
 void _exportJson(LanguageData data, String path) {
-  final logger = LiteLogger(enabled: true, minLevel: LogLevel.debug);
+  final logger = LiteLogger(
+    name: 'ExportJson',
+    enabled: true,
+    minLevel: LogLevel.debug,
+  );
   logger.debug(
     () => '===========================================================',
   );
@@ -86,7 +90,11 @@ void _exportJson(LanguageData data, String path) {
 }
 
 void _exportJsonCodes(LanguageData data, String path) {
-  final logger = LiteLogger(enabled: true, minLevel: LogLevel.debug);
+  final logger = LiteLogger(
+    name: 'ExportJsonCodes',
+    enabled: true,
+    minLevel: LogLevel.debug,
+  );
   logger.debug(() => 'Creating codes.json...');
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
@@ -100,7 +108,11 @@ void _exportJsonCodes(LanguageData data, String path) {
 }
 
 void _exportJsonLanguages(LanguageData data, String path) {
-  final logger = LiteLogger(enabled: true, minLevel: LogLevel.debug);
+  final logger = LiteLogger(
+    name: 'ExportJsonLanguages',
+    enabled: true,
+    minLevel: LogLevel.debug,
+  );
   logger.debug(() => 'Creating languages json files...');
 
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');

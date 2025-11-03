@@ -17,7 +17,11 @@ class Utils {
     Map<String, String>? headers,
     http.Client? client,
   }) async {
-    final logger = LiteLogger(enabled: true, minLevel: LogLevel.debug);
+    final logger = LiteLogger(
+      name: 'GetUrl',
+      enabled: true,
+      minLevel: LogLevel.debug,
+    );
     client ??= http.Client();
     try {
       final response = await client.get(uri, headers: headers);
