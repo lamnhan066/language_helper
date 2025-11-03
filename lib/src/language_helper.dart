@@ -31,11 +31,13 @@ class LanguageHelper {
   /// builder pushing its helper during build and popping it after.
   static final List<LanguageHelper> _stack = [];
 
-  /// Gets the current scoped [LanguageHelper] from the stack, or null if none is active.
+  /// Gets the current scoped [LanguageHelper] from the stack, or [LanguageHelper.instance]
+  /// if none is active.
   ///
   /// This is used by extension methods to find which helper to use. The helper at the
   /// top of the stack is the one from the most recently built [LanguageBuilder].
-  static LanguageHelper? get _current => _stack.isEmpty ? null : _stack.last;
+  static LanguageHelper get _current =>
+      _stack.lastOrNull ?? LanguageHelper.instance;
 
   /// Pushes a [LanguageHelper] onto the stack.
   ///

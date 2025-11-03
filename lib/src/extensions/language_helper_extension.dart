@@ -18,8 +18,7 @@ extension LanguageHelperEx on String {
   /// )
   /// ```
   String get tr {
-    final scope = LanguageHelper._current;
-    return (scope ?? LanguageHelper.instance).translate(this);
+    return LanguageHelper._current.translate(this);
   }
 
   /// Translates with only the [params] parameter.
@@ -35,8 +34,7 @@ extension LanguageHelperEx on String {
   /// print(text); // -> 'result is zero'
   /// ```
   String trP(Map<String, dynamic> params) {
-    final scope = LanguageHelper._current;
-    return (scope ?? LanguageHelper.instance).translate(this, params: params);
+    return LanguageHelper._current.translate(this, params: params);
   }
 
   /// Translates to a specific [LanguageCodes] instead of the current language.
@@ -51,8 +49,7 @@ extension LanguageHelperEx on String {
   /// final text = 'Hello'.trT(LanguageCodes.en); // Translates to English
   /// ```
   String trT(LanguageCodes toCode) {
-    final scope = LanguageHelper._current;
-    return (scope ?? LanguageHelper.instance).translate(this, toCode: toCode);
+    return LanguageHelper._current.translate(this, toCode: toCode);
   }
 
   /// Full version of the translation with all parameters.
@@ -70,8 +67,7 @@ extension LanguageHelperEx on String {
   /// );
   /// ```
   String trF({Map<String, dynamic> params = const {}, LanguageCodes? toCode}) {
-    final scope = LanguageHelper._current;
-    return (scope ?? LanguageHelper.instance).translate(
+    return LanguageHelper._current.translate(
       this,
       params: params,
       toCode: toCode,
