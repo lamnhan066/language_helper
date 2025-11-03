@@ -528,7 +528,7 @@ void main() {
       helper.dispose();
     });
 
-    testWidgets('updateShouldNotify triggers rebuild when helper changes', (
+    testWidgets('LanguageBuilder updates when scope helper changes', (
       tester,
     ) async {
       SharedPreferences.setMockInitialValues({});
@@ -561,7 +561,7 @@ void main() {
       expect(buildCount, greaterThan(0));
       expect(find.text('Hello'), findsOneWidget);
 
-      // Update with different helper - should trigger rebuild
+      // Update with different helper - LanguageBuilder will detect change in didChangeDependencies
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -581,6 +581,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should have rebuilt and show Vietnamese text
+      // LanguageBuilder detects the helper change in didChangeDependencies and rebuilds
       expect(find.text('Xin Chào'), findsOneWidget);
       expect(buildCount, greaterThan(1)); // Should have rebuilt
 

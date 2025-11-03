@@ -53,13 +53,17 @@ class LanguageHelper {
   /// Returns the [LanguageHelper] from the nearest [LanguageScope] ancestor,
   /// or [LanguageHelper.instance] if no scope is found.
   ///
-  /// This method registers a dependency on the [LanguageScope], meaning the widget
-  /// will rebuild when the scope changes (if the [languageHelper] instance changes).
+  /// This method does not register a dependency on the [LanguageScope], which means
+  /// the widget will not automatically rebuild when the scope changes. This is intentional
+  /// because [LanguageBuilder] widgets handle rebuilds through their own mechanism when
+  /// the helper's language changes via the [change] method.
+  ///
   /// Since [LanguageHelper.instance] is always available, this method always returns
   /// a valid helper (either from scope or the default instance).
   ///
-  /// This method should be used when you need to access the scoped [LanguageHelper]
-  /// instance from a [BuildContext] and want to rebuild when it changes.
+  /// **Note**: If you need to automatically rebuild when the scope changes (i.e., when
+  /// a different helper instance is provided), wrap your widget in a [LanguageBuilder]
+  /// instead of using this method directly.
   ///
   /// Example:
   /// ```dart
@@ -71,7 +75,7 @@ class LanguageHelper {
   /// )
   /// ```
   static LanguageHelper of(BuildContext context) {
-    final scope = context.dependOnInheritedWidgetOfExactType<LanguageScope>();
+    final scope = context.getInheritedWidgetOfExactType<LanguageScope>();
     return scope?.languageHelper ?? LanguageHelper.instance;
   }
 
