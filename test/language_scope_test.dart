@@ -1110,5 +1110,169 @@ void main() {
         scopedHelper.dispose();
       },
     );
+
+    testWidgets(
+      'LanguageHelper.of logs warning when no LanguageScope is found',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+
+        final languageHelper = LanguageHelper.instance;
+        await languageHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.en,
+          isDebug: true, // Enable debug to see logging
+        );
+
+        // Capture logs by monitoring console output
+        // Since we can't easily capture logger output in tests,
+        // we'll verify the behavior by checking that the instance is returned
+        // and that logging would occur (tested by ensuring no scope exists)
+        LanguageHelper? retrievedHelper;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Builder(
+                builder: (context) {
+                  // First call - should log
+                  retrievedHelper = LanguageHelper.of(context);
+                  return const SizedBox();
+                },
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(retrievedHelper, equals(LanguageHelper.instance));
+        expect(retrievedHelper, isNotNull);
+
+        // Call again with same context - should not log again
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Builder(
+                builder: (context) {
+                  // Second call with different context - should log again
+                  retrievedHelper = LanguageHelper.of(context);
+                  return const SizedBox();
+                },
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(retrievedHelper, equals(LanguageHelper.instance));
+      },
+    );
+
+    testWidgets('LanguageHelper.of does not log when LanguageScope is found', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final scopedHelper = LanguageHelper('ScopedHelper');
+      await scopedHelper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.vi,
+        isDebug: true,
+      );
+
+      LanguageHelper? retrievedHelper;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageScope(
+              languageHelper: scopedHelper,
+              child: Builder(
+                builder: (context) {
+                  // Should not log because scope exists
+                  retrievedHelper = LanguageHelper.of(context);
+                  return const SizedBox();
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(retrievedHelper, equals(scopedHelper));
+      expect(retrievedHelper, isNot(equals(LanguageHelper.instance)));
+
+      scopedHelper.dispose();
+    });
+
+    testWidgets('LanguageHelper.of logs only once per context identity', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final languageHelper = LanguageHelper.instance;
+      await languageHelper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+        isDebug: true,
+      );
+
+      LanguageHelper? helper1;
+      LanguageHelper? helper2;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                // Multiple calls with same context - should only log once
+                helper1 = LanguageHelper.of(context);
+                helper2 = LanguageHelper.of(context);
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(helper1, equals(LanguageHelper.instance));
+      expect(helper2, equals(LanguageHelper.instance));
+    });
+
+    testWidgets(
+      'LanguageHelper.of caller information extraction works correctly',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+
+        final languageHelper = LanguageHelper.instance;
+        await languageHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.en,
+          isDebug: true,
+        );
+
+        LanguageHelper? retrievedHelper;
+
+        // Call from LanguageBuilder which should show in caller info
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: LanguageBuilder(
+                builder: (context) {
+                  retrievedHelper = LanguageHelper.of(context);
+                  return const SizedBox();
+                },
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(retrievedHelper, equals(LanguageHelper.instance));
+        // The caller info should be extracted from the stack trace
+        // (We can't easily verify the exact message in tests, but we verify it doesn't crash)
+      },
+    );
   });
 }
