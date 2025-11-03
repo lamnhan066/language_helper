@@ -1,3 +1,9 @@
+## 0.13.0-rc.6
+
+* Change from `LanguageScope.of` to `LanguageHelper.of`.
+* Remove `LanguageScope.maybeOf`.
+* Update docs.
+
 ## 0.13.0-rc.5
 
 * Add `LanguageScope` to scoped LanguageHelper instances,  enabling localized translations within specific widget trees. So we can use `tr`, `trP` with a custom LanguageHelper without the need of `translate` or `.trC`.
