@@ -24,7 +24,7 @@ class LanguageHelper {
   ///
   /// The helper pushed onto the stack comes from [LanguageBuilder], which may be:
   /// - An explicit `languageHelper` parameter
-  /// - A helper from [LanguageScope] (via [maybeOf])
+  /// - A helper from [LanguageScope] (via [of])
   /// - [LanguageHelper.instance] (fallback)
   ///
   /// The stack allows nested [LanguageBuilder] widgets to work correctly, with each
@@ -55,6 +55,8 @@ class LanguageHelper {
   ///
   /// This method registers a dependency on the [LanguageScope], meaning the widget
   /// will rebuild when the scope changes (if the [languageHelper] instance changes).
+  /// Since [LanguageHelper.instance] is always available, this method always returns
+  /// a valid helper (either from scope or the default instance).
   ///
   /// This method should be used when you need to access the scoped [LanguageHelper]
   /// instance from a [BuildContext] and want to rebuild when it changes.
@@ -68,42 +70,9 @@ class LanguageHelper {
   ///   },
   /// )
   /// ```
-  ///
-  /// For accessing the helper without registering a dependency (no rebuild on change),
-  /// use [maybeOf] instead.
   static LanguageHelper of(BuildContext context) {
     final scope = context.dependOnInheritedWidgetOfExactType<LanguageScope>();
     return scope?.languageHelper ?? LanguageHelper.instance;
-  }
-
-  /// Returns the [LanguageHelper] from the nearest [LanguageScope] ancestor,
-  /// or null if no scope is found.
-  ///
-  /// Unlike [of], this method does not register a dependency on the [LanguageScope],
-  /// which means the widget will not rebuild when the scope changes. This is useful
-  /// when you only need to read the helper value without causing rebuilds.
-  ///
-  /// This method is used internally by [LanguageBuilder] to discover scoped helpers
-  /// without creating unnecessary rebuild dependencies.
-  ///
-  /// Example:
-  /// ```dart
-  /// Builder(
-  ///   builder: (context) {
-  ///     final helper = LanguageHelper.maybeOf(context);
-  ///     if (helper != null) {
-  ///       return Text(helper.translate('Hello'));
-  ///     }
-  ///     return Text('Fallback');
-  ///   },
-  /// )
-  /// ```
-  ///
-  /// If no scope is found and you need a fallback to [LanguageHelper.instance],
-  /// use [of] instead.
-  static LanguageHelper? maybeOf(BuildContext context) {
-    final scope = context.getInheritedWidgetOfExactType<LanguageScope>();
-    return scope?.languageHelper;
   }
 
   /// To control [LanguageBuilder]

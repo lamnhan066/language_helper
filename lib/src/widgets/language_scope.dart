@@ -14,12 +14,12 @@ import '../../language_helper.dart';
 ///   (unless an explicit `languageHelper` parameter is provided)
 /// - Extension methods (`tr`, `trP`, `trT`, `trF`) use the scoped helper when
 ///   called within a [LanguageBuilder]
-/// - You can access the scoped helper directly via [LanguageHelper.of] or [LanguageHelper.maybeOf]
+/// - You can access the scoped helper directly via [LanguageHelper.of]
 ///
 /// Priority order when resolving which helper to use:
 /// 1. Explicit `languageHelper` parameter (in [LanguageBuilder] or [Tr])
-/// 2. [LanguageScope] from widget tree (via [LanguageHelper.maybeOf])
-/// 3. [LanguageHelper.instance] (fallback)
+/// 2. [LanguageScope] from widget tree (via [LanguageHelper.of])
+/// 3. [LanguageHelper.instance] (fallback - always available)
 ///
 /// Example:
 /// ```dart

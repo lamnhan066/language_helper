@@ -77,7 +77,7 @@ void main() {
       expect(find.text('Hello'), findsOneWidget);
     });
 
-    testWidgets('LanguageHelper.maybeOf returns scoped helper', (tester) async {
+    testWidgets('LanguageHelper.of returns scoped helper', (tester) async {
       SharedPreferences.setMockInitialValues({});
 
       final scopedHelper = LanguageHelper('ScopedHelper');
@@ -92,7 +92,7 @@ void main() {
               languageHelper: scopedHelper,
               child: LanguageBuilder(
                 builder: (context) {
-                  retrievedHelper = LanguageHelper.maybeOf(context);
+                  retrievedHelper = LanguageHelper.of(context);
                   return Text('Hello'.tr);
                 },
               ),
@@ -108,7 +108,7 @@ void main() {
       scopedHelper.dispose();
     });
 
-    testWidgets('LanguageHelper.maybeOf returns null when no scope', (
+    testWidgets('LanguageHelper.of falls back to instance when no scope', (
       tester,
     ) async {
       SharedPreferences.setMockInitialValues({});
@@ -126,7 +126,7 @@ void main() {
           home: Scaffold(
             body: Builder(
               builder: (context) {
-                retrievedHelper = LanguageHelper.maybeOf(context);
+                retrievedHelper = LanguageHelper.of(context);
                 return Text('Hello'.tr);
               },
             ),
@@ -135,7 +135,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(retrievedHelper, isNull);
+      expect(retrievedHelper, equals(LanguageHelper.instance));
       expect(find.text('Hello'), findsOneWidget);
     });
 
@@ -651,7 +651,7 @@ void main() {
     );
 
     testWidgets(
-      'maybeOf returns null in deeply nested structure without scope',
+      'of falls back to instance in deeply nested structure without scope',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
 
@@ -674,9 +674,7 @@ void main() {
                         builder: (innerContext) {
                           return Builder(
                             builder: (deepContext) {
-                              retrievedHelper = LanguageHelper.maybeOf(
-                                deepContext,
-                              );
+                              retrievedHelper = LanguageHelper.of(deepContext);
                               return const SizedBox();
                             },
                           );
@@ -691,11 +689,11 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(retrievedHelper, isNull);
+        expect(retrievedHelper, equals(LanguageHelper.instance));
       },
     );
 
-    testWidgets('maybeOf finds scoped helper in deeply nested structure', (
+    testWidgets('of finds scoped helper in deeply nested structure', (
       tester,
     ) async {
       SharedPreferences.setMockInitialValues({});
@@ -718,9 +716,7 @@ void main() {
                         builder: (innerContext) {
                           return Builder(
                             builder: (deepContext) {
-                              retrievedHelper = LanguageHelper.maybeOf(
-                                deepContext,
-                              );
+                              retrievedHelper = LanguageHelper.of(deepContext);
                               return const SizedBox();
                             },
                           );
@@ -851,7 +847,7 @@ void main() {
       helper.dispose();
     });
 
-    testWidgets('Nested maybeOf returns child scope, not parent scope', (
+    testWidgets('Nested of returns child scope, not parent scope', (
       tester,
     ) async {
       SharedPreferences.setMockInitialValues({});
@@ -871,12 +867,12 @@ void main() {
               languageHelper: parentHelper,
               child: Builder(
                 builder: (parentContext) {
-                  parentRetrieved = LanguageHelper.maybeOf(parentContext);
+                  parentRetrieved = LanguageHelper.of(parentContext);
                   return LanguageScope(
                     languageHelper: childHelper,
                     child: Builder(
                       builder: (childContext) {
-                        childRetrieved = LanguageHelper.maybeOf(childContext);
+                        childRetrieved = LanguageHelper.of(childContext);
                         return const SizedBox();
                       },
                     ),

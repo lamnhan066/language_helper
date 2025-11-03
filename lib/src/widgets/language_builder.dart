@@ -12,7 +12,7 @@ part of '../language_helper.dart';
 /// The [LanguageHelper] used by this widget is determined by the following
 /// priority order:
 /// 1. Explicit `languageHelper` parameter
-/// 2. [LanguageScope] from the widget tree (via [LanguageHelper.maybeOf])
+/// 2. [LanguageScope] from the widget tree (via [LanguageHelper.of])
 /// 3. [LanguageHelper.instance] (fallback)
 ///
 /// When building, [LanguageBuilder] pushes its helper onto a stack so that
@@ -120,12 +120,10 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   /// Gets the [LanguageHelper] to use based on priority:
   ///
   /// 1. Explicit `languageHelper` parameter (if provided)
-  /// 2. [LanguageScope] from widget tree (via [LanguageHelper.maybeOf])
-  /// 3. [LanguageHelper.instance] (fallback)
+  /// 2. [LanguageScope] from widget tree (via [LanguageHelper.of])
+  /// 3. [LanguageHelper.instance] (fallback - always available)
   LanguageHelper _getLanguageHelper() {
-    return widget.languageHelper ??
-        LanguageHelper.maybeOf(context) ??
-        LanguageHelper.instance;
+    return widget.languageHelper ?? LanguageHelper.of(context);
   }
 
   @override
