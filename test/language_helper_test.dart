@@ -2010,4 +2010,100 @@ void main() async {
       expect(result, isEmpty);
     });
   });
+
+  group('Test isDebug getter', () {
+    test('isDebug getter returns current debug state', () async {
+      final helper = LanguageHelper('DebugTestHelper');
+      // Initially false
+      expect(helper.isDebug, equals(false));
+
+      // Initialize with isDebug = true
+      await helper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+        isDebug: true,
+      );
+      expect(helper.isDebug, equals(true));
+
+      // Create another helper with isDebug = false
+      final helper2 = LanguageHelper('DebugTestHelper2');
+      await helper2.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+        isDebug: false,
+      );
+      expect(helper2.isDebug, equals(false));
+
+      helper.dispose();
+      helper2.dispose();
+    });
+  });
+
+  group('Test LanguageBuilder logger coverage', () {
+    testWidgets(
+      'LanguageBuilder logger debug call when helper changes',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+
+        final helper1 = LanguageHelper('LoggerTestHelper1');
+        final helper2 = LanguageHelper('LoggerTestHelper2');
+
+        // Initialize both with isDebug = true to ensure logger exists
+        await helper1.initial(
+          data: dataList,
+          initialCode: LanguageCodes.en,
+          isDebug: true,
+        );
+        await helper2.initial(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+          isDebug: true,
+        );
+
+        // Create a widget that will change helper in didChangeDependencies
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: LanguageScope(
+                languageHelper: helper1,
+                child: LanguageBuilder(
+                  builder: (_) => Text('Hello'.tr),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Verify initial state
+        expect(find.text('Hello'), findsOneWidget);
+
+        // Change to a different helper scope to trigger didChangeDependencies
+        // with a different helper (this will trigger the if block path)
+        await tester.pumpWidget(
+          MaterialApp(
+            key: const ValueKey('changed'),
+            home: Scaffold(
+              body: LanguageScope(
+                languageHelper: helper2,
+                child: LanguageBuilder(
+                  builder: (_) => Text('Hello'.tr),
+                ),
+              ),
+            ),
+          ),
+        );
+        // Pump multiple times to ensure didChangeDependencies is called
+        await tester.pump();
+        await tester.pump();
+        await tester.pumpAndSettle();
+
+        // The widget should rebuild with the new helper
+        expect(find.text('Xin Chào'), findsOneWidget);
+
+        helper1.dispose();
+        helper2.dispose();
+      },
+    );
+  });
 }
