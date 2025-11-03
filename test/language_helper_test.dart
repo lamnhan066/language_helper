@@ -8,7 +8,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:language_code/language_code.dart';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper/src/mixins/update_language.dart';
-import 'package:language_helper/src/utils/print_debug.dart';
 import 'package:language_helper/src/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,7 +26,6 @@ void main() async {
   StreamSubscription? languageSub;
 
   setUpAll(() async {
-    isTestingDebugLog = true;
     await languageHelper.initial(
       data: dataList,
       initialCode: LanguageCodes.en,
@@ -80,7 +78,11 @@ void main() async {
       });
       await languageHelper.initial(
         data: dataList,
-        analysisKeys: languageHelper.data.entries.first.value.keys.toSet(),
+        analysisKeys: dataList.isNotEmpty
+            ? (await dataList.first.getData(
+                LanguageCodes.en,
+              )).entries.first.value.keys.toSet()
+            : <String>{},
         useInitialCodeWhenUnavailable: false,
         isDebug: true,
         onChanged: (value) {

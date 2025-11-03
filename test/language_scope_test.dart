@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:language_helper/language_helper.dart';
-import 'package:language_helper/src/utils/print_debug.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'language_data.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  setUpAll(() {
-    isTestingDebugLog = true;
-  });
 
   group('Test LanguageScope -', () {
     testWidgets('LanguageHelper.of returns scoped helper', (tester) async {
