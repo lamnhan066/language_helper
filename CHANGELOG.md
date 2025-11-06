@@ -1,3 +1,7 @@
+## 0.13.0-rc.9
+
+* Bump `lite_logger` to `v0.2.0`.
+
 ## 0.13.0-rc.8
 
 * Show warning if `LanguageHelper.of` cannot find the `LanguageScope`.
