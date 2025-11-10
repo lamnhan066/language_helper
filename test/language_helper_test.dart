@@ -51,6 +51,14 @@ void main() async {
       await languageHelper.initial(data: []);
       expect(languageHelper.code, equals(LanguageCodes.en));
     });
+
+    test('data = [] with isDebug: true to cover logger callback', () async {
+      final testHelper = LanguageHelper('TestEmptyDataLogger');
+      addTearDown(testHelper.dispose);
+
+      await testHelper.initial(data: [], isDebug: true);
+      expect(testHelper.code, equals(LanguageCodes.en));
+    });
   });
 
   group('Test initial -', () {
@@ -335,6 +343,28 @@ void main() async {
       testHelper.change(LanguageCodes.cu);
       expect(testHelper.code, equals(LanguageCodes.vi));
     });
+
+    test(
+      'true but initial code is unavailable in data with isDebug: true to cover logger warning callback',
+      () async {
+        final testHelper = LanguageHelper('TestUseInitial4');
+        addTearDown(testHelper.dispose);
+
+        SharedPreferences.setMockInitialValues({});
+        await testHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.cu, // cu is not in dataList
+          useInitialCodeWhenUnavailable: true,
+          isDebug: true,
+          onChanged: (code) {},
+        );
+        // Try to change to an unavailable language
+        // This should trigger the warning at lines 877-878
+        testHelper.change(LanguageCodes.aa); // aa is also not in dataList
+        // Should remain at the current code since initialCode is also unavailable
+        expect(testHelper.code, isNot(equals(LanguageCodes.aa)));
+      },
+    );
   });
 
   group('Test for mixins', () {
@@ -754,6 +784,48 @@ void main() async {
 
       expect(testHelper.code, equals(LanguageCodes.en));
     });
+
+    test(
+      'true and have local database but with no changed code with isDebug: true to cover logger debug callback',
+      () async {
+        final testHelper = LanguageHelper('TestSyncDevice7');
+        addTearDown(testHelper.dispose);
+
+        SharedPreferences.setMockInitialValues({
+          testHelper.deviceCodeKey: LanguageCodes.vi.code,
+        });
+        LanguageCode.setTestCode(LanguageCodes.vi);
+        await testHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: true,
+          isDebug: true,
+        );
+
+        expect(testHelper.code, equals(LanguageCodes.vi));
+      },
+    );
+
+    test(
+      'true and have local database but with changed code with isDebug: true to cover logger step callback',
+      () async {
+        final testHelper = LanguageHelper('TestSyncDevice8');
+        addTearDown(testHelper.dispose);
+
+        SharedPreferences.setMockInitialValues({
+          testHelper.deviceCodeKey: LanguageCodes.vi.code,
+        });
+        LanguageCode.setTestCode(LanguageCodes.en);
+        await testHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: true,
+          isDebug: true,
+        );
+
+        expect(testHelper.code, equals(LanguageCodes.en));
+      },
+    );
   });
 
   group('Test widget', () {
@@ -1550,6 +1622,22 @@ void main() async {
       expect(addedData, contains('Hello add'));
       expect(addedData['Hello'], isNot(equals('Hello')));
       expect(addedData['Hello'], equals('HelloOverwrite'));
+    });
+
+    test('Add data with overwrite is true to cover line 1179', () async {
+      await languageHelper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+      );
+      // Add data with overwrite: true when key already exists
+      await languageHelper.addData(dataAdd, overwrite: true);
+      languageHelper.reload();
+
+      final addedData = languageHelper.data[LanguageCodes.en]!;
+      expect(addedData, contains('Hello add'));
+      // The existing 'Hello' key should be overwritten
+      expect(addedData['Hello'], equals('HelloOverwrite'));
+      expect(addedData['Hello'], isNot(equals('Hello')));
     });
   });
 
