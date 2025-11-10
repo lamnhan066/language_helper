@@ -227,7 +227,7 @@ class LanguageHelper {
   /// Gets the current language as [LanguageCodes].
   ///
   /// You must call `await initial()` before using this getter.
-  LanguageCodes get code => _currentCode ?? LanguageCode.code;
+  LanguageCodes get code => _currentCode!;
 
   /// The current language code being used.
   ///
