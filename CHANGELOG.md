@@ -1,3 +1,10 @@
+## 0.13.0-rc.10
+
+* **BREAKING CHANGE** The `LanguageHelper.initial` is now safe to call multiple times.
+* Add `LanguageDelegate` for integrating LanguageHelper with Flutter's localization system.
+* Add example.
+* Update README.
+
 ## 0.13.0-rc.9
 
 * Bump `lite_logger` to `v0.2.0`.
