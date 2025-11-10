@@ -227,7 +227,7 @@ class LanguageHelper {
   /// Gets the current language as [LanguageCodes].
   ///
   /// You must call `await initial()` before using this getter.
-  LanguageCodes get code => _currentCode!;
+  LanguageCodes get code => _currentCode ?? LanguageCode.code;
 
   /// The current language code being used.
   ///
@@ -336,6 +336,9 @@ class LanguageHelper {
   ///
   /// Format: `$prefix.DeviceCode`
   String get _deviceCodeKey => '$prefix.DeviceCode';
+
+  /// Whether the LanguageHelper is initializing.
+  bool _isInitializing = false;
 
   /// Returns `true` if the `initial` method has been completed.
   bool get isInitialized => _ensureInitialized.isCompleted;
@@ -460,6 +463,11 @@ class LanguageHelper {
     /// ```
     bool isDebug = false,
   }) async {
+    if (isInitialized) return;
+
+    if (_isInitializing) return ensureInitialized;
+    _isInitializing = true;
+
     _data.clear();
     _dataOverrides.clear();
     _dataProviders = data;
