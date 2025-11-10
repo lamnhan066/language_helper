@@ -9,6 +9,7 @@ import 'pages/dart_map_page.dart';
 import 'pages/json_asset_page.dart';
 import 'pages/multiple_sources_page.dart';
 import 'pages/network_data_page.dart';
+import 'pages/package_delegate_page.dart';
 import 'widgets/improve_translation_button.dart';
 
 void main() async {
@@ -88,6 +89,7 @@ class _HomePageState extends State<HomePage> {
     const NetworkDataPage(),
     const MultipleSourcesPage(),
     const AdvancedFeaturesPage(),
+    const PackageDelegatePage(),
   ];
 
   @override
@@ -159,6 +161,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: const Icon(Icons.settings),
             label: 'Advanced'.tr,
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.extension),
+            label: 'Package Delegate',
           ),
         ],
       ),
