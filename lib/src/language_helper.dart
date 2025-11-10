@@ -465,7 +465,7 @@ class LanguageHelper {
   }) async {
     if (isInitialized) return;
 
-    if (_isInitializing) return ensureInitialized;
+    if (_isInitializing) return await ensureInitialized;
     _isInitializing = true;
 
     _data.clear();
