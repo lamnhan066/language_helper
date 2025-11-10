@@ -287,27 +287,34 @@ final codes = languageHelper.codes; // All supported languages
 final overrides = languageHelper.codesOverrides; // Override languages
 ```
 
-### Work With Flutter Localizations
+### Integrating with Flutter Localizations
+
+To use `LanguageHelper` and `LanguageDelegate` in your Flutter app, set up the `localizationsDelegates` and `supportedLocales` in your `MaterialApp`. You can manage multiple helpers for different parts of your app (e.g., in a package).
 
 ```dart
-// Default LanguageHelper instance
-final defaultInstance = LanguageHelper.instance;
+// The main app's LanguageHelper (singleton)
+final mainHelper = LanguageHelper.instance;
 
-// LanguageHelper instance of the `PackageWidget`
-final packageInstance = LanguageHelper('PackageWidget');
+// For a specific package/widget tree, use a dedicated helper if needed
+final packageHelper = LanguageHelper('PackageWidget');
 
-// ...
 return MaterialApp(
   localizationsDelegates: [
-    ...defaultInstance.delegates, // Add Flutter default localizations
-    LanguageDelegate(packageInstance), // Add `PackageWidget`'s delegate
+    // Flutter's built-in localizations
+    ...mainHelper.delegates,
+
+    // Language delegate for the package/widget tree
+    LanguageDelegate(packageHelper),
+
+    // Optionally, you can add more delegates here
   ],
+  supportedLocales: mainHelper.locales,
+  locale: mainHelper.locale,
   // ...
 );
-// ...
 ```
 
-After that, the language of the `PackageWidget` will be changed along with the main app. See more in the example.
+Now, both your main app and `PackageWidget` will automatically update languages together when you change the locale via `LanguageHelper`. For more advanced use cases and examples, see the example app.
 
 ## Advanced Usage
 
@@ -757,7 +764,7 @@ Add supported localizations to `Info.plist`:
 
 - Use `@{param}` for parameters (recommended)
 - The package automatically uses device locale on first launch
-- Only the outermost `LanguageBuilder` rebuilds for better performance
+- Only the outermost `LanguageBuilder` rebuilds for better performance unless `forceRebuild` is set to true
 - Use `isInitialized` to check if `initial()` has been called
 - Assets are preferred over network data (no caching yet)
 
