@@ -290,26 +290,24 @@ final overrides = languageHelper.codesOverrides; // Override languages
 ### Work With Flutter Localizations
 
 ```dart
-final customPackage = LanguageHelper('CusomPackage');
+// Default LanguageHelper instance
+final defaultInstance = LanguageHelper.instance;
 
-LanguageBuilder(
-  builder: (context) {
-    return MaterialApp(
-      localizationsDelegates: [
-        ...LanguageHelper.instance.delegates,
-        LanguageDelegate(customPackage),
-      ],
-      supportedLocales: LanguageHelper.instance.locales,
-      locale: LanguageCodes.en.locale,
-      home: Scaffold(
-        body: LanguageBuilder(builder: (_) => Text('Hello'.tr)),
-      ),
-    );
-  },
-),
+// LanguageHelper instance of the `PackageWidget`
+final packageInstance = LanguageHelper('PackageWidget');
+
+// ...
+return MaterialApp(
+  localizationsDelegates: [
+    ...defaultInstance.delegates, // Add Flutter default localizations
+    LanguageDelegate(packageInstance), // Add `PackageWidget`'s delegate
+  ],
+  // ...
+);
+// ...
 ```
 
-After that, the language of the `CustomPackage` will be changed along with the main app.
+After that, the language of the `PackageWidget` will be changed along with the main app. See more in the example.
 
 ## Advanced Usage
 
