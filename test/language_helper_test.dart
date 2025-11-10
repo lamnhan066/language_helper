@@ -69,14 +69,21 @@ void main() async {
       await temp.ensureInitialized;
       expect(temp.isInitialized, equals(true));
     });
+    test('accessing `code` before initialization throws', () {
+      final temp = LanguageHelper('TempLanguageHelper2');
+      expect(() => temp.code, throwsA(anything));
+    });
   });
 
   group('Test with SharedPreferences', () {
+    late LanguageHelper testHelper;
+
     setUp(() async {
+      testHelper = LanguageHelper('TestSharedPreferences');
       SharedPreferences.setMockInitialValues({
-        languageHelper.codeKey: LanguageCodes.vi.code,
+        testHelper.codeKey: LanguageCodes.vi.code,
       });
-      await languageHelper.initial(
+      await testHelper.initial(
         data: dataList,
         analysisKeys: dataList.isNotEmpty
             ? (await dataList.first.getData(
@@ -90,8 +97,13 @@ void main() async {
         },
       );
     });
+
+    tearDown(() {
+      testHelper.dispose();
+    });
+
     test('Get language from prefs', () {
-      expect(languageHelper.code, equals(LanguageCodes.vi));
+      expect(testHelper.code, equals(LanguageCodes.vi));
     });
   });
 
@@ -131,9 +143,12 @@ void main() async {
   });
 
   group('Test for analyzing missed key', () {
+    late LanguageHelper testHelper;
+
     setUp(() async {
+      testHelper = LanguageHelper('TestAnalyzeMissed');
       SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(
+      await testHelper.initial(
         data: dataList,
         analysisKeys: analysisMissedKeys,
         initialCode: LanguageCodes.cu,
@@ -146,8 +161,12 @@ void main() async {
       );
     });
 
+    tearDown(() {
+      testHelper.dispose();
+    });
+
     test('', () {
-      expect(languageHelper.analyze(), contains('The below keys were missing'));
+      expect(testHelper.analyze(), contains('The below keys were missing'));
     });
   });
 
@@ -185,6 +204,9 @@ void main() async {
     });
 
     test('[data] has more LanguageCodes than [dataOverrides]', () async {
+      final testHelper = LanguageHelper('TestCodes1');
+      addTearDown(testHelper.dispose);
+
       final LanguageData dataOverrides = {
         LanguageCodes.vi: {},
         LanguageCodes.en: {},
@@ -192,7 +214,7 @@ void main() async {
       };
       final LanguageData data = {LanguageCodes.vi: {}, LanguageCodes.en: {}};
 
-      await languageHelper.initial(
+      await testHelper.initial(
         data: [LanguageDataProvider.data(data)],
         dataOverrides: [LanguageDataProvider.data(dataOverrides)],
         useInitialCodeWhenUnavailable: false,
@@ -202,10 +224,13 @@ void main() async {
           expect(value, isA<LanguageCodes>());
         },
       );
-      expect(languageHelper.codes, equals(dataOverrides.keys));
+      expect(testHelper.codes, equals({...dataOverrides.keys, ...data.keys}));
     });
 
     test('[dataOverrides] has more LanguageCodes than [data]', () async {
+      final testHelper = LanguageHelper('TestCodes2');
+      addTearDown(testHelper.dispose);
+
       final LanguageData data = {
         LanguageCodes.vi: {},
         LanguageCodes.en: {},
@@ -216,7 +241,7 @@ void main() async {
         LanguageCodes.en: {},
       };
 
-      await languageHelper.initial(
+      await testHelper.initial(
         data: [LanguageDataProvider.data(data)],
         dataOverrides: [LanguageDataProvider.data(dataOverrides)],
         useInitialCodeWhenUnavailable: false,
@@ -227,14 +252,17 @@ void main() async {
         },
       );
 
-      expect(languageHelper.codes, equals(data.keys));
+      expect(testHelper.codes, equals({...data.keys, ...dataOverrides.keys}));
     });
   });
 
   group('Test for analyzing deprecated key', () {
+    late LanguageHelper testHelper;
+
     setUp(() async {
+      testHelper = LanguageHelper('TestAnalyzeDeprecated');
       SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(
+      await testHelper.initial(
         data: dataList,
         analysisKeys: analysisRemovedKeys.toSet(),
         initialCode: LanguageCodes.cu,
@@ -247,55 +275,65 @@ void main() async {
       );
     });
 
+    tearDown(() {
+      testHelper.dispose();
+    });
+
     test('', () {
-      expect(
-        languageHelper.analyze(),
-        contains('The below keys were deprecated'),
-      );
+      expect(testHelper.analyze(), contains('The below keys were deprecated'));
     });
   });
 
   group('Test for using initial code when the `toCode` is unavailable', () {
     test('true', () async {
+      final testHelper = LanguageHelper('TestUseInitial1');
+      addTearDown(testHelper.dispose);
+
       SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(
+      await testHelper.initial(
         data: dataList,
         initialCode: LanguageCodes.en,
         useInitialCodeWhenUnavailable: true,
         onChanged: (code) {},
       );
-      languageHelper.change(LanguageCodes.vi);
-      expect(languageHelper.code, equals(LanguageCodes.vi));
+      testHelper.change(LanguageCodes.vi);
+      expect(testHelper.code, equals(LanguageCodes.vi));
 
-      languageHelper.change(LanguageCodes.cu);
-      expect(languageHelper.code, equals(LanguageCodes.en));
+      testHelper.change(LanguageCodes.cu);
+      expect(testHelper.code, equals(LanguageCodes.en));
     });
 
     test('false', () async {
+      final testHelper = LanguageHelper('TestUseInitial2');
+      addTearDown(testHelper.dispose);
+
       SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(
+      await testHelper.initial(
         data: dataList,
         initialCode: LanguageCodes.en,
         useInitialCodeWhenUnavailable: false,
       );
-      languageHelper.change(LanguageCodes.vi);
-      expect(languageHelper.code, equals(LanguageCodes.vi));
+      testHelper.change(LanguageCodes.vi);
+      expect(testHelper.code, equals(LanguageCodes.vi));
 
-      languageHelper.change(LanguageCodes.cu);
-      expect(languageHelper.code, equals(LanguageCodes.vi));
+      testHelper.change(LanguageCodes.cu);
+      expect(testHelper.code, equals(LanguageCodes.vi));
     });
 
     test('true but initial code is null', () async {
+      final testHelper = LanguageHelper('TestUseInitial3');
+      addTearDown(testHelper.dispose);
+
       SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(
+      await testHelper.initial(
         data: dataList,
         useInitialCodeWhenUnavailable: false,
       );
-      languageHelper.change(LanguageCodes.vi);
-      expect(languageHelper.code, equals(LanguageCodes.vi));
+      testHelper.change(LanguageCodes.vi);
+      expect(testHelper.code, equals(LanguageCodes.vi));
 
-      languageHelper.change(LanguageCodes.cu);
-      expect(languageHelper.code, equals(LanguageCodes.vi));
+      testHelper.change(LanguageCodes.cu);
+      expect(testHelper.code, equals(LanguageCodes.vi));
     });
   });
 
@@ -537,24 +575,29 @@ void main() async {
 
   group('dataOverrides', () {
     test('not using dataOverrides', () async {
-      await languageHelper.initial(data: dataList);
-      languageHelper.change(LanguageCodes.en);
+      final testHelper = LanguageHelper('TestDataOverrides1');
+      addTearDown(testHelper.dispose);
 
-      final errorTranslated = 'You have @{number} dollar in your wallet'.trP({
-        'number': 2,
-      });
+      await testHelper.initial(data: dataList);
+      testHelper.change(LanguageCodes.en);
+
+      final errorTranslated = 'You have @{number} dollar in your wallet'.trC(
+        testHelper,
+        params: {'number': 2},
+      );
       expect(errorTranslated, 'You have 2 dollar in your wallet');
     });
     test('using dataOverrides', () async {
-      await languageHelper.initial(
-        data: dataList,
-        dataOverrides: dataOverrides,
-      );
-      languageHelper.change(LanguageCodes.en);
+      final testHelper = LanguageHelper('TestDataOverrides2');
+      addTearDown(testHelper.dispose);
 
-      final translated = 'You have @{number} dollar in your wallet'.trP({
-        'number': 2,
-      });
+      await testHelper.initial(data: dataList, dataOverrides: dataOverrides);
+      testHelper.change(LanguageCodes.en);
+
+      final translated = 'You have @{number} dollar in your wallet'.trC(
+        testHelper,
+        params: {'number': 2},
+      );
       expect(translated, 'You have 2 dollars in your wallet');
     });
   });
@@ -615,95 +658,110 @@ void main() async {
 
   group('Test `syncWithDevice`', () {
     test('false', () async {
+      final testHelper = LanguageHelper('TestSyncDevice1');
+      addTearDown(testHelper.dispose);
+
       SharedPreferences.setMockInitialValues({
-        languageHelper.deviceCodeKey: LanguageCodes.vi.code,
+        testHelper.deviceCodeKey: LanguageCodes.vi.code,
       });
       LanguageCode.setTestCode(LanguageCodes.en);
-      await languageHelper.initial(
+      await testHelper.initial(
         data: dataList,
         initialCode: LanguageCodes.vi,
         syncWithDevice: false,
       );
 
-      expect(languageHelper.code, equals(LanguageCodes.vi));
+      expect(testHelper.code, equals(LanguageCodes.vi));
     });
 
     test('true and haven\'t local database', () async {
+      final testHelper = LanguageHelper('TestSyncDevice2');
+      addTearDown(testHelper.dispose);
+
       SharedPreferences.setMockInitialValues({});
       LanguageCode.setTestCode(LanguageCodes.en);
-      await languageHelper.initial(
+      await testHelper.initial(
         data: dataList,
         initialCode: LanguageCodes.vi,
         syncWithDevice: true,
       );
 
-      expect(languageHelper.code, equals(LanguageCodes.vi));
+      expect(testHelper.code, equals(LanguageCodes.vi));
     });
 
     test(
       'true, the `languageCode_countryCode` not available in local database but the `languageCode` only is available and isOptionalCountryCode is true',
       () async {
+        final testHelper = LanguageHelper('TestSyncDevice3');
+        addTearDown(testHelper.dispose);
+
         SharedPreferences.setMockInitialValues({});
         LanguageCode.setTestCode(LanguageCodes.zh_TW);
-        await languageHelper.initial(data: dataAdds, syncWithDevice: true);
+        await testHelper.initial(data: dataAdds, syncWithDevice: true);
 
-        expect(languageHelper.code, equals(LanguageCodes.zh));
+        expect(testHelper.code, equals(LanguageCodes.zh));
       },
     );
 
     test(
       'true, the `languageCode_countryCode` not available in local database but the `languageCode` only is available and isOptionalCountryCode is false',
       () async {
+        final testHelper = LanguageHelper('TestSyncDevice4');
+        addTearDown(testHelper.dispose);
+
         SharedPreferences.setMockInitialValues({});
         LanguageCode.setTestCode(LanguageCodes.zh_TW);
-        await languageHelper.initial(
+        await testHelper.initial(
           data: dataAdds,
           syncWithDevice: true,
           isOptionalCountryCode: false,
         );
 
-        expect(languageHelper.code, equals(LanguageCodes.en));
+        expect(testHelper.code, equals(LanguageCodes.en));
       },
     );
 
     test('true and have local database but with no changed code', () async {
+      final testHelper = LanguageHelper('TestSyncDevice5');
+      addTearDown(testHelper.dispose);
+
       SharedPreferences.setMockInitialValues({
-        languageHelper.deviceCodeKey: LanguageCodes.vi.code,
+        testHelper.deviceCodeKey: LanguageCodes.vi.code,
       });
       LanguageCode.setTestCode(LanguageCodes.vi);
-      await languageHelper.initial(
+      await testHelper.initial(
         data: dataList,
         initialCode: LanguageCodes.vi,
         syncWithDevice: true,
       );
 
-      expect(languageHelper.code, equals(LanguageCodes.vi));
+      expect(testHelper.code, equals(LanguageCodes.vi));
     });
 
     test('true and have local database but with changed code', () async {
+      final testHelper = LanguageHelper('TestSyncDevice6');
+      addTearDown(testHelper.dispose);
+
       SharedPreferences.setMockInitialValues({
-        languageHelper.deviceCodeKey: LanguageCodes.vi.code,
+        testHelper.deviceCodeKey: LanguageCodes.vi.code,
       });
       LanguageCode.setTestCode(LanguageCodes.en);
-      await languageHelper.initial(
+      await testHelper.initial(
         data: dataList,
         initialCode: LanguageCodes.vi,
         syncWithDevice: true,
       );
 
-      expect(languageHelper.code, equals(LanguageCodes.en));
+      expect(testHelper.code, equals(LanguageCodes.en));
     });
   });
 
   group('Test widget', () {
     testWidgets('LanguageBuilder', (tester) async {
       // Use en as default language
-      SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.en,
-      );
-
+      // languageHelper is already initialized in setUpAll()
+      // Ensure we're in English mode
+      await languageHelper.change(LanguageCodes.en);
       await tester.pumpWidget(const LanguageHelperWidget());
       await tester.pumpAndSettle();
 
@@ -729,12 +787,9 @@ void main() async {
 
     testWidgets('Tr', (tester) async {
       // Use en as default language
-      SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.en,
-      );
-
+      // languageHelper is already initialized in setUpAll()
+      // Ensure we're in English mode
+      await languageHelper.change(LanguageCodes.en);
       await tester.pumpWidget(const TrWidget());
       await tester.pumpAndSettle();
 
@@ -1304,12 +1359,9 @@ void main() async {
     });
 
     testWidgets('LanguageBuilder with refreshTree enabled', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.en,
-      );
-
+      // languageHelper is already initialized in setUpAll()
+      // Ensure we're in English mode
+      await languageHelper.change(LanguageCodes.en);
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -1332,12 +1384,9 @@ void main() async {
     });
 
     testWidgets('LanguageBuilder with forceRebuild true', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.en,
-      );
-
+      // languageHelper is already initialized in setUpAll()
+      // Ensure we're in English mode
+      await languageHelper.change(LanguageCodes.en);
       int buildCount = 0;
 
       await tester.pumpWidget(
@@ -1367,12 +1416,9 @@ void main() async {
     });
 
     testWidgets('LanguageBuilder with forceRebuild false', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.en,
-      );
-
+      // languageHelper is already initialized in setUpAll()
+      // Ensure we're in English mode
+      await languageHelper.change(LanguageCodes.en);
       int buildCount = 0;
 
       await tester.pumpWidget(
@@ -1403,12 +1449,9 @@ void main() async {
     });
 
     testWidgets('Tr widget with refreshTree enabled', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      await languageHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.en,
-      );
-
+      // languageHelper is already initialized in setUpAll()
+      // Ensure we're in English mode
+      await languageHelper.change(LanguageCodes.en);
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(body: Tr((_) => Text('Hello'.tr), refreshTree: true)),
@@ -2040,70 +2083,65 @@ void main() async {
   });
 
   group('Test LanguageBuilder logger coverage', () {
-    testWidgets(
-      'LanguageBuilder logger debug call when helper changes',
-      (tester) async {
-        SharedPreferences.setMockInitialValues({});
+    testWidgets('LanguageBuilder logger debug call when helper changes', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
 
-        final helper1 = LanguageHelper('LoggerTestHelper1');
-        final helper2 = LanguageHelper('LoggerTestHelper2');
+      final helper1 = LanguageHelper('LoggerTestHelper1');
+      final helper2 = LanguageHelper('LoggerTestHelper2');
 
-        // Initialize both with isDebug = true to ensure logger exists
-        await helper1.initial(
-          data: dataList,
-          initialCode: LanguageCodes.en,
-          isDebug: true,
-        );
-        await helper2.initial(
-          data: dataList,
-          initialCode: LanguageCodes.vi,
-          isDebug: true,
-        );
+      // Initialize both with isDebug = true to ensure logger exists
+      await helper1.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+        isDebug: true,
+      );
+      await helper2.initial(
+        data: dataList,
+        initialCode: LanguageCodes.vi,
+        isDebug: true,
+      );
 
-        // Create a widget that will change helper in didChangeDependencies
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: LanguageScope(
-                languageHelper: helper1,
-                child: LanguageBuilder(
-                  builder: (_) => Text('Hello'.tr),
-                ),
-              ),
+      // Create a widget that will change helper in didChangeDependencies
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageScope(
+              languageHelper: helper1,
+              child: LanguageBuilder(builder: (_) => Text('Hello'.tr)),
             ),
           ),
-        );
-        await tester.pumpAndSettle();
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        // Verify initial state
-        expect(find.text('Hello'), findsOneWidget);
+      // Verify initial state
+      expect(find.text('Hello'), findsOneWidget);
 
-        // Change to a different helper scope to trigger didChangeDependencies
-        // with a different helper (this will trigger the if block path)
-        await tester.pumpWidget(
-          MaterialApp(
-            key: const ValueKey('changed'),
-            home: Scaffold(
-              body: LanguageScope(
-                languageHelper: helper2,
-                child: LanguageBuilder(
-                  builder: (_) => Text('Hello'.tr),
-                ),
-              ),
+      // Change to a different helper scope to trigger didChangeDependencies
+      // with a different helper (this will trigger the if block path)
+      await tester.pumpWidget(
+        MaterialApp(
+          key: const ValueKey('changed'),
+          home: Scaffold(
+            body: LanguageScope(
+              languageHelper: helper2,
+              child: LanguageBuilder(builder: (_) => Text('Hello'.tr)),
             ),
           ),
-        );
-        // Pump multiple times to ensure didChangeDependencies is called
-        await tester.pump();
-        await tester.pump();
-        await tester.pumpAndSettle();
+        ),
+      );
+      // Pump multiple times to ensure didChangeDependencies is called
+      await tester.pump();
+      await tester.pump();
+      await tester.pumpAndSettle();
 
-        // The widget should rebuild with the new helper
-        expect(find.text('Xin Chào'), findsOneWidget);
+      // The widget should rebuild with the new helper
+      expect(find.text('Xin Chào'), findsOneWidget);
 
-        helper1.dispose();
-        helper2.dispose();
-      },
-    );
+      helper1.dispose();
+      helper2.dispose();
+    });
   });
 }

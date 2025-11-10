@@ -305,81 +305,88 @@ void main() {
         SharedPreferences.setMockInitialValues({});
       });
 
-      testWidgets(
-        'MaterialApp with LanguageHelper.instance and LanguageDelegate',
-        (tester) async {
-          // Initialize the main instance
-          await LanguageHelper.instance.initial(
-            data: dataList,
-            initialCode: LanguageCodes.en,
-            useInitialCodeWhenUnavailable: false,
-            isAutoSave: false,
-          );
+      testWidgets('MaterialApp with LanguageHelper and LanguageDelegate', (
+        tester,
+      ) async {
+        // Create a new helper instance for this test
+        final testHelper = LanguageHelper('WidgetTest1');
+        addTearDown(testHelper.dispose);
 
-          await tester.pumpWidget(
-            MaterialApp(
-              localizationsDelegates: [
-                LanguageDelegate(LanguageHelper.instance),
-                ...LanguageHelper.instance.delegates,
-              ],
-              supportedLocales: LanguageHelper.instance.locales,
-              locale: LanguageHelper.instance.locale,
-              home: Scaffold(
-                body: LanguageBuilder(
-                  builder: (_) => Column(
-                    children: [
-                      Text('Hello'.tr),
-                      Text('You have @number dollars'.trP({'number': 100})),
-                    ],
-                  ),
+        await testHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.en,
+          useInitialCodeWhenUnavailable: false,
+          isAutoSave: false,
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: [
+              LanguageDelegate(testHelper),
+              ...testHelper.delegates,
+            ],
+            supportedLocales: testHelper.locales,
+            locale: testHelper.locale,
+            home: Scaffold(
+              body: LanguageBuilder(
+                languageHelper: testHelper,
+                builder: (_) => Column(
+                  children: [
+                    Text('Hello'.tr),
+                    Text('You have @number dollars'.trP({'number': 100})),
+                  ],
                 ),
               ),
             ),
-          );
-          await tester.pumpAndSettle();
+          ),
+        );
+        await tester.pumpAndSettle();
 
-          // Verify initial language is English
-          expect(find.text('Hello'), findsOneWidget);
-          expect(find.text('You have 100 dollars'), findsOneWidget);
-          expect(find.text('Xin Chào'), findsNothing);
-          expect(find.text('Bạn có 100 đô-la'), findsNothing);
+        // Verify initial language is English
+        expect(find.text('Hello'), findsOneWidget);
+        expect(find.text('You have 100 dollars'), findsOneWidget);
+        expect(find.text('Xin Chào'), findsNothing);
+        expect(find.text('Bạn có 100 đô-la'), findsNothing);
 
-          // Change locale via MaterialApp
-          await tester.pumpWidget(
-            MaterialApp(
-              localizationsDelegates: [
-                LanguageDelegate(LanguageHelper.instance),
-                ...LanguageHelper.instance.delegates,
-              ],
-              supportedLocales: LanguageHelper.instance.locales,
-              locale: LanguageCodes.vi.locale,
-              home: Scaffold(
-                body: LanguageBuilder(
-                  builder: (_) => Column(
-                    children: [
-                      Text('Hello'.tr),
-                      Text('You have @number dollars'.trP({'number': 100})),
-                    ],
-                  ),
+        // Change locale via MaterialApp
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: [
+              LanguageDelegate(testHelper),
+              ...testHelper.delegates,
+            ],
+            supportedLocales: testHelper.locales,
+            locale: LanguageCodes.vi.locale,
+            home: Scaffold(
+              body: LanguageBuilder(
+                languageHelper: testHelper,
+                builder: (_) => Column(
+                  children: [
+                    Text('Hello'.tr),
+                    Text('You have @number dollars'.trP({'number': 100})),
+                  ],
                 ),
               ),
             ),
-          );
-          await tester.pumpAndSettle();
+          ),
+        );
+        await tester.pumpAndSettle();
 
-          // Verify widgets updated to Vietnamese
-          expect(find.text('Xin Chào'), findsOneWidget);
-          expect(find.text('Bạn có 100 đô-la'), findsOneWidget);
-          expect(find.text('Hello'), findsNothing);
-          expect(find.text('You have 100 dollars'), findsNothing);
-        },
-      );
+        // Verify widgets updated to Vietnamese
+        expect(find.text('Xin Chào'), findsOneWidget);
+        expect(find.text('Bạn có 100 đô-la'), findsOneWidget);
+        expect(find.text('Hello'), findsNothing);
+        expect(find.text('You have 100 dollars'), findsNothing);
+      });
 
       testWidgets(
         'Separate widget with different LanguageHelper instance updates when main app locale changes',
         (tester) async {
-          // Initialize main instance
-          await LanguageHelper.instance.initial(
+          // Create main helper for this test
+          final mainHelper = LanguageHelper('WidgetTest2');
+          addTearDown(mainHelper.dispose);
+
+          await mainHelper.initial(
             data: dataList,
             initialCode: LanguageCodes.en,
             useInitialCodeWhenUnavailable: false,
@@ -388,6 +395,8 @@ void main() {
 
           // Create separate helper for a widget
           final separateHelper = LanguageHelper('SeparateWidget');
+          addTearDown(separateHelper.dispose);
+
           await separateHelper.initial(
             data: dataList,
             initialCode: LanguageCodes.en,
@@ -403,17 +412,20 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               localizationsDelegates: [
-                LanguageDelegate(LanguageHelper.instance),
+                LanguageDelegate(mainHelper),
                 LanguageDelegate(separateHelper),
-                ...LanguageHelper.instance.delegates,
+                ...mainHelper.delegates,
               ],
-              supportedLocales: LanguageHelper.instance.locales,
-              locale: LanguageHelper.instance.locale,
+              supportedLocales: mainHelper.locales,
+              locale: mainHelper.locale,
               home: Scaffold(
                 body: Column(
                   children: [
-                    // Main app widget using LanguageHelper.instance
-                    LanguageBuilder(builder: (_) => Text('Hello'.tr)),
+                    // Main app widget using mainHelper
+                    LanguageBuilder(
+                      languageHelper: mainHelper,
+                      builder: (_) => Text('Hello'.tr),
+                    ),
                     // Separate widget using separateHelper
                     separateWidget,
                   ],
@@ -431,17 +443,20 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               localizationsDelegates: [
-                LanguageDelegate(LanguageHelper.instance),
+                LanguageDelegate(mainHelper),
                 LanguageDelegate(separateHelper),
-                ...LanguageHelper.instance.delegates,
+                ...mainHelper.delegates,
               ],
-              supportedLocales: LanguageHelper.instance.locales,
+              supportedLocales: mainHelper.locales,
               locale: LanguageCodes.vi.locale,
               home: Scaffold(
                 body: Column(
                   children: [
-                    // Main app widget using LanguageHelper.instance
-                    LanguageBuilder(builder: (_) => Text('Hello'.tr)),
+                    // Main app widget using mainHelper
+                    LanguageBuilder(
+                      languageHelper: mainHelper,
+                      builder: (_) => Text('Hello'.tr),
+                    ),
                     // Separate widget using separateHelper
                     separateWidget,
                   ],
@@ -451,8 +466,8 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          // Verify main app widget updated (uses LanguageHelper.instance)
-          expect(LanguageHelper.instance.code, equals(LanguageCodes.vi));
+          // Verify main app widget updated (uses mainHelper)
+          expect(mainHelper.code, equals(LanguageCodes.vi));
           expect(find.text('Xin Chào'), findsOneWidget);
           expect(
             find.text('Hello'),
@@ -470,16 +485,17 @@ void main() {
           expect(separateHelper.code, equals(LanguageCodes.vi));
           expect(find.text('Xin Chào'), findsNWidgets(2));
           expect(find.text('Hello'), findsNothing);
-
-          separateHelper.dispose();
         },
       );
 
       testWidgets(
         'Separate widget updates independently when its helper language changes',
         (tester) async {
-          // Initialize main instance
-          await LanguageHelper.instance.initial(
+          // Create main helper for this test
+          final mainHelper = LanguageHelper('WidgetTest3');
+          addTearDown(mainHelper.dispose);
+
+          await mainHelper.initial(
             data: dataList,
             initialCode: LanguageCodes.en,
             useInitialCodeWhenUnavailable: false,
@@ -488,6 +504,8 @@ void main() {
 
           // Create separate helper
           final separateHelper = LanguageHelper('SeparateWidget');
+          addTearDown(separateHelper.dispose);
+
           await separateHelper.initial(
             data: dataList,
             initialCode: LanguageCodes.en,
@@ -502,16 +520,19 @@ void main() {
           await tester.pumpWidget(
             MaterialApp(
               localizationsDelegates: [
-                LanguageDelegate(LanguageHelper.instance),
+                LanguageDelegate(mainHelper),
                 LanguageDelegate(separateHelper),
-                ...LanguageHelper.instance.delegates,
+                ...mainHelper.delegates,
               ],
-              supportedLocales: LanguageHelper.instance.locales,
-              locale: LanguageHelper.instance.locale,
+              supportedLocales: mainHelper.locales,
+              locale: mainHelper.locale,
               home: Scaffold(
                 body: Column(
                   children: [
-                    LanguageBuilder(builder: (_) => Text('Hello'.tr)),
+                    LanguageBuilder(
+                      languageHelper: mainHelper,
+                      builder: (_) => Text('Hello'.tr),
+                    ),
                     separateWidget,
                   ],
                 ),
@@ -532,31 +553,29 @@ void main() {
           // Separate widget should show Vietnamese
           expect(find.text('Hello'), findsOneWidget);
           expect(find.text('Xin Chào'), findsOneWidget);
-
-          separateHelper.dispose();
         },
       );
 
       testWidgets('Delegate isSupported works correctly in widget context', (
         tester,
       ) async {
-        await LanguageHelper.instance.initial(
+        final testHelper = LanguageHelper('WidgetTest4');
+        addTearDown(testHelper.dispose);
+
+        await testHelper.initial(
           data: dataList,
           initialCode: LanguageCodes.en,
           useInitialCodeWhenUnavailable: false,
           isAutoSave: false,
         );
 
-        final delegate = LanguageDelegate(LanguageHelper.instance);
+        final delegate = LanguageDelegate(testHelper);
 
         await tester.pumpWidget(
           MaterialApp(
-            localizationsDelegates: [
-              delegate,
-              ...LanguageHelper.instance.delegates,
-            ],
-            supportedLocales: LanguageHelper.instance.locales,
-            locale: LanguageHelper.instance.locale,
+            localizationsDelegates: [delegate, ...testHelper.delegates],
+            supportedLocales: testHelper.locales,
+            locale: testHelper.locale,
             home: const Scaffold(),
           ),
         );
@@ -571,7 +590,10 @@ void main() {
       testWidgets('Delegate load is called when MaterialApp locale changes', (
         tester,
       ) async {
-        await LanguageHelper.instance.initial(
+        final testHelper = LanguageHelper('WidgetTest5');
+        addTearDown(testHelper.dispose);
+
+        await testHelper.initial(
           data: dataList,
           initialCode: LanguageCodes.en,
           useInitialCodeWhenUnavailable: false,
@@ -580,46 +602,52 @@ void main() {
 
         // Track language changes
         LanguageCodes? lastChangedCode;
-        LanguageHelper.instance.stream.listen((code) {
+        testHelper.stream.listen((code) {
           lastChangedCode = code;
         });
 
         await tester.pumpWidget(
           MaterialApp(
             localizationsDelegates: [
-              LanguageDelegate(LanguageHelper.instance),
-              ...LanguageHelper.instance.delegates,
+              LanguageDelegate(testHelper),
+              ...testHelper.delegates,
             ],
-            supportedLocales: LanguageHelper.instance.locales,
-            locale: LanguageHelper.instance.locale,
+            supportedLocales: testHelper.locales,
+            locale: testHelper.locale,
             home: Scaffold(
-              body: LanguageBuilder(builder: (_) => Text('Hello'.tr)),
+              body: LanguageBuilder(
+                languageHelper: testHelper,
+                builder: (_) => Text('Hello'.tr),
+              ),
             ),
           ),
         );
         await tester.pumpAndSettle();
 
-        expect(LanguageHelper.instance.code, equals(LanguageCodes.en));
+        expect(testHelper.code, equals(LanguageCodes.en));
         expect(find.text('Hello'), findsOneWidget);
 
         // Change locale - this should trigger delegate.load
         await tester.pumpWidget(
           MaterialApp(
             localizationsDelegates: [
-              LanguageDelegate(LanguageHelper.instance),
-              ...LanguageHelper.instance.delegates,
+              LanguageDelegate(testHelper),
+              ...testHelper.delegates,
             ],
-            supportedLocales: LanguageHelper.instance.locales,
+            supportedLocales: testHelper.locales,
             locale: LanguageCodes.vi.locale,
             home: Scaffold(
-              body: LanguageBuilder(builder: (_) => Text('Hello'.tr)),
+              body: LanguageBuilder(
+                languageHelper: testHelper,
+                builder: (_) => Text('Hello'.tr),
+              ),
             ),
           ),
         );
         await tester.pumpAndSettle();
 
         // Verify delegate.load was called and language changed
-        expect(LanguageHelper.instance.code, equals(LanguageCodes.vi));
+        expect(testHelper.code, equals(LanguageCodes.vi));
         expect(lastChangedCode, equals(LanguageCodes.vi));
         expect(find.text('Xin Chào'), findsOneWidget);
       });
@@ -627,25 +655,28 @@ void main() {
       testWidgets('Delegate shouldReload works correctly in widget context', (
         tester,
       ) async {
-        await LanguageHelper.instance.initial(
+        final testHelper = LanguageHelper('WidgetTest6');
+        addTearDown(testHelper.dispose);
+
+        await testHelper.initial(
           data: dataList,
           initialCode: LanguageCodes.en,
           useInitialCodeWhenUnavailable: false,
           isAutoSave: false,
         );
 
-        final delegate1 = LanguageDelegate(LanguageHelper.instance);
+        final delegate1 = LanguageDelegate(testHelper);
 
         await tester.pumpWidget(
           MaterialApp(
-            localizationsDelegates: [
-              delegate1,
-              ...LanguageHelper.instance.delegates,
-            ],
-            supportedLocales: LanguageHelper.instance.locales,
-            locale: LanguageHelper.instance.locale,
+            localizationsDelegates: [delegate1, ...testHelper.delegates],
+            supportedLocales: testHelper.locales,
+            locale: testHelper.locale,
             home: Scaffold(
-              body: LanguageBuilder(builder: (_) => Text('Hello'.tr)),
+              body: LanguageBuilder(
+                languageHelper: testHelper,
+                builder: (_) => Text('Hello'.tr),
+              ),
             ),
           ),
         );
@@ -654,21 +685,21 @@ void main() {
         // Change locale
         await tester.pumpWidget(
           MaterialApp(
-            localizationsDelegates: [
-              delegate1,
-              ...LanguageHelper.instance.delegates,
-            ],
-            supportedLocales: LanguageHelper.instance.locales,
+            localizationsDelegates: [delegate1, ...testHelper.delegates],
+            supportedLocales: testHelper.locales,
             locale: LanguageCodes.vi.locale,
             home: Scaffold(
-              body: LanguageBuilder(builder: (_) => Text('Hello'.tr)),
+              body: LanguageBuilder(
+                languageHelper: testHelper,
+                builder: (_) => Text('Hello'.tr),
+              ),
             ),
           ),
         );
         await tester.pumpAndSettle();
 
         // Verify locale changed to Vietnamese
-        expect(LanguageHelper.instance.code, equals(LanguageCodes.vi));
+        expect(testHelper.code, equals(LanguageCodes.vi));
 
         // At this point, both delegate1 and a new delegate would have the same locale (vi)
         // because shouldReload compares current locales, not the locale when delegate was created
@@ -677,6 +708,8 @@ void main() {
         // To test shouldReload returning true, we need to compare with a delegate
         // that has a different current locale. Let's create a helper with a different locale
         final helper2 = LanguageHelper('Helper2');
+        addTearDown(helper2.dispose);
+
         await helper2.initial(
           data: dataList,
           initialCode: LanguageCodes.en,
@@ -689,28 +722,26 @@ void main() {
         // shouldReload should return true (different locales)
         expect(delegate2.shouldReload(delegate1), isTrue);
 
-        helper2.dispose();
-
         // Change back to English
         await tester.pumpWidget(
           MaterialApp(
-            localizationsDelegates: [
-              delegate1,
-              ...LanguageHelper.instance.delegates,
-            ],
-            supportedLocales: LanguageHelper.instance.locales,
+            localizationsDelegates: [delegate1, ...testHelper.delegates],
+            supportedLocales: testHelper.locales,
             locale: LanguageCodes.en.locale,
             home: Scaffold(
-              body: LanguageBuilder(builder: (_) => Text('Hello'.tr)),
+              body: LanguageBuilder(
+                languageHelper: testHelper,
+                builder: (_) => Text('Hello'.tr),
+              ),
             ),
           ),
         );
         await tester.pumpAndSettle();
 
         // Verify locale changed back to English
-        expect(LanguageHelper.instance.code, equals(LanguageCodes.en));
+        expect(testHelper.code, equals(LanguageCodes.en));
 
-        final delegate3 = LanguageDelegate(LanguageHelper.instance);
+        final delegate3 = LanguageDelegate(testHelper);
         // shouldReload should return false (back to original locale, same as delegate1)
         expect(delegate3.shouldReload(delegate1), isFalse);
       });
