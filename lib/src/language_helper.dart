@@ -206,13 +206,6 @@ class LanguageHelper {
   /// the same translation key.
   LanguageData get dataOverrides => _dataOverrides;
 
-  /// List of all the keys of text in your project.
-  ///
-  /// You can maintain it by yourself or using [language_helper_generator](https://pub.dev/packages/language_helper_generator).
-  /// This value will be used by `analyze` method to let you know that which
-  /// text is missing in your language data.
-  Iterable<String> _analysisKeys = const {};
-
   /// Gets the list of [LanguageCodes] from both [data] and [dataOverrides].
   Set<LanguageCodes> get codes => {..._codes, ..._codesOverrides}.toSet();
   Set<LanguageCodes> _codes = {};
@@ -377,32 +370,6 @@ class LanguageHelper {
       LanguageDataProvider.empty(),
     ],
 
-    /// Keys to analyze for missing translations.
-    ///
-    /// List of all the keys of text in your project. You can maintain it by
-    /// yourself or using [language_helper_generator](https://pub.dev/packages/language_helper_generator).
-    ///
-    /// When provided, the [analyze] method will compare these keys against
-    /// the keys in your [data] to identify:
-    /// - Missing keys: in [analysisKeys] but not in [data]
-    /// - Deprecated keys: in [data] but not in [analysisKeys]
-    ///
-    /// These keys are typically extracted from your source code using the
-    /// language_helper generator, which scans for `.tr`, `.trP`, `.trT`, and
-    /// `.translate()` usage.
-    ///
-    /// If empty (default), the analyzer will only check for missing translations
-    /// across different languages without checking against a reference set.
-    ///
-    /// Example:
-    /// ```dart
-    /// await languageHelper.initial(
-    ///   data: [myData],
-    ///   analysisKeys: {'Hello', 'Goodbye', 'Welcome'}, // Your app's text keys
-    /// );
-    /// ```
-    Iterable<String> analysisKeys = const {},
-
     /// Firstly, the app will try to use this [initialCode]. If [initialCode] is null,
     /// the plugin will try to get the current device language. If both of them are
     /// null, the plugin will use the first language in the [data].
@@ -450,7 +417,6 @@ class LanguageHelper {
     /// - Translation lookups and missing text warnings
     /// - Device language synchronization events
     /// - Data provider operations
-    /// - Analysis results when [analysisKeys] are provided
     ///
     /// Defaults to `false` to avoid console noise in production.
     ///
@@ -478,7 +444,6 @@ class LanguageHelper {
     _useInitialCodeWhenUnavailable = useInitialCodeWhenUnavailable;
     _isAutoSave = isAutoSave;
     _syncWithDevice = syncWithDevice;
-    _analysisKeys = analysisKeys;
     _initialCode = initialCode;
     _logger ??= LiteLogger(
       name: prefix,
@@ -596,10 +561,6 @@ class LanguageHelper {
 
     _data.addAll(await _dataProvider.getData(code));
     _dataOverrides.addAll(await _dataOverridesProvider.getData(code));
-
-    if (_isDebug) {
-      analyze();
-    }
 
     if (!_ensureInitialized.isCompleted) {
       _ensureInitialized.complete();
@@ -969,124 +930,6 @@ class LanguageHelper {
     _useInitialCodeWhenUnavailable = newValue;
   }
 
-  /// Analyze the [_data] to identify missing or deprecated translation keys.
-  ///
-  /// Compares the keys in your [data] with the [analysisKeys] provided during
-  /// [initial] to identify:
-  /// - Missing keys: keys in [analysisKeys] but not in any language's [data]
-  /// - Deprecated keys: keys in [data] but not in [analysisKeys]
-  /// - Missing translations: keys present in one language but missing in others
-  ///
-  /// When [isDebug] is `true`, the analysis results are automatically logged
-  /// to the console using the debug logger with colored output.
-  ///
-  /// Returns a formatted string with the analysis results. The output format:
-  ///
-  /// ```
-  /// ==================================================
-  /// Analyze all languages...
-  /// Missing keys:
-  ///   >> Key name 1
-  ///   >> Key name 2
-  /// Deprecated keys:
-  ///   >> Old key name 1
-  /// Specific text missing results:
-  ///   >> LanguageCodes.en:
-  ///       >> Text is missed in vi
-  ///   >> LanguageCodes.vi:
-  ///       >> Text is missed in en
-  /// ==================================================
-  /// ```
-  ///
-  /// Note: This method only works with data from [LanguageDataProvider.data].
-  /// It cannot analyze data from assets or network providers.
-  ///
-  /// Example:
-  /// ```dart
-  /// final result = languageHelper.analyze();
-  /// print(result);
-  /// ```
-  String analyze() {
-    final List<String> keys = [];
-    StringBuffer buffer = StringBuffer('');
-
-    buffer.write('\n\n');
-    buffer.write('==================================================');
-    buffer.write('\n');
-    buffer.write('Analyze all languages...');
-    buffer.write('\n');
-
-    // Add all keys to [keys]
-    for (final code in codes) {
-      if (!_data.containsKey(code)) {
-        return 'Can analyze the data from `LanguageDataProvider.data` only';
-      }
-      for (final key in _data[code]!.keys) {
-        if (!keys.contains(key)) keys.add(key);
-      }
-    }
-
-    final List<String> missedKeys = [];
-    final List<String> removedKeys = [];
-    if (_analysisKeys.isNotEmpty) {
-      // Analyze which keys are in [analysisKeys] but not in [data].
-      for (final key in _analysisKeys) {
-        if (!keys.contains(key)) {
-          missedKeys.add(key);
-        }
-      }
-
-      // Analyze which keys are in [data] but not in [analysisKeys]
-      for (final key in keys) {
-        if (!_analysisKeys.contains(key)) {
-          removedKeys.add(key);
-        }
-      }
-    }
-
-    if (missedKeys.isNotEmpty) {
-      buffer.write(
-        'The below keys were missing ([analysisKeys]: yes, [data]: no):\n',
-      );
-      for (final key in missedKeys) {
-        buffer.write('  >> ${_removeNewline(key)}\n');
-      }
-      buffer.write('\n');
-    }
-
-    if (removedKeys.isNotEmpty) {
-      buffer.write(
-        'The below keys were deprecated ([analysisKeys]: no, [data]: yes):\n',
-      );
-      for (final key in removedKeys) {
-        buffer.write('  >> ${_removeNewline(key)}\n');
-      }
-      buffer.write('\n');
-    }
-
-    buffer.write('Specific text missing results:\n');
-
-    // Analyze the results
-    for (final code in codes) {
-      buffer.write('  >> $code:\n');
-      for (final key in keys) {
-        if (!_data[code]!.keys.contains(key)) {
-          buffer.write('      >> ${_removeNewline(key)}\n');
-        }
-      }
-
-      // Don't need to add \n for the last element
-      if (code != codes.last) buffer.write('\n');
-    }
-
-    buffer.write('==================================================');
-    buffer.write('\n');
-
-    _logger?.debug(() => buffer.toString());
-
-    return buffer.toString();
-  }
-
   /// Selects the first available data provider from [providers] that has translations.
   ///
   /// This internal method iterates through [providers] and returns the first one
@@ -1221,15 +1064,6 @@ class LanguageHelper {
     }
 
     return _replaceParams(translated, params);
-  }
-
-  /// Replaces newline characters in [text] with a visible symbol for analysis output.
-  ///
-  /// This internal utility method converts newlines to ' ⏎ ' (space-return-arrow-space)
-  /// to make multi-line translation keys visible in analysis reports. Used by [analyze]
-  /// to format output when translation keys contain line breaks.
-  String _removeNewline(String text) {
-    return text.replaceAll('\n', ' ⏎ ');
   }
 
   @override

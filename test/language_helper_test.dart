@@ -93,11 +93,6 @@ void main() async {
       });
       await testHelper.initial(
         data: dataList,
-        analysisKeys: dataList.isNotEmpty
-            ? (await dataList.first.getData(
-                LanguageCodes.en,
-              )).entries.first.value.keys.toSet()
-            : <String>{},
         useInitialCodeWhenUnavailable: false,
         isDebug: true,
         onChanged: (value) {
@@ -148,34 +143,6 @@ void main() async {
         expect(languageHelper.code, equals(LanguageCodes.en));
       },
     );
-  });
-
-  group('Test for analyzing missed key', () {
-    late LanguageHelper testHelper;
-
-    setUp(() async {
-      testHelper = LanguageHelper('TestAnalyzeMissed');
-      SharedPreferences.setMockInitialValues({});
-      await testHelper.initial(
-        data: dataList,
-        analysisKeys: analysisMissedKeys,
-        initialCode: LanguageCodes.cu,
-        useInitialCodeWhenUnavailable: false,
-        isAutoSave: false,
-        isDebug: true,
-        onChanged: (value) {
-          expect(value, isA<LanguageCodes>());
-        },
-      );
-    });
-
-    tearDown(() {
-      testHelper.dispose();
-    });
-
-    test('', () {
-      expect(testHelper.analyze(), contains('The below keys were missing'));
-    });
   });
 
   group('Test for using unavailable code', () {
@@ -261,34 +228,6 @@ void main() async {
       );
 
       expect(testHelper.codes, equals({...data.keys, ...dataOverrides.keys}));
-    });
-  });
-
-  group('Test for analyzing deprecated key', () {
-    late LanguageHelper testHelper;
-
-    setUp(() async {
-      testHelper = LanguageHelper('TestAnalyzeDeprecated');
-      SharedPreferences.setMockInitialValues({});
-      await testHelper.initial(
-        data: dataList,
-        analysisKeys: analysisRemovedKeys.toSet(),
-        initialCode: LanguageCodes.cu,
-        useInitialCodeWhenUnavailable: false,
-        isAutoSave: false,
-        isDebug: true,
-        onChanged: (value) {
-          expect(value, isA<LanguageCodes>());
-        },
-      );
-    });
-
-    tearDown(() {
-      testHelper.dispose();
-    });
-
-    test('', () {
-      expect(testHelper.analyze(), contains('The below keys were deprecated'));
     });
   });
 
@@ -2012,16 +1951,6 @@ void main() async {
         helper.code,
         equals(LanguageCodes.en),
       ); // Should fallback to first available
-    });
-
-    test('LanguageHelper analyze with empty analysis keys', () {
-      final result = languageHelper.analyze();
-      expect(result, isNotEmpty);
-    });
-
-    test('LanguageHelper analyze with null analysis keys', () {
-      final result = languageHelper.analyze();
-      expect(result, isNotEmpty);
     });
 
     test('LanguageHelper reload with no data', () async {

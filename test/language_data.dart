@@ -62,13 +62,3 @@ LanguageData _dataAdd = {
   LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'},
   LanguageCodes.zh: {'Hello': '你好'},
 };
-
-Set<String> analysisMissedKeys = {
-  'Hello',
-  'You have @number dollars',
-  'You have @{number}, dollars',
-  'You have @{number} dollar',
-  'This is a new key',
-};
-
-List<String> analysisRemovedKeys = ['Hello', 'You have @number dollars'];
