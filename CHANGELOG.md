@@ -1,3 +1,12 @@
+## 0.13.0-rc.11
+
+* **BREAKING CHANGE** Remove `analyze()` method from `LanguageHelper`. Missing translation detection is now handled by `language_helper_generator` package.
+* **BREAKING CHANGE** Remove `analysisKeys` parameter from `LanguageHelper.initial()`. The generator will automatically detect and report missing translations.
+* **BREAKING CHANGE** The `forceRebuild` parameter in `LanguageHelper.initial()` now defaults to `true` instead of `false`. This change makes it easier to use nested `LanguageBuilder` widgets since they will rebuild by default when the language changes. Previously, only the root `LanguageBuilder` would rebuild, which made nested builders less useful.
+* Update tests to reflect the removal of analysis functionality.
+
+* **MIGRATION**: If you want the old behavior (only root widgets rebuild), use `LanguageHelper.initial(forceRebuild: false)`.
+
 ## 0.13.0-rc.10
 
 * **BREAKING CHANGE** The `LanguageHelper.initial` is now safe to call multiple times.
