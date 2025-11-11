@@ -268,7 +268,7 @@ class LanguageHelper {
   ///
   /// You can override this per-widget using the `forceRebuild` parameter in
   /// [LanguageBuilder] or [Tr].
-  bool _forceRebuild = false;
+  bool _forceRebuild = true;
 
   /// Callback function called when the language changes.
   ///
@@ -353,8 +353,8 @@ class LanguageHelper {
   /// 5. [LanguageCodes.en] (if [data] is empty)
   ///
   /// After initialization, all [LanguageBuilder] widgets will rebuild when the
-  /// language changes. Set [forceRebuild] to `true` to force all builders to
-  /// rebuild (may decrease performance).
+  /// language changes by default. Set [forceRebuild] to `false` to only rebuild
+  /// the root widget for better performance.
   Future<void> initial({
     /// Data of languages. If this value is empty, a temporary data ([LanguageDataProvider.data({LanguagesCode.en: {}})])
     /// will be added to let make it easier to develop the app.
@@ -381,7 +381,7 @@ class LanguageHelper {
     bool useInitialCodeWhenUnavailable = false,
 
     /// Use this value as default for all [LanguageBuilder].
-    bool forceRebuild = false,
+    bool forceRebuild = true,
 
     /// Auto save the current change of the language. The app will use the new
     /// language in the next open instead of [initialCode].

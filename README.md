@@ -377,18 +377,20 @@ Tr((_) => Text('Hello'.tr))
 
 #### `forceRebuild` Parameter
 
-By default, only the root `LanguageBuilder` widget rebuilds when the language changes for better performance. Use `forceRebuild: true` to force a specific widget to always rebuild:
+By default, all `LanguageBuilder` widgets rebuild when the language changes. You can control this behavior globally via `LanguageHelper.initial(forceRebuild: false)` or per-widget using the `forceRebuild` parameter:
 
 ```dart
 LanguageBuilder(
-  forceRebuild: true, // This widget will always rebuild on language change
+  forceRebuild: false, // Only rebuild the root widget for better performance
   builder: (context) => Text('Hello'.tr),
 )
 ```
 
-- `true` → Always rebuild this widget when language changes
-- `false` → Only rebuild the root widget (default behavior)
+- `true` → Always rebuild this widget when language changes (default)
+- `false` → Only rebuild the root widget (better performance)
 - `null` → Fallback to `LanguageHelper.forceRebuild` default
+
+> **⚠️ Breaking Change (v0.13.0)**: The default value of `forceRebuild` changed from `false` to `true`. This change makes it easier to use nested `LanguageBuilder` widgets since they will rebuild by default. If you want the old behavior (only root widgets rebuild), use `LanguageHelper.initial(forceRebuild: false)`.
 
 #### `refreshTree` Parameter
 
@@ -407,7 +409,7 @@ LanguageBuilder(
 > - Poor performance with large widget trees
 > - Unnecessary rebuilds of child widgets
 >
-> **💡 Note**: If you use `const` widgets nested inside a `LanguageBuilder`, they may not rebuild automatically when the root rebuilds. To ensure these widgets update on language change (without using `refreshTree`), wrap them in their own `LanguageBuilder` with `forceRebuild: true`.
+> **💡 Note**: If you use `const` widgets nested inside a `LanguageBuilder` and have `forceRebuild: false`, they may not rebuild automatically when the root rebuilds. To ensure these widgets update on language change (without using `refreshTree`), either keep the default `forceRebuild: true` or wrap them in their own `LanguageBuilder` with `forceRebuild: true`.
 
 Use `refreshTree` only when you specifically need to reset widget state or when dealing with widgets that don't properly handle language changes.
 
@@ -764,7 +766,7 @@ Add supported localizations to `Info.plist`:
 
 - Use `@{param}` for parameters (recommended)
 - The package automatically uses device locale on first launch
-- Only the outermost `LanguageBuilder` rebuilds for better performance unless `forceRebuild` is set to true
+- All `LanguageBuilder` widgets rebuild by default when language changes. Set `forceRebuild: false` in `LanguageHelper.initial()` or per-widget for better performance
 - Use `isInitialized` to check if `initial()` has been called
 - Assets are preferred over network data (no caching yet)
 
