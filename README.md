@@ -390,8 +390,6 @@ LanguageBuilder(
 - `false` → Only rebuild the root widget (better performance)
 - `null` → Fallback to `LanguageHelper.forceRebuild` default
 
-> **⚠️ Breaking Change (v0.13.0)**: The default value of `forceRebuild` changed from `false` to `true`. This change makes it easier to use nested `LanguageBuilder` widgets since they will rebuild by default. If you want the old behavior (only root widgets rebuild), use `LanguageHelper.initial(forceRebuild: false)`.
-
 #### `refreshTree` Parameter
 
 Use `refreshTree: true` to completely refresh the widget tree using `KeyedSubtree`. This changes the key of the current tree so the entire tree is removed and recreated:
