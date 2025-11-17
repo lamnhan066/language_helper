@@ -1274,5 +1274,243 @@ void main() {
         // (We can't easily verify the exact message in tests, but we verify it doesn't crash)
       },
     );
+
+    testWidgets(
+      'FutureBuilder wrapping LanguageScope - scope accessible in loading and completed states',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+
+        final scopedHelper = LanguageHelper('ScopedHelper');
+        await scopedHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+        );
+
+        LanguageHelper? loadingHelper;
+        LanguageHelper? completedHelper;
+
+        final future = Future.delayed(
+          const Duration(milliseconds: 10),
+          () => 'data',
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: FutureBuilder<String>(
+                future: future,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // During loading state
+                    return LanguageScope(
+                      languageHelper: scopedHelper,
+                      child: LanguageBuilder(
+                        builder: (context) {
+                          loadingHelper = LanguageHelper.of(context);
+                          return Text('Hello'.tr);
+                        },
+                      ),
+                    );
+                  } else {
+                    // After future completes
+                    return LanguageScope(
+                      languageHelper: scopedHelper,
+                      child: LanguageBuilder(
+                        builder: (context) {
+                          completedHelper = LanguageHelper.of(context);
+                          return Text('Hello'.tr);
+                        },
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+        );
+
+        // Pump once to show loading state
+        await tester.pump();
+        await tester.pump();
+
+        // Verify scope is accessible during loading
+        expect(loadingHelper, equals(scopedHelper));
+        expect(find.text('Xin Chào'), findsOneWidget);
+
+        // Wait for future to complete
+        await tester.pumpAndSettle();
+
+        // Verify scope is accessible after completion
+        expect(completedHelper, equals(scopedHelper));
+        expect(find.text('Xin Chào'), findsOneWidget);
+
+        scopedHelper.dispose();
+      },
+    );
+
+    testWidgets(
+      'LanguageScope wrapping FutureBuilder - widgets can access scope in both loading and data states',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+
+        final scopedHelper = LanguageHelper('ScopedHelper');
+        await scopedHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+        );
+
+        LanguageHelper? loadingHelper;
+        LanguageHelper? dataHelper;
+
+        final future = Future.delayed(
+          const Duration(milliseconds: 10),
+          () => 'data',
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: LanguageScope(
+                languageHelper: scopedHelper,
+                child: FutureBuilder<String>(
+                  future: future,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      // Loading state - should access scope
+                      loadingHelper = LanguageHelper.of(context);
+                      return LanguageBuilder(
+                        builder: (_) => Column(
+                          children: [
+                            Text('Hello'.tr),
+                            const CircularProgressIndicator(),
+                          ],
+                        ),
+                      );
+                    } else {
+                      // Data state - should access scope
+                      dataHelper = LanguageHelper.of(context);
+                      return LanguageBuilder(
+                        builder: (_) => Column(
+                          children: [
+                            Text('Hello'.tr),
+                            Text(snapshot.data ?? ''),
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Pump once to show loading state
+        await tester.pump();
+        await tester.pump();
+
+        // Verify scope is accessible during loading
+        expect(loadingHelper, equals(scopedHelper));
+        expect(find.text('Xin Chào'), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+        // Wait for future to complete
+        await tester.pumpAndSettle();
+
+        // Verify scope is accessible after completion
+        expect(dataHelper, equals(scopedHelper));
+        expect(find.text('Xin Chào'), findsOneWidget);
+        expect(find.text('data'), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+
+        scopedHelper.dispose();
+      },
+    );
+
+    testWidgets(
+      'LanguageScope inside FutureBuilder builder - scope works when created dynamically',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+
+        final scopedHelper = LanguageHelper('ScopedHelper');
+        await scopedHelper.initial(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+        );
+
+        LanguageHelper? loadingHelper;
+        LanguageHelper? completedHelper;
+
+        final future = Future.delayed(
+          const Duration(milliseconds: 10),
+          () => 'data',
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: FutureBuilder<String>(
+                future: future,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // Create LanguageScope dynamically during loading
+                    return LanguageScope(
+                      languageHelper: scopedHelper,
+                      child: LanguageBuilder(
+                        builder: (context) {
+                          loadingHelper = LanguageHelper.of(context);
+                          return Column(
+                            children: [
+                              Text('Hello'.tr),
+                              const CircularProgressIndicator(),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                  } else {
+                    // Create LanguageScope dynamically after completion
+                    return LanguageScope(
+                      languageHelper: scopedHelper,
+                      child: LanguageBuilder(
+                        builder: (context) {
+                          completedHelper = LanguageHelper.of(context);
+                          return Column(
+                            children: [
+                              Text('Hello'.tr),
+                              Text(snapshot.data ?? ''),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+        );
+
+        // Pump once to show loading state
+        await tester.pump();
+        await tester.pump();
+
+        // Verify scope is accessible during loading
+        expect(loadingHelper, equals(scopedHelper));
+        expect(find.text('Xin Chào'), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+        // Wait for future to complete
+        await tester.pumpAndSettle();
+
+        // Verify scope is accessible after completion
+        expect(completedHelper, equals(scopedHelper));
+        expect(find.text('Xin Chào'), findsOneWidget);
+        expect(find.text('data'), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+
+        scopedHelper.dispose();
+      },
+    );
   });
 }
