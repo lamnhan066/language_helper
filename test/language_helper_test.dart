@@ -190,8 +190,10 @@ void main() async {
       final LanguageData data = {LanguageCodes.vi: {}, LanguageCodes.en: {}};
 
       await testHelper.initial(
-        data: [LanguageDataProvider.data(data)],
-        dataOverrides: [LanguageDataProvider.data(dataOverrides)],
+        data: [
+          LanguageDataProvider.data(data),
+          LanguageDataProvider.data(dataOverrides),
+        ],
         useInitialCodeWhenUnavailable: false,
         isAutoSave: false,
         isDebug: true,
@@ -217,8 +219,10 @@ void main() async {
       };
 
       await testHelper.initial(
-        data: [LanguageDataProvider.data(data)],
-        dataOverrides: [LanguageDataProvider.data(dataOverrides)],
+        data: [
+          LanguageDataProvider.data(data),
+          LanguageDataProvider.data(dataOverrides),
+        ],
         useInitialCodeWhenUnavailable: false,
         isAutoSave: false,
         isDebug: true,
@@ -243,10 +247,10 @@ void main() async {
         useInitialCodeWhenUnavailable: true,
         onChanged: (code) {},
       );
-      testHelper.change(LanguageCodes.vi);
+      await testHelper.change(LanguageCodes.vi);
       expect(testHelper.code, equals(LanguageCodes.vi));
 
-      testHelper.change(LanguageCodes.cu);
+      await testHelper.change(LanguageCodes.cu);
       expect(testHelper.code, equals(LanguageCodes.en));
     });
 
@@ -260,10 +264,10 @@ void main() async {
         initialCode: LanguageCodes.en,
         useInitialCodeWhenUnavailable: false,
       );
-      testHelper.change(LanguageCodes.vi);
+      await testHelper.change(LanguageCodes.vi);
       expect(testHelper.code, equals(LanguageCodes.vi));
 
-      testHelper.change(LanguageCodes.cu);
+      await testHelper.change(LanguageCodes.cu);
       expect(testHelper.code, equals(LanguageCodes.vi));
     });
 
@@ -276,10 +280,10 @@ void main() async {
         data: dataList,
         useInitialCodeWhenUnavailable: false,
       );
-      testHelper.change(LanguageCodes.vi);
+      await testHelper.change(LanguageCodes.vi);
       expect(testHelper.code, equals(LanguageCodes.vi));
 
-      testHelper.change(LanguageCodes.cu);
+      await testHelper.change(LanguageCodes.cu);
       expect(testHelper.code, equals(LanguageCodes.vi));
     });
 
@@ -299,7 +303,7 @@ void main() async {
         );
         // Try to change to an unavailable language
         // This should trigger the warning at lines 877-878
-        testHelper.change(LanguageCodes.aa); // aa is also not in dataList
+        await testHelper.change(LanguageCodes.aa); // aa is also not in dataList
         // Should remain at the current code since initialCode is also unavailable
         expect(testHelper.code, isNot(equals(LanguageCodes.aa)));
       },
@@ -336,9 +340,9 @@ void main() async {
   });
 
   group('Test base translation', () {
-    setUp(() {
+    setUp(() async {
       languageHelper.setUseInitialCodeWhenUnavailable(false);
-      languageHelper.change(LanguageCodes.en);
+      await languageHelper.change(LanguageCodes.en);
     });
 
     test('Get variables', () {
@@ -359,8 +363,8 @@ void main() async {
       );
     });
 
-    test('Test with vi language', () {
-      languageHelper.change(LanguageCodes.vi);
+    test('Test with vi language', () async {
+      await languageHelper.change(LanguageCodes.vi);
 
       expect('Hello'.tr, equals('Xin Chào'));
 
@@ -376,10 +380,10 @@ void main() async {
 
     test(
       'Test with undefined language when useInitialCodeWhenUnavailable = false',
-      () {
-        languageHelper.change(LanguageCodes.vi);
+      () async {
+        await languageHelper.change(LanguageCodes.vi);
         languageHelper.setUseInitialCodeWhenUnavailable(false);
-        languageHelper.change(LanguageCodes.cu);
+        await languageHelper.change(LanguageCodes.cu);
 
         expect('Hello'.tr, equals('Xin Chào'));
 
@@ -392,9 +396,9 @@ void main() async {
 
     test(
       'Test with undefined language when useInitialCodeWhenUnavailable = true',
-      () {
+      () async {
         languageHelper.setUseInitialCodeWhenUnavailable(true);
-        languageHelper.change(LanguageCodes.cu);
+        await languageHelper.change(LanguageCodes.cu);
 
         expect('Hello'.tr, equals('Hello'));
 
@@ -405,9 +409,9 @@ void main() async {
       },
     );
 
-    test('Translate with parameters in multiple cases of text', () {
+    test('Translate with parameters in multiple cases of text', () async {
       languageHelper.setUseInitialCodeWhenUnavailable(true);
-      languageHelper.change(LanguageCodes.en);
+      await languageHelper.change(LanguageCodes.en);
 
       expect(
         '@number is a started text'.trP({'number': 100}),
@@ -433,9 +437,9 @@ void main() async {
       );
     });
 
-    test('Translate with condition', () {
+    test('Translate with condition', () async {
       languageHelper.setUseInitialCodeWhenUnavailable(true);
-      languageHelper.change(LanguageCodes.en);
+      await languageHelper.change(LanguageCodes.en);
 
       expect(
         'You have @{number} dollar'.trP({'number': 0}),
@@ -462,7 +466,7 @@ void main() async {
         equals('There are @number people in your family'),
       );
 
-      languageHelper.change(LanguageCodes.vi);
+      await languageHelper.change(LanguageCodes.vi);
       expect(
         'You have @{number} dollar'.trP({'number': 0}),
         equals('Bạn có 0 đô-la'),
@@ -481,8 +485,8 @@ void main() async {
       );
     });
 
-    test('Test trT', () {
-      languageHelper.change(LanguageCodes.en);
+    test('Test trT', () async {
+      await languageHelper.change(LanguageCodes.vi);
 
       expect('Hello'.trT(LanguageCodes.vi), equals('Xin Chào'));
     });
@@ -560,7 +564,7 @@ void main() async {
       final testHelper = LanguageHelper('TestDataOverrides2');
       addTearDown(testHelper.dispose);
 
-      await testHelper.initial(data: dataList, dataOverrides: dataOverrides);
+      await testHelper.initial(data: [...dataList, ...dataOverrides]);
       testHelper.change(LanguageCodes.en);
 
       final translated = 'You have @{number} dollar in your wallet'.trC(
@@ -787,7 +791,7 @@ void main() async {
       expect(dollar100, findsOneWidget);
       expect(dollar10, findsOneWidget);
 
-      languageHelper.change(LanguageCodes.vi);
+      await languageHelper.change(LanguageCodes.vi);
       await tester.pumpAndSettle();
 
       expect(helloText, findsOneWidget);
@@ -844,7 +848,7 @@ void main() async {
       expect(dollar100, findsOneWidget);
       expect(dollar10, findsOneWidget);
 
-      helper.change(LanguageCodes.vi);
+      await helper.change(LanguageCodes.vi);
       await tester.pumpAndSettle();
 
       expect(helloText, findsOneWidget);
@@ -1539,8 +1543,17 @@ void main() async {
   /// This test have to be the last test because it will change the value of the database.
   group('Unit test for methods', () {
     test('Add data with overwrite is false', () async {
-      await languageHelper.addData(dataAdd, overwrite: false);
-      languageHelper.reload();
+      final dataToAdd = {
+        LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'},
+        LanguageCodes.zh: {'Hello': '你好'},
+      };
+      final providerWithoutOverride = LanguageDataProvider.data(
+        dataToAdd,
+        override: false,
+      );
+
+      await languageHelper.change(LanguageCodes.en);
+      await languageHelper.addProvider(providerWithoutOverride);
 
       final addedData = languageHelper.data[LanguageCodes.en]!;
       expect(addedData, contains('Hello add'));
@@ -1550,14 +1563,21 @@ void main() async {
 
     test('Add data with overwrite is true', () async {
       await languageHelper.initial(
-        data: dataList,
-        dataOverrides: dataOverrides,
+        data: [...dataList, ...dataOverrides],
         initialCode: LanguageCodes.en,
       );
-      await languageHelper.addDataOverrides(dataAdd, overwrite: true);
-      languageHelper.reload();
+      final dataToAdd = {
+        LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'},
+        LanguageCodes.zh: {'Hello': '你好'},
+      };
+      final providerWithOverride = LanguageDataProvider.data(
+        dataToAdd,
+        override: true,
+      );
+      await languageHelper.addProvider(providerWithOverride);
+      await languageHelper.reload();
 
-      final addedData = languageHelper.dataOverrides[LanguageCodes.en]!;
+      final addedData = languageHelper.data[LanguageCodes.en]!;
       expect(addedData, contains('Hello add'));
       expect(addedData['Hello'], isNot(equals('Hello')));
       expect(addedData['Hello'], equals('HelloOverwrite'));
@@ -1568,8 +1588,16 @@ void main() async {
         data: dataList,
         initialCode: LanguageCodes.en,
       );
-      // Add data with overwrite: true when key already exists
-      await languageHelper.addData(dataAdd, overwrite: true);
+      // Add data with override: true when key already exists
+      final dataToAdd = {
+        LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'},
+        LanguageCodes.zh: {'Hello': '你好'},
+      };
+      final providerWithOverride = LanguageDataProvider.data(
+        dataToAdd,
+        override: true,
+      );
+      await languageHelper.addProvider(providerWithOverride);
       languageHelper.reload();
 
       final addedData = languageHelper.data[LanguageCodes.en]!;
@@ -1963,23 +1991,13 @@ void main() async {
     test('LanguageHelper addData with null data', () async {
       final helper = LanguageHelper('TestHelper');
       await helper.initial(data: dataList);
-      await helper.addData(LanguageDataProvider.data({}));
+      await helper.addProvider(LanguageDataProvider.data({}));
       expect(helper.data, isNotEmpty);
-    });
-
-    test('LanguageHelper addDataOverrides with empty data', () async {
-      final helper = LanguageHelper('TestHelper');
-      await helper.initial(data: dataList);
-      await helper.addDataOverrides(LanguageDataProvider.data({}));
-      expect(
-        helper.dataOverrides,
-        isEmpty,
-      ); // Empty data results in empty dataOverrides
     });
 
     test('LanguageHelper stream subscription handling', () async {
       final helper = LanguageHelper('TestHelper');
-      await helper.initial(data: dataList);
+      await helper.initial(data: dataList, initialCode: LanguageCodes.en);
 
       int streamCount = 0;
       final subscription = helper.stream.listen((_) {
@@ -1988,6 +2006,8 @@ void main() async {
 
       await helper.change(LanguageCodes.vi);
       await helper.change(LanguageCodes.en);
+
+      await null; // Wait for the stream to be processed
 
       expect(streamCount, equals(2));
       subscription.cancel();
