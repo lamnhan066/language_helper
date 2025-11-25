@@ -925,8 +925,8 @@ class LanguageHelper {
     _dataProviders = _dataProviders.where((p) => p != provider).toList();
 
     final result = await Future.wait([
-      _loadCodesFromProviders([provider]),
-      _loadDataFromProviders(_currentCode!, [provider]),
+      _loadCodesFromProviders(_dataProviders),
+      _loadDataFromProviders(_currentCode!, _dataProviders),
     ]);
 
     _codes = result[0] as Set<LanguageCodes>;
