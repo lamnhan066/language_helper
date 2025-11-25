@@ -864,6 +864,30 @@ class LanguageHelper {
     bool activate = true,
   }) async {
     _dataProviders = [..._dataProviders, provider];
+
+    final data = await Future.wait([
+      _loadCodesFromProviders([provider]),
+      _loadDataFromProviders(_currentCode!, [provider]),
+    ]);
+
+    final newCodes = data[0] as Set<LanguageCodes>?;
+    final newData = data[1] as LanguageData?;
+
+    if (newCodes != null && newCodes.isNotEmpty) {
+      _codes.addAll(newCodes);
+    }
+
+    if (newData != null &&
+        newData.isNotEmpty &&
+        newData.containsKey(_currentCode!)) {
+      for (final entry in newData[_currentCode!]!.entries) {
+        if (provider.override) {
+          _data[_currentCode!]![entry.key] = entry.value;
+        } else {
+          _data[_currentCode!]!.putIfAbsent(entry.key, () => entry.value);
+        }
+      }
+    }
     if (activate) await reload();
     _logger?.info(
       () =>
@@ -1098,6 +1122,7 @@ class LanguageHelper {
 
     if (!_data.containsKey(_currentCode)) {
       final data = await _loadDataFromProviders(_currentCode!, _dataProviders);
+      _data.clear();
       _data.addAll(data);
     }
 
