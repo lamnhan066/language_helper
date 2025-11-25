@@ -778,134 +778,9 @@ LanguageScope(
 
 [`LanguageImprover`](https://pub.dev/packages/language_improver) is a widget that provides a user-friendly interface for viewing, comparing, and editing translations. It's perfect for translators, QA teams, or anyone who needs to improve translations directly in the app.
 
-#### Features
-
-- 📝 **Side-by-side comparison**: View reference and target translations together
-- 🔍 **Search functionality**: Quickly find translations by key or content
-- ✏️ **Inline editing**: Edit translations directly in the interface
-- 📌 **Auto-scroll**: Automatically scroll to specific translation keys
-- 💾 **Update callback**: Receive updated translations via callback
-- 🎯 **Flash animation**: Visual highlight for keys being focused
-
-#### Basic Usage
-
-```cmd
-dart pub add language_improver
-```
-
-```dart
-LanguageImprover(
-  languageHelper: LanguageHelper.instance,
-  onTranslationsUpdated: (updatedTranslations) {
-    // Handle the improved translations
-    // updatedTranslations: Map<LanguageCodes, Map<String, dynamic>>
-    for (final entry in updatedTranslations.entries) {
-      final code = entry.key;
-      final translations = entry.value;
-      
-      // Create a LanguageDataProvider from updated translations
-      final provider = LanguageDataProvider.data({
-        code: translations,
-      });
-      
-      // Add translations as overrides (using addProvider)
-      await LanguageHelper.instance.addProvider(provider);
-    }
-  },
-)
-```
-
-#### Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `languageHelper` | `LanguageHelper?` | The LanguageHelper instance to use. Defaults to `LanguageHelper.instance` |
-| `onTranslationsUpdated` | `FutureOr<void> Function(Map<LanguageCodes, Map<String, dynamic>>)?` | Callback called when translations are saved. Receives a map of language codes to updated translations |
-| `onCancel` | `VoidCallback?` | Callback called when the user cancels editing |
-| `initialDefaultLanguage` | `LanguageCodes?` | Initial reference language. Defaults to first available language |
-| `initialTargetLanguage` | `LanguageCodes?` | Initial target language to improve. Defaults to current language |
-| `scrollToKey` | `String?` | Key to automatically scroll to and focus on |
-| `autoSearchOnScroll` | `bool` | Whether to automatically search for `scrollToKey`. Defaults to `true` |
-| `showKey` | `bool` | Whether to show the translation key. Defaults to `true` |
-
-#### Example: Navigate and Open
-
-```dart
-ElevatedButton(
-  onPressed: () {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => LanguageImprover(
-          languageHelper: LanguageHelper.instance,
-          initialDefaultLanguage: LanguageCodes.en,
-          initialTargetLanguage: LanguageCodes.vi,
-          scrollToKey: 'Hello World', // Automatically scroll to this key
-          onTranslationsUpdated: (updatedTranslations) {
-            // Apply updated translations
-            for (final entry in updatedTranslations.entries) {
-              final provider = LanguageDataProvider.data({
-                entry.key: entry.value,
-              });
-              LanguageHelper.instance.addDataOverrides(provider);
-            }
-            
-            // Show success message
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Translations updated!'.tr),
-                backgroundColor: Colors.green,
-              ),
-            );
-          },
-          onCancel: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Translation editing cancelled.'.tr),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  },
-  child: Text('Improve Translations'.tr),
-)
-```
-
-#### Example: Scroll to Specific Key
-
-```dart
-LanguageImprover(
-  languageHelper: LanguageHelper.instance,
-  scrollToKey: 'Welcome Message', // Scrolls to this key on load
-  autoSearchOnScroll: true, // Automatically filters to this key
-  onTranslationsUpdated: (translations) {
-    // Handle updates
-  },
-)
-```
-
-#### Example: Hide Translation Keys
-
-```dart
-LanguageImprover(
-  languageHelper: LanguageHelper.instance,
-  showKey: false, // Hide translation keys, only show translations
-  onTranslationsUpdated: (translations) {
-    // Handle updates
-  },
-)
-```
-
-#### Use Cases
-
-- **Translation QA**: Review and improve translations before release
-- **On-device editing**: Allow translators to edit translations directly on device
-- **Debugging**: Quickly find and fix translation issues
-- **Localization workflows**: Integrate translation improvement into your workflow
-- **User feedback**: Let users suggest translation improvements
-
 ## AI Translator
+
+### Chat GPT
 
 Use the [Language Helper Translator](https://chat.openai.com/g/g-qoPMopEAb-language-helper-translator) in Chat-GPT for easy translation:
 
@@ -918,59 +793,102 @@ final en = {
 };
 ```
 
+### Agent
+
 <details>
-<summary>Or using AI instruction</summary>
+<summary>- Add AI instructions</summary>
 
   ````md
-  # Step-by-Step Instructions for Translation using language_helper package
+  # Translation procedure for `language_helper` (Dart `Map<String, dynamic>`)
 
-  1. Identify the Dart `Map<String, dynamic>` structure and focus only on translating the values — do not modify the keys or overall structure.
-  2. Review the entire input first to understand its context and ensure the most accurate translation. If the target language is not `en`, and the keys are not in English, and an `en.dart` file exists in the same folder, use it as a reference to maintain contextual consistency.
-  3. Translate only the values that have a `TODO` comment directly above them. Leave all other values unchanged.
-  4. Check for plural forms and, if found, convert them using `LanguageConditions`.
-  5. When translating plural forms, follow this pattern: 0 → '0 products', 1 → '1 product', other → '@{count} products'.
-  6. Translate only the values; keep all keys and structure unchanged.
-  7. Preserve all comments (`//` and `///`) exactly as they are — do not translate them.
-  8. Do not translate nested comments.
-  9. Ensure the map structure remains intact after translation, including proper handling of plural forms and comments.
-  10. Remove any TODO notes associated with the translated texts.
-  11. Try to keep the translation length similar to the original text (not required, but preferred for consistency).
-  12. Do not ask the user for any confirmation or permission — perform the translation directly with best effort to achieve the most accurate and natural results.
-  13. After completing the translation, provide the user with a short summary or note explaining any important details about the translation (e.g., ambiguous meanings, context-based choices, or plural handling).
+  **Goal:** translate only the *values* in a `Map<String, dynamic>` used for localization. Do **not** change keys, structure, or comments.
 
-  ### Example for Plural Grammar Handling
+  ---
 
-  If the input is:
+  ## Preflight
+
+  1. Read the entire input file to understand context before translating any entries.
+  2. If the target language is not English and the keys are not in English, check for an `en.dart` in the same folder and use it as a contextual reference.
+
+  ## Which items to translate
+
+  3. **Translate only values that have a `TODO` comment immediately above them.** Leave all other values unchanged.
+  4. Preserve all comments (`//`, `///`) exactly as they are. Do not translate comments or modify their position. Do not translate nested comments.
+
+  ## Keys, structure, and safety
+
+  5. Never modify keys, the map structure, or comment text/placement. Ensure indentation and syntax remain valid Dart.
+  6. After translating a value, remove the `TODO` note associated with that value (but keep surrounding comments intact).
+
+  ## Plural handling
+
+  7. If a value represents plural text, convert it into a `LanguageConditions` object using the `param` used in the string (e.g., `count`).
+  8. Use this pattern for English plurals unless a language-specific rule is required:
+
+    * `0` → `no products`
+    * `1` → `1 product`
+    * `other` (fallback) → `@{count} products`
+  9. For languages that do not distinguish singular/plural in the same way, you **may** keep a single string value rather than `LanguageConditions`. Use `LanguageConditions` only when the target language requires multiple forms.
+
+  ## Quality and style
+
+  10. Try to keep translated text length similar to the original for layout/UX consistency (preferred, not mandatory).
+  11. Produce natural, context-appropriate translations — prefer idiomatic phrasing over literal word-for-word translation when context suggests it.
+  12. Double-check grammar, punctuation, interpolation markers (e.g., `@{count}`), and escape sequences so the resulting Dart file stays valid.
+
+  ## Automation / workflow rules
+
+  13. Do not prompt the user for permission or confirmation; perform the translation using best effort.
+  14. After finishing the translation pass, include a short summary note that describes:
+
+      * Any ambiguous entries and the choices you made.
+      * Where plural handling was applied and why.
+      * Any entries left unchanged (and the reason).
+  15. Run a final syntactic check to ensure the map remains valid Dart and that all TODO markers for translated values were removed.
+
+  ---
+
+  ## Plural example
+
+  **Input**
 
   ```dart
+  // TODO
   '@{count} sản phẩm': '@{count} sản phẩm'
   ```
 
-  It should be generated in the `en` language as:
+  **Output (English)**
 
   ```dart
   '@{count} sản phẩm': LanguageConditions(
     param: 'count',
     conditions: {
-      '0': '0 products',
+      '0': 'no products',
       '1': '1 product',
       '_': '@{count} products',
     },
   )
   ```
 
-  ### Important Reminders
+  *(If the target language does not require distinct plural forms, replace the value with a single translated string instead of `LanguageConditions`.)*
 
-  * Only translate values with a `TODO` comment above them.
-  * Never modify keys or comments.
-  * Do not ask for user permission — always proceed with best effort.
-  * Use `LanguageConditions` for plural handling when applicable.
-  * Remove TODO notes for translated entries.
-  * Keep translation length roughly similar to the original text for readability and layout consistency.
-  * Provide a brief translation note after completion if needed.
+  ---
+
+  ## Quick checklist (use at the end of each file)
+
+  * [ ] Only values with `TODO` were translated.
+  * [ ] Keys, structure, and comments unchanged.
+  * [ ] All `TODO` markers removed for translated entries.
+  * [ ] Plural forms converted to `LanguageConditions` when needed.
+  * [ ] Interpolations (e.g., `@{count}`) preserved correctly.
+  * [ ] Short summary note added describing ambiguous choices and plural handling.
+  * [ ] File compiles / is syntactically valid Dart (basic check).
   ````
 
 </details>
+
+- Open the AI Agent tab and input `Translate <path/to/languages/data>`.
+- Review the result.
 
 ## iOS Configuration
 
