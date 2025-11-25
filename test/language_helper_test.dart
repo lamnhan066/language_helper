@@ -1714,6 +1714,149 @@ void main() async {
     });
   });
 
+  group('Test change() always reloads data', () {
+    test(
+      'change() reloads data even when switching back to previously used language',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+
+        final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
+
+        LazyLanguageData lazyData = {
+          LanguageCodes.en: () {
+            callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
+            return Map<String, dynamic>.from(data[LanguageCodes.en]!);
+          },
+          LanguageCodes.vi: () {
+            callCount[LanguageCodes.vi] = callCount[LanguageCodes.vi]! + 1;
+            return Map<String, dynamic>.from(data[LanguageCodes.vi]!);
+          },
+        };
+
+        final helper = LanguageHelper('TestChangeReloadsData');
+        addTearDown(helper.dispose);
+
+        await helper.initial(
+          data: [LanguageDataProvider.lazyData(lazyData)],
+          initialCode: LanguageCodes.en,
+          syncWithDevice: false,
+          isAutoSave: false,
+          useInitialCodeWhenUnavailable: false,
+        );
+
+        // Initial load
+        expect(helper.translate('Hello'), equals('Hello'));
+        expect(callCount[LanguageCodes.en], equals(1));
+        expect(callCount[LanguageCodes.vi], equals(0));
+
+        // Change to Vietnamese - should load vi data
+        await helper.change(LanguageCodes.vi);
+        expect(helper.translate('Hello'), equals('Xin Chào'));
+        expect(callCount[LanguageCodes.en], equals(1));
+        expect(callCount[LanguageCodes.vi], equals(1));
+
+        // Change back to English - should reload en data (even though it was loaded before)
+        await helper.change(LanguageCodes.en);
+        expect(helper.translate('Hello'), equals('Hello'));
+        expect(
+          callCount[LanguageCodes.en],
+          equals(2),
+        ); // Should be called again
+        expect(callCount[LanguageCodes.vi], equals(1));
+
+        // Change to Vietnamese again - should reload vi data again
+        await helper.change(LanguageCodes.vi);
+        expect(helper.translate('Hello'), equals('Xin Chào'));
+        expect(callCount[LanguageCodes.en], equals(2));
+        expect(
+          callCount[LanguageCodes.vi],
+          equals(2),
+        ); // Should be called again
+      },
+    );
+
+    test('change() reloads data with LanguageData provider', () async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper = LanguageHelper('TestChangeReloadsData2');
+      addTearDown(helper.dispose);
+
+      await helper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+        syncWithDevice: false,
+        isAutoSave: false,
+        useInitialCodeWhenUnavailable: false,
+      );
+
+      // Initial state
+      expect(helper.code, equals(LanguageCodes.en));
+      expect(helper.translate('Hello'), equals('Hello'));
+
+      // Change to Vietnamese
+      await helper.change(LanguageCodes.vi);
+      expect(helper.code, equals(LanguageCodes.vi));
+      expect(helper.translate('Hello'), equals('Xin Chào'));
+
+      // Change back to English - should work correctly
+      await helper.change(LanguageCodes.en);
+      expect(helper.code, equals(LanguageCodes.en));
+      expect(helper.translate('Hello'), equals('Hello'));
+
+      // Change to Vietnamese again - should work correctly
+      await helper.change(LanguageCodes.vi);
+      expect(helper.code, equals(LanguageCodes.vi));
+      expect(helper.translate('Hello'), equals('Xin Chào'));
+    });
+
+    test(
+      'change() reloads data when switching languages multiple times',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+
+        final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
+
+        LazyLanguageData lazyData = {
+          LanguageCodes.en: () {
+            callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
+            return Map<String, dynamic>.from(data[LanguageCodes.en]!);
+          },
+          LanguageCodes.vi: () {
+            callCount[LanguageCodes.vi] = callCount[LanguageCodes.vi]! + 1;
+            return Map<String, dynamic>.from(data[LanguageCodes.vi]!);
+          },
+        };
+
+        final helper = LanguageHelper('TestChangeMultipleSwitches');
+        addTearDown(helper.dispose);
+
+        await helper.initial(
+          data: [LanguageDataProvider.lazyData(lazyData)],
+          initialCode: LanguageCodes.en,
+          syncWithDevice: false,
+          isAutoSave: false,
+          useInitialCodeWhenUnavailable: false,
+        );
+
+        // Switch between languages multiple times
+        await helper.change(LanguageCodes.vi);
+        await helper.change(LanguageCodes.en);
+        await helper.change(LanguageCodes.vi);
+        await helper.change(LanguageCodes.en);
+        await helper.change(LanguageCodes.vi);
+
+        // Each change should reload the data
+        expect(
+          callCount[LanguageCodes.en],
+          equals(3),
+        ); // Initial + 2 changes back to en
+        expect(callCount[LanguageCodes.vi], equals(3)); // 3 changes to vi
+        expect(helper.code, equals(LanguageCodes.vi));
+        expect(helper.translate('Hello'), equals('Xin Chào'));
+      },
+    );
+  });
+
   group('Remove provider', () {
     test('removeProvider removes provider and updates data', () async {
       final testHelper = LanguageHelper('TestRemoveProvider1');
