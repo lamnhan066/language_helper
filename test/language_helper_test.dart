@@ -552,7 +552,7 @@ void main() async {
       addTearDown(testHelper.dispose);
 
       await testHelper.initial(data: dataList);
-      testHelper.change(LanguageCodes.en);
+      await testHelper.change(LanguageCodes.en);
 
       final errorTranslated = 'You have @{number} dollar in your wallet'.trC(
         testHelper,
@@ -565,7 +565,7 @@ void main() async {
       addTearDown(testHelper.dispose);
 
       await testHelper.initial(data: [...dataList, ...dataOverrides]);
-      testHelper.change(LanguageCodes.en);
+      await testHelper.change(LanguageCodes.en);
 
       final translated = 'You have @{number} dollar in your wallet'.trC(
         testHelper,
