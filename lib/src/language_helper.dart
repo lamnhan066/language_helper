@@ -992,7 +992,11 @@ class LanguageHelper {
     /// => Result: "Current number is 3"
     Map<String, dynamic> params = const {},
 
-    /// To specific [LanguageCodes] instead of the current [code]
+    /// Translate to a specific [LanguageCodes] instead of the current [code].
+    ///
+    /// **Note:** This only works reliably when using `LanguageData`.
+    /// If you are using `LazyLanguageData`, the data for [toCode] may not yet be loaded,
+    /// so the translation may not be available unless it has already been fetched.
     LanguageCodes? toCode,
   }) {
     toCode ??= _currentCode;

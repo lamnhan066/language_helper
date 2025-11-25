@@ -44,6 +44,10 @@ extension LanguageHelperEx on String {
   ///   that builder (which may come from a [LanguageScope]).
   /// - Otherwise, falls back to [LanguageHelper.instance].
   ///
+  /// **Note:** The [toCode] parameter only works reliably when using `LanguageData`.
+  /// If you are using `LazyLanguageData`, the data for [toCode] may not yet be loaded,
+  /// so the translation may not be available unless it has already been fetched.
+  ///
   /// Example:
   /// ```dart
   /// final text = 'Hello'.trT(LanguageCodes.en); // Translates to English
