@@ -11,7 +11,58 @@ import 'mixins/update_language.dart';
 part 'extensions/language_helper_extension.dart';
 part 'widgets/language_builder.dart';
 
-/// Make it easier for you to control multiple languages in your app
+/// A helper class for managing multiple languages and translations in Flutter apps.
+///
+/// [LanguageHelper] provides a centralized way to:
+/// - Load translations from multiple sources (Dart maps, JSON assets, network)
+/// - Switch between languages dynamically
+/// - Translate text with parameter substitution
+/// - Handle plural forms and conditional translations
+/// - Persist language preferences
+/// - Sync with device language settings
+/// - Automatically rebuild widgets when language changes
+///
+/// **Basic Usage:**
+/// ```dart
+/// // Initialize with translation data
+/// await LanguageHelper.instance.initial(
+///   data: [
+///     LanguageDataProvider.data(myLanguageData),
+///   ],
+/// );
+///
+/// // Translate text
+/// final text = LanguageHelper.instance.translate('Hello');
+///
+/// // Change language
+/// await LanguageHelper.instance.change(LanguageCodes.vi);
+/// ```
+///
+/// **Using Extension Methods:**
+/// ```dart
+/// // Within LanguageBuilder widgets
+/// LanguageBuilder(
+///   builder: (context) {
+///     return Text('Hello'.tr); // Automatic translation
+///   },
+/// )
+/// ```
+///
+/// **Multiple Instances:**
+/// You can create custom instances for different parts of your app:
+/// ```dart
+/// final packageHelper = LanguageHelper('PackageHelper');
+/// await packageHelper.initial(data: [packageData]);
+/// ```
+///
+/// However, prefer using [LanguageHelper.instance] when possible, as it
+/// enables extension methods (`tr`, `trP`, etc.) throughout your app without
+/// needing to pass the instance explicitly.
+///
+/// See also:
+/// - [LanguageDataProvider] - For loading translations from various sources
+/// - [LanguageBuilder] - Widget that rebuilds when language changes
+/// - [LanguageScope] - Provides a helper to descendant widgets
 class LanguageHelper {
   // Get the LanguageHelper instance
   static final LanguageHelper instance = LanguageHelper('LanguageHelper');
@@ -177,49 +228,118 @@ class LanguageHelper {
   /// Storage for all language data.
   final LanguageData _data = {};
 
-  /// Provider for language data.
-  late LanguageDataProvider _dataProvider;
-
   /// Collection of data providers.
   Iterable<LanguageDataProvider> _dataProviders = [];
 
   /// Gets the current language data as [LanguageData].
   ///
-  /// This returns all translations for all languages currently loaded.
+  /// This returns all translations for all languages currently loaded in memory.
+  /// The data is organized as a map where keys are [LanguageCodes] and values
+  /// are maps of translation keys to their translated values (strings or [LanguageConditions]).
+  ///
+  /// **Important Notes:**
+  /// - This only contains data that has been loaded so far. Languages that haven't
+  ///   been accessed yet may not be present until they're first used (for lazy/network providers).
+  /// - The returned map is the internal storage - modifications will affect the helper's state.
+  /// - Data is loaded on-demand for [LanguageDataProvider.lazyData] and [LanguageDataProvider.network]
+  ///   providers when a language is first accessed via [change] or [translate].
+  ///
+  /// **Use Cases:**
+  /// - Inspecting available translations
+  /// - Exporting translations to JSON
+  /// - Debugging translation issues
+  /// - Programmatically modifying translations (use with caution)
+  ///
+  /// Example:
+  /// ```dart
+  /// // Access all loaded translations
+  /// final allData = languageHelper.data;
+  /// final englishTranslations = allData[LanguageCodes.en];
+  /// print(englishTranslations?['Hello']); // Prints the English translation
+  ///
+  /// // Check if a language is loaded
+  /// if (allData.containsKey(LanguageCodes.vi)) {
+  ///   print('Vietnamese translations are loaded');
+  /// }
+  /// ```
   LanguageData get data => _data;
 
-  /// Storage for language data overrides.
+  /// Gets the list of [LanguageCodes] from all data providers.
   ///
-  /// Overrides take precedence over regular [data] when both contain
-  /// the same translation key.
-  final LanguageData _dataOverrides = {};
-
-  /// Provider for language data overrides.
-  late LanguageDataProvider _dataOverridesProvider;
-
-  /// Collection of data override providers.
-  Iterable<LanguageDataProvider> _dataOverridesProviders = [];
-
-  /// Gets the current language data overrides as [LanguageData].
+  /// This returns all language codes that are available across all registered
+  /// [LanguageDataProvider] instances. The codes are collected from all providers
+  /// and combined into a single set (duplicates are automatically removed).
   ///
-  /// Overrides take precedence over regular [data] when both contain
-  /// the same translation key.
-  LanguageData get dataOverrides => _dataOverrides;
-
-  /// Gets the list of [LanguageCodes] from both [data] and [dataOverrides].
-  Set<LanguageCodes> get codes => {..._codes, ..._codesOverrides}.toSet();
+  /// **Important:** You must call `await initial()` before using this getter,
+  /// otherwise it will return an empty set.
+  ///
+  /// **Use Cases:**
+  /// - Displaying a language picker with available options
+  /// - Validating if a language code is supported before changing
+  /// - Configuring Flutter's `supportedLocales`
+  ///
+  /// Example:
+  /// ```dart
+  /// // Get all supported language codes
+  /// final codes = languageHelper.codes;
+  /// print('Supported languages: $codes');
+  /// // Output: {LanguageCodes.en, LanguageCodes.vi, LanguageCodes.es}
+  ///
+  /// // Check if a language is available
+  /// if (languageHelper.codes.contains(LanguageCodes.vi)) {
+  ///   await languageHelper.change(LanguageCodes.vi);
+  /// }
+  ///
+  /// // Use in MaterialApp
+  /// MaterialApp(
+  ///   supportedLocales: languageHelper.locales,
+  ///   // ...
+  /// )
+  /// ```
+  Set<LanguageCodes> get codes => _codes.toSet();
   Set<LanguageCodes> _codes = {};
 
-  /// Gets the list of [LanguageCodes] from [dataOverrides].
-  Set<LanguageCodes> get codesOverrides => _codesOverrides;
-  Set<LanguageCodes> _codesOverrides = {};
-
   /// Gets the list of languages as [Locale].
+  ///
+  /// This returns all supported language codes converted to Flutter's [Locale]
+  /// format. This is useful for configuring [MaterialApp.supportedLocales] or
+  /// [CupertinoApp.supportedLocales].
+  ///
+  /// You must call `await initial()` before using this getter.
+  ///
+  /// Example:
+  /// ```dart
+  /// MaterialApp(
+  ///   supportedLocales: languageHelper.locales,
+  ///   locale: languageHelper.locale,
+  ///   // ...
+  /// )
+  /// ```
   Set<Locale> get locales => codes.map((e) => e.locale).toSet();
 
   /// Gets the current language as [LanguageCodes].
   ///
-  /// You must call `await initial()` before using this getter.
+  /// This returns the language code that is currently active. All translations
+  /// via [translate] use this language by default.
+  ///
+  /// **Important:** You must call `await initial()` before using this getter,
+  /// otherwise it will throw a null check error.
+  ///
+  /// The current code is updated when:
+  /// - [initial] completes (sets the initial language)
+  /// - [change] is called (switches to a new language)
+  ///
+  /// Example:
+  /// ```dart
+  /// // Get current language
+  /// final currentLang = languageHelper.code;
+  /// print('Current language: $currentLang'); // e.g., LanguageCodes.en
+  ///
+  /// // Use in conditional logic
+  /// if (languageHelper.code == LanguageCodes.vi) {
+  ///   // Show Vietnamese-specific UI
+  /// }
+  /// ```
   LanguageCodes get code => _currentCode!;
 
   /// The current language code being used.
@@ -229,7 +349,20 @@ class LanguageHelper {
 
   /// Gets the current language as [Locale].
   ///
-  /// You must call `await initial()` before using this getter.
+  /// This returns the current language code converted to Flutter's [Locale] format.
+  /// This is useful for configuring [MaterialApp.locale] or [CupertinoApp.locale].
+  ///
+  /// **Important:** You must call `await initial()` before using this getter,
+  /// otherwise it will throw a null check error.
+  ///
+  /// Example:
+  /// ```dart
+  /// MaterialApp(
+  ///   locale: languageHelper.locale,
+  ///   supportedLocales: languageHelper.locales,
+  ///   // ...
+  /// )
+  /// ```
   Locale get locale => code.locale;
 
   /// The initial language code specified during initialization.
@@ -276,8 +409,44 @@ class LanguageHelper {
   /// whenever [change] successfully updates the language.
   void Function(LanguageCodes code)? _onChanged;
 
-  /// Stream on changed. Please remember to close this stream subscription
-  /// when you are done to avoid memory leaks.
+  /// Stream that emits events whenever the language changes.
+  ///
+  /// This stream emits a [LanguageCodes] value every time [change] is called
+  /// successfully. You can listen to this stream to react to language changes
+  /// outside of the widget tree.
+  ///
+  /// **Important:** Remember to cancel the stream subscription when you're done
+  /// to avoid memory leaks. Use `subscription.cancel()` or dispose the listener
+  /// in your widget's `dispose` method.
+  ///
+  /// **Note:** The stream emits the new language code after all [LanguageBuilder]
+  /// widgets have been notified to rebuild.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Listen to language changes
+  /// final subscription = languageHelper.stream.listen((code) {
+  ///   print('Language changed to: $code');
+  ///   // Perform actions when language changes
+  /// });
+  ///
+  /// // In a StatefulWidget
+  /// @override
+  /// void initState() {
+  ///   super.initState();
+  ///   _subscription = languageHelper.stream.listen((code) {
+  ///     setState(() {
+  ///       // Update state based on language change
+  ///     });
+  ///   });
+  /// }
+  ///
+  /// @override
+  /// void dispose() {
+  ///   _subscription?.cancel(); // Important: cancel to avoid leaks
+  ///   super.dispose();
+  /// }
+  /// ```
   Stream<LanguageCodes> get stream => _streamController.stream;
   final StreamController<LanguageCodes> _streamController =
       StreamController.broadcast();
@@ -333,10 +502,48 @@ class LanguageHelper {
   /// Whether the LanguageHelper is initializing.
   bool _isInitializing = false;
 
-  /// Returns `true` if the `initial` method has been completed.
+  /// Returns `true` if the [initial] method has been completed.
+  ///
+  /// This is useful for checking whether the helper is ready to use before
+  /// accessing properties like [code], [data], or [codes].
+  ///
+  /// Example:
+  /// ```dart
+  /// if (languageHelper.isInitialized) {
+  ///   print('Current language: ${languageHelper.code}');
+  /// } else {
+  ///   print('Helper not initialized yet');
+  /// }
+  /// ```
   bool get isInitialized => _ensureInitialized.isCompleted;
 
-  /// Wait until the `initial` method is completed.
+  /// A [Future] that completes when the [initial] method finishes.
+  ///
+  /// You can await this future to ensure the helper is fully initialized
+  /// before using it. This is particularly useful when initialization happens
+  /// asynchronously and you need to wait for it to complete.
+  ///
+  /// **Note:** If [initial] has already completed, this future will complete
+  /// immediately. If [initial] hasn't been called yet, this future will
+  /// never complete (until [initial] is called).
+  ///
+  /// Example:
+  /// ```dart
+  /// // Wait for initialization
+  /// await languageHelper.ensureInitialized;
+  /// // Now safe to use languageHelper.code, languageHelper.translate, etc.
+  ///
+  /// // Or use in a widget
+  /// FutureBuilder(
+  ///   future: languageHelper.ensureInitialized,
+  ///   builder: (context, snapshot) {
+  ///     if (snapshot.connectionState == ConnectionState.done) {
+  ///       return Text(languageHelper.translate('Hello'));
+  ///     }
+  ///     return CircularProgressIndicator();
+  ///   },
+  /// )
+  /// ```
   Future<void> get ensureInitialized => _ensureInitialized.future;
   final _ensureInitialized = Completer<void>();
 
@@ -345,30 +552,68 @@ class LanguageHelper {
   /// This method must be called before using the helper. It sets up the language
   /// data, determines the initial language, and configures various options.
   ///
-  /// The initial language is determined in this order:
-  /// 1. [initialCode] parameter (if provided)
-  /// 2. Saved language from `SharedPreferences` (if [isAutoSave] is `true`)
-  /// 3. Device language (if [syncWithDevice] is `true` and has changed)
-  /// 4. First language in [data]
-  /// 5. [LanguageCodes.en] (if [data] is empty)
+  /// **Initialization Process:**
+  /// 1. Registers all [LanguageDataProvider] instances
+  /// 2. Loads supported language codes from all providers
+  /// 3. Determines the initial language code (see priority below)
+  /// 4. Loads translation data for the initial language
+  /// 5. Configures logging, persistence, and device sync
   ///
+  /// **Initial Language Priority:**
+  /// The initial language is determined in this order:
+  /// 1. [initialCode] parameter (if provided and available in [data])
+  /// 2. Saved language from `SharedPreferences` (if [isAutoSave] is `true`)
+  /// 3. Device language (if [syncWithDevice] is `true` and has changed since last run)
+  /// 4. First language code from [data] providers
+  /// 5. [LanguageCodes.en] (if [data] is empty - temporary fallback for development)
+  ///
+  /// **Country Code Handling:**
+  /// If [isOptionalCountryCode] is `true` (default), when a full locale code
+  /// (e.g., `zh_CN`) is not available, the helper will fall back to the language
+  /// code only (e.g., `zh`). This provides better compatibility with device locales.
+  ///
+  /// **Performance:**
   /// After initialization, all [LanguageBuilder] widgets will rebuild when the
   /// language changes by default. Set [forceRebuild] to `false` to only rebuild
-  /// the root widget for better performance.
+  /// the root widget for better performance in large widget trees.
+  ///
+  /// **Thread Safety:**
+  /// This method is safe to call multiple times - subsequent calls after the
+  /// first initialization will return immediately without re-initializing.
+  ///
+  /// **Error Handling:**
+  /// If [data] is empty, a temporary provider with empty English translations
+  /// will be added to allow development to continue. A warning will be logged.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Basic initialization
+  /// await languageHelper.initial(
+  ///   data: [
+  ///     LanguageDataProvider.data(myLanguageData),
+  ///   ],
+  /// );
+  ///
+  /// // With all options
+  /// await languageHelper.initial(
+  ///   data: [
+  ///     LanguageDataProvider.asset('assets/languages'),
+  ///     LanguageDataProvider.network('https://api.example.com/translations'),
+  ///   ],
+  ///   initialCode: LanguageCodes.en,
+  ///   useInitialCodeWhenUnavailable: true,
+  ///   forceRebuild: false, // Better performance
+  ///   isAutoSave: true,
+  ///   syncWithDevice: true,
+  ///   isOptionalCountryCode: true,
+  ///   onChanged: (code) => print('Language changed to $code'),
+  ///   isDebug: !kReleaseMode,
+  /// );
+  /// ```
   Future<void> initial({
     /// Data of languages. If this value is empty, a temporary data ([LanguageDataProvider.data({LanguagesCode.en: {}})])
     /// will be added to let make it easier to develop the app.
     required Iterable<LanguageDataProvider> data,
-
-    /// Data of the languages that you want to override the [data]. This feature
-    /// will helpful when you want to change just some translations of the language
-    /// that are already available in the [data].
-    ///
-    /// Common case is that you're using the generated [languageData] as your [data]
-    /// but you want to change some translations (mostly with [LanguageConditions]).
-    Iterable<LanguageDataProvider> dataOverrides = const [
-      LanguageDataProvider.empty(),
-    ],
 
     /// Firstly, the app will try to use this [initialCode]. If [initialCode] is null,
     /// the plugin will try to get the current device language. If both of them are
@@ -435,9 +680,7 @@ class LanguageHelper {
     _isInitializing = true;
 
     _data.clear();
-    _dataOverrides.clear();
     _dataProviders = data;
-    _dataOverridesProviders = dataOverrides;
     _forceRebuild = forceRebuild;
     _onChanged = onChanged;
     _isDebug = isDebug;
@@ -463,16 +706,9 @@ class LanguageHelper {
       ];
     }
 
-    _dataProvider = await _chooseTheBestDataProvider(_dataProviders, false);
-    _dataOverridesProvider = await _chooseTheBestDataProvider(
-      _dataOverridesProviders,
-      true,
-    );
-
     LanguageCodes finalCode = _initialCode ?? LanguageCode.code;
 
-    _codes = await _dataProvider.getSupportedCodes();
-    _codesOverrides = await _dataOverridesProvider.getSupportedCodes();
+    _codes = await _loadCodesFromProviders(_dataProviders);
 
     assert(
       _codes.isNotEmpty,
@@ -559,8 +795,7 @@ class LanguageHelper {
     _logger?.step(() => 'Set `currentCode` to $finalCode');
     _currentCode = finalCode;
 
-    _data.addAll(await _dataProvider.getData(code));
-    _dataOverrides.addAll(await _dataOverridesProvider.getData(code));
+    _data.addAll(await _loadDataFromProviders(_currentCode!, _dataProviders));
 
     if (!_ensureInitialized.isCompleted) {
       _ensureInitialized.complete();
@@ -588,15 +823,15 @@ class LanguageHelper {
     _streamController.close();
   }
 
-  /// Adds new translation data to the current [data].
+  /// Adds a new [LanguageDataProvider] to the list of data providers.
   ///
-  /// This method allows you to dynamically add translations from a [LanguageDataProvider]
-  /// at runtime, useful for loading translations from a network source, user-generated
-  /// content, or A/B testing scenarios.
+  /// This method allows you to dynamically add translation sources at runtime.
+  /// The provider will be used for all future language changes and translation lookups.
   ///
-  /// The [overwrite] parameter controls whether existing translations are replaced:
-  /// - `true` (default): New translations will overwrite existing ones with the same keys
-  /// - `false`: Existing translations are preserved, only new keys are added
+  /// The provider's [LanguageDataProvider.override] property controls whether its
+  /// translations overwrite existing ones:
+  /// - `true`: New translations will overwrite existing ones with the same keys
+  /// - `false`: Only new translation keys are added (existing keys preserved)
   ///
   /// The [activate] parameter controls whether widgets are updated immediately:
   /// - `true` (default): All [LanguageBuilder] widgets will rebuild automatically
@@ -606,86 +841,74 @@ class LanguageHelper {
   /// build as it may cause `setState` errors. Consider setting [activate] to `false`
   /// and calling [reload] manually after the build completes.
   ///
+  /// **Note**: The provider is added to the end of the providers list. If multiple
+  /// providers contain the same translation key, later providers (with `override: true`)
+  /// will overwrite earlier ones.
+  ///
   /// Example:
   /// ```dart
-  /// // Load translations from network
+  /// // Add a network provider for remote translations
   /// final networkProvider = LanguageDataProvider.network('https://api.example.com/translations');
-  /// await languageHelper.addData(networkProvider);
+  /// await languageHelper.addProvider(networkProvider);
   ///
-  /// // Add translations without overwriting existing ones
-  /// await languageHelper.addData(
-  ///   LanguageDataProvider.data(newTranslations),
-  ///   overwrite: false,
-  /// );
-  ///
-  /// // Add data without triggering rebuilds immediately
-  /// await languageHelper.addData(
-  ///   additionalData,
+  /// // Add a provider without immediate activation
+  /// await languageHelper.addProvider(
+  ///   additionalProvider,
   ///   activate: false,
   /// );
   /// // ... do other operations ...
-  /// await languageHelper.reload(); // Update widgets now
+  /// await languageHelper.reload(); // Activate now
   /// ```
-  Future<void> addData(
-    LanguageDataProvider data, {
-    bool overwrite = true,
+  Future<void> addProvider(
+    LanguageDataProvider provider, {
     bool activate = true,
   }) async {
-    final getData = await data.getData(_currentCode!);
-    _addData(data: getData, database: _data, overwrite: overwrite);
-    _codes.addAll(await data.getSupportedCodes());
-    if (activate) change(code);
+    _dataProviders = [..._dataProviders, provider];
+    if (activate) await reload();
     _logger?.info(
       () =>
-          'The new `data` is added and activated with overwrite is $overwrite',
+          'The new `provider` is added and activated with override is ${provider.override}',
     );
   }
 
-  /// Adds new translation data to the current [dataOverrides].
+  /// Removes a [LanguageDataProvider] from the list of data providers.
   ///
-  /// Override data takes precedence over regular [data] when both contain the same
-  /// translation key. This is useful for:
-  /// - User-customized translations
-  /// - A/B testing different translation variants
-  /// - Temporarily overriding translations for specific contexts
-  ///
-  /// The [overwrite] parameter controls whether existing overrides are replaced:
-  /// - `true` (default): New overrides will overwrite existing ones with the same keys
-  /// - `false`: Existing overrides are preserved, only new keys are added
+  /// This method allows you to dynamically remove translation sources at runtime.
+  /// After removal, translations from this provider will no longer be available.
   ///
   /// The [activate] parameter controls whether widgets are updated immediately:
   /// - `true` (default): All [LanguageBuilder] widgets will rebuild automatically
-  /// - `false`: Data is added but widgets won't update until [reload] or [change] is called
+  /// - `false`: Provider is removed but widgets won't update until [reload] or [change] is called
   ///
   /// **Warning**: When [activate] is `true`, be careful not to call this during widget
   /// build as it may cause `setState` errors. Consider setting [activate] to `false`
   /// and calling [reload] manually after the build completes.
   ///
+  /// **Note**: Only the exact provider instance is removed. If the same provider
+  /// was added multiple times, only one instance is removed. Translations that were
+  /// already loaded from this provider remain in memory until the language is changed.
+  ///
   /// Example:
   /// ```dart
-  /// // Add user customizations that override default translations
-  /// await languageHelper.addDataOverrides(
-  ///   LanguageDataProvider.data(userCustomizations),
-  /// );
+  /// // Remove a provider
+  /// await languageHelper.removeProvider(networkProvider);
   ///
-  /// // Add test translations without affecting widgets immediately
-  /// await languageHelper.addDataOverrides(
-  ///   testTranslations,
+  /// // Remove without immediate activation
+  /// await languageHelper.removeProvider(
+  ///   oldProvider,
   ///   activate: false,
   /// );
+  /// await languageHelper.reload(); // Update widgets now
   /// ```
-  Future<void> addDataOverrides(
-    LanguageDataProvider dataOverrides, {
-    bool overwrite = true,
+  Future<void> removeProvider(
+    LanguageDataProvider provider, {
     bool activate = true,
   }) async {
-    final getData = await dataOverrides.getData(_currentCode!);
-    _addData(data: getData, database: _dataOverrides, overwrite: overwrite);
-    _codesOverrides.addAll(await dataOverrides.getSupportedCodes());
-    if (activate) change(code);
+    _dataProviders = _dataProviders.where((p) => p != provider).toList();
+    if (activate) await reload();
     _logger?.info(
       () =>
-          'The new `dataOverrides` is added and activated with overwrite is $overwrite',
+          'The `provider` is removed and activated with override is ${provider.override}',
     );
   }
 
@@ -696,9 +919,11 @@ class LanguageHelper {
   /// text using [params].
   ///
   /// The translation lookup follows this priority:
-  /// 1. [dataOverrides] for the target language
-  /// 2. [data] for the target language
-  /// 3. Returns the original [text] with parameters replaced if no translation is found
+  /// 1. [data] for the target language (searches all registered providers in order)
+  /// 2. Returns the original [text] with parameters replaced if no translation is found
+  ///
+  /// When multiple providers contain the same translation key, the first provider
+  /// in the list (or the one with `override: true`) takes precedence.
   ///
   /// If the translation is a [LanguageConditions], it will evaluate the condition
   /// based on the parameter value and select the appropriate translation.
@@ -746,15 +971,15 @@ class LanguageHelper {
     toCode ??= _currentCode;
     final stringParams = params.map((key, value) => MapEntry(key, '$value'));
 
-    if (!codes.contains(toCode) && !codesOverrides.contains(toCode)) {
+    if (!codes.contains(toCode)) {
       _logger?.warning(
         () =>
-            'Cannot translate this text because $toCode is not available in `data` and `dataOverrides` ($text)',
+            'Cannot translate this text because $toCode is not available in `data` ($text)',
       );
       return _replaceParams(text, stringParams);
     }
 
-    final translated = _dataOverrides[toCode]?[text] ?? _data[toCode]?[text];
+    final translated = _data[toCode]?[text];
     if (translated == null) {
       _logger?.warning(
         () => 'This text is not contained in current $toCode ($text)',
@@ -772,17 +997,23 @@ class LanguageHelper {
   /// Reloads all [LanguageBuilder] widgets to apply updated translation data.
   ///
   /// This is a convenience method that calls [change] with the current [code].
-  /// Use this after modifying translation data (e.g., via [addData] or
-  /// [addDataOverrides]) to refresh all visible text in the app without
-  /// changing the language.
+  /// Use this after modifying translation data (e.g., via [addProvider]) to refresh
+  /// all visible text in the app without changing the language.
   ///
   /// All [LanguageBuilder] widgets in the widget tree will be notified to
   /// rebuild with the updated translations.
   ///
+  /// **When to use:**
+  /// - After adding new translation data with [addProvider] when `activate: false`
+  /// - After manually modifying the [data] map
+  /// - When you want to force a refresh of all translations without changing language
+  ///
   /// Example:
   /// ```dart
-  /// await languageHelper.addData(newDataProvider);
-  /// await languageHelper.reload(); // Refresh all visible translations
+  /// // Add data without immediate activation
+  /// await languageHelper.addData(newDataProvider, activate: false);
+  /// // ... do other operations ...
+  /// await languageHelper.reload(); // Refresh all visible translations now
   /// ```
   Future<void> reload() => change(code);
 
@@ -793,20 +1024,33 @@ class LanguageHelper {
   /// will be persisted to local storage if [isAutoSave] was enabled during
   /// [initial].
   ///
+  /// **Process:**
+  /// 1. Validates that [toCode] exists in [codes] (or handles fallback)
+  /// 2. Loads translation data if not already cached for the new language
+  ///    (for lazy/network providers, this may involve async operations)
+  /// 3. Updates all [LanguageBuilder] widgets to reflect the new language
+  /// 4. Saves the new language code to SharedPreferences (if [isAutoSave] is enabled)
+  /// 5. Emits events via [stream] and calls [onChanged] callback
+  ///
   /// **Behavior when [toCode] is unavailable:**
-  /// - If [useInitialCodeWhenUnavailable] is `false`: The change is ignored
-  ///   and the current language remains unchanged.
+  /// - If [useInitialCodeWhenUnavailable] is `false` (default): The change is ignored
+  ///   and the current language remains unchanged. A warning is logged.
   /// - If [useInitialCodeWhenUnavailable] is `true`: Falls back to [initialCode]
-  ///   if it's available in the data.
+  ///   if it's available in the data. If [initialCode] is also unavailable, the
+  ///   change is ignored.
   ///
-  /// The method will:
-  /// 1. Validate that [toCode] exists in [codes] or [codesOverrides]
-  /// 2. Load translation data if not already cached for the new language
-  /// 3. Update all [LanguageBuilder] widgets to reflect the new language
-  /// 4. Save the new language code to SharedPreferences (if [isAutoSave] is enabled)
-  /// 5. Emit events via [stream] and call [onChanged] callback
+  /// **Performance:**
+  /// - For [LanguageDataProvider.data] and [LanguageDataProvider.lazyData]: Fast (synchronous)
+  /// - For [LanguageDataProvider.asset]: Medium (async I/O, but cached after first load)
+  /// - For [LanguageDataProvider.network]: Slow (async network request, depends on connection)
   ///
-  /// Returns a [Future] that completes when all updates are finished.
+  /// **Widget Rebuilds:**
+  /// By default, all [LanguageBuilder] widgets rebuild. If [forceRebuild] was set
+  /// to `false` during [initial], only the root [LanguageBuilder] widgets rebuild
+  /// (better performance for large widget trees).
+  ///
+  /// Returns a [Future] that completes when all updates are finished, including
+  /// any async data loading operations.
   ///
   /// Example:
   /// ```dart
@@ -814,12 +1058,17 @@ class LanguageHelper {
   /// await languageHelper.change(LanguageCodes.vi);
   ///
   /// // All widgets will automatically update to show Vietnamese text
+  ///
+  /// // Handle unavailable language
+  /// try {
+  ///   await languageHelper.change(LanguageCodes.zh);
+  /// } catch (e) {
+  ///   // Language not available, current language unchanged
+  /// }
   /// ```
   Future<void> change(LanguageCodes toCode) async {
     if (!codes.contains(toCode)) {
-      _logger?.warning(
-        () => '$toCode is not available in `data` or `dataOverrides`',
-      );
+      _logger?.warning(() => '$toCode is not available in `data`');
 
       if (!_useInitialCodeWhenUnavailable) {
         _logger?.info(
@@ -837,7 +1086,7 @@ class LanguageHelper {
         } else {
           _logger?.warning(
             () =>
-                '`useInitialCodeWhenUnavailable` is true but the `initialCode` is not available in `data` or `dataOverrides` => Cannot change the language',
+                '`useInitialCodeWhenUnavailable` is true but the `initialCode` is not available in `data` => Cannot change the language',
           );
           return;
         }
@@ -848,16 +1097,8 @@ class LanguageHelper {
     }
 
     if (!_data.containsKey(_currentCode)) {
-      _dataProvider = await _chooseTheBestDataProvider(_dataProviders, false);
-      _dataOverridesProvider = await _chooseTheBestDataProvider(
-        _dataOverridesProviders,
-        true,
-      );
-
-      final data = await _dataProvider.getData(code);
-      final dataOverrides = await _dataOverridesProvider.getData(code);
+      final data = await _loadDataFromProviders(_currentCode!, _dataProviders);
       _data.addAll(data);
-      _dataOverrides.addAll(dataOverrides);
     }
 
     _logger?.step(
@@ -903,7 +1144,7 @@ class LanguageHelper {
   /// Updates whether to use [initialCode] when an unavailable language is requested.
   ///
   /// When [newValue] is `true`, calling [change] with a language code that
-  /// doesn't exist in [codes] or [codesOverrides] will fall back to [initialCode]
+  /// doesn't exist in [codes] will fall back to [initialCode]
   /// if it's available.
   ///
   /// When `false` (default), requests to change to unavailable languages are
@@ -930,33 +1171,6 @@ class LanguageHelper {
     _useInitialCodeWhenUnavailable = newValue;
   }
 
-  /// Selects the first available data provider from [providers] that has translations.
-  ///
-  /// This internal method iterates through [providers] and returns the first one
-  /// that supports at least one language code. Used during [initial] to select
-  /// which provider to use for loading translation data.
-  ///
-  /// Returns an empty [LanguageDataProvider] if no provider has available data.
-  ///
-  /// The [isOverrides] parameter is used for logging purposes to distinguish
-  /// between regular data providers and override providers.
-  Future<LanguageDataProvider> _chooseTheBestDataProvider(
-    Iterable<LanguageDataProvider> providers,
-    bool isOverrides,
-  ) async {
-    LanguageDataProvider? result;
-    for (final provider in providers) {
-      Set<LanguageCodes> codes = await provider.getSupportedCodes();
-
-      if (codes.isNotEmpty) {
-        result = provider;
-        break;
-      }
-    }
-
-    return result ?? LanguageDataProvider.data({});
-  }
-
   /// Replaces parameter placeholders in [input] with values from [params].
   ///
   /// Supports two placeholder formats:
@@ -978,52 +1192,6 @@ class LanguageHelper {
     });
 
     return input as String;
-  }
-
-  /// Merges [data] into [database] with optional overwrite behavior.
-  ///
-  /// This internal method handles merging translation data from multiple sources.
-  /// When [overwrite] is `true`, existing translations for the same keys will
-  /// be replaced with new values. When `false`, existing translations are preserved.
-  ///
-  /// The merging process:
-  /// 1. Adds new language codes to [database] if they don't exist
-  /// 2. Adds new translation keys within existing languages
-  /// 3. Optionally overwrites existing keys based on [overwrite] parameter
-  ///
-  /// This is used internally by [addData] and [addDataOverrides] to manage
-  /// translation data from multiple providers.
-  void _addData({
-    required LanguageData data,
-    required LanguageData database,
-    required bool overwrite,
-  }) {
-    for (final element in data.entries) {
-      final code = element.key;
-      final data = element.value;
-
-      /// If the code isn't in the database -> just add it
-      if (!database.containsKey(code)) {
-        database[code] = data;
-        continue;
-      }
-
-      final copy = {...database[code]!};
-      final current = database[code]!;
-      for (final adding in data.entries) {
-        // If the adding key isn't in the language data -> just add it
-        if (!current.containsKey(adding.key)) {
-          copy[adding.key] = adding.value;
-          continue;
-        }
-
-        // If it's duplicated, only adds when overwrite is true
-        if (overwrite) {
-          copy[adding.key] = adding.value;
-        }
-      }
-      database[code] = copy;
-    }
   }
 
   /// Evaluates [LanguageConditions] and replaces parameters in the selected translation.
@@ -1064,6 +1232,47 @@ class LanguageHelper {
     }
 
     return _replaceParams(translated, params);
+  }
+
+  /// Loads codes from all providers and returns the codes.
+  ///
+  /// This internal method iterates through all [dataProviders] and returns the codes
+  /// from the first provider that has codes for the given [code].
+  ///
+  /// Returns an empty [Set<LanguageCodes>] if no provider has codes.
+  Future<Set<LanguageCodes>> _loadCodesFromProviders(
+    Iterable<LanguageDataProvider> providers,
+  ) async {
+    final results = await Future.wait<Set<LanguageCodes>>(
+      providers.map((provider) => provider.getSupportedCodes()),
+    );
+    return results.expand((codeSet) => codeSet).toSet();
+  }
+
+  /// Loads data from all providers and returns the data.
+  ///
+  /// This internal method iterates through all [providers] and returns the data
+  /// from the first provider that has data for the given [code].
+  ///
+  /// Returns an empty [LanguageData] if no provider has data for the given [code].
+  Future<LanguageData> _loadDataFromProviders(
+    LanguageCodes code,
+    Iterable<LanguageDataProvider> providers,
+  ) async {
+    final data = <String, dynamic>{};
+    for (final provider in providers) {
+      final providerData = await provider.getData(code);
+      if (providerData.isNotEmpty && providerData.containsKey(code)) {
+        for (final entry in providerData[code]!.entries) {
+          if (provider.override) {
+            data[entry.key] = entry.value;
+          } else {
+            data.putIfAbsent(entry.key, () => entry.value);
+          }
+        }
+      }
+    }
+    return {code: data};
   }
 
   @override
