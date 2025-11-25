@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
-import 'package:language_improver/language_improver.dart';
 
 import 'languages/codes.dart';
 import 'pages/advanced_features_page.dart';
@@ -10,7 +9,6 @@ import 'pages/json_asset_page.dart';
 import 'pages/multiple_sources_page.dart';
 import 'pages/network_data_page.dart';
 import 'pages/package_delegate_page.dart';
-import 'widgets/improve_translation_button.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -350,96 +348,6 @@ class HomeContent extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-
-              // Language Improver Quick Access
-              _buildSectionCard(
-                context,
-                title: 'Improve Translations'.tr,
-                icon: Icons.edit,
-                children: [
-                  Text(
-                    'Use the Language Improver to edit and improve your '
-                            'translations by comparing them with '
-                            'a reference language.'
-                        .tr,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => LanguageImprover(
-                            languageHelper: LanguageHelper.instance,
-                            onTranslationsUpdated: (updatedTranslations) async {
-                              // Apply the updated translations to
-                              // LanguageHelper
-                              for (final entry in updatedTranslations.entries) {
-                                final code = entry.key;
-                                final translations = entry.value;
-
-                                // Create a LanguageDataProvider from
-                                // the updated translations
-                                final provider = LanguageDataProvider.data({
-                                  code: translations,
-                                });
-
-                                // Add the translations as overrides, which will
-                                // trigger rebuilds
-                                await LanguageHelper.instance.addDataOverrides(
-                                  provider,
-                                );
-                              }
-
-                              // Show success message
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Translations updated! '
-                                              '${updatedTranslations.length} '
-                                              'language(s) modified.'
-                                          .tr,
-                                    ),
-                                    backgroundColor: Colors.green,
-                                    duration: const Duration(seconds: 3),
-                                  ),
-                                );
-                              }
-
-                              if (kDebugMode) {
-                                print(
-                                  'Updated translations: $updatedTranslations',
-                                );
-                              }
-                            },
-                            onCancel: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Translation editing cancelled.'.tr,
-                                  ),
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.auto_awesome),
-                    label: Text('Open Language Improver'.tr),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
         );
@@ -520,10 +428,6 @@ class HomeContent extends StatelessWidget {
                   fontSize: 13,
                 ),
               ),
-              if (titleKey != null) ...[
-                const SizedBox(width: 4),
-                ImproveTranslationButton(translationKey: titleKey),
-              ],
             ],
           ),
           const SizedBox(height: 6),
@@ -538,20 +442,9 @@ class HomeContent extends StatelessWidget {
               color: const Color(0xFF2563EB).withValues(alpha: 0.2),
             ),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  example,
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-                ),
-              ),
-              if (exampleKey != null) ...[
-                const SizedBox(width: 4),
-                ImproveTranslationButton(translationKey: exampleKey),
-              ],
-            ],
+          child: Text(
+            example,
+            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
           ),
         ),
       ],

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 
-import '../widgets/improve_translation_button.dart';
-
 class DartMapPage extends StatelessWidget {
   const DartMapPage({super.key});
 
@@ -259,10 +257,6 @@ final LazyLanguageData languageData = {
                   fontSize: 13,
                 ),
               ),
-              if (titleKey != null) ...[
-                const SizedBox(width: 4),
-                ImproveTranslationButton(translationKey: titleKey),
-              ],
             ],
           ),
           const SizedBox(height: 6),
@@ -275,20 +269,9 @@ final LazyLanguageData languageData = {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  example,
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-                ),
-              ),
-              if (exampleKey != null) ...[
-                const SizedBox(width: 4),
-                ImproveTranslationButton(translationKey: exampleKey),
-              ],
-            ],
+          child: Text(
+            example,
+            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
           ),
         ),
       ],

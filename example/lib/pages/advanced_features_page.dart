@@ -1,9 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
-import 'package:language_improver/language_improver.dart';
 
 class AdvancedFeaturesPage extends StatefulWidget {
   const AdvancedFeaturesPage({super.key});
@@ -475,133 +473,6 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.blue.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.translate,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Language Improver'.tr,
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Improve translations by comparing with a default '
-                                'language and editing them directly in a '
-                                'user-friendly interface.'
-                            .tr,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodySmall?.copyWith(color: Colors.grey),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => LanguageImprover(
-                                languageHelper: LanguageHelper.instance,
-                                onTranslationsUpdated: (updatedTranslations) {
-                                  // Apply the updated translations to
-                                  // LanguageHelper
-                                  for (final entry
-                                      in updatedTranslations.entries) {
-                                    final code = entry.key;
-                                    final translations = entry.value;
-
-                                    // Create a LanguageDataProvider from the
-                                    // updated translations
-                                    final provider = LanguageDataProvider.data({
-                                      code: translations,
-                                    });
-
-                                    // Add the translations as overrides, which
-                                    // will trigger rebuilds
-                                    LanguageHelper.instance
-                                        .addDataOverrides(provider)
-                                        .then((_) {
-                                          // Show success message after
-                                          // translations are applied
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  'Translations updated! '
-                                                          'Check the callback '
-                                                          'data to '
-                                                          'see the changes.'
-                                                      .tr,
-                                                ),
-                                                backgroundColor: Colors.green,
-                                                duration: const Duration(
-                                                  seconds: 3,
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        });
-                                  }
-
-                                  // Print the updated translations for
-                                  // demonstration
-                                  if (kDebugMode) {
-                                    print(
-                                      'Updated translations: '
-                                      '$updatedTranslations',
-                                    );
-                                  }
-                                },
-                                onCancel: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Translation editing cancelled.'.tr,
-                                      ),
-                                      duration: const Duration(seconds: 2),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.edit),
-                        label: Text('Open Language Improver'.tr),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2563EB),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
                               color: Colors.purple.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -643,15 +514,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
                 });
                 
                 // Dynamic parameters
-                'Welcome @{name}'.trP({'name': 'John'})
-                
-                // Language Improver
-                LanguageImprover(
-                  languageHelper: LanguageHelper.instance,
-                  onTranslationsUpdated: (translations) {
-                    // Handle updated translations
-                  },
-                )''',
+                'Welcome @{name}'.trP({'name': 'John'})''',
                           style: TextStyle(
                             fontFamily: 'monospace',
                             fontSize: 11,

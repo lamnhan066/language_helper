@@ -14,7 +14,6 @@ dependencies:
   http: ^1.1.0
   language_helper:
     path: ../
-  language_improver: ^0.0.1
 
 dependency_overrides:
   language_helper:

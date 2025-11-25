@@ -474,7 +474,7 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
   );
 
   void _addDynamicData() {
-    _languageHelper.addData(LanguageDataProvider.data(additionalData));
+    _languageHelper.addProvider(LanguageDataProvider.data(additionalData));
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

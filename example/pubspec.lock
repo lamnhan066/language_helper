@@ -139,15 +139,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.13.0-rc.8"
-  language_improver:
-    dependency: "direct main"
-    description:
-      name: language_improver
-      sha256: "8015c3cf5889f6143032080af5c464475c1e91412ac1f1baed1a34babfcf3528"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.1"
+    version: "0.13.0-rc.11"
   leak_tracker:
     dependency: transitive
     description:
