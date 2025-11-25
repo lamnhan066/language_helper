@@ -796,8 +796,10 @@ final en = {
 
 ### Agent
 
-<details>
-<summary>- Add AI instructions</summary>
+- Add AI instructions:
+
+  <details>
+  <summary>Show</summary>
 
   ````md
   # Translation procedure for `language_helper` (Dart `Map<String, dynamic>`)
@@ -889,7 +891,7 @@ final en = {
 </details>
 
 - Open the AI Agent tab and input `Translate <path/to/languages/data>`.
-- Review the result.
+- Review the results.
 
 ## iOS Configuration
 
