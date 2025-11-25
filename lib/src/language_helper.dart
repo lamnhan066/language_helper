@@ -795,7 +795,7 @@ class LanguageHelper {
     _logger?.step(() => 'Set `currentCode` to $finalCode');
     _currentCode = finalCode;
 
-    _data.addAll(await _loadDataFromProviders(_currentCode!, _dataProviders));
+    _data = await _loadDataFromProviders(_currentCode!, _dataProviders);
 
     if (!_ensureInitialized.isCompleted) {
       _ensureInitialized.complete();
@@ -865,9 +865,13 @@ class LanguageHelper {
   }) async {
     _dataProviders = [..._dataProviders, provider];
 
-    final data = await _loadDataFromProviders(_currentCode!, [provider]);
+    final result = await Future.wait([
+      _loadCodesFromProviders([provider]),
+      _loadDataFromProviders(_currentCode!, [provider]),
+    ]);
 
-    _codes.addAll(data.keys);
+    _codes.addAll(result[0] as Iterable<LanguageCodes>);
+    final data = result[1] as LanguageData;
 
     if (data.isNotEmpty && data.containsKey(_currentCode!)) {
       for (final entry in data[_currentCode!]!.entries) {
@@ -920,10 +924,13 @@ class LanguageHelper {
   }) async {
     _dataProviders = _dataProviders.where((p) => p != provider).toList();
 
-    final data = await _loadDataFromProviders(_currentCode!, _dataProviders);
+    final result = await Future.wait([
+      _loadCodesFromProviders([provider]),
+      _loadDataFromProviders(_currentCode!, [provider]),
+    ]);
 
-    _codes = data.keys.toSet();
-    _data = data;
+    _codes = result[0] as Set<LanguageCodes>;
+    _data = result[1] as LanguageData;
 
     if (activate) await reload();
     _logger?.info(
@@ -1117,9 +1124,7 @@ class LanguageHelper {
     }
 
     if (!_data.containsKey(_currentCode)) {
-      final data = await _loadDataFromProviders(_currentCode!, _dataProviders);
-      _data.clear();
-      _data.addAll(data);
+      _data = await _loadDataFromProviders(_currentCode!, _dataProviders);
     }
 
     _logger?.step(
