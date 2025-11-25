@@ -209,7 +209,7 @@ main() async {
 **Performance Considerations:**
 
 - `LanguageDataProvider.data`: Fastest (synchronous, no I/O) - Use for static or pre-loaded translations
-- `LanguageDataProvider.lazyData`: Fast (synchronous function calls) - Use when you want to defer loading until a language is first accessed
+- `LanguageDataProvider.lazyData`: Fast (synchronous function calls) - Use when you want to defer loading until a language is accessed. Functions are called on every language change to ensure fresh data.
 - `LanguageDataProvider.asset`: Medium (async I/O, but bundled with app) - Use for bundled JSON translations
 - `LanguageDataProvider.network`: Slowest (async network requests) - Use for remote translations, consider caching for production
 
@@ -292,7 +292,7 @@ main() async {
   - `https://api.example.com/translations/data/en.json`
   - `https://api.example.com/translations/data/vi.json`
 
-- **On-demand loading**: Network providers load data on-demand when a language is first accessed. Each language file is fetched separately, so switching languages may cause network delays.
+- **On-demand loading**: Network providers load data on-demand when a language is accessed. Each language file is fetched separately when switching languages, and data is reloaded on every language change (not cached between changes). This ensures fresh data but may cause network delays on each switch.
 
 - **Error handling**: If a network request fails (network error, timeout, non-200 status), the provider returns empty data for that language without throwing exceptions. This allows your app to continue functioning even if some translations fail to load.
 
@@ -382,9 +382,12 @@ await languageHelper.change(LanguageCodes.vi);
 
 **Performance:**
 
-- For `data` and `lazyData` providers: Fast (synchronous)
-- For `asset` providers: Medium (async I/O, but cached after first load)
-- For `network` providers: Slow (async network request, depends on connection)
+- For `data` providers: Fast (synchronous, data already in memory)
+- For `lazyData` providers: Fast (synchronous function calls, functions are called on every language change to ensure fresh data)
+- For `asset` providers: Medium (async I/O, files are read on every change)
+- For `network` providers: Slow (async network request on every change, depends on connection)
+
+**Note:** Translation data is always reloaded from providers on every language change, even if it was previously loaded. This ensures fresh data but may impact performance for network providers. Consider implementing your own caching strategy if needed.
 
 **Auto-save:** If `isAutoSave: true` (default), the new language is automatically saved to SharedPreferences and will be restored on the next app launch.
 
@@ -477,7 +480,7 @@ final englishTranslations = allData[LanguageCodes.en];
 
 - You must call `await initial()` before accessing these properties
 - `codes` returns all language codes from all registered providers
-- `data` only contains languages that have been loaded so far (for lazy/network providers, languages are loaded on-demand)
+- `data` contains the currently loaded language data. For lazy/network providers, data is reloaded on every language change to ensure freshness.
 
 ### Integrating with Flutter Localizations
 
@@ -555,7 +558,7 @@ main() async {
 > - **Override property** - Providers with `override: true` (default) will overwrite existing translations with the same keys from earlier providers
 > - **Preserve existing** - When `override: false`, only new translation keys are added; existing keys from earlier providers are preserved
 > - **Adding providers** - New providers added via `addProvider` are appended to the end of the list. Later providers with `override: true` will overwrite earlier ones
-> - **Performance** - Use `data` or `lazyData` providers for best performance. Network providers load on-demand and may cause delays when switching languages
+> - **Performance** - Use `data` or `lazyData` providers for best performance. Network providers reload data on every language change and may cause delays when switching languages
 
 ### Widget Rebuilding
 
@@ -919,7 +922,7 @@ Add supported localizations to `Info.plist`:
   - Always await `initial()` before accessing `code`, `data`, or `codes`
 - **Data sources**:
   - Assets are preferred over network data for faster loading
-  - Network providers load on-demand when a language is first accessed
+  - Network providers load data on every language change (not cached between changes)
   - Consider implementing caching strategies for network providers in production
 - **Provider override**:
   - Use `override: true` (default) when creating providers to overwrite existing translations

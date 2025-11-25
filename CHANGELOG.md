@@ -4,6 +4,7 @@
 * **BREAKING CHANGE** Remove `dataOverrides` and `codesOverrides` properties from `LanguageHelper`. The override functionality is now handled by the `override` parameter in `LanguageDataProvider` constructors.
 * **BREAKING CHANGE** Remove `addDataOverrides` method. Use `addProvider` with a provider that has `override: true` instead.
 * **BREAKING CHANGE** Rename `addData` to `addProvider` and add `removeProvider` method for better clarity and consistency.
+* **BEHAVIOR CHANGE** The `change()` method now always reloads translation data from all providers on every language change, even if the data was previously loaded. This ensures fresh data but may impact performance for network providers. Previously, data was only loaded if it wasn't already cached.
 * Add `reload()` method to refresh all `LanguageBuilder` widgets without changing the language. Useful after adding/removing providers with `activate: false`.
 * Enhance documentation throughout the codebase with comprehensive examples and usage guidelines.
 * Update README with improved examples, performance considerations, and best practices for using different provider types.
