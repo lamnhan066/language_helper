@@ -1057,8 +1057,10 @@ class LanguageHelper {
   ///
   /// **Process:**
   /// 1. Validates that [toCode] exists in [codes] (or handles fallback)
-  /// 2. Loads translation data if not already cached for the new language
+  /// 2. Always reloads translation data for the new language from all providers
   ///    (for lazy/network providers, this may involve async operations)
+  ///    **Note:** Data is reloaded even if it was previously loaded, ensuring
+  ///    fresh data on every language change.
   /// 3. Updates all [LanguageBuilder] widgets to reflect the new language
   /// 4. Saves the new language code to SharedPreferences (if [isAutoSave] is enabled)
   /// 5. Emits events via [stream] and calls [onChanged] callback
@@ -1071,9 +1073,12 @@ class LanguageHelper {
   ///   change is ignored.
   ///
   /// **Performance:**
-  /// - For [LanguageDataProvider.data] and [LanguageDataProvider.lazyData]: Fast (synchronous)
-  /// - For [LanguageDataProvider.asset]: Medium (async I/O, but cached after first load)
-  /// - For [LanguageDataProvider.network]: Slow (async network request, depends on connection)
+  /// - For [LanguageDataProvider.data]: Fast (synchronous, data already in memory)
+  /// - For [LanguageDataProvider.lazyData]: Fast (synchronous function calls, but functions
+  ///   are called on every language change to ensure fresh data)
+  /// - For [LanguageDataProvider.asset]: Medium (async I/O, files are read on every change)
+  /// - For [LanguageDataProvider.network]: Slow (async network request on every change,
+  ///   depends on connection)
   ///
   /// **Widget Rebuilds:**
   /// By default, all [LanguageBuilder] widgets rebuild. If [forceRebuild] was set
@@ -1127,9 +1132,7 @@ class LanguageHelper {
       _currentCode = toCode;
     }
 
-    if (!_data.containsKey(_currentCode)) {
-      _data = await _loadDataFromProviders(_currentCode!, _dataProviders);
-    }
+    _data = await _loadDataFromProviders(_currentCode!, _dataProviders);
 
     _logger?.step(
       () => 'Change language to $toCode for ${_states.length} states',
