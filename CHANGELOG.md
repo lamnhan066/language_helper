@@ -1,3 +1,20 @@
+## 0.13.0-rc.12
+
+* **BREAKING CHANGE** Change the behavior of the `initial.data` from loading the first successful provider to loading all providers and decide to override the translations by setting `override` parameter of each provider. The providers will be loaded from top to bottom.
+* **BREAKING CHANGE** Remove `dataOverrides` and `codesOverrides` properties from `LanguageHelper`. The override functionality is now handled by the `override` parameter in `LanguageDataProvider` constructors.
+* **BREAKING CHANGE** Remove `addDataOverrides` method. Use `addProvider` with a provider that has `override: true` instead.
+* **BREAKING CHANGE** Rename `addData` to `addProvider` and add `removeProvider` method for better clarity and consistency.
+* Add `reload()` method to refresh all `LanguageBuilder` widgets without changing the language. Useful after adding/removing providers with `activate: false`.
+* Enhance documentation throughout the codebase with comprehensive examples and usage guidelines.
+* Update README with improved examples, performance considerations, and best practices for using different provider types.
+* Update example code to use the new `addProvider` method.
+
+* **MIGRATION**
+  * Replace `languageHelper.addData(provider)` with `languageHelper.addProvider(provider)`
+  * Replace `languageHelper.addDataOverrides(provider)` with `languageHelper.addProvider(provider)` (the provider's `override` property controls whether it overwrites existing translations)
+  * Replace `languageHelper.dataOverrides` with `languageHelper.data` (all providers are now unified)
+  * Replace `languageHelper.codesOverrides` with `languageHelper.codes` (all language codes are now unified)
+
 ## 0.13.0-rc.11
 
 * **BREAKING CHANGE** Remove `analyze()` method from `LanguageHelper`. Missing translation detection is now handled by `language_helper_generator` package.

@@ -6,14 +6,14 @@ A Flutter package for easy multi-language app localization with automatic text e
 
 ## Features
 
-- 🚀 **Easy Setup**: Add `.tr` and `.trP` to any string for instant translation
-- 🔍 **Auto Extraction**: Automatically extract all translatable text from your Dart files
-- 🎯 **Smart Translation**: Control translations with conditions and parameters
-- 🌐 **Multiple Sources**: Support for Dart maps, JSON files, assets, and network data
-- 📱 **Device Locale**: Automatically uses device locale on first launch
-- 🔧 **AI Integration**: Custom translator for easy language conversion
-- 🎨 **LanguageScope**: Provide scoped `LanguageHelper` instances to specific widget trees
-- ✏️ **LanguageImprover**: Visual translation editor for on-device translation improvement
+- **Easy Setup**: Add `.tr` and `.trP` to any string for instant translation
+- **Auto Extraction**: Automatically extract all translatable text from your Dart files
+- **Smart Translation**: Control translations with conditions and parameters
+- **Multiple Sources**: Support for Dart maps, JSON files, assets, and network data
+- **Device Locale**: Automatically uses device locale on first launch
+- **AI Integration**: Custom translator for easy language conversion
+- **LanguageScope**: Provide scoped `LanguageHelper` instances to specific widget trees
+- **LanguageImprover**: Visual translation editor for on-device translation improvement
 
 ## Quick Start
 
@@ -23,17 +23,36 @@ A Flutter package for easy multi-language app localization with automatic text e
 flutter pub add language_helper
 ```
 
-### 2. Initialize (while developing)
+### 2. Initialize
 
 ```dart
 final languageHelper = LanguageHelper.instance;
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize with empty data (temporary English fallback for development)
   await languageHelper.initial(data: []);
+  
+  // Or initialize with your translation data
+  // await languageHelper.initial(
+  //   data: [
+  //     LanguageDataProvider.data(myLanguageData),
+  //   ],
+  // );
+  
   runApp(const MyApp());
 }
 ```
+
+**Initialization Options:**
+
+- `data`: List of `LanguageDataProvider` instances (required)
+- `initialCode`: Preferred initial language code
+- `isAutoSave`: Automatically save and restore language preference (default: `true`)
+- `syncWithDevice`: Sync with device language changes (default: `true`)
+- `forceRebuild`: Rebuild all widgets on language change (default: `true`, set to `false` for better performance)
+- `isDebug`: Enable debug logging (default: `false`)
 
 ### 3. Add translations to your strings
 
@@ -47,6 +66,8 @@ Text('Hello @{name}'.trP({'name': 'John'}))
 // With conditions
 Text('You have @{count} item'.trP({'count': itemCount}))
 ```
+
+**Note:** Extension methods (`tr`, `trP`, `trT`, `trF`) work automatically within `LanguageBuilder` widgets. They use an internal stack mechanism to access the correct `LanguageHelper` instance (from `LanguageScope`, explicit parameter, or `LanguageHelper.instance`). When used outside of `LanguageBuilder`, they fall back to `LanguageHelper.instance`.
 
 ### 4. Wrap your app
 
@@ -74,9 +95,9 @@ The generator automatically scans your project for text using language_helper ex
 
 > **Note**: The generator is smart about managing translations:
 >
-> - ✅ **Keeps existing translations** - Your current translated texts are preserved
-> - 🆕 **Marks new texts with TODO** - Only untranslated texts get TODO markers
-> - 🗑️ **Removes unused texts** - Automatically cleans up translations no longer used in your code
+> - **Keeps existing translations** - Your current translated texts are preserved
+> - **Marks new texts with TODO** - Only untranslated texts get TODO markers
+> - **Removes unused texts** - Automatically cleans up translations no longer used in your code
 
 ### Add Generator Dependency
 
@@ -167,35 +188,117 @@ dart run language_helper:generate --languages=en,vi,es,fr --ignore-todo=en
 ### Dart Map
 
 ```dart
+// Using lazy data (functions called when language is accessed)
 final languageDataProvider = LanguageDataProvider.lazyData(languageData);
+
+// Using direct data (synchronous, fastest)
+final directProvider = LanguageDataProvider.data(languageData);
+
+// With override enabled
+final overrideProvider = LanguageDataProvider.data(
+  overrideData,
+  override: true, // Overwrites existing translations
+);
 
 main() async {
   await languageHelper.initial(data: [languageDataProvider]);
   runApp(const MyApp());
 }
 ```
+
+**Performance Considerations:**
+
+- `LanguageDataProvider.data`: Fastest (synchronous, no I/O) - Use for static or pre-loaded translations
+- `LanguageDataProvider.lazyData`: Fast (synchronous function calls) - Use when you want to defer loading until a language is first accessed
+- `LanguageDataProvider.asset`: Medium (async I/O, but bundled with app) - Use for bundled JSON translations
+- `LanguageDataProvider.network`: Slowest (async network requests) - Use for remote translations, consider caching for production
 
 ### JSON Assets
 
 ```dart
+// Basic usage
 final languageDataProvider = LanguageDataProvider.asset('assets/languages');
+
+// With override disabled (preserve existing translations)
+final preserveProvider = LanguageDataProvider.asset(
+  'assets/languages',
+  override: false, // Only adds new keys, preserves existing ones
+);
 
 main() async {
   await languageHelper.initial(data: [languageDataProvider]);
   runApp(const MyApp());
 }
 ```
+
+**Important:**
+
+- Make sure to add the assets to your `pubspec.yaml`:
+
+```yaml
+flutter:
+  assets:
+    - assets/languages/
+    - assets/languages/data/
+```
+
+- **Directory structure**: The `parentPath` should contain `codes.json` and a `data/` subdirectory:
+
+```txt
+assets/languages/
+├── codes.json          (List of language codes: ["en", "vi", ...])
+└── data/
+    ├── en.json         (English translations)
+    ├── vi.json         (Vietnamese translations)
+    └── ...
+```
+
+- **Error handling**: If an asset file is missing, the provider returns empty data for that language without throwing exceptions
 
 ### Network Data
 
 ```dart
+// Basic usage
 final languageDataProvider = LanguageDataProvider.network('https://api.example.com/translations');
+
+// With authentication headers
+final authenticatedProvider = LanguageDataProvider.network(
+  'https://api.example.com/translations',
+  headers: {
+    'Authorization': 'Bearer token',
+    'X-API-Key': 'your-api-key',
+  },
+);
+
+// With custom HTTP client (for timeouts, retries, etc.)
+final client = http.Client();
+client.timeout = const Duration(seconds: 10);
+final customClientProvider = LanguageDataProvider.network(
+  'https://api.example.com/translations',
+  client: client,
+  override: true, // Overwrites existing translations
+);
 
 main() async {
   await languageHelper.initial(data: [languageDataProvider]);
   runApp(const MyApp());
 }
 ```
+
+**Important Notes:**
+
+- **URL structure**: The `parentUrl` should contain `codes.json` and a `data/` subdirectory:
+  - `https://api.example.com/translations/codes.json`
+  - `https://api.example.com/translations/data/en.json`
+  - `https://api.example.com/translations/data/vi.json`
+
+- **On-demand loading**: Network providers load data on-demand when a language is first accessed. Each language file is fetched separately, so switching languages may cause network delays.
+
+- **Error handling**: If a network request fails (network error, timeout, non-200 status), the provider returns empty data for that language without throwing exceptions. This allows your app to continue functioning even if some translations fail to load.
+
+- **Performance**: Consider implementing caching strategies for production apps to improve performance and reduce network usage.
+
+- **Security**: When using authentication headers, be careful not to expose sensitive credentials in client-side code. Consider using secure storage or environment variables.
 
 ## Manual Translation Setup
 
@@ -264,28 +367,116 @@ flutter:
 ### Change Language
 
 ```dart
-languageHelper.change(LanguageCodes.vi);
+// Change to Vietnamese
+await languageHelper.change(LanguageCodes.vi);
+
+// All LanguageBuilder widgets will automatically update
 ```
 
-### Add New Language Data
+**Behavior:**
+
+- If the requested language is not available:
+  - By default: The change is ignored and the current language remains unchanged
+  - If `useInitialCodeWhenUnavailable: true`: Falls back to the initial code if available
+
+**Performance:**
+
+- For `data` and `lazyData` providers: Fast (synchronous)
+- For `asset` providers: Medium (async I/O, but cached after first load)
+- For `network` providers: Slow (async network request, depends on connection)
+
+**Auto-save:** If `isAutoSave: true` (default), the new language is automatically saved to SharedPreferences and will be restored on the next app launch.
+
+### Add or Remove Language Data Providers
 
 ```dart
-languageHelper.addData(LanguageDataProvider.lazyData(newLanguageData));
+// Add a new provider (will activate immediately by default)
+final newProvider = LanguageDataProvider.data(newTranslations);
+await languageHelper.addProvider(newProvider);
+
+// Add provider without immediate activation
+await languageHelper.addProvider(
+  LanguageDataProvider.lazyData(newLanguageData),
+  activate: false,
+);
+// ... do other operations ...
+await languageHelper.reload(); // Activate now
+
+// Remove a provider
+await languageHelper.removeProvider(oldProvider);
+
+// Remove without immediate activation
+await languageHelper.removeProvider(
+  oldProvider,
+  activate: false,
+);
+await languageHelper.reload(); // Update widgets now
 ```
+
+**Note:**
+
+- The `override` property of the provider controls whether new translations overwrite existing ones. Use `LanguageDataProvider.data(translations, override: true)` to overwrite existing translations.
+- Providers are added to the end of the providers list. Later providers with `override: true` will overwrite earlier ones.
+- When `activate: false`, data is added/removed but widgets won't update until `reload()` or `change()` is called.
+- Be careful not to call `addProvider` or `removeProvider` with `activate: true` during widget build, as it may cause `setState` errors.
 
 ### Listen to Changes
 
 ```dart
+// Simple listener
 final sub = languageHelper.stream.listen((code) => print('Language changed to: $code'));
 // Remember to cancel: sub.cancel()
+
+// In a StatefulWidget
+StreamSubscription<LanguageCodes>? _subscription;
+
+@override
+void initState() {
+  super.initState();
+  _subscription = languageHelper.stream.listen((code) {
+    setState(() {
+      // Update state based on language change
+    });
+  });
+}
+
+@override
+void dispose() {
+  _subscription?.cancel(); // Important: cancel to avoid memory leaks
+  super.dispose();
+}
 ```
+
+**Note:** The stream emits the new language code after all `LanguageBuilder` widgets have been notified to rebuild. Remember to cancel subscriptions to avoid memory leaks.
 
 ### Get Supported Languages
 
 ```dart
-final codes = languageHelper.codes; // All supported languages
-final overrides = languageHelper.codesOverrides; // Override languages
+// Get all supported language codes from all providers
+final codes = languageHelper.codes; // Set<LanguageCodes>
+
+// Get all supported locales (for MaterialApp/CupertinoApp)
+final locales = languageHelper.locales; // Set<Locale>
+
+// Get current language
+final currentCode = languageHelper.code; // LanguageCodes
+final currentLocale = languageHelper.locale; // Locale
+
+// Check if a language is available
+if (languageHelper.codes.contains(LanguageCodes.vi)) {
+  await languageHelper.change(LanguageCodes.vi);
+}
+
+// Access all loaded translation data
+final allData = languageHelper.data; // LanguageData
+final englishTranslations = allData[LanguageCodes.en];
 ```
+
+**Important:**
+
+- You must call `await initial()` before accessing these properties
+- `codes` returns all language codes from all registered providers
+- `data` only contains languages that have been loaded so far (for lazy/network providers, languages are loaded on-demand)
 
 ### Integrating with Flutter Localizations
 
@@ -359,9 +550,11 @@ main() async {
 
 > **Data Priority**: When multiple sources contain the same translation:
 >
-> - **First source wins** - Data sources are processed in order (top to bottom) for the entire source
-> - **Specific overrides** - To override individual translations, use `dataOverrides` instead of adding to `data`
-> - **AddData behavior** - New data can overwrite existing translations (controlled by `overwrite` parameter)
+> - **Provider order matters** - Data sources are processed in the order they're added (first to last)
+> - **Override property** - Providers with `override: true` (default) will overwrite existing translations with the same keys from earlier providers
+> - **Preserve existing** - When `override: false`, only new translation keys are added; existing keys from earlier providers are preserved
+> - **Adding providers** - New providers added via `addProvider` are appended to the end of the list. Later providers with `override: true` will overwrite earlier ones
+> - **Performance** - Use `data` or `lazyData` providers for best performance. Network providers load on-demand and may cause delays when switching languages
 
 ### Widget Rebuilding
 
@@ -438,14 +631,43 @@ When `LanguageScope` is present in the widget tree:
 2. **Extension methods** (`tr`, `trP`, `trT`, `trF`) - Use the scoped helper when called within a `LanguageBuilder`. When called outside a `LanguageBuilder`, they fall back to `LanguageHelper.instance` (which is always available)
 3. **Priority order**: Explicit `languageHelper` parameter > `LanguageScope` > `LanguageHelper.instance`
 
-#### Extension Methods Behavior
+#### Extension Methods and the Stack System
 
-Extension methods (`tr`, `trP`, `trT`, `trF`) always use a valid `LanguageHelper` instance:
+Extension methods (`tr`, `trP`, `trT`, `trF`) work seamlessly with scoped helpers through an internal stack mechanism:
 
-- **Inside `LanguageBuilder`**: Use the helper associated with that builder (from `LanguageScope`, explicit parameter, or `LanguageHelper.instance`)
+**How the Stack Works:**
+
+- When `LanguageBuilder` builds, it pushes its helper onto a stack before calling the builder function
+- Extension methods access the helper at the top of the stack via `LanguageHelper._current`
+- After the build completes, the helper is popped from the stack
+- This allows extension methods to work with scoped helpers even though they don't have `BuildContext`
+
+**Extension Methods Behavior:**
+
+- **Inside `LanguageBuilder`**: Use the helper from the stack (which comes from `LanguageScope`, explicit parameter, or `LanguageHelper.instance`)
 - **Outside `LanguageBuilder`**: Fall back to `LanguageHelper.instance` (always available)
+- **Nested `LanguageBuilder` widgets**: Each builder pushes its helper during build, allowing nested builders to use different helpers correctly
 
 This ensures that extension methods never fail and always have a helper to work with, making them safe to use anywhere in your code.
+
+**Example with Nested Builders:**
+
+```dart
+LanguageScope(
+  languageHelper: parentHelper,
+  child: LanguageBuilder(
+    builder: (context) => Column(
+      children: [
+        Text('Parent'.tr), // Uses parentHelper from stack
+        LanguageBuilder(
+          languageHelper: childHelper, // Explicit helper
+          builder: (context) => Text('Child'.tr), // Uses childHelper from stack
+        ),
+      ],
+    ),
+  ),
+)
+```
 
 #### Example: Scoped Translation
 
@@ -493,6 +715,8 @@ You can access the scoped helper directly from context:
 final helper = LanguageHelper.of(context);
 final translated = helper.translate('Hello');
 ```
+
+**Note:** `LanguageHelper.of(context)` does not register a dependency on `LanguageScope`, so widgets using it won't automatically rebuild when the scope changes. If you need automatic rebuilds, wrap your widget in a `LanguageBuilder` instead. When no `LanguageScope` is found, a warning is logged once per context (when debug logging is enabled) to help developers understand that the default `LanguageHelper.instance` is being used.
 
 #### Priority with Explicit Helper
 
@@ -584,8 +808,8 @@ LanguageImprover(
         code: translations,
       });
       
-      // Add translations as overrides
-      LanguageHelper.instance.addDataOverrides(provider);
+      // Add translations as overrides (using addProvider)
+      await LanguageHelper.instance.addProvider(provider);
     }
   },
 )
@@ -762,11 +986,33 @@ Add supported localizations to `Info.plist`:
 
 ## Tips
 
-- Use `@{param}` for parameters (recommended)
-- The package automatically uses device locale on first launch
-- All `LanguageBuilder` widgets rebuild by default when language changes. Set `forceRebuild: false` in `LanguageHelper.initial()` or per-widget for better performance
-- Use `isInitialized` to check if `initial()` has been called
-- Assets are preferred over network data (no caching yet)
+- **Parameter format**: Use `@{param}` for parameters (recommended over `@param`)
+- **Device locale**: The package automatically uses device locale on first launch (if `syncWithDevice: true`)
+- **Performance**:
+  - All `LanguageBuilder` widgets rebuild by default when language changes. Set `forceRebuild: false` in `LanguageHelper.initial()` or per-widget for better performance
+  - Use `LanguageDataProvider.data` for fastest performance (synchronous, no I/O)
+  - Network providers load on-demand and may cause delays when switching languages
+- **Initialization**:
+  - Use `isInitialized` to check if `initial()` has been called
+  - Use `ensureInitialized` to wait for initialization to complete
+  - Always await `initial()` before accessing `code`, `data`, or `codes`
+- **Data sources**:
+  - Assets are preferred over network data for faster loading
+  - Network providers load on-demand when a language is first accessed
+  - Consider implementing caching strategies for network providers in production
+- **Provider override**:
+  - Use `override: true` (default) when creating providers to overwrite existing translations
+  - Use `override: false` to only add new keys and preserve existing translations
+- **Adding/removing providers**:
+  - Use `addProvider` with `activate: false` to batch multiple additions, then call `reload()` once
+  - Be careful not to call `addProvider`/`removeProvider` with `activate: true` during widget build
+- **Memory**:
+  - Only languages that have been accessed are loaded into memory (for lazy/network providers)
+  - Use lazy loading for large translation sets or when users typically use only a few languages
+- **Multiple providers**:
+  - Providers are processed in order (first to last)
+  - Later providers with `override: true` will overwrite earlier providers' translations
+  - Combine different provider types (data, asset, network) for flexible translation management
 
 ## Contributing
 
