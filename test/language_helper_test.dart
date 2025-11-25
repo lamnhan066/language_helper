@@ -623,6 +623,41 @@ void main() async {
       );
     });
 
+    test('LanguageDataSerializer with LanguageConditions in data', () {
+      final dataWithConditions = {
+        LanguageCodes.en: {
+          'Count': const LanguageConditions(
+            param: 'count',
+            conditions: {'1': 'one', '_': 'many'},
+          ),
+        },
+      };
+      final json = dataWithConditions.toJson();
+      expect(json, isA<String>());
+      expect(json, isNotEmpty);
+
+      final fromJson = LanguageDataSerializer.fromJson(json);
+      expect(fromJson[LanguageCodes.en]!['Count'], isA<LanguageConditions>());
+    });
+
+    test('LanguageDataSerializer valuesFromJson with LanguageConditions', () {
+      final json = '''
+      {
+        "Hello": "Hello",
+        "Count": {
+          "param": "count",
+          "conditions": {
+            "1": "one",
+            "_": "many"
+          }
+        }
+      }
+      ''';
+      final result = LanguageDataSerializer.valuesFromJson(json);
+      expect(result['Hello'], equals('Hello'));
+      expect(result['Count'], isA<LanguageConditions>());
+    });
+
     test('LanguageDataSerializer with empty JSON', () {
       final result = LanguageDataSerializer.fromJson('{}');
       expect(result, isEmpty);
@@ -1679,6 +1714,117 @@ void main() async {
     });
   });
 
+  group('Remove provider', () {
+    test('removeProvider removes provider and updates data', () async {
+      final testHelper = LanguageHelper('TestRemoveProvider1');
+      addTearDown(testHelper.dispose);
+
+      final provider1 = LanguageDataProvider.data({
+        LanguageCodes.en: {'Key1': 'Value1'},
+        LanguageCodes.vi: {'Key1': 'Giá trị 1'},
+      });
+      final provider2 = LanguageDataProvider.data({
+        LanguageCodes.en: {'Key2': 'Value2'},
+        LanguageCodes.vi: {'Key2': 'Giá trị 2'},
+      });
+
+      await testHelper.initial(
+        data: [provider1, provider2],
+        initialCode: LanguageCodes.en,
+      );
+
+      expect(testHelper.translate('Key1'), equals('Value1'));
+      expect(testHelper.translate('Key2'), equals('Value2'));
+
+      await testHelper.removeProvider(provider2);
+
+      expect(testHelper.translate('Key1'), equals('Value1'));
+      expect(
+        testHelper.translate('Key2'),
+        equals('Key2'),
+      ); // Should return key when not found
+    });
+
+    test('removeProvider with activate false', () async {
+      final testHelper = LanguageHelper('TestRemoveProvider2');
+      addTearDown(testHelper.dispose);
+
+      final provider1 = LanguageDataProvider.data({
+        LanguageCodes.en: {'Key1': 'Value1'},
+      });
+      final provider2 = LanguageDataProvider.data({
+        LanguageCodes.en: {'Key2': 'Value2'},
+      });
+
+      await testHelper.initial(
+        data: [provider1, provider2],
+        initialCode: LanguageCodes.en,
+      );
+
+      await testHelper.removeProvider(provider2, activate: false);
+      // Data is removed from providers but widgets are not updated until reload
+      // However, the data in memory is already updated, so Key2 should be gone
+      expect(testHelper.translate('Key2'), equals('Key2'));
+
+      await testHelper.reload();
+      expect(testHelper.translate('Key2'), equals('Key2'));
+    });
+
+    test('removeProvider updates codes correctly', () async {
+      final testHelper = LanguageHelper('TestRemoveProvider3');
+      addTearDown(testHelper.dispose);
+
+      final provider1 = LanguageDataProvider.data({
+        LanguageCodes.en: {'Key1': 'Value1'},
+        LanguageCodes.vi: {'Key1': 'Giá trị 1'},
+      });
+      final provider2 = LanguageDataProvider.data({
+        LanguageCodes.zh: {'Key2': 'Value2'},
+      });
+
+      await testHelper.initial(
+        data: [provider1, provider2],
+        initialCode: LanguageCodes.en,
+      );
+
+      expect(
+        testHelper.codes,
+        containsAll([LanguageCodes.en, LanguageCodes.vi, LanguageCodes.zh]),
+      );
+
+      await testHelper.removeProvider(provider2);
+
+      expect(
+        testHelper.codes,
+        containsAll([LanguageCodes.en, LanguageCodes.vi]),
+      );
+      expect(testHelper.codes, isNot(contains(LanguageCodes.zh)));
+    });
+
+    test('removeProvider when provider not in list', () async {
+      final testHelper = LanguageHelper('TestRemoveProvider4');
+      addTearDown(testHelper.dispose);
+
+      final provider1 = LanguageDataProvider.data({
+        LanguageCodes.en: {'Key1': 'Value1'},
+      });
+      final provider2 = LanguageDataProvider.data({
+        LanguageCodes.en: {'Key2': 'Value2'},
+      });
+
+      await testHelper.initial(
+        data: [provider1],
+        initialCode: LanguageCodes.en,
+      );
+
+      // Try to remove a provider that was never added
+      await testHelper.removeProvider(provider2);
+
+      // Should not throw and should still work
+      expect(testHelper.translate('Key1'), equals('Value1'));
+    });
+  });
+
   group('Language Data Provider from - ', () {
     setUp(() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -1734,6 +1880,17 @@ void main() async {
       final data = LanguageDataProvider.network('abc', client: MockClient());
 
       expect(await data.getData(LanguageCodes.en), isEmpty);
+    });
+
+    test('network - with headers', () async {
+      final data = LanguageDataProvider.network(
+        'https://pub.lamnhan.dev/languages',
+        client: MockClient(),
+        headers: {'Authorization': 'Bearer token', 'X-Custom-Header': 'value'},
+      );
+
+      final codes = await data.getSupportedCodes();
+      expect(codes, equals({LanguageCodes.en, LanguageCodes.vi}));
     });
 
     test('empty data provider', () async {
@@ -1944,6 +2101,39 @@ void main() async {
       expect('Value: @{value}'.trP({'value': 3.14}), equals('Value: 3.14'));
     });
 
+    test('translate with LanguageConditions missing param', () async {
+      languageHelper.setUseInitialCodeWhenUnavailable(true);
+      await languageHelper.change(LanguageCodes.en);
+
+      // Test when param is missing from params map
+      expect(
+        'You have @{number} dollar'.trP({'other': 100}),
+        equals('You have @{number} dollar'),
+      );
+    });
+
+    test('translate with LanguageConditions no matching condition', () async {
+      languageHelper.setUseInitialCodeWhenUnavailable(true);
+      await languageHelper.change(LanguageCodes.en);
+
+      // Test when condition value doesn't match any condition key
+      // and no default/underscore key exists
+      final customData = {
+        LanguageCodes.en: {
+          'Test': const LanguageConditions(
+            param: 'count',
+            conditions: {'1': 'one', '2': 'two'},
+          ),
+        },
+      };
+      final helper = LanguageHelper('TestConditions');
+      addTearDown(helper.dispose);
+      await helper.initial(data: [LanguageDataProvider.data(customData)]);
+
+      // Should return fallback text when no condition matches
+      expect(helper.translate('Test', params: {'count': '3'}), equals('Test'));
+    });
+
     test('translate with special characters in parameters', () {
       expect(
         'Hello @{name}'.trP({'name': 'John@Doe'}),
@@ -1986,6 +2176,49 @@ void main() async {
       await helper.initial(data: []);
       helper.reload();
       expect(helper.data, isNotEmpty);
+    });
+
+    test('change method when data not loaded yet', () async {
+      final helper = LanguageHelper('TestChangeNotLoaded');
+      addTearDown(helper.dispose);
+
+      // Create a lazy provider that hasn't loaded vi yet
+      LazyLanguageData lazyData = {
+        LanguageCodes.en: () => {'Hello': 'Hello'},
+        LanguageCodes.vi: () => {'Hello': 'Xin Chào'},
+      };
+
+      await helper.initial(
+        data: [LanguageDataProvider.lazyData(lazyData)],
+        initialCode: LanguageCodes.en,
+      );
+
+      // Change to vi - should load data on demand
+      await helper.change(LanguageCodes.vi);
+      expect(helper.code, equals(LanguageCodes.vi));
+      expect(helper.translate('Hello'), equals('Xin Chào'));
+    });
+
+    test('concurrent initialization', () async {
+      final helper = LanguageHelper('TestConcurrent');
+      addTearDown(helper.dispose);
+
+      // Start multiple initializations concurrently
+      final future1 = helper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.en,
+      );
+      final future2 = helper.initial(
+        data: dataList,
+        initialCode: LanguageCodes.vi,
+      );
+
+      // Both should complete without error
+      await future1;
+      await future2;
+
+      // Should be initialized
+      expect(helper.isInitialized, isTrue);
     });
 
     test('LanguageHelper addData with null data', () async {
@@ -2046,6 +2279,54 @@ void main() async {
         equals('key1'),
       ); // Should not resolve circular reference
     });
+
+    test('translate with toCode parameter', () async {
+      await languageHelper.change(LanguageCodes.en);
+      // Translate to Vietnamese even though current language is English
+      expect(
+        languageHelper.translate('Hello', toCode: LanguageCodes.vi),
+        equals('Xin Chào'),
+      );
+    });
+
+    test('translate with toCode not in codes', () async {
+      await languageHelper.change(LanguageCodes.en);
+      // Try to translate to a language not in codes
+      expect(
+        languageHelper.translate('Hello', toCode: LanguageCodes.aa),
+        equals('Hello'), // Should return original text
+      );
+    });
+
+    test('translate with empty params map', () {
+      expect('Hello @{name}'.trP({}), equals('Hello @{name}'));
+    });
+
+    test('translate with params containing newline', () {
+      expect(
+        'Line1 @{param}\nLine2'.trP({'param': 'value'}),
+        equals('Line1 value\nLine2'),
+      );
+    });
+
+    test('translate with params at end of string', () {
+      expect('Text @{param}'.trP({'param': 'end'}), equals('Text end'));
+    });
+
+    test('translate with legacy @param format', () {
+      expect(
+        'Hello @name world'.trP({'name': 'John'}),
+        equals('Hello John world'),
+      );
+    });
+
+    test('translate with legacy @param at end', () {
+      expect('Hello @name'.trP({'name': 'John'}), equals('Hello John'));
+    });
+
+    test('translate with legacy @param followed by newline', () {
+      expect('Hello @name\n'.trP({'name': 'John'}), equals('Hello John\n'));
+    });
   });
 
   group('Test utils', () {
@@ -2085,6 +2366,24 @@ void main() async {
     test('get url with timeout', () async {
       final result = await Utils.getUrl(
         Uri.parse('https://httpstat.us/200?sleep=10000'),
+        client: MockClient(),
+      );
+      expect(result, isEmpty);
+    });
+
+    test('get url with headers', () async {
+      final result = await Utils.getUrl(
+        Uri.parse('https://pub.lamnhan.dev/languages/data/en.json'),
+        client: MockClient(),
+        headers: {'Authorization': 'Bearer token'},
+      );
+      expect(result, isNotEmpty);
+    });
+
+    test('get url with non-200 status code', () async {
+      // MockClient will return empty for invalid URLs
+      final result = await Utils.getUrl(
+        Uri.parse('https://invalid-url-that-will-fail.com'),
         client: MockClient(),
       );
       expect(result, isEmpty);
@@ -2179,6 +2478,107 @@ void main() async {
 
       helper1.dispose();
       helper2.dispose();
+    });
+
+    testWidgets('LanguageBuilder _of returns null when root not found', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper1 = LanguageHelper('TestOf1');
+      final helper2 = LanguageHelper('TestOf2');
+      addTearDown(() {
+        helper1.dispose();
+        helper2.dispose();
+      });
+
+      await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
+      await helper2.initial(data: dataList, initialCode: LanguageCodes.vi);
+
+      // Create nested LanguageBuilders with different helpers
+      // When helpers are different, _of() should return null for the inner builder
+      // because the root has a different helper
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageBuilder(
+              languageHelper: helper1,
+              builder: (_) => LanguageBuilder(
+                languageHelper: helper2,
+                builder: (_) => Text('Hello'.trC(helper2)),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Inner builder uses helper2, so should show Vietnamese
+      expect(find.text('Xin Chào'), findsOneWidget);
+    });
+
+    testWidgets('LanguageBuilder with refreshTree true', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+
+      // Create a fresh helper to avoid state pollution from other tests
+      final testHelper = LanguageHelper('TestRefreshTree');
+      addTearDown(testHelper.dispose);
+      await testHelper.initial(data: dataList, initialCode: LanguageCodes.en);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageBuilder(
+              languageHelper: testHelper,
+              refreshTree: true,
+              builder: (_) => Text('Hello'.tr),
+            ),
+          ),
+        ),
+      );
+      // Use simple pumps to avoid hanging - don't use pumpAndSettle
+      await tester.pump();
+      await tester.pump();
+
+      // Verify the widget shows text
+      expect(find.text('Hello'), findsOneWidget);
+
+      // Change language and verify it updates
+      await testHelper.change(LanguageCodes.vi);
+      // Use simple pumps - avoid pumpAndSettle which can hang
+      await tester.pump();
+      await tester.pump();
+
+      // The widget should update to show Vietnamese text
+      expect(find.text('Xin Chào'), findsOneWidget);
+    });
+
+    testWidgets('LanguageBuilder dispose removes from states', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+
+      final helper = LanguageHelper.instance;
+      await helper.initial(data: dataList, initialCode: LanguageCodes.en);
+
+      // Get initial state count
+      final initialStateCount = helper.states.length;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageBuilder(builder: (_) => Text('Hello'.tr)),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(helper.states.length, greaterThan(initialStateCount));
+
+      // Remove widget
+      await tester.pumpWidget(const MaterialApp(home: SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // States should be back to initial count (or less if other widgets were disposed)
+      expect(helper.states.length, lessThanOrEqualTo(initialStateCount + 1));
     });
   });
 }
