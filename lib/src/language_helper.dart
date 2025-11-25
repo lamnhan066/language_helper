@@ -226,7 +226,7 @@ class LanguageHelper {
   final String prefix;
 
   /// Storage for all language data.
-  final LanguageData _data = {};
+  LanguageData _data = {};
 
   /// Collection of data providers.
   Iterable<LanguageDataProvider> _dataProviders = [];
@@ -297,7 +297,7 @@ class LanguageHelper {
   /// )
   /// ```
   Set<LanguageCodes> get codes => _codes.toSet();
-  Set<LanguageCodes> _codes = {};
+  var _codes = <LanguageCodes>{};
 
   /// Gets the list of languages as [Locale].
   ///
@@ -865,22 +865,12 @@ class LanguageHelper {
   }) async {
     _dataProviders = [..._dataProviders, provider];
 
-    final data = await Future.wait([
-      _loadCodesFromProviders([provider]),
-      _loadDataFromProviders(_currentCode!, [provider]),
-    ]);
+    final data = await _loadDataFromProviders(_currentCode!, [provider]);
 
-    final newCodes = data[0] as Set<LanguageCodes>?;
-    final newData = data[1] as LanguageData?;
+    _codes.addAll(data.keys);
 
-    if (newCodes != null && newCodes.isNotEmpty) {
-      _codes.addAll(newCodes);
-    }
-
-    if (newData != null &&
-        newData.isNotEmpty &&
-        newData.containsKey(_currentCode!)) {
-      for (final entry in newData[_currentCode!]!.entries) {
+    if (data.isNotEmpty && data.containsKey(_currentCode!)) {
+      for (final entry in data[_currentCode!]!.entries) {
         if (provider.override) {
           _data[_currentCode!]![entry.key] = entry.value;
         } else {
@@ -929,6 +919,12 @@ class LanguageHelper {
     bool activate = true,
   }) async {
     _dataProviders = _dataProviders.where((p) => p != provider).toList();
+
+    final data = await _loadDataFromProviders(_currentCode!, _dataProviders);
+
+    _codes = data.keys.toSet();
+    _data = data;
+
     if (activate) await reload();
     _logger?.info(
       () =>
@@ -1274,30 +1270,47 @@ class LanguageHelper {
     return results.expand((codeSet) => codeSet).toSet();
   }
 
-  /// Loads data from all providers and returns the data.
+  /// Loads translation data from all given [providers] for the specified [code].
   ///
-  /// This internal method iterates through all [providers] and returns the data
-  /// from the first provider that has data for the given [code].
+  /// This method aggregates translation data for the requested [LanguageCodes] [code]
+  /// from all [LanguageDataProvider] sources in [providers], in order. If multiple
+  /// providers supply translations for the same key, providers with `override: true`
+  /// will overwrite keys from previous providers; if `override: false`, only
+  /// new keys are added and existing ones are preserved.
   ///
-  /// Returns an empty [LanguageData] if no provider has data for the given [code].
+  /// Returns a [LanguageData] map containing all keys and their translations for [code]
+  /// across all providers. If no provider has data for the code, returns an empty map.
+  ///
+  /// Example return structure for [LanguageCodes.en]:
+  /// ```
+  /// {
+  ///   LanguageCodes.en: {
+  ///     'Hello': 'Hello',
+  ///     'Goodbye': 'Goodbye',
+  ///   }
+  /// }
+  /// ```
   Future<LanguageData> _loadDataFromProviders(
     LanguageCodes code,
     Iterable<LanguageDataProvider> providers,
   ) async {
-    final data = <String, dynamic>{};
+    final LanguageData data = {};
+
     for (final provider in providers) {
       final providerData = await provider.getData(code);
-      if (providerData.isNotEmpty && providerData.containsKey(code)) {
-        for (final entry in providerData[code]!.entries) {
+      for (final entry in providerData.entries) {
+        data.putIfAbsent(entry.key, () => {});
+        for (final language in entry.value.entries) {
           if (provider.override) {
-            data[entry.key] = entry.value;
+            data[entry.key]![language.key] = language.value;
           } else {
-            data.putIfAbsent(entry.key, () => entry.value);
+            data[entry.key]!.putIfAbsent(language.key, () => language.value);
           }
         }
       }
     }
-    return {code: data};
+
+    return data;
   }
 
   @override
