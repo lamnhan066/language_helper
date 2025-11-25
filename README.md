@@ -101,11 +101,11 @@ The generator automatically scans your project for text using language_helper ex
 
 ### Add Generator Dependency
 
-First, add the generator to your `pubspec.yaml`:
+First, add the [language_helper_generator](https://pub.dev/packages/language_helper_generator) to your `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
-  language_helper_generator: ^0.7.0
+  language_helper_generator: ^latest
 ```
 
 Then run:
@@ -311,6 +311,7 @@ final en = {
   'You have @{count} item': LanguageConditions(
     param: 'count',
     conditions: {
+      '0': 'You have no items',
       '1': 'You have one item',
       '_': 'You have @{count} items', // Default
     }
