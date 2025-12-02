@@ -1102,7 +1102,12 @@ class LanguageHelper {
   ///   // Language not available, current language unchanged
   /// }
   /// ```
-  Future<void> change(LanguageCodes toCode) async {
+  Future<void> change(LanguageCodes toCode, {bool force = false}) async {
+    if (toCode == _currentCode && !force) {
+      _logger?.debug(() => 'The language is already $toCode');
+      return;
+    }
+
     if (!codes.contains(toCode)) {
       _logger?.warning(() => '$toCode is not available in `data`');
 
