@@ -5,6 +5,7 @@ import 'package:language_helper/language_helper.dart';
 import 'package:language_helper/src/utils/serializer.dart';
 import 'package:lite_logger/lite_logger.dart';
 
+/// Extension on [LanguageData] to export to JSON files.
 extension ExportLanguageData on LanguageData {
   /// Export to json files for `LanguageDataProvider`. Default `path` is set
   /// to './assets/languages'.
@@ -37,6 +38,7 @@ extension ExportLanguageData on LanguageData {
   }
 }
 
+/// Extension on [LazyLanguageData] to export to JSON files.
 extension ExportLazyLanguageData on LazyLanguageData {
   /// Exports to JSON files for [LanguageDataProvider]. Default path:
   /// './assets/languages'. Creates `codes.json` and `data/[code].json` files.

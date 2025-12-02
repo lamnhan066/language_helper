@@ -42,7 +42,8 @@ class LanguageHelper {
   /// - Direct `translate()` calls
   ///
   LanguageHelper(this.prefix);
-  // Get the LanguageHelper instance
+
+  /// The default LanguageHelper instance.
   static final LanguageHelper instance = LanguageHelper('LanguageHelper');
 
   /// Stack of [LanguageHelper] instances used by [LanguageBuilder] to make
@@ -93,6 +94,7 @@ class LanguageHelper {
   final Set<_LanguageBuilderState> _states = {};
 
   @visibleForTesting
+  /// The states of the [LanguageBuilder] widgets.
   Set<UpdateLanguage> get states => _states;
 
   /// Prefix of the key to save the data to `SharedPreferences`.

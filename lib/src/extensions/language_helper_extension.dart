@@ -1,5 +1,6 @@
 part of '../language_helper.dart';
 
+/// Extension on [String] to translate text using the helper.
 extension LanguageHelperEx on String {
   /// Translates text using the helper from current build context. Uses scoped
   /// helper within [LanguageBuilder], otherwise [LanguageHelper.instance].

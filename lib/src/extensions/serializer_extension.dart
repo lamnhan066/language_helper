@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper/src/utils/serializer.dart' as s;
 
+/// Extension on [LanguageData] to serialize and deserialize the data.
 extension LanguageDataSerializer on LanguageData {
   /// Converts to a JSON string. [LanguageConditions] are converted to map
   /// representations.
