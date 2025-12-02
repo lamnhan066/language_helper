@@ -59,6 +59,22 @@ void main() async {
       await testHelper.initial(data: [], isDebug: true);
       expect(testHelper.code, equals(LanguageCodes.en));
     });
+
+    test(
+      'data with empty providers to cover error log when codes are empty',
+      () async {
+        final testHelper = LanguageHelper('TestEmptyCodesLogger');
+        addTearDown(testHelper.dispose);
+
+        // Use empty providers that return empty codes (not empty provider list)
+        await testHelper.initial(
+          data: [LanguageDataProvider.empty()],
+          isDebug: true,
+        );
+
+        expect(testHelper.isInitialized, equals(false));
+      },
+    );
   });
 
   group('Test initial -', () {
