@@ -467,18 +467,19 @@ class LanguageHelper {
   }
 
   /// Reloads all [LanguageBuilder] widgets to apply updated translation data
-  /// without changing language. Equivalent to `change(code, force: true)`.
-  Future<void> reload() => change(code, force: true);
+  /// without changing language. Equivalent to `change(code)`.
+  Future<void> reload() => change(code);
 
-  /// Switches to [toCode] and reloads translations. If [force] is true,
-  /// changes even if same. Falls back to [initialCode] if [toCode] is
-  /// unavailable and [useInitialCodeWhenUnavailable] is true.
-  Future<void> change(LanguageCodes toCode, {bool force = false}) async {
-    if (toCode == _currentCode && !force) {
-      _logger?.debug(() => 'The language is already $toCode');
-      return;
-    }
-
+  /// Switches to [toCode] and reloads translations. Falls back to [initialCode]
+  /// if [toCode] is unavailable and [useInitialCodeWhenUnavailable] is true.
+  ///
+  /// **Note:** This method will always reload the translations from all
+  /// providers even if the translations were previously loaded or `toCode`
+  /// is the same as the current language.
+  ///
+  /// [reload] can be used instead of [change] as a shortcut of reloading the
+  /// translations without changing the language.
+  Future<void> change(LanguageCodes toCode) async {
     if (!codes.contains(toCode)) {
       _logger?.warning(() => '$toCode is not available in `data`');
 
