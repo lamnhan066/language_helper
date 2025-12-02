@@ -23,7 +23,7 @@ void main() async {
   // Use en as default language
   SharedPreferences.setMockInitialValues({});
 
-  StreamSubscription? languageSub;
+  StreamSubscription<LanguageCodes>? languageSub;
 
   setUpAll(() async {
     await languageHelper.initial(
@@ -40,9 +40,9 @@ void main() async {
     });
   });
 
-  tearDownAll(() {
+  tearDownAll(() async {
     languageHelper.dispose();
-    languageSub?.cancel();
+    await languageSub?.cancel();
   });
 
   group('Test with empty data and use temporary testing data -', () {
@@ -85,9 +85,11 @@ void main() async {
     });
     test('`ensureInitialized`', () async {
       final temp = LanguageHelper('TempLanguageHelper');
-      temp.ensureInitialized.then((value) {
-        expect(temp.isInitialized, equals(true));
-      });
+      unawaited(
+        temp.ensureInitialized.then((value) {
+          expect(temp.isInitialized, equals(true));
+        }),
+      );
       await temp.initial(data: []);
       await temp.ensureInitialized;
       expect(temp.isInitialized, equals(true));
@@ -189,12 +191,15 @@ void main() async {
       final testHelper = LanguageHelper('TestCodes1');
       addTearDown(testHelper.dispose);
 
-      final LanguageData dataOverrides = {
+      final dataOverrides = <LanguageCodes, Map<String, dynamic>>{
         LanguageCodes.vi: {},
         LanguageCodes.en: {},
         LanguageCodes.cu: {},
       };
-      final LanguageData data = {LanguageCodes.vi: {}, LanguageCodes.en: {}};
+      final data = <LanguageCodes, Map<String, dynamic>>{
+        LanguageCodes.vi: {},
+        LanguageCodes.en: {},
+      };
 
       await testHelper.initial(
         data: [
@@ -214,12 +219,12 @@ void main() async {
       final testHelper = LanguageHelper('TestCodes2');
       addTearDown(testHelper.dispose);
 
-      final LanguageData data = {
+      final data = <LanguageCodes, Map<String, dynamic>>{
         LanguageCodes.vi: {},
         LanguageCodes.en: {},
         LanguageCodes.cu: {},
       };
-      final LanguageData dataOverrides = {
+      final dataOverrides = <LanguageCodes, Map<String, dynamic>>{
         LanguageCodes.vi: {},
         LanguageCodes.en: {},
       };
@@ -291,7 +296,8 @@ void main() async {
     });
 
     test(
-      'true but initial code is unavailable in data with isDebug: true to cover logger warning callback',
+      'true but initial code is unavailable in data with isDebug: true '
+      'to cover logger warning callback',
       () async {
         final testHelper = LanguageHelper('TestUseInitial4');
         addTearDown(testHelper.dispose);
@@ -306,8 +312,10 @@ void main() async {
         );
         // Try to change to an unavailable language
         // This should trigger the warning at lines 877-878
-        await testHelper.change(LanguageCodes.aa); // aa is also not in dataList
-        // Should remain at the current code since initialCode is also unavailable
+        // aa is also not in dataList
+        await testHelper.change(LanguageCodes.aa);
+        // Should remain at the current code since initialCode is also
+        // unavailable
         expect(testHelper.code, isNot(equals(LanguageCodes.aa)));
       },
     );
@@ -325,8 +333,7 @@ void main() async {
     });
 
     test('UpdateLanguage Mixin with custom implementation', () {
-      final customMixin = CustomUpdateLanguageMixin();
-      customMixin.updateLanguage();
+      final customMixin = CustomUpdateLanguageMixin()..updateLanguage();
       expect(customMixin.updateCount, equals(1));
 
       customMixin.updateLanguage();
@@ -334,10 +341,10 @@ void main() async {
     });
 
     test('UpdateLanguage Mixin with multiple calls', () {
-      final mixin = UpdateLanguageMixinMock();
-      mixin.updateLanguage();
-      mixin.updateLanguage();
-      mixin.updateLanguage();
+      UpdateLanguageMixinMock()
+        ..updateLanguage()
+        ..updateLanguage()
+        ..updateLanguage();
       // Should not throw
     });
   });
@@ -581,9 +588,9 @@ void main() async {
   group('Language Data serializer', () {
     late String toJson;
     late LanguageData fromJson;
-    setUp(() {
+    setUp(() async {
       languageHelper.setUseInitialCodeWhenUnavailable(true);
-      languageHelper.change(LanguageCodes.en);
+      await languageHelper.change(LanguageCodes.en);
     });
 
     test('LanguageData ToJson and FromJson', () {
@@ -700,7 +707,9 @@ void main() async {
     });
 
     test(
-      'true, the `languageCode_countryCode` not available in local database but the `languageCode` only is available and isOptionalCountryCode is true',
+      'true, the `languageCode_countryCode` not available in local '
+      'database but the `languageCode` only is available and '
+      'isOptionalCountryCode is true',
       () async {
         final testHelper = LanguageHelper('TestSyncDevice3');
         addTearDown(testHelper.dispose);
@@ -714,7 +723,9 @@ void main() async {
     );
 
     test(
-      'true, the `languageCode_countryCode` not available in local database but the `languageCode` only is available and isOptionalCountryCode is false',
+      'true, the `languageCode_countryCode` not available in local '
+      'database but the `languageCode` only is available and '
+      'isOptionalCountryCode is false',
       () async {
         final testHelper = LanguageHelper('TestSyncDevice4');
         addTearDown(testHelper.dispose);
@@ -763,7 +774,8 @@ void main() async {
     });
 
     test(
-      'true and have local database but with no changed code with isDebug: true to cover logger debug callback',
+      'true and have local database but with no changed code with '
+      'isDebug: true to cover logger debug callback',
       () async {
         final testHelper = LanguageHelper('TestSyncDevice7');
         addTearDown(testHelper.dispose);
@@ -783,7 +795,8 @@ void main() async {
     );
 
     test(
-      'true and have local database but with changed code with isDebug: true to cover logger step callback',
+      'true and have local database but with changed code with '
+      'isDebug: true to cover logger step callback',
       () async {
         final testHelper = LanguageHelper('TestSyncDevice8');
         addTearDown(testHelper.dispose);
@@ -851,7 +864,7 @@ void main() async {
       expect(dollar100, findsOneWidget);
       expect(dollar10, findsNWidgets(2));
 
-      languageHelper.change(LanguageCodes.vi);
+      await languageHelper.change(LanguageCodes.vi);
       await tester.pumpAndSettle();
 
       expect(helloText, findsOneWidget);
@@ -905,7 +918,7 @@ void main() async {
       expect(buildCount, 1);
 
       // Trigger language update
-      LanguageHelper.instance.change(LanguageCodes.vi);
+      await LanguageHelper.instance.change(LanguageCodes.vi);
 
       await tester.pump();
 
@@ -914,7 +927,8 @@ void main() async {
     });
 
     testWidgets(
-      'Only the outermost LanguageBuilder triggers a rebuild on language change',
+      'Only the outermost LanguageBuilder triggers a rebuild on language '
+      'change',
       (tester) async {
         var outerBuilds = 0;
         var innerBuilds = 0;
@@ -949,7 +963,7 @@ void main() async {
         );
 
         // Trigger language change
-        LanguageHelper.instance.change(LanguageCodes.vi);
+        await LanguageHelper.instance.change(LanguageCodes.vi);
         await tester.pump();
 
         expect(
@@ -962,7 +976,8 @@ void main() async {
           innerBuilds,
           2,
           reason:
-              'Inner LanguageBuilder should only rebuild as part of outer rebuild, not independently',
+              'Inner LanguageBuilder should only rebuild as part of outer '
+              'rebuild, not independently',
         );
       },
     );
@@ -991,7 +1006,8 @@ void main() async {
     });
 
     testWidgets(
-      'Only the outermost LanguageBuilder triggers a rebuild on language change',
+      'Only the outermost LanguageBuilder triggers a rebuild on language '
+      'change',
       (tester) async {
         var outerBuilds = 0;
         var innerBuilds = 0;
@@ -1026,7 +1042,7 @@ void main() async {
         );
 
         // Trigger language change
-        LanguageHelper.instance.change(LanguageCodes.vi);
+        await LanguageHelper.instance.change(LanguageCodes.vi);
         await tester.pump();
 
         expect(
@@ -1039,7 +1055,8 @@ void main() async {
           innerBuilds,
           2,
           reason:
-              'Inner LanguageBuilder should only rebuild as part of outer rebuild, not independently',
+              'Inner LanguageBuilder should only rebuild as part of outer '
+              'rebuild, not independently',
         );
       },
     );
@@ -1049,7 +1066,7 @@ void main() async {
       data.exportJson(dir.path);
       final codesFile = File('./test/export_json/codes.json');
       final codesJson = codesFile.readAsStringSync();
-      expect(jsonDecode(codesJson), isA<List>());
+      expect(jsonDecode(codesJson), isA<List<dynamic>>());
       expect(jsonDecode(codesJson), isNotEmpty);
 
       // Test that language files are created in the correct structure
@@ -1058,10 +1075,12 @@ void main() async {
       expect(enFile.existsSync(), isTrue);
       expect(viFile.existsSync(), isTrue);
 
-      final enJson = jsonDecode(enFile.readAsStringSync());
-      final viJson = jsonDecode(viFile.readAsStringSync());
-      expect(enJson, isA<Map>());
-      expect(viJson, isA<Map>());
+      final enJson =
+          jsonDecode(enFile.readAsStringSync()) as Map<String, dynamic>;
+      final viJson =
+          jsonDecode(viFile.readAsStringSync()) as Map<String, dynamic>;
+      expect(enJson, isA<Map<String, dynamic>>());
+      expect(viJson, isA<Map<String, dynamic>>());
       expect(enJson['Hello'], equals('Hello'));
       expect(viJson['Hello'], equals('Xin Chào'));
 
@@ -1078,11 +1097,10 @@ void main() async {
 
     test('export lazy language data', () {
       final dir = Directory('./test/export_lazy');
-      final LazyLanguageData lazyData = {
+      final _ = <LanguageCodes, Map<String, dynamic> Function()>{
         LanguageCodes.en: () => {'Hello': 'Hello'},
         LanguageCodes.vi: () => {'Hello': 'Xin Chào'},
-      };
-      lazyData.exportJson(dir.path);
+      }..exportJson(dir.path);
       final codesFile = File('./test/export_lazy/codes.json');
       expect(codesFile.existsSync(), isTrue);
       dir.deleteSync(recursive: true);
@@ -1523,8 +1541,14 @@ void main() async {
         final helper1 = LanguageHelper('TestHelper1');
         final helper2 = LanguageHelper('TestHelper2');
 
-        await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
-        await helper2.initial(data: dataList, initialCode: LanguageCodes.vi);
+        await helper1.initial(
+          data: dataList,
+          initialCode: LanguageCodes.en,
+        );
+        await helper2.initial(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+        );
 
         await tester.pumpWidget(
           MaterialApp(
@@ -1534,7 +1558,8 @@ void main() async {
                 builder: (_) => Column(
                   children: [
                     Text('Hello'.trC(helper1)),
-                    // Nested LanguageBuilder with different LanguageHelper instance
+                    // Nested LanguageBuilder with different LanguageHelper
+                    // instance
                     LanguageBuilder(
                       languageHelper: helper2,
                       builder: (_) => Text('Hello'.trC(helper2)),
@@ -1572,7 +1597,8 @@ void main() async {
     );
   });
 
-  /// This test have to be the last test because it will change the value of the database.
+  /// This test have to be the last test because it will change the value of
+  /// the database.
   group('Unit test for methods', () {
     test('Add data with overwrite is false', () async {
       final dataToAdd = {
@@ -1628,7 +1654,7 @@ void main() async {
         dataToAdd,
       );
       await languageHelper.addProvider(providerWithOverride);
-      languageHelper.reload();
+      await languageHelper.reload();
 
       final addedData = languageHelper.data[LanguageCodes.en]!;
       expect(addedData, contains('Hello add'));
@@ -1644,7 +1670,7 @@ void main() async {
 
       final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
 
-      final LazyLanguageData lazyData = {
+      final lazyData = <LanguageCodes, Map<String, dynamic> Function()>{
         LanguageCodes.en: () {
           callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
           return Map<String, dynamic>.from(data[LanguageCodes.en]!);
@@ -1676,7 +1702,7 @@ void main() async {
 
       final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
 
-      final LazyLanguageData lazyData = {
+      final lazyData = <LanguageCodes, Map<String, dynamic> Function()>{
         LanguageCodes.en: () {
           callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
           return Map<String, dynamic>.from(data[LanguageCodes.en]!);
@@ -1709,13 +1735,14 @@ void main() async {
 
   group('Test change() always reloads data', () {
     test(
-      'change() reloads data even when switching back to previously used language',
+      'change() reloads data even when switching back to previously used '
+      'language',
       () async {
         SharedPreferences.setMockInitialValues({});
 
         final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
 
-        final LazyLanguageData lazyData = {
+        final lazyData = <LanguageCodes, Map<String, dynamic> Function()>{
           LanguageCodes.en: () {
             callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
             return Map<String, dynamic>.from(data[LanguageCodes.en]!);
@@ -1747,7 +1774,8 @@ void main() async {
         expect(callCount[LanguageCodes.en], equals(1));
         expect(callCount[LanguageCodes.vi], equals(1));
 
-        // Change back to English - should reload en data (even though it was loaded before)
+        // Change back to English - should reload en data (even though it
+        // was loaded before)
         await helper.change(LanguageCodes.en);
         expect(helper.translate('Hello'), equals('Hello'));
         expect(
@@ -1807,7 +1835,7 @@ void main() async {
 
         final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
 
-        final LazyLanguageData lazyData = {
+        final lazyData = <LanguageCodes, Map<String, dynamic> Function()>{
           LanguageCodes.en: () {
             callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
             return Map<String, dynamic>.from(data[LanguageCodes.en]!);
@@ -1957,35 +1985,39 @@ void main() async {
       expect(testHelper.translate('Key1'), equals('Value1'));
     });
 
-    test('removeProvider with override provider to cover logger info', () async {
-      final testHelper = LanguageHelper('TestRemoveProviderOverride');
-      addTearDown(testHelper.dispose);
+    test(
+      'removeProvider with override provider to cover logger info',
+      () async {
+        final testHelper = LanguageHelper('TestRemoveProviderOverride');
+        addTearDown(testHelper.dispose);
 
-      final provider1 = LanguageDataProvider.data({
-        LanguageCodes.en: {'Key1': 'Value1'},
-      });
-      final provider2 = LanguageDataProvider.data({
-        LanguageCodes.en: {'Key2': 'Value2'},
-      });
+        final provider1 = LanguageDataProvider.data({
+          LanguageCodes.en: {'Key1': 'Value1'},
+        });
+        final provider2 = LanguageDataProvider.data({
+          LanguageCodes.en: {'Key2': 'Value2'},
+        });
 
-      await testHelper.initial(
-        data: [provider1, provider2],
-        initialCode: LanguageCodes.en,
-        isDebug: true,
-      );
+        await testHelper.initial(
+          data: [provider1, provider2],
+          initialCode: LanguageCodes.en,
+          isDebug: true,
+        );
 
-      expect(testHelper.translate('Key1'), equals('Value1'));
-      expect(testHelper.translate('Key2'), equals('Value2'));
+        expect(testHelper.translate('Key1'), equals('Value1'));
+        expect(testHelper.translate('Key2'), equals('Value2'));
 
-      // Remove provider with override=true to trigger logger info at lines 937-938
-      await testHelper.removeProvider(provider2);
+        // Remove provider with override=true to trigger logger info at lines
+        // 937-938
+        await testHelper.removeProvider(provider2);
 
-      expect(testHelper.translate('Key1'), equals('Value1'));
-      expect(
-        testHelper.translate('Key2'),
-        equals('Key2'),
-      ); // Should return key when not found
-    });
+        expect(testHelper.translate('Key1'), equals('Value1'));
+        expect(
+          testHelper.translate('Key2'),
+          equals('Key2'),
+        ); // Should return key when not found
+      },
+    );
   });
 
   group('Language Data Provider from - ', () {
@@ -2245,9 +2277,9 @@ void main() async {
     });
 
     test('dispose multiple times', () {
-      final helper = LanguageHelper('TestHelper');
-      helper.dispose();
-      helper.dispose(); // Should not throw
+      LanguageHelper('TestHelper')
+        ..dispose()
+        ..dispose(); // Should not throw
     });
 
     test('translate with null parameter', () {
@@ -2330,7 +2362,7 @@ void main() async {
     test('LanguageHelper reload with no data', () async {
       final helper = LanguageHelper('TestHelper');
       await helper.initial(data: []);
-      helper.reload();
+      await helper.reload();
       expect(helper.data, isNotEmpty);
     });
 
@@ -2339,7 +2371,7 @@ void main() async {
       addTearDown(helper.dispose);
 
       // Create a lazy provider that hasn't loaded vi yet
-      final LazyLanguageData lazyData = {
+      final lazyData = <LanguageCodes, Map<String, dynamic> Function()>{
         LanguageCodes.en: () => {'Hello': 'Hello'},
         LanguageCodes.vi: () => {'Hello': 'Xin Chào'},
       };
@@ -2399,7 +2431,7 @@ void main() async {
       await null; // Wait for the stream to be processed
 
       expect(streamCount, equals(2));
-      subscription.cancel();
+      await subscription.cancel();
     });
 
     test('LanguageHelper with malformed language data', () async {
@@ -2651,8 +2683,8 @@ void main() async {
       await helper2.initial(data: dataList, initialCode: LanguageCodes.vi);
 
       // Create nested LanguageBuilders with different helpers
-      // When helpers are different, _of() should return null for the inner builder
-      // because the root has a different helper
+      // When helpers are different, _of() should return null for the inner
+      // builder because the root has a different helper
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -2732,12 +2764,14 @@ void main() async {
       await tester.pumpWidget(const MaterialApp(home: SizedBox.shrink()));
       await tester.pumpAndSettle();
 
-      // States should be back to initial count (or less if other widgets were disposed)
+      // States should be back to initial count (or less if other widgets
+      // were disposed)
       expect(helper.states.length, lessThanOrEqualTo(initialStateCount + 1));
     });
 
     testWidgets(
-      'Nested LanguageBuilders with same helper to cover root update (line 1142)',
+      'Nested LanguageBuilders with same helper to cover root update '
+      '(line 1142)',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
 
@@ -2746,7 +2780,8 @@ void main() async {
         await testHelper.initial(data: dataList, initialCode: LanguageCodes.en);
 
         // Create nested LanguageBuilders with the same helper
-        // Both should have forceRebuild: false (default) so the inner one will find the root
+        // Both should have forceRebuild: false (default) so the inner one
+        // will find the root
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -2770,8 +2805,9 @@ void main() async {
         // Verify the widget shows English text
         expect(find.text('Hello'), findsOneWidget);
 
-        // Change language - this should trigger the root update path (line 1142)
-        // The inner builder's _of() should return the root, and root should be added to needToUpdate
+        // Change language - this should trigger the root update path
+        // The inner builder's _of() should return the root, and root should
+        // be added to needToUpdate
         await testHelper.change(LanguageCodes.vi);
         await tester.pumpAndSettle();
 
@@ -2781,7 +2817,7 @@ void main() async {
     );
 
     testWidgets(
-      'LanguageBuilder _of() returns null when root is not mounted (lines 113-114)',
+      'LanguageBuilder _of() returns null when root is not mounted ',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
 
@@ -2821,17 +2857,19 @@ void main() async {
         );
         await tester.pumpAndSettle();
 
-        // The root should be unmounted now, but if it's still in _states somehow,
-        // calling change() should trigger the !root.mounted check
-        // However, when a widget is disposed, it's removed from _states in dispose()
-        // So this path might be hard to test
+        // The root should be unmounted now, but if it's still in _states
+        // somehow, calling change() should trigger the !root.mounted check
+        // However, when a widget is disposed, it's removed from _states in
+        // dispose() So this path might be hard to test
 
-        // Instead, let's test the case where _of() returns null because root is null
-        // (which is already covered) or because helpers are different (already covered)
+        // Instead, let's test the case where _of() returns null because root
+        // is null (which is already covered) or because helpers are different
+        // (already covered)
 
-        // For the !root.mounted case, we need a scenario where findRootAncestorStateOfType
-        // returns a state that's not mounted. This is a defensive check that might be
-        // unreachable in practice, but let's try to trigger it by disposing during change
+        // For the !root.mounted case, we need a scenario where
+        // findRootAncestorStateOfType returns a state that's not mounted.
+        // This is a defensive check that might be unreachable in practice,
+        // but let's try to trigger it by disposing during change
 
         // Create a scenario where we dispose a widget while change is happening
         final helper2 = LanguageHelper('TestOfNotMounted2');

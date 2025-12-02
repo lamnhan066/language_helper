@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:language_helper/language_helper.dart';
@@ -335,7 +337,8 @@ void main() {
                 builder: (_) => Column(
                   children: [
                     Text('Hello'.tr),
-                    // trT should still use scoped helper, but translate to specified code
+                    // trT should still use scoped helper, but translate to
+                    // specified code
                     Text('Hello'.trT(LanguageCodes.vi)),
                   ],
                 ),
@@ -517,7 +520,8 @@ void main() {
         child: const SizedBox(),
       );
 
-      // updateShouldNotify should return false when helpers are the same instance
+      // updateShouldNotify should return false when helpers are the same
+      // instance
       expect(scope1.updateShouldNotify(scope2), isFalse);
 
       helper.dispose();
@@ -556,7 +560,8 @@ void main() {
       expect(buildCount, greaterThan(0));
       expect(find.text('Hello'), findsOneWidget);
 
-      // Update with different helper - LanguageBuilder will detect change in didChangeDependencies
+      // Update with different helper - LanguageBuilder will detect change in
+      // didChangeDependencies
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -576,7 +581,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should have rebuilt and show Vietnamese text
-      // LanguageBuilder detects the helper change in didChangeDependencies and rebuilds
+      // LanguageBuilder detects the helper change in didChangeDependencies
+      // and rebuilds
       expect(find.text('Xin Chào'), findsOneWidget);
       expect(buildCount, greaterThan(1)); // Should have rebuilt
 
@@ -889,7 +895,8 @@ void main() {
     });
 
     testWidgets(
-      'showDialog can access same LanguageHelper instance from parent LanguageScope',
+      'showDialog can access same LanguageHelper instance from parent '
+      'LanguageScope',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
 
@@ -912,22 +919,26 @@ void main() {
                     languageHelper1 = LanguageHelper.of(context);
                     return ElevatedButton(
                       onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (dialogContext) {
-                            languageHelper2 = LanguageHelper.of(dialogContext);
-                            return AlertDialog(
-                              title: Text('Hello'.tr),
-                              content: const Text('Test Dialog'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(dialogContext).pop(),
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                            );
-                          },
+                        unawaited(
+                          showDialog<void>(
+                            context: context,
+                            builder: (dialogContext) {
+                              languageHelper2 = LanguageHelper.of(
+                                dialogContext,
+                              );
+                              return AlertDialog(
+                                title: Text('Hello'.tr),
+                                content: const Text('Test Dialog'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(dialogContext).pop(),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
                         );
                       },
                       child: const Text('Open Dialog'),
@@ -957,7 +968,8 @@ void main() {
     );
 
     testWidgets(
-      'showDialog can access LanguageHelper from LanguageScope with nested MaterialApp when scope wraps outer app',
+      'showDialog can access LanguageHelper from LanguageScope with nested '
+      'MaterialApp when scope wraps outer app',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
 
@@ -970,7 +982,8 @@ void main() {
         LanguageHelper? languageHelper1;
         LanguageHelper? languageHelper2;
 
-        // When there's an outer MaterialApp, LanguageScope should wrap the outer MaterialApp
+        // When there's an outer MaterialApp, LanguageScope should wrap the
+        // outer MaterialApp
         // so that dialogs shown from the inner MaterialApp can access it
         await tester.pumpWidget(
           LanguageScope(
@@ -983,24 +996,26 @@ void main() {
                       languageHelper1 = LanguageHelper.of(context);
                       return ElevatedButton(
                         onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (dialogContext) {
-                              languageHelper2 = LanguageHelper.of(
-                                dialogContext,
-                              );
-                              return AlertDialog(
-                                title: Text('Hello'.tr),
-                                content: const Text('Test Dialog'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(dialogContext).pop(),
-                                    child: const Text('OK'),
-                                  ),
-                                ],
-                              );
-                            },
+                          unawaited(
+                            showDialog<void>(
+                              context: context,
+                              builder: (dialogContext) {
+                                languageHelper2 = LanguageHelper.of(
+                                  dialogContext,
+                                );
+                                return AlertDialog(
+                                  title: Text('Hello'.tr),
+                                  content: const Text('Test Dialog'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(dialogContext).pop(),
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                           );
                         },
                         child: const Text('Open Dialog'),
@@ -1031,7 +1046,8 @@ void main() {
     );
 
     testWidgets(
-      'showDialog cannot access LanguageHelper when LanguageScope is between nested MaterialApps',
+      'showDialog cannot access LanguageHelper when LanguageScope is between '
+      'nested MaterialApps',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
 
@@ -1044,8 +1060,9 @@ void main() {
         LanguageHelper? languageHelper1;
         LanguageHelper? languageHelper2;
 
-        // This pattern does NOT work correctly because dialogs shown from the inner MaterialApp
-        // are shown in the outer MaterialApp's overlay, which doesn't have access to
+        // This pattern does NOT work correctly because dialogs shown from the
+        // inner MaterialApp are shown in the outer MaterialApp's overlay,
+        // which doesn't have access to
         // the LanguageScope that's between the two MaterialApps.
         // Solution: Wrap the outermost MaterialApp with LanguageScope.
         await tester.pumpWidget(
@@ -1059,26 +1076,29 @@ void main() {
                       languageHelper1 = LanguageHelper.of(context);
                       return ElevatedButton(
                         onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (dialogContext) {
-                              // The dialog context cannot access LanguageScope
-                              // because it's shown in the outer MaterialApp's overlay
-                              languageHelper2 = LanguageHelper.of(
-                                dialogContext,
-                              );
-                              return AlertDialog(
-                                title: const Text('Test Dialog'),
-                                content: const Text('Dialog Content'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(dialogContext).pop(),
-                                    child: const Text('OK'),
-                                  ),
-                                ],
-                              );
-                            },
+                          unawaited(
+                            showDialog<void>(
+                              context: context,
+                              builder: (dialogContext) {
+                                // The dialog context cannot access
+                                // LanguageScope because it's shown in the outer
+                                // MaterialApp's overlay
+                                languageHelper2 = LanguageHelper.of(
+                                  dialogContext,
+                                );
+                                return AlertDialog(
+                                  title: const Text('Test Dialog'),
+                                  content: const Text('Dialog Content'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(dialogContext).pop(),
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                           );
                         },
                         child: const Text('Open Dialog'),
@@ -1099,10 +1119,12 @@ void main() {
         await tester.tap(find.text('Open Dialog'));
         await tester.pumpAndSettle();
 
-        // When LanguageScope is between nested MaterialApps, the dialog context
-        // cannot access it because the dialog is shown in the outer MaterialApp's overlay,
-        // which is above the LanguageScope in the widget tree.
-        // The dialog falls back to LanguageHelper.instance instead of the scoped helper.
+        // When LanguageScope is between nested MaterialApps, the dialog
+        // context cannot access it because the dialog is shown in the outer
+        // MaterialApp's overlay, which is above the LanguageScope in the
+        // widget tree.
+        // The dialog falls back to LanguageHelper.instance instead of the
+        // scoped helper.
         expect(languageHelper2, isNotNull);
         expect(languageHelper2, isNot(equals(scopedHelper)));
         expect(languageHelper2, equals(LanguageHelper.instance));
@@ -1271,12 +1293,14 @@ void main() {
 
         expect(retrievedHelper, equals(LanguageHelper.instance));
         // The caller info should be extracted from the stack trace
-        // (We can't easily verify the exact message in tests, but we verify it doesn't crash)
+        // (We can't easily verify the exact message in tests, but we verify
+        // it doesn't crash)
       },
     );
 
     testWidgets(
-      'FutureBuilder wrapping LanguageScope - scope accessible in loading and completed states',
+      'FutureBuilder wrapping LanguageScope - scope accessible in loading '
+      'and completed states',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
 
@@ -1349,7 +1373,8 @@ void main() {
     );
 
     testWidgets(
-      'LanguageScope wrapping FutureBuilder - widgets can access scope in both loading and data states',
+      'LanguageScope wrapping FutureBuilder - widgets can access scope in '
+      'both loading and data states',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
 
@@ -1428,7 +1453,8 @@ void main() {
     );
 
     testWidgets(
-      'LanguageScope inside FutureBuilder builder - scope works when created dynamically',
+      'LanguageScope inside FutureBuilder builder - scope works when created '
+      'dynamically',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
 

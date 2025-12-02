@@ -43,10 +43,12 @@ void main() {
       );
 
       test('handles locale with country code correctly', () {
-        // isSupported uses exact matching via contains(), so en_US won't match en
+        // isSupported uses exact matching via contains(), so en_US won't
+        // match en
         // unless en_US is explicitly in the locales set
         const enUSLocale = Locale('en', 'US');
-        // Since we only have 'en' in our data, not 'en_US', this should return false
+        // Since we only have 'en' in our data, not 'en_US', this should
+        // return false
         expect(delegate.isSupported(enUSLocale), isFalse);
 
         // But the base 'en' locale should be supported
@@ -135,7 +137,8 @@ void main() {
         // Try to load an unsupported locale (e.g., Chinese)
         await delegate.load(LanguageCodes.zh.locale);
 
-        // Since useInitialCodeWhenUnavailable is false, the language should not change
+        // Since useInitialCodeWhenUnavailable is false, the language should
+        // not change
         // But the method should complete without throwing
         expect(languageHelper.code, equals(initialCode));
       });
@@ -192,11 +195,14 @@ void main() {
           // Create new delegate with Vietnamese
           // Note: Since both delegates share the same languageHelper instance,
           // shouldReload compares the current locale of both helpers.
-          // After the change, both will have the same locale (vi), so shouldReload returns false.
-          // To test shouldReload returning true, we need different helper instances.
+          // After the change, both will have the same locale (vi), so
+          // shouldReload returns false.
+          // To test shouldReload returning true, we need different helper
+          // instances.
           final newDelegate = LanguageDelegate(languageHelper);
 
-          // Both delegates reference the same helper, so they have the same locale
+          // Both delegates reference the same helper, so they have the same
+          // locale
           expect(newDelegate.shouldReload(oldDelegate), isFalse);
         },
       );
@@ -260,8 +266,9 @@ void main() {
           // Change helper2 to same language as helper1
           await helper2.change(LanguageCodes.en);
 
-          // shouldReload should return true because helper instances are different
-          // (implementation checks: languageHelper != old.languageHelper || locale != old.locale)
+          // shouldReload should return true because helper instances are
+          // different (implementation checks: languageHelper !=
+          // old.languageHelper || locale != old.locale)
           expect(delegate2.shouldReload(delegate1), isTrue);
 
           helper1.dispose();
@@ -399,7 +406,8 @@ void main() {
       });
 
       testWidgets(
-        'Separate widget with different LanguageHelper instance updates when main app locale changes',
+        'Separate widget with different LanguageHelper instance updates when '
+        'main app locale changes',
         (tester) async {
           // Create main helper for this test
           final mainHelper = LanguageHelper('WidgetTest2');
@@ -491,10 +499,12 @@ void main() {
             findsOneWidget,
           ); // Separate widget still shows English
 
-          // When MaterialApp's locale changes, Flutter calls load() on delegates that support the locale.
-          // However, Flutter's localization system may only call load() on the primary delegate
-          // or delegates in a specific order. The separate helper's delegate might not be called
-          // automatically. To update the separate widget, we need to manually change its helper's language:
+          // When MaterialApp's locale changes, Flutter calls load() on
+          // delegates that support the locale. However, Flutter's localization
+          // system may only call load() on the primary delegate or delegates
+          // in a specific order. The separate helper's delegate might not be
+          // called automatically. To update the separate widget, we need to
+          // manually change its helper's language:
           await separateHelper.change(LanguageCodes.vi);
           await tester.pumpAndSettle();
 
@@ -506,7 +516,8 @@ void main() {
       );
 
       testWidgets(
-        'Separate widget updates independently when its helper language changes',
+        'Separate widget updates independently when its helper language '
+        'changes',
         (tester) async {
           // Create main helper for this test
           final mainHelper = LanguageHelper('WidgetTest3');
@@ -713,12 +724,14 @@ void main() {
         // Verify locale changed to Vietnamese
         expect(testHelper.code, equals(LanguageCodes.vi));
 
-        // At this point, both delegate1 and a new delegate would have the same locale (vi)
-        // because shouldReload compares current locales, not the locale when delegate was created
+        // At this point, both delegate1 and a new delegate would have the
+        // same locale (vi) because shouldReload compares current locales, not
+        // the locale when delegate was created
         // So shouldReload would return false
 
-        // To test shouldReload returning true, we need to compare with a delegate
-        // that has a different current locale. Let's create a helper with a different locale
+        // To test shouldReload returning true, we need to compare with a
+        // delegate that has a different current locale. Let's create a helper
+        // with a different locale
         final helper2 = LanguageHelper('Helper2');
         addTearDown(helper2.dispose);
 
@@ -729,7 +742,8 @@ void main() {
         );
         final delegate2 = LanguageDelegate(helper2);
 
-        // Now delegate1's helper has vi locale, delegate2's helper has en locale
+        // Now delegate1's helper has vi locale, delegate2's helper has en
+        // locale
         // shouldReload should return true (different locales)
         expect(delegate2.shouldReload(delegate1), isTrue);
 
@@ -753,7 +767,8 @@ void main() {
         expect(testHelper.code, equals(LanguageCodes.en));
 
         final delegate3 = LanguageDelegate(testHelper);
-        // shouldReload should return false (back to original locale, same as delegate1)
+        // shouldReload should return false (back to original locale, same as
+        // delegate1)
         expect(delegate3.shouldReload(delegate1), isFalse);
       });
     });
