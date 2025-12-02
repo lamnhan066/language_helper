@@ -22,11 +22,9 @@ class Utils {
     Map<String, String>? headers,
     http.Client? client,
   }) async {
-    final logger = LiteLogger(
+    const logger = LiteLogger(
       name: 'GetUrl',
-      enabled: true,
       minLevel: LogLevel.debug,
-      usePrint: false,
     );
     client ??= http.Client();
     try {

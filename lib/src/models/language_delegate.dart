@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart' show CupertinoApp;
+import 'package:flutter/material.dart' show MaterialApp;
 import 'package:flutter/widgets.dart';
 import 'package:language_helper/language_helper.dart';
 

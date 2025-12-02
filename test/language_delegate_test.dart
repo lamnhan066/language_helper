@@ -18,7 +18,6 @@ void main() {
       await languageHelper.initial(
         data: dataList,
         initialCode: LanguageCodes.en,
-        useInitialCodeWhenUnavailable: false,
         isAutoSave: false,
       );
       delegate = LanguageDelegate(languageHelper);
@@ -46,7 +45,7 @@ void main() {
       test('handles locale with country code correctly', () {
         // isSupported uses exact matching via contains(), so en_US won't match en
         // unless en_US is explicitly in the locales set
-        final enUSLocale = const Locale('en', 'US');
+        const enUSLocale = Locale('en', 'US');
         // Since we only have 'en' in our data, not 'en_US', this should return false
         expect(delegate.isSupported(enUSLocale), isFalse);
 
@@ -58,7 +57,6 @@ void main() {
         final emptyHelper = LanguageHelper('EmptyHelper');
         await emptyHelper.initial(
           data: [],
-          useInitialCodeWhenUnavailable: false,
           isAutoSave: false,
         );
         final emptyDelegate = LanguageDelegate(emptyHelper);
@@ -243,7 +241,6 @@ void main() {
           await helper1.initial(
             data: dataList,
             initialCode: LanguageCodes.en,
-            useInitialCodeWhenUnavailable: false,
             isAutoSave: false,
           );
           final delegate1 = LanguageDelegate(helper1);
@@ -253,7 +250,6 @@ void main() {
           await helper2.initial(
             data: dataList,
             initialCode: LanguageCodes.vi,
-            useInitialCodeWhenUnavailable: false,
             isAutoSave: false,
           );
           final delegate2 = LanguageDelegate(helper2);
@@ -281,7 +277,6 @@ void main() {
           await helper1.initial(
             data: dataList,
             initialCode: LanguageCodes.en,
-            useInitialCodeWhenUnavailable: false,
             isAutoSave: false,
           );
           final oldDelegate = LanguageDelegate(helper1);
@@ -291,7 +286,6 @@ void main() {
           await helper2.initial(
             data: dataList,
             initialCode: LanguageCodes.vi,
-            useInitialCodeWhenUnavailable: false,
             isAutoSave: false,
           );
           final newDelegate = LanguageDelegate(helper2);
@@ -341,7 +335,6 @@ void main() {
         await testHelper.initial(
           data: dataList,
           initialCode: LanguageCodes.en,
-          useInitialCodeWhenUnavailable: false,
           isAutoSave: false,
         );
 
@@ -415,7 +408,6 @@ void main() {
           await mainHelper.initial(
             data: dataList,
             initialCode: LanguageCodes.en,
-            useInitialCodeWhenUnavailable: false,
             isAutoSave: false,
           );
 
@@ -426,7 +418,6 @@ void main() {
           await separateHelper.initial(
             data: dataList,
             initialCode: LanguageCodes.en,
-            useInitialCodeWhenUnavailable: false,
             isAutoSave: false,
           );
 
@@ -524,7 +515,6 @@ void main() {
           await mainHelper.initial(
             data: dataList,
             initialCode: LanguageCodes.en,
-            useInitialCodeWhenUnavailable: false,
             isAutoSave: false,
           );
 
@@ -535,7 +525,6 @@ void main() {
           await separateHelper.initial(
             data: dataList,
             initialCode: LanguageCodes.en,
-            useInitialCodeWhenUnavailable: false,
             isAutoSave: false,
           );
 
@@ -591,7 +580,6 @@ void main() {
         await testHelper.initial(
           data: dataList,
           initialCode: LanguageCodes.en,
-          useInitialCodeWhenUnavailable: false,
           isAutoSave: false,
         );
 
@@ -622,7 +610,6 @@ void main() {
         await testHelper.initial(
           data: dataList,
           initialCode: LanguageCodes.en,
-          useInitialCodeWhenUnavailable: false,
           isAutoSave: false,
         );
 
@@ -687,7 +674,6 @@ void main() {
         await testHelper.initial(
           data: dataList,
           initialCode: LanguageCodes.en,
-          useInitialCodeWhenUnavailable: false,
           isAutoSave: false,
         );
 
@@ -739,7 +725,6 @@ void main() {
         await helper2.initial(
           data: dataList,
           initialCode: LanguageCodes.en,
-          useInitialCodeWhenUnavailable: false,
           isAutoSave: false,
         );
         final delegate2 = LanguageDelegate(helper2);

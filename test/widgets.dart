@@ -88,7 +88,7 @@ class TrWidget extends StatelessWidget {
 }
 
 class CustomLanguageHelperWidget extends StatelessWidget {
-  const CustomLanguageHelperWidget({super.key, required this.helper});
+  const CustomLanguageHelperWidget({required this.helper, super.key});
 
   final LanguageHelper helper;
 

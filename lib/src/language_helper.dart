@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:language_code/language_code.dart';
+import 'package:language_helper/language_helper.dart';
+import 'package:language_helper/src/language_helper.dart' show LanguageHelper;
+import 'package:language_helper/src/mixins/update_language.dart';
 import 'package:lite_logger/lite_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../language_helper.dart';
-import 'mixins/update_language.dart';
 
 part 'extensions/language_helper_extension.dart';
 part 'widgets/language_builder.dart';
@@ -32,6 +32,17 @@ part 'widgets/language_builder.dart';
 ///
 /// See also: [LanguageDataProvider], [LanguageBuilder], [LanguageScope]
 class LanguageHelper {
+
+  /// Creates a custom helper instance. Prefer [LanguageHelper.instance] when
+  /// possible to enable extension methods (`tr`, `trP`, etc.) throughout
+  /// your app.
+  ///
+  /// Custom instances can be used with:
+  /// - `.trC(helper)` extension method (always available)
+  /// - [LanguageBuilder] or [LanguageScope] (enables `tr`, `trP`, etc. within scope)
+  /// - Direct `translate()` calls
+  ///
+  LanguageHelper(this.prefix);
   // Get the LanguageHelper instance
   static final LanguageHelper instance = LanguageHelper('LanguageHelper');
 
@@ -61,13 +72,11 @@ class LanguageHelper {
     final scope = context.getInheritedWidgetOfExactType<LanguageScope>();
     if (scope == null) {
       assert(() {
-        LiteLogger(
+        const LiteLogger(
           name: 'LanguageHelper',
-          enabled: true,
           minLevel: LogLevel.debug,
-          usePrint: false,
         ).warning(() {
-          final message =
+          const message =
               'No LanguageScope found in widget tree. Using default LanguageHelper.instance. '
               'Wrap your app with LanguageScope to provide a custom helper.';
           return message;
@@ -85,17 +94,6 @@ class LanguageHelper {
 
   @visibleForTesting
   Set<UpdateLanguage> get states => _states;
-
-  /// Creates a custom helper instance. Prefer [LanguageHelper.instance] when
-  /// possible to enable extension methods (`tr`, `trP`, etc.) throughout
-  /// your app.
-  ///
-  /// Custom instances can be used with:
-  /// - `.trC(helper)` extension method (always available)
-  /// - [LanguageBuilder] or [LanguageScope] (enables `tr`, `trP`, etc. within scope)
-  /// - Direct `translate()` calls
-  ///
-  LanguageHelper(this.prefix);
 
   /// Prefix of the key to save the data to `SharedPreferences`.
   final String prefix;
@@ -233,7 +231,7 @@ class LanguageHelper {
   }) async {
     if (isInitialized) return;
 
-    if (_isInitializing) return await ensureInitialized;
+    if (_isInitializing) return ensureInitialized;
     _isInitializing = true;
 
     _data.clear();
@@ -249,7 +247,6 @@ class LanguageHelper {
       name: prefix,
       enabled: isDebug,
       minLevel: LogLevel.debug,
-      usePrint: false,
     );
 
     // When the `data` is empty, a temporary data will be added.
@@ -263,7 +260,7 @@ class LanguageHelper {
       ];
     }
 
-    LanguageCodes finalCode = _initialCode ?? LanguageCode.code;
+    var finalCode = _initialCode ?? LanguageCode.code;
 
     _codes = await _loadCodesFromProviders(_dataProviders);
 
@@ -383,7 +380,7 @@ class LanguageHelper {
     _codes.addAll(result[0] as Iterable<LanguageCodes>);
     final data = result[1] as LanguageData;
 
-    if (data.isNotEmpty && data.containsKey(_currentCode!)) {
+    if (data.isNotEmpty && data.containsKey(_currentCode)) {
       for (final entry in data[_currentCode!]!.entries) {
         if (provider.override) {
           _data[_currentCode!]![entry.key] = entry.value;
@@ -513,8 +510,8 @@ class LanguageHelper {
     _logger?.step(
       () => 'Change language to $toCode for ${_states.length} states',
     );
-    Set<_LanguageBuilderState> needToUpdate = {};
-    for (var state in _states.toList()) {
+    final needToUpdate = <_LanguageBuilderState>{};
+    for (final state in _states.toList()) {
       if (state._forceRebuild) {
         needToUpdate.add(state);
         continue;
@@ -530,7 +527,7 @@ class LanguageHelper {
 
     _logger?.debug(() => 'Need to update ${needToUpdate.length} states');
 
-    for (var state in needToUpdate) {
+    for (final state in needToUpdate) {
       state.updateLanguage();
     }
 

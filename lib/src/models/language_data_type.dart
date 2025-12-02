@@ -1,4 +1,4 @@
-import '../../language_helper.dart';
+import 'package:language_helper/language_helper.dart';
 
 /// Translation data structure: map of [LanguageCodes] to translation maps.
 /// Values can be `String` or [LanguageConditions] for conditional translations.

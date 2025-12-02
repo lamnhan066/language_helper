@@ -21,8 +21,7 @@ part of '../language_helper.dart';
 class LanguageBuilder extends StatefulWidget {
   /// Creates a builder that rebuilds when the language changes.
   const LanguageBuilder({
-    super.key,
-    required this.builder,
+    required this.builder, super.key,
     this.forceRebuild,
     this.languageHelper,
     this.refreshTree = false,

@@ -49,11 +49,9 @@ extension ExportLazyLanguageData on LazyLanguageData {
 /// Exports [LanguageData] to JSON files. Creates `codes.json` and
 /// `data/[code].json` files matching [LanguageDataProvider.asset] structure.
 void _exportJson(LanguageData data, String path) {
-  final logger = LiteLogger(
+  const logger = LiteLogger(
     name: 'ExportJson',
-    enabled: true,
     minLevel: LogLevel.debug,
-    usePrint: false,
   );
   logger.step(
     () => '===========================================================',
@@ -70,15 +68,13 @@ void _exportJson(LanguageData data, String path) {
 /// Exports language codes to `codes.json`. Creates array of language code
 /// strings with formatted JSON.
 void _exportJsonCodes(LanguageData data, String path) {
-  final logger = LiteLogger(
+  const logger = LiteLogger(
     name: 'ExportJsonCodes',
-    enabled: true,
     minLevel: LogLevel.debug,
-    usePrint: false,
   );
   logger.info(() => 'Creating codes.json...');
 
-  JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+  const encoder = JsonEncoder.withIndent('  ');
 
   final desFile = File('$path/codes.json');
   desFile.createSync(recursive: true);
@@ -91,15 +87,13 @@ void _exportJsonCodes(LanguageData data, String path) {
 /// Exports translation data for each language to `data/[code].json` files.
 /// Converts [LanguageConditions] to map format.
 void _exportJsonLanguages(LanguageData data, String path) {
-  final logger = LiteLogger(
+  const logger = LiteLogger(
     name: 'ExportJsonLanguages',
-    enabled: true,
     minLevel: LogLevel.debug,
-    usePrint: false,
   );
   logger.info(() => 'Creating languages json files...');
 
-  JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+  const encoder = JsonEncoder.withIndent('  ');
 
   final desPath = '$path/data/';
   final map = languageDataToMap(data);

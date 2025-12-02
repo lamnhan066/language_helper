@@ -533,7 +533,7 @@ void main() {
       await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
       await helper2.initial(data: dataList, initialCode: LanguageCodes.vi);
 
-      int buildCount = 0;
+      var buildCount = 0;
 
       await tester.pumpWidget(
         MaterialApp(

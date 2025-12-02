@@ -1,4 +1,4 @@
-import '../../language_helper.dart';
+import 'package:language_helper/language_helper.dart';
 
 /// Converts [LanguageData] to a serializable map. Transforms [LanguageCodes]
 /// keys to strings and [LanguageConditions] to map representations. Used for

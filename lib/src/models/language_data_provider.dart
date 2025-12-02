@@ -30,43 +30,6 @@ import 'package:lite_logger/lite_logger.dart';
 /// ]);
 /// ```
 class LanguageDataProvider {
-  /// Loads an asset file from Flutter's asset bundle. Returns empty string if not found.
-  /// Internal method used by [asset] providers.
-  static Future<String> _loadAsset(String path) async {
-    try {
-      return await rootBundle.loadString(path);
-    } catch (_) {
-      LiteLogger(
-        name: 'LoadAsset',
-        enabled: true,
-        minLevel: LogLevel.debug,
-        usePrint: false,
-      ).warning(() => 'The $path does not exist in the assets');
-    }
-    return Future.value('');
-  }
-
-  /// Retrieves translation data for a specific language code. Returns empty
-  /// map if unavailable. For [data] providers, returns the entire
-  /// [LanguageData] map; others return only the requested code.
-  FutureOr<LanguageData> Function(LanguageCodes code) get getData =>
-      _getData ?? (code) => Future.value({});
-  final FutureOr<LanguageData> Function(LanguageCodes code)? _getData;
-
-  /// Retrieves all supported language codes. Returns empty set if provider has
-  /// no data. May perform I/O for asset/network providers. Result is cached
-  /// by [LanguageHelper] after first call.
-  Future<Set<LanguageCodes>> Function() get getSupportedCodes =>
-      _getSupportedCodes ?? () async => {};
-  final Future<Set<LanguageCodes>> Function()? _getSupportedCodes;
-
-  /// Whether this provider overwrites existing translations with matching keys.
-  /// If true (default), overwrites; if false, only adds new keys. Order matters.
-  final bool override;
-
-  /// Returns true if this is an empty provider (no data source). Useful for
-  /// testing or placeholders.
-  bool get isEmpty => _getData == null || _getSupportedCodes == null;
 
   /// Internal constructor for creating a provider with custom getter functions.
   const LanguageDataProvider._(
@@ -97,21 +60,21 @@ class LanguageDataProvider {
   }) {
     return LanguageDataProvider._(
       (code) async {
-        String path = Utils.removeLastSlash(parentPath);
+        final path = Utils.removeLastSlash(parentPath);
         final uri = Uri.parse('$path/data/${code.code}.json');
-        String json = await _loadAsset(uri.path);
+        final json = await _loadAsset(uri.path);
         if (json.isNotEmpty) {
           return {code: LanguageDataSerializer.valuesFromJson(json)};
         }
         return {};
       },
       () async {
-        String path = Utils.removeLastSlash(parentPath);
+        final path = Utils.removeLastSlash(parentPath);
         final uri = Uri.parse('$path/codes.json');
         final json = await _loadAsset(uri.path);
         if (json.isNotEmpty) {
           final decoded = jsonDecode(json).cast<String>() as List<String>;
-          final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
+          final set = decoded.map(LanguageCodes.fromCode).toSet();
           return Future.value(set);
         }
         return {};
@@ -143,21 +106,21 @@ class LanguageDataProvider {
   }) {
     return LanguageDataProvider._(
       (code) async {
-        String path = Utils.removeLastSlash(parentUrl);
+        final path = Utils.removeLastSlash(parentUrl);
         final uri = Uri.parse('$path/data/${code.code}.json');
-        String json = await Utils.getUrl(uri, client: client, headers: headers);
+        final json = await Utils.getUrl(uri, client: client, headers: headers);
         if (json.isNotEmpty) {
           return {code: LanguageDataSerializer.valuesFromJson(json)};
         }
         return {};
       },
       () async {
-        String path = Utils.removeLastSlash(parentUrl);
+        final path = Utils.removeLastSlash(parentUrl);
         final uri = Uri.parse('$path/codes.json');
         final json = await Utils.getUrl(uri, client: client, headers: headers);
         if (json.isNotEmpty) {
           final decoded = jsonDecode(json).cast<String>() as List<String>;
-          final set = decoded.map((e) => LanguageCodes.fromCode(e)).toSet();
+          final set = decoded.map(LanguageCodes.fromCode).toSet();
           return Future.value(set);
         }
         return {};
@@ -221,4 +184,39 @@ class LanguageDataProvider {
       override,
     );
   }
+  /// Loads an asset file from Flutter's asset bundle. Returns empty string if not found.
+  /// Internal method used by [asset] providers.
+  static Future<String> _loadAsset(String path) async {
+    try {
+      return await rootBundle.loadString(path);
+    } catch (_) {
+      const LiteLogger(
+        name: 'LoadAsset',
+        minLevel: LogLevel.debug,
+      ).warning(() => 'The $path does not exist in the assets');
+    }
+    return Future.value('');
+  }
+
+  /// Retrieves translation data for a specific language code. Returns empty
+  /// map if unavailable. For [data] providers, returns the entire
+  /// [LanguageData] map; others return only the requested code.
+  FutureOr<LanguageData> Function(LanguageCodes code) get getData =>
+      _getData ?? (code) => Future.value({});
+  final FutureOr<LanguageData> Function(LanguageCodes code)? _getData;
+
+  /// Retrieves all supported language codes. Returns empty set if provider has
+  /// no data. May perform I/O for asset/network providers. Result is cached
+  /// by [LanguageHelper] after first call.
+  Future<Set<LanguageCodes>> Function() get getSupportedCodes =>
+      _getSupportedCodes ?? () async => {};
+  final Future<Set<LanguageCodes>> Function()? _getSupportedCodes;
+
+  /// Whether this provider overwrites existing translations with matching keys.
+  /// If true (default), overwrites; if false, only adds new keys. Order matters.
+  final bool override;
+
+  /// Returns true if this is an empty provider (no data source). Useful for
+  /// testing or placeholders.
+  bool get isEmpty => _getData == null || _getSupportedCodes == null;
 }

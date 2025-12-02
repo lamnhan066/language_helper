@@ -29,7 +29,6 @@ void main() async {
     await languageHelper.initial(
       data: dataList,
       initialCode: LanguageCodes.en,
-      useInitialCodeWhenUnavailable: false,
       isDebug: true,
       onChanged: (value) {
         debugPrint('onChanged: $value');
@@ -68,7 +67,7 @@ void main() async {
 
         // Use empty providers that return empty codes (not empty provider list)
         await testHelper.initial(
-          data: [LanguageDataProvider.empty()],
+          data: [const LanguageDataProvider.empty()],
           isDebug: true,
         );
 
@@ -109,7 +108,6 @@ void main() async {
       });
       await testHelper.initial(
         data: dataList,
-        useInitialCodeWhenUnavailable: false,
         isDebug: true,
         onChanged: (value) {
           expect(value, isA<LanguageCodes>());
@@ -133,7 +131,6 @@ void main() async {
     test('Get language from prefs and is available in LanguageData', () async {
       await languageHelper.initial(
         data: dataList,
-        useInitialCodeWhenUnavailable: false,
         isDebug: true,
         isAutoSave: false,
         onChanged: (value) {
@@ -149,7 +146,6 @@ void main() async {
         await languageHelper.initial(
           data: dataList,
           initialCode: LanguageCodes.cu,
-          useInitialCodeWhenUnavailable: false,
           isAutoSave: false,
           isDebug: true,
           onChanged: (value) {
@@ -167,7 +163,6 @@ void main() async {
       LanguageCode.setTestCode(LanguageCodes.cu);
       await languageHelper.initial(
         data: dataList,
-        useInitialCodeWhenUnavailable: false,
         syncWithDevice: false,
         isAutoSave: false,
         isDebug: true,
@@ -177,9 +172,7 @@ void main() async {
       );
     });
 
-    tearDown(() {
-      LanguageCode.setTestCode();
-    });
+    tearDown(LanguageCode.setTestCode);
 
     test('Get the first code in `data` if current locale is not available', () {
       expect(
@@ -190,9 +183,7 @@ void main() async {
   });
 
   group('Test for [codes]', () {
-    tearDown(() {
-      LanguageCode.setTestCode();
-    });
+    tearDown(LanguageCode.setTestCode);
 
     test('[data] has more LanguageCodes than [dataOverrides]', () async {
       final testHelper = LanguageHelper('TestCodes1');
@@ -210,7 +201,6 @@ void main() async {
           LanguageDataProvider.data(data),
           LanguageDataProvider.data(dataOverrides),
         ],
-        useInitialCodeWhenUnavailable: false,
         isAutoSave: false,
         isDebug: true,
         onChanged: (value) {
@@ -239,7 +229,6 @@ void main() async {
           LanguageDataProvider.data(data),
           LanguageDataProvider.data(dataOverrides),
         ],
-        useInitialCodeWhenUnavailable: false,
         isAutoSave: false,
         isDebug: true,
         onChanged: (value) {
@@ -278,7 +267,6 @@ void main() async {
       await testHelper.initial(
         data: dataList,
         initialCode: LanguageCodes.en,
-        useInitialCodeWhenUnavailable: false,
       );
       await testHelper.change(LanguageCodes.vi);
       expect(testHelper.code, equals(LanguageCodes.vi));
@@ -294,7 +282,6 @@ void main() async {
       SharedPreferences.setMockInitialValues({});
       await testHelper.initial(
         data: dataList,
-        useInitialCodeWhenUnavailable: false,
       );
       await testHelper.change(LanguageCodes.vi);
       expect(testHelper.code, equals(LanguageCodes.vi));
@@ -534,15 +521,15 @@ void main() async {
     });
 
     test('equality and hashCode', () {
-      final conditions1 = const LanguageConditions(
+      const conditions1 = LanguageConditions(
         param: 'number',
         conditions: {'0': 'zero', 'default': 'default'},
       );
-      final conditions2 = const LanguageConditions(
+      const conditions2 = LanguageConditions(
         param: 'number',
         conditions: {'0': 'zero', 'default': 'default'},
       );
-      final conditions3 = const LanguageConditions(
+      const conditions3 = LanguageConditions(
         param: 'count',
         conditions: {'0': 'zero', 'default': 'default'},
       );
@@ -553,7 +540,7 @@ void main() async {
     });
 
     test('empty conditions', () {
-      final emptyConditions = const LanguageConditions(
+      const emptyConditions = LanguageConditions(
         param: 'test',
         conditions: {},
       );
@@ -657,7 +644,7 @@ void main() async {
     });
 
     test('LanguageDataSerializer valuesFromJson with LanguageConditions', () {
-      final json = '''
+      const json = '''
       {
         "Hello": "Hello",
         "Count": {
@@ -698,7 +685,7 @@ void main() async {
       expect(testHelper.code, equals(LanguageCodes.vi));
     });
 
-    test('true and haven\'t local database', () async {
+    test("true and haven't local database", () async {
       final testHelper = LanguageHelper('TestSyncDevice2');
       addTearDown(testHelper.dispose);
 
@@ -707,7 +694,6 @@ void main() async {
       await testHelper.initial(
         data: dataList,
         initialCode: LanguageCodes.vi,
-        syncWithDevice: true,
       );
 
       expect(testHelper.code, equals(LanguageCodes.vi));
@@ -721,7 +707,7 @@ void main() async {
 
         SharedPreferences.setMockInitialValues({});
         LanguageCode.setTestCode(LanguageCodes.zh_TW);
-        await testHelper.initial(data: dataAdds, syncWithDevice: true);
+        await testHelper.initial(data: dataAdds);
 
         expect(testHelper.code, equals(LanguageCodes.zh));
       },
@@ -737,7 +723,6 @@ void main() async {
         LanguageCode.setTestCode(LanguageCodes.zh_TW);
         await testHelper.initial(
           data: dataAdds,
-          syncWithDevice: true,
           isOptionalCountryCode: false,
         );
 
@@ -756,7 +741,6 @@ void main() async {
       await testHelper.initial(
         data: dataList,
         initialCode: LanguageCodes.vi,
-        syncWithDevice: true,
       );
 
       expect(testHelper.code, equals(LanguageCodes.vi));
@@ -773,7 +757,6 @@ void main() async {
       await testHelper.initial(
         data: dataList,
         initialCode: LanguageCodes.vi,
-        syncWithDevice: true,
       );
 
       expect(testHelper.code, equals(LanguageCodes.en));
@@ -792,7 +775,6 @@ void main() async {
         await testHelper.initial(
           data: dataList,
           initialCode: LanguageCodes.vi,
-          syncWithDevice: true,
           isDebug: true,
         );
 
@@ -813,7 +795,6 @@ void main() async {
         await testHelper.initial(
           data: dataList,
           initialCode: LanguageCodes.vi,
-          syncWithDevice: true,
           isDebug: true,
         );
 
@@ -909,7 +890,7 @@ void main() async {
     });
 
     testWidgets('Tr rebuilds only itself on language change', (tester) async {
-      int buildCount = 0;
+      var buildCount = 0;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -935,8 +916,8 @@ void main() async {
     testWidgets(
       'Only the outermost LanguageBuilder triggers a rebuild on language change',
       (tester) async {
-        int outerBuilds = 0;
-        int innerBuilds = 0;
+        var outerBuilds = 0;
+        var innerBuilds = 0;
 
         await tester.pumpWidget(
           MaterialApp(
@@ -1012,8 +993,8 @@ void main() async {
     testWidgets(
       'Only the outermost LanguageBuilder triggers a rebuild on language change',
       (tester) async {
-        int outerBuilds = 0;
-        int innerBuilds = 0;
+        var outerBuilds = 0;
+        var innerBuilds = 0;
 
         await tester.pumpWidget(
           MaterialApp(
@@ -1097,7 +1078,7 @@ void main() async {
 
     test('export lazy language data', () {
       final dir = Directory('./test/export_lazy');
-      LazyLanguageData lazyData = {
+      final LazyLanguageData lazyData = {
         LanguageCodes.en: () => {'Hello': 'Hello'},
         LanguageCodes.vi: () => {'Hello': 'Xin Chào'},
       };
@@ -1263,8 +1244,8 @@ void main() async {
       await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
       await helper2.initial(data: dataList, initialCode: LanguageCodes.en);
 
-      int buildCount1 = 0;
-      int buildCount2 = 0;
+      var buildCount1 = 0;
+      var buildCount2 = 0;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -1453,7 +1434,7 @@ void main() async {
       // languageHelper is already initialized in setUpAll()
       // Ensure we're in English mode
       await languageHelper.change(LanguageCodes.en);
-      int buildCount = 0;
+      var buildCount = 0;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -1485,7 +1466,7 @@ void main() async {
       // languageHelper is already initialized in setUpAll()
       // Ensure we're in English mode
       await languageHelper.change(LanguageCodes.en);
-      int buildCount = 0;
+      var buildCount = 0;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -1623,7 +1604,6 @@ void main() async {
       };
       final providerWithOverride = LanguageDataProvider.data(
         dataToAdd,
-        override: true,
       );
       await languageHelper.addProvider(providerWithOverride);
       await languageHelper.reload();
@@ -1646,7 +1626,6 @@ void main() async {
       };
       final providerWithOverride = LanguageDataProvider.data(
         dataToAdd,
-        override: true,
       );
       await languageHelper.addProvider(providerWithOverride);
       languageHelper.reload();
@@ -1665,7 +1644,7 @@ void main() async {
 
       final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
 
-      LazyLanguageData lazyData = {
+      final LazyLanguageData lazyData = {
         LanguageCodes.en: () {
           callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
           return Map<String, dynamic>.from(data[LanguageCodes.en]!);
@@ -1684,7 +1663,6 @@ void main() async {
         initialCode: LanguageCodes.en,
         syncWithDevice: false,
         isAutoSave: false,
-        useInitialCodeWhenUnavailable: false,
       );
 
       expect(helper.code, equals(LanguageCodes.en));
@@ -1698,7 +1676,7 @@ void main() async {
 
       final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
 
-      LazyLanguageData lazyData = {
+      final LazyLanguageData lazyData = {
         LanguageCodes.en: () {
           callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
           return Map<String, dynamic>.from(data[LanguageCodes.en]!);
@@ -1717,7 +1695,6 @@ void main() async {
         initialCode: LanguageCodes.en,
         syncWithDevice: false,
         isAutoSave: false,
-        useInitialCodeWhenUnavailable: false,
       );
 
       expect(helper.translate('Hello'), equals('Hello'));
@@ -1738,7 +1715,7 @@ void main() async {
 
         final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
 
-        LazyLanguageData lazyData = {
+        final LazyLanguageData lazyData = {
           LanguageCodes.en: () {
             callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
             return Map<String, dynamic>.from(data[LanguageCodes.en]!);
@@ -1757,7 +1734,6 @@ void main() async {
           initialCode: LanguageCodes.en,
           syncWithDevice: false,
           isAutoSave: false,
-          useInitialCodeWhenUnavailable: false,
         );
 
         // Initial load
@@ -1802,7 +1778,6 @@ void main() async {
         initialCode: LanguageCodes.en,
         syncWithDevice: false,
         isAutoSave: false,
-        useInitialCodeWhenUnavailable: false,
       );
 
       // Initial state
@@ -1832,7 +1807,7 @@ void main() async {
 
         final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
 
-        LazyLanguageData lazyData = {
+        final LazyLanguageData lazyData = {
           LanguageCodes.en: () {
             callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
             return Map<String, dynamic>.from(data[LanguageCodes.en]!);
@@ -1851,7 +1826,6 @@ void main() async {
           initialCode: LanguageCodes.en,
           syncWithDevice: false,
           isAutoSave: false,
-          useInitialCodeWhenUnavailable: false,
         );
 
         // Switch between languages multiple times
@@ -1992,7 +1966,7 @@ void main() async {
       });
       final provider2 = LanguageDataProvider.data({
         LanguageCodes.en: {'Key2': 'Value2'},
-      }, override: true);
+      });
 
       await testHelper.initial(
         data: [provider1, provider2],
@@ -2020,7 +1994,7 @@ void main() async {
           .setMockMessageHandler('flutter/assets', (message) async {
             if (message == null) return null;
 
-            final String assetKey = utf8.decode(message.buffer.asUint8List());
+            final assetKey = utf8.decode(message.buffer.asUint8List());
             return mockAssets.containsKey(assetKey)
                 ? ByteData.view(
                     Uint8List.fromList(mockAssets[assetKey]!.codeUnits).buffer,
@@ -2083,7 +2057,7 @@ void main() async {
     });
 
     test('empty data provider', () async {
-      final data = LanguageDataProvider.empty();
+      const data = LanguageDataProvider.empty();
       expect(data.isEmpty, equals(true));
       expect(await data.getData(LanguageCodes.en), isEmpty);
       expect(await data.getSupportedCodes(), isEmpty);
@@ -2165,14 +2139,12 @@ void main() async {
       await helper1.initial(
         data: dataList,
         initialCode: LanguageCodes.en,
-        isAutoSave: true,
         syncWithDevice: false,
       );
 
       await helper2.initial(
         data: dataList,
         initialCode: LanguageCodes.vi,
-        isAutoSave: true,
         syncWithDevice: false,
       );
 
@@ -2201,7 +2173,6 @@ void main() async {
         await helper1.initial(
           data: dataList,
           initialCode: LanguageCodes.en,
-          isAutoSave: true,
           syncWithDevice: false,
         );
 
@@ -2212,7 +2183,6 @@ void main() async {
         await helper2.initial(
           data: dataList,
           initialCode: LanguageCodes.en,
-          isAutoSave: true,
           syncWithDevice: false,
         );
 
@@ -2339,7 +2309,6 @@ void main() async {
       await helper.initial(
         data: dataList,
         initialCode: LanguageCodes.cu, // Not in data
-        useInitialCodeWhenUnavailable: false,
       );
       expect(
         helper.code,
@@ -2351,8 +2320,6 @@ void main() async {
       final helper = LanguageHelper('TestHelper');
       await helper.initial(
         data: dataList,
-        initialCode: null,
-        useInitialCodeWhenUnavailable: false,
       );
       expect(
         helper.code,
@@ -2372,7 +2339,7 @@ void main() async {
       addTearDown(helper.dispose);
 
       // Create a lazy provider that hasn't loaded vi yet
-      LazyLanguageData lazyData = {
+      final LazyLanguageData lazyData = {
         LanguageCodes.en: () => {'Hello': 'Hello'},
         LanguageCodes.vi: () => {'Hello': 'Xin Chào'},
       };
@@ -2421,7 +2388,7 @@ void main() async {
       final helper = LanguageHelper('TestHelper');
       await helper.initial(data: dataList, initialCode: LanguageCodes.en);
 
-      int streamCount = 0;
+      var streamCount = 0;
       final subscription = helper.stream.listen((_) {
         streamCount++;
       });
@@ -2598,7 +2565,6 @@ void main() async {
       await helper2.initial(
         data: dataList,
         initialCode: LanguageCodes.en,
-        isDebug: false,
       );
       expect(helper2.isDebug, equals(false));
 
@@ -2892,7 +2858,7 @@ void main() async {
         // This might create a race condition where root.mounted is false
         final changeFuture = helper2.change(LanguageCodes.vi);
         await tester.pumpWidget(
-          MaterialApp(home: Scaffold(body: Text('Disposed'))),
+          const MaterialApp(home: Scaffold(body: Text('Disposed'))),
         );
         await changeFuture;
         await tester.pumpAndSettle();
