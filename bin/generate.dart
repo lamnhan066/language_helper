@@ -1,6 +1,6 @@
-// ignore_for_file: avoid_print
-
 import 'dart:io';
+
+import 'package:lite_logger/lite_logger.dart';
 
 /// Executes the isolate manager generator with the provided arguments.
 ///
@@ -15,14 +15,16 @@ import 'dart:io';
 ///   4: Main function has no open braces
 ///   5: File not found
 ///
-///   11: Could not find package `language_helper_generator` or file `language_helper_generator`
+///   11: Could not find package `language_helper_generator` or file
+///   `language_helper_generator`
 ///
 ///   111: Unknown error
 void main(List<String> args) async {
+  const logger = LiteLogger(name: 'LanguageHelper Generator');
   final isGeneratorInstalled = _isGeneratorInstalled();
   if (!isGeneratorInstalled) {
     if (args.contains('--add-generator')) {
-      print('Adding language_helper_generator to dev dependencies...');
+      logger.info('Adding language_helper_generator to dev dependencies...');
 
       final addProcess = await Process.run('dart', [
         'pub',
@@ -32,13 +34,15 @@ void main(List<String> args) async {
       ]);
 
       if (addProcess.exitCode != 0) {
-        print('Failed to add language_helper_generator: ${addProcess.stderr}');
+        logger.error(
+          'Failed to add language_helper_generator: ${addProcess.stderr}',
+        );
         exit(1);
       }
 
-      print('Added language_helper_generator to dev dependencies.');
+      logger.info('Added language_helper_generator to dev dependencies.');
     } else {
-      print(
+      logger.error(
         'Missing dependency: `language_helper_generator`.\n'
         'To fix this, you have two options:\n'
         '1. Run: `dart pub add language_helper_generator --dev`\n'
