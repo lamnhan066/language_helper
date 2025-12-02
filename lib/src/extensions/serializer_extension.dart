@@ -32,7 +32,7 @@ extension LanguageDataSerializer on LanguageData {
   /// final languageData = LanguageDataSerializer.fromJson(json);
   /// ```
   static LanguageData fromJson(String json) {
-    return fromMap(jsonDecode(json));
+    return fromMap(jsonDecode(json) as Map<String, dynamic>);
   }
 
   /// Converts a map to [LanguageData]. Inverse of [toMap].
@@ -50,6 +50,8 @@ extension LanguageDataSerializer on LanguageData {
   /// Converts condition maps to [LanguageConditions]. Used internally by
   /// [LanguageDataProvider.asset] and [LanguageDataProvider.network].
   static Map<String, dynamic> valuesFromJson(String json) {
-    return s.languageDataValuesFromMap(jsonDecode(json));
+    return s.languageDataValuesFromMap(
+      jsonDecode(json) as Map<String, dynamic>,
+    );
   }
 }

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 class LanguageConditions {
-
   /// Conditional translations based on parameter values. [param] must match
   /// the parameter in the text (specified by @ or @{}). Use `'_'` (recommended)
   /// or `'default'` (legacy) for fallback.
@@ -35,8 +34,8 @@ class LanguageConditions {
   /// ```
   factory LanguageConditions.fromMap(Map<String, dynamic> map) {
     return LanguageConditions(
-      param: map['param'] ?? '',
-      conditions: Map<String, dynamic>.from(map['conditions']),
+      param: map['param'] as String? ?? '',
+      conditions: map['conditions'] as Map<String, dynamic>,
     );
   }
 
@@ -50,7 +49,8 @@ class LanguageConditions {
   /// final condition = LanguageConditions.fromJson(jsonString);
   /// ```
   factory LanguageConditions.fromJson(String source) =>
-      LanguageConditions.fromMap(json.decode(source));
+      LanguageConditions.fromMap(json.decode(source) as Map<String, dynamic>);
+
   /// The parameter that you want to use the conditions.
   final String param;
 

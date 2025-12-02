@@ -23,7 +23,7 @@ Map<String, dynamic> languageDataToMap(LanguageData data) {
 LanguageData languageDataFromMap(Map<String, dynamic> map) {
   return map.map((key, value) {
     // Reorganize the `value` back to String and LanguageCondition
-    value = languageDataValuesFromMap(value);
+    value = languageDataValuesFromMap(value as Map<String, dynamic>);
     return MapEntry(LanguageCodes.fromCode(key), value.cast<String, dynamic>());
   });
 }
