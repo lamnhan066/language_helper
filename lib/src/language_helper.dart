@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:language_code/language_code.dart';
@@ -60,11 +61,7 @@ class LanguageHelper {
   static LanguageHelper of(BuildContext context) {
     final scope = context.getInheritedWidgetOfExactType<LanguageScope>();
     if (scope == null) {
-      // Log once per context to avoid spam
-      final contextId = identityHashCode(context);
-      if (!_noScopeLoggedContexts.contains(contextId)) {
-        _noScopeLoggedContexts.add(contextId);
-
+      assert(() {
         LiteLogger(
           name: 'LanguageHelper',
           enabled: true,
@@ -76,14 +73,13 @@ class LanguageHelper {
               'Wrap your app with LanguageScope to provide a custom helper.';
           return message;
         });
-      }
+        return true;
+      }());
+
       return LanguageHelper.instance;
     }
     return scope.languageHelper;
   }
-
-  /// Tracks contexts where "no scope" message was logged to prevent duplicates.
-  static final Set<int> _noScopeLoggedContexts = {};
 
   /// To control [LanguageBuilder]
   final Set<_LanguageBuilderState> _states = {};
@@ -272,10 +268,10 @@ class LanguageHelper {
 
     _codes = await _loadCodesFromProviders(_dataProviders);
 
-    assert(
-      _codes.isNotEmpty,
-      'The LanguageData in the `data` must be not empty',
-    );
+    if (_codes.isEmpty) {
+      _logger?.error(() => 'The LanguageData in the `data` is empty');
+      return;
+    }
 
     // Try to reload from memory if `isAutoSave` is `true`
     if (_isAutoSave) {
@@ -518,7 +514,7 @@ class LanguageHelper {
       () => 'Change language to $toCode for ${_states.length} states',
     );
     Set<_LanguageBuilderState> needToUpdate = {};
-    for (var state in _states) {
+    for (var state in _states.toList()) {
       if (state._forceRebuild) {
         needToUpdate.add(state);
         continue;
@@ -546,9 +542,8 @@ class LanguageHelper {
     // Save to local memory
     if (_isAutoSave) {
       _logger?.debug(() => 'Save this $toCode to local memory');
-      SharedPreferences.getInstance().then((pref) {
-        pref.setString(_autoSaveCodeKey, toCode.code);
-      });
+      final pref = await SharedPreferences.getInstance();
+      await pref.setString(_autoSaveCodeKey, toCode.code);
     }
 
     _logger?.step(() => 'Changing completed!');
