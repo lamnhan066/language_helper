@@ -2,7 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
+/// Conditional translations based on parameter values.
+@immutable
 class LanguageConditions {
+  /// Creates a new [LanguageConditions] instance.
+  ///
+  /// Parameters:
+  /// - [param]: The parameter that you want to use the conditions.
+  /// - [conditions]: The map of conditions.
+  ///
+  /// Example:
   /// Conditional translations based on parameter values. [param] must match
   /// the parameter in the text (specified by @ or @{}). Use `'_'` (recommended)
   /// or `'default'` (legacy) for fallback.
@@ -73,7 +82,7 @@ class LanguageConditions {
     return {'param': param, 'conditions': conditions};
   }
 
-  /// Converts to a JSON string. Inverse of [fromJson].
+  /// Converts to a JSON string. Inverse of `fromJson`.
   String toJson() => json.encode(toMap());
 
   @override

@@ -13,11 +13,12 @@ class Utils {
   ///
   /// Returns the path with all trailing slashes removed.
   static String removeLastSlash(String path) {
-    while (path.endsWith('/')) {
-      path = path.substring(0, path.length - 1);
+    var pathString = path;
+    while (pathString.endsWith('/')) {
+      pathString = pathString.substring(0, pathString.length - 1);
     }
 
-    return path;
+    return pathString;
   }
 
   /// Fetches content from a network URL using HTTP GET. Returns UTF-8 decoded
@@ -52,9 +53,12 @@ class Utils {
       } else {
         logger.warning(
           () =>
-              'Failed to load data from URL. Status code: ${response.statusCode}',
+              'Failed to load data from URL. Status code: '
+              '${response.statusCode}',
         );
       }
+      // Catch the error when the URL is not found.
+      // ignore: avoid_catches_without_on_clauses
     } catch (e) {
       logger.error(() => 'Error fetching data from URL: $e');
     }

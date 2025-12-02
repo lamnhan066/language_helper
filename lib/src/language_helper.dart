@@ -78,12 +78,13 @@ class LanguageHelper {
           minLevel: LogLevel.debug,
         ).warning(() {
           const message =
-              'No LanguageScope found in widget tree. Using default LanguageHelper.instance. '
+              'No LanguageScope found in widget tree. '
+              'Using default LanguageHelper.instance. '
               'Wrap your app with LanguageScope to provide a custom helper.';
           return message;
         });
         return true;
-      }());
+      }(), 'No LanguageScope found in widget tree');
 
       return LanguageHelper.instance;
     }
@@ -131,10 +132,10 @@ class LanguageHelper {
   Locale get locale => code.locale;
 
   /// The initial language code, used as fallback when
-  /// [useInitialCodeWhenUnavailable] is true.
+  /// `useInitialCodeWhenUnavailable` is true.
   LanguageCodes? _initialCode;
 
-  /// Whether to fall back to [initialCode] when an unavailable language is
+  /// Whether to fall back to `_initialCode` when an unavailable language is
   /// requested.
   bool _useInitialCodeWhenUnavailable = false;
 
@@ -161,7 +162,7 @@ class LanguageHelper {
       StreamController.broadcast();
 
   /// Whether debug logging is enabled. When true, logs language changes,
-  /// translation lookups, and other operations using [lite_logger].
+  /// translation lookups, and other operations using `lite_logger`.
   bool get isDebug => _isDebug;
   bool _isDebug = false;
 
@@ -216,10 +217,10 @@ class LanguageHelper {
     /// language if null.
     LanguageCodes? initialCode,
 
-    /// Use [initialCode] as fallback when changing to unavailable languages.
+    /// Use `initialCode` as fallback when changing to unavailable languages.
     bool useInitialCodeWhenUnavailable = false,
 
-    /// Default [forceRebuild] value for all [LanguageBuilder] widgets.
+    /// Default `forceRebuild` value for all `LanguageBuilder` widgets.
     bool forceRebuild = true,
 
     /// Automatically save/restore language preference to SharedPreferences.
@@ -262,7 +263,8 @@ class LanguageHelper {
     if (_dataProviders.isEmpty) {
       _logger?.info(
         () =>
-            'The `data` is empty, we will use a temporary `data` for the developing state',
+            'The `data` is empty, we will use a temporary `data` '
+            'for the developing state',
       );
       _dataProviders = [
         LanguageDataProvider.data({LanguageCodes.en: {}}),
@@ -299,19 +301,21 @@ class LanguageHelper {
 
       if (prefCodeCode == null) {
         // Sync with device only track the changing of the device language,
-        // so it will not use the device language for the app at the first time.
-        prefs.setString(_deviceCodeKey, currentCode.code);
+        // so it will not use the device language for the app at the first
+        // time.
+        await prefs.setString(_deviceCodeKey, currentCode.code);
         _logger?.info(
           () =>
               'Sync with device saved the current language to local database.',
         );
       } else {
-        // We only consider to change the app language when the device language
-        // is changed. So it will not affect the app language that is set by the user.
+        // We only consider to change the app language when the device
+        // language is changed. So it will not affect the app language that
+        // is set by the user.
         final prefCode = LanguageCodes.fromCode(prefCodeCode);
         if (currentCode != prefCode) {
           finalCode = currentCode;
-          prefs.setString(_deviceCodeKey, currentCode.code);
+          await prefs.setString(_deviceCodeKey, currentCode.code);
           _logger?.step(
             () => 'Sync with device applied the new device language',
           );
@@ -326,29 +330,34 @@ class LanguageHelper {
     if (!codes.contains(finalCode)) {
       LanguageCodes? tempCode;
       if (isOptionalCountryCode && finalCode.locale.countryCode != null) {
-        // Try to use the `languageCode` only if the `languageCode_countryCode`
-        // is not available
+        // Try to use the `languageCode` only if the
+        // `languageCode_countryCode` is not available
         _logger?.info(
           () =>
-              'language does not contain the $finalCode => Try to use the `languageCode` only..',
+              'language does not contain the $finalCode => '
+              'Try to use the `languageCode` only..',
         );
         try {
           tempCode = LanguageCodes.fromCode(finalCode.locale.languageCode);
           if (!codes.contains(tempCode)) {
             tempCode = null;
           }
+          // Catch the error when the language code is not valid.
+          // ignore: avoid_catches_without_on_clauses
         } catch (_) {}
       }
 
       if (tempCode == null) {
         _logger?.info(
           () =>
-              'Unable to use the `languageCode` only => Change the code to ${codes.first}',
+              'Unable to use the `languageCode` only => '
+              'Change the code to ${codes.first}',
         );
       } else {
         _logger?.info(
           () =>
-              'Able to use the `languageCode` only => Change the code to $tempCode',
+              'Able to use the `languageCode` only => '
+              'Change the code to $tempCode',
         );
       }
 
@@ -376,7 +385,9 @@ class LanguageHelper {
   /// After calling [dispose], the helper should not be used anymore.
   /// Any attempts to use it may result in errors.
   void dispose() {
-    _streamController.close();
+    // StreamController.close() returns a Future but we don't need to await
+    // it since we're disposing the controller and won't use it anymore.
+    unawaited(_streamController.close());
   }
 
   /// Adds a provider dynamically at runtime. If [activate] is true (default),
@@ -409,7 +420,8 @@ class LanguageHelper {
     if (activate) await reload();
     _logger?.info(
       () =>
-          'The new `provider` is added and activated with override is ${provider.override}',
+          'The new `provider` is added and activated with override is '
+          '${provider.override}',
     );
   }
 
@@ -433,7 +445,8 @@ class LanguageHelper {
     if (activate) await reload();
     _logger?.info(
       () =>
-          'The `provider` is removed and activated with override is ${provider.override}',
+          'The `provider` is removed and activated with override is '
+          '${provider.override}',
     );
   }
 
@@ -459,7 +472,8 @@ class LanguageHelper {
     if (!codes.contains(toCode)) {
       _logger?.warning(
         () =>
-            'Cannot translate this text because $toCode is not available in `data` ($text)',
+            'Cannot translate this text because $toCode is not available '
+            'in `data` ($text)',
       );
       return _replaceParams(text, stringParams);
     }
@@ -483,8 +497,9 @@ class LanguageHelper {
   /// without changing language. Equivalent to `change(code)`.
   Future<void> reload() => change(code);
 
-  /// Switches to [toCode] and reloads translations. Falls back to [initialCode]
-  /// if [toCode] is unavailable and [useInitialCodeWhenUnavailable] is true.
+  /// Switches to [toCode] and reloads translations. Falls back to
+  /// `_initialCode` if [toCode] is unavailable and
+  /// `useInitialCodeWhenUnavailable` is true.
   ///
   /// **Note:** This method will always reload the translations from all
   /// providers even if the translations were previously loaded or `toCode`
@@ -499,20 +514,24 @@ class LanguageHelper {
       if (!_useInitialCodeWhenUnavailable) {
         _logger?.info(
           () =>
-              'Does not allow using the initial code => Cannot change the language.',
+              'Does not allow using the initial code => '
+              'Cannot change the language.',
         );
         return;
       } else {
         if (codes.contains(_initialCode)) {
           _logger?.step(
             () =>
-                '`useInitialCodeWhenUnavailable` is true => Change the language to $_initialCode',
+                '`useInitialCodeWhenUnavailable` is true => '
+                'Change the language to $_initialCode',
           );
           _currentCode = _initialCode;
         } else {
           _logger?.warning(
             () =>
-                '`useInitialCodeWhenUnavailable` is true but the `initialCode` is not available in `data` => Cannot change the language',
+                '`useInitialCodeWhenUnavailable` is true but the '
+                '`initialCode` is not available in `data` => '
+                'Cannot change the language',
           );
           return;
         }
@@ -549,9 +568,7 @@ class LanguageHelper {
     }
 
     _streamController.sink.add(toCode);
-    if (_onChanged != null) {
-      _onChanged!(toCode);
-    }
+    _onChanged?.call(toCode);
 
     // Save to local memory
     if (_isAutoSave) {
@@ -563,19 +580,20 @@ class LanguageHelper {
     _logger?.step(() => 'Changing completed!');
   }
 
-  /// Sets whether to fall back to [initialCode] when changing to unavailable
+  /// Sets whether to fall back to `_initialCode` when changing to unavailable
   /// languages.
   ///
   /// Parameters:
-  /// - [newValue]: If `true`, when [change] is called with an unavailable
-  ///   language code, the helper will fall back to [initialCode] (if it's
+  /// - [value]: If `true`, when [change] is called with an unavailable
+  ///   language code, the helper will fall back to `_initialCode` (if it's
   ///   available). If `false`, [change] will fail silently when an
   ///   unavailable language is requested.
   ///
   /// This setting can also be configured during [initial] via the
   /// `useInitialCodeWhenUnavailable` parameter.
-  void setUseInitialCodeWhenUnavailable(bool newValue) {
-    _useInitialCodeWhenUnavailable = newValue;
+  // ignore: avoid_positional_boolean_parameters, use_setters_to_change_properties
+  void setUseInitialCodeWhenUnavailable(bool value) {
+    _useInitialCodeWhenUnavailable = value;
   }
 
   /// Replaces parameter placeholders (`@{paramName}` or `@paramName`) in
@@ -583,13 +601,14 @@ class LanguageHelper {
   String _replaceParams(dynamic input, Map<String, dynamic> params) {
     if (params.isEmpty) return '$input';
 
+    var result = '$input';
     params.forEach((key, value) {
       // @param and end with space, end of line, new line.
-      input = '$input'.replaceAll('@{$key}', '$value');
-      input = '$input'.replaceAll(RegExp('@$key(?=\\s|\$|\\n)'), '$value');
+      result = result.replaceAll('@{$key}', '$value');
+      result = result.replaceAll(RegExp('@$key(?=\\s|\$|\\n)'), '$value');
     });
 
-    return input as String;
+    return result;
   }
 
   /// Evaluates [LanguageConditions] based on [params] and replaces parameters
@@ -603,7 +622,8 @@ class LanguageHelper {
     if (!params.containsKey(translateCondition.param)) {
       _logger?.warning(
         () =>
-            'The params does not contain the condition param: ${translateCondition.param}',
+            'The params does not contain the condition param: '
+            '${translateCondition.param}',
       );
       return _replaceParams(fallback, params);
     }
@@ -616,7 +636,8 @@ class LanguageHelper {
     if (translated == null) {
       _logger?.warning(
         () =>
-            'There is no result for key $param of condition ${translateCondition.param}',
+            'There is no result for key $param of condition '
+            '${translateCondition.param}',
       );
       return _replaceParams(fallback, params);
     }
@@ -641,7 +662,7 @@ class LanguageHelper {
     LanguageCodes code,
     Iterable<LanguageDataProvider> providers,
   ) async {
-    final LanguageData data = {};
+    final data = <LanguageCodes, Map<String, dynamic>>{};
 
     for (final provider in providers) {
       final providerData = await provider.getData(code);
@@ -661,6 +682,9 @@ class LanguageHelper {
   }
 
   @override
+  // LanguageHelper instances are compared by prefix for equality, which is
+  // stable even though the class is mutable.
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
@@ -668,5 +692,8 @@ class LanguageHelper {
   }
 
   @override
+  // LanguageHelper instances use prefix for hashCode, which is stable even
+  // though the class is mutable.
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
   int get hashCode => prefix.hashCode;
 }

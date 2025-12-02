@@ -14,8 +14,8 @@ import 'package:language_helper/src/language_helper.dart'
 /// **Implementation:**
 /// - Override [updateLanguage] to perform the update (typically calling
 ///   `setState`).
-/// - Widgets using this mixin are automatically registered with [LanguageHelper]
-///   and will receive update notifications.
+/// - Widgets using this mixin are automatically registered with
+///   [LanguageHelper] and will receive update notifications.
 ///
 /// **Example:**
 /// ```dart
@@ -38,7 +38,8 @@ import 'package:language_helper/src/language_helper.dart'
 /// ```
 mixin UpdateLanguage {
   /// Called by [LanguageHelper] when the language changes. Override this method
-  /// to handle the update (typically by calling `setState` to trigger a rebuild).
+  /// to handle the update (typically by calling `setState` to trigger
+  /// a rebuild).
   ///
   /// **Important:** Always check `mounted` before calling `setState` in Flutter
   /// widgets to avoid calling setState on a disposed widget.

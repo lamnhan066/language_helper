@@ -51,35 +51,35 @@ extension ExportLazyLanguageData on LazyLanguageData {
 /// Exports [LanguageData] to JSON files. Creates `codes.json` and
 /// `data/[code].json` files matching [LanguageDataProvider.asset] structure.
 void _exportJson(LanguageData data, String path) {
-  const logger = LiteLogger(
-    name: 'ExportJson',
-    minLevel: LogLevel.debug,
-  );
-  logger.step(
-    () => '===========================================================',
-  );
-  logger.step(() => 'Exporting Json...');
+  final logger =
+      const LiteLogger(
+          name: 'ExportJson',
+          minLevel: LogLevel.debug,
+        )
+        ..step(
+          () => '===========================================================',
+        )
+        ..step(() => 'Exporting Json...');
   _exportJsonCodes(data, path);
   _exportJsonLanguages(data, path);
-  logger.step(() => 'Exported Json');
-  logger.step(
-    () => '===========================================================',
-  );
+  logger
+    ..step(() => 'Exported Json')
+    ..step(
+      () => '===========================================================',
+    );
 }
 
 /// Exports language codes to `codes.json`. Creates array of language code
 /// strings with formatted JSON.
 void _exportJsonCodes(LanguageData data, String path) {
-  const logger = LiteLogger(
+  final logger = const LiteLogger(
     name: 'ExportJsonCodes',
     minLevel: LogLevel.debug,
-  );
-  logger.info(() => 'Creating codes.json...');
+  )..info(() => 'Creating codes.json...');
 
   const encoder = JsonEncoder.withIndent('  ');
 
-  final desFile = File('$path/codes.json');
-  desFile.createSync(recursive: true);
+  final desFile = File('$path/codes.json')..createSync(recursive: true);
   final codes = data.keys.map((e) => e.code).toList();
   desFile.writeAsStringSync(encoder.convert(codes));
 
@@ -89,19 +89,17 @@ void _exportJsonCodes(LanguageData data, String path) {
 /// Exports translation data for each language to `data/[code].json` files.
 /// Converts [LanguageConditions] to map format.
 void _exportJsonLanguages(LanguageData data, String path) {
-  const logger = LiteLogger(
+  final logger = const LiteLogger(
     name: 'ExportJsonLanguages',
     minLevel: LogLevel.debug,
-  );
-  logger.info(() => 'Creating languages json files...');
+  )..info(() => 'Creating languages json files...');
 
   const encoder = JsonEncoder.withIndent('  ');
 
   final desPath = '$path/data/';
   final map = languageDataToMap(data);
   for (final MapEntry(key: String key, value: dynamic value) in map.entries) {
-    final desFile = File('$desPath$key.json');
-    desFile.createSync(recursive: true);
+    final desFile = File('$desPath$key.json')..createSync(recursive: true);
     final data = encoder.convert(value);
     desFile.writeAsStringSync(data);
   }

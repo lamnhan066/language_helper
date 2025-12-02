@@ -28,7 +28,7 @@ class LanguageBuilder extends StatefulWidget {
   /// - [forceRebuild]: Controls rebuild behavior. If `true`, always rebuilds
   ///   this widget and all descendants. If `false`, only the root widget
   ///   rebuilds (better performance). If `null`, uses
-  ///   [LanguageHelper.forceRebuild] setting.
+  ///   `LanguageHelper.forceRebuild` setting.
   /// - [languageHelper]: Explicit [LanguageHelper] instance to use. Takes
   ///   priority over [LanguageScope]. If `null`, uses [LanguageScope] or
   ///   [LanguageHelper.instance].
@@ -49,7 +49,7 @@ class LanguageBuilder extends StatefulWidget {
   final Widget Function(BuildContext context) builder;
 
   /// Controls rebuild behavior: `true` = always rebuild, `false` = only root
-  /// rebuilds (default), `null` = use [LanguageHelper.forceRebuild].
+  /// rebuilds (default), `null` = use `LanguageHelper.forceRebuild`.
   final bool? forceRebuild;
 
   /// If true, completely refreshes the widget tree using [KeyedSubtree] when
@@ -137,13 +137,14 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
 
   @override
   Widget build(BuildContext context) {
-    // Push the current helper to the scope stack so extension methods can access it
-    // during the synchronous build phase. Extension methods (tr, trP, etc.) don't have
-    // BuildContext, so they rely on LanguageHelper._current to find the scoped helper.
+    // Push the current helper to the scope stack so extension methods can
+    // access it during the synchronous build phase. Extension methods
+    // (tr, trP, etc.) don't have BuildContext, so they rely on
+    // LanguageHelper._current to find the scoped helper.
     //
-    // The stack is managed during build because Flutter builds are synchronous, so
-    // when extension methods are called during widget.builder(context), they can
-    // safely access the stack.
+    // The stack is managed during build because Flutter builds are
+    // synchronous, so when extension methods are called during
+    // widget.builder(context), they can safely access the stack.
     LanguageHelper._push(_languageHelper);
     try {
       final result = widget.refreshTree
@@ -187,8 +188,8 @@ class Tr extends StatelessWidget {
   ///   work within this builder.
   /// - [forceRebuild]: Controls rebuild behavior. If `true`, always rebuilds
   ///   this widget and all descendants. If `false`, only the root widget
-  ///   rebuilds (better performance). If `null`, uses
-  ///   [LanguageHelper.forceRebuild] setting.
+  ///   rebuilds (better performance). If `null`, uses the
+  ///   `LanguageHelper.forceRebuild` setting.
   /// - [languageHelper]: Explicit [LanguageHelper] instance to use. Takes
   ///   priority over [LanguageScope]. If `null`, uses [LanguageScope] or
   ///   [LanguageHelper.instance].
@@ -207,7 +208,7 @@ class Tr extends StatelessWidget {
   final Widget Function(BuildContext _) builder;
 
   /// Controls rebuild behavior: `true` = always rebuild, `false` = only root
-  /// rebuilds (default), `null` = use [LanguageHelper.forceRebuild].
+  /// rebuilds (default), `null` = use `LanguageHelper.forceRebuild`.
   final bool? forceRebuild;
 
   /// If true, completely refreshes the widget tree using [KeyedSubtree] when

@@ -11,15 +11,15 @@ import 'package:lite_logger/lite_logger.dart';
 /// network).
 ///
 /// Provider types:
-/// - [data] - Direct Dart map (synchronous, fastest)
-/// - [lazyData] - Lazy-loaded Dart map (on-demand)
-/// - [asset] - JSON from Flutter assets (async, bundled)
-/// - [network] - JSON from HTTP/HTTPS URLs (async, remote)
-/// - [empty] - Empty provider (testing/placeholder)
+/// - `data` - Direct Dart map (synchronous, fastest)
+/// - `lazyData` - Lazy-loaded Dart map (on-demand)
+/// - `asset` - JSON from Flutter assets (async, bundled)
+/// - `network` - JSON from HTTP/HTTPS URLs (async, remote)
+/// - `empty` - Empty provider (testing/placeholder)
 ///
-/// Providers are processed in order. If [override] is true, translations
+/// Providers are processed in order. If `override` is true, translations
 /// overwrite existing keys; if false, only new keys are added. Performance:
-/// [data] > [lazyData] > [asset] > [network].
+/// `data` > `lazyData` > `asset` > `network`.
 ///
 /// Example:
 /// ```dart
@@ -78,7 +78,7 @@ class LanguageDataProvider {
         final uri = Uri.parse('$path/codes.json');
         final json = await _loadAsset(uri.path);
         if (json.isNotEmpty) {
-          final decoded = jsonDecode(json).cast<String>() as List<String>;
+          final decoded = (jsonDecode(json) as List).cast<String>();
           final set = decoded.map(LanguageCodes.fromCode).toSet();
           return Future.value(set);
         }
@@ -136,7 +136,7 @@ class LanguageDataProvider {
         final uri = Uri.parse('$path/codes.json');
         final json = await Utils.getUrl(uri, client: client, headers: headers);
         if (json.isNotEmpty) {
-          final decoded = jsonDecode(json).cast<String>() as List<String>;
+          final decoded = (jsonDecode(json) as List).cast<String>();
           final set = decoded.map(LanguageCodes.fromCode).toSet();
           return Future.value(set);
         }
@@ -217,10 +217,12 @@ class LanguageDataProvider {
 
   /// Loads an asset file from Flutter's asset bundle. Returns empty string
   /// if not found.
-  /// Internal method used by [asset] providers.
+  /// Internal method used by `asset` providers.
   static Future<String> _loadAsset(String path) async {
     try {
       return await rootBundle.loadString(path);
+      // Catch the error when the asset is not found.
+      // ignore: avoid_catches_without_on_clauses
     } catch (_) {
       const LiteLogger(
         name: 'LoadAsset',
@@ -231,8 +233,8 @@ class LanguageDataProvider {
   }
 
   /// Retrieves translation data for a specific language code. Returns empty
-  /// map if unavailable. For [data] providers, returns the entire
-  /// [LanguageData] map; others return only the requested code.
+  /// map if unavailable. For `data` providers, returns the entire
+  /// `LanguageData` map; others return only the requested code.
   FutureOr<LanguageData> Function(LanguageCodes code) get getData =>
       _getData ?? (code) => Future.value({});
   final FutureOr<LanguageData> Function(LanguageCodes code)? _getData;
