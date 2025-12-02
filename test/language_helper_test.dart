@@ -41,7 +41,7 @@ void main() async {
   });
 
   tearDownAll(() async {
-    languageHelper.dispose();
+    await languageHelper.dispose();
     await languageSub?.cancel();
   });
 
@@ -117,8 +117,8 @@ void main() async {
       );
     });
 
-    tearDown(() {
-      testHelper.dispose();
+    tearDown(() async {
+      await testHelper.dispose();
     });
 
     test('Get language from prefs', () {
@@ -1159,8 +1159,8 @@ void main() async {
       expect(find.text('Hello'), findsNothing);
 
       // Dispose helpers
-      helper1.dispose();
-      helper2.dispose();
+      await helper1.dispose();
+      await helper2.dispose();
     });
 
     testWidgets('Tr widget with different prefixes', (tester) async {
@@ -1202,8 +1202,8 @@ void main() async {
       expect(find.text('Hello'), findsNothing);
 
       // Dispose helpers
-      helper1.dispose();
-      helper2.dispose();
+      await helper1.dispose();
+      await helper2.dispose();
     });
 
     testWidgets('Multiple LanguageHelper instances with same prefix', (
@@ -1247,8 +1247,8 @@ void main() async {
       expect(find.text('Hello'), findsNothing);
 
       // Dispose helpers
-      helper1.dispose();
-      helper2.dispose();
+      await helper1.dispose();
+      await helper2.dispose();
     });
 
     testWidgets('Widget rebuild behavior with different prefixes', (
@@ -1311,8 +1311,8 @@ void main() async {
       expect(buildCount2, equals(2));
 
       // Dispose helpers
-      helper1.dispose();
-      helper2.dispose();
+      await helper1.dispose();
+      await helper2.dispose();
     });
 
     testWidgets('Nested LanguageBuilder with different prefixes', (
@@ -1367,8 +1367,8 @@ void main() async {
       expect(find.text('Xin Chào'), findsOneWidget);
 
       // Dispose helpers
-      outerHelper.dispose();
-      innerHelper.dispose();
+      await outerHelper.dispose();
+      await innerHelper.dispose();
     });
 
     testWidgets('Tr widget with custom prefix and parameters', (tester) async {
@@ -1420,7 +1420,7 @@ void main() async {
       expect(find.text('Bạn có 1 đô-la'), findsOneWidget);
 
       // Dispose helper
-      helper.dispose();
+      await helper.dispose();
     });
 
     testWidgets('LanguageBuilder with refreshTree enabled', (tester) async {
@@ -1591,8 +1591,8 @@ void main() async {
         expect(find.text('Hello'), findsNothing);
 
         // Dispose helpers
-        helper1.dispose();
-        helper2.dispose();
+        await helper1.dispose();
+        await helper2.dispose();
       },
     );
   });
@@ -2189,8 +2189,8 @@ void main() async {
       expect(helper2.code, equals(LanguageCodes.en));
 
       // Dispose helpers
-      helper1.dispose();
-      helper2.dispose();
+      await helper1.dispose();
+      await helper2.dispose();
     });
 
     test(
@@ -2222,8 +2222,8 @@ void main() async {
         expect(helper2.code, equals(LanguageCodes.vi));
 
         // Dispose helpers
-        helper1.dispose();
-        helper2.dispose();
+        await helper1.dispose();
+        await helper2.dispose();
       },
     );
 
@@ -2276,10 +2276,10 @@ void main() async {
       expect(languageHelper.code, equals(LanguageCodes.en));
     });
 
-    test('dispose multiple times', () {
-      LanguageHelper('TestHelper')
-        ..dispose()
-        ..dispose(); // Should not throw
+    test('dispose multiple times', () async {
+      final helper = LanguageHelper('TestHelper');
+      await helper.dispose();
+      await helper.dispose(); // Should not throw
     });
 
     test('translate with null parameter', () {
@@ -2600,8 +2600,8 @@ void main() async {
       );
       expect(helper2.isDebug, equals(false));
 
-      helper.dispose();
-      helper2.dispose();
+      await helper.dispose();
+      await helper2.dispose();
     });
   });
 
@@ -2663,8 +2663,8 @@ void main() async {
       // The widget should rebuild with the new helper
       expect(find.text('Xin Chào'), findsOneWidget);
 
-      helper1.dispose();
-      helper2.dispose();
+      await helper1.dispose();
+      await helper2.dispose();
     });
 
     testWidgets('LanguageBuilder _of returns null when root not found', (
@@ -2674,9 +2674,9 @@ void main() async {
 
       final helper1 = LanguageHelper('TestOf1');
       final helper2 = LanguageHelper('TestOf2');
-      addTearDown(() {
-        helper1.dispose();
-        helper2.dispose();
+      addTearDown(() async {
+        await helper1.dispose();
+        await helper2.dispose();
       });
 
       await helper1.initial(data: dataList, initialCode: LanguageCodes.en);

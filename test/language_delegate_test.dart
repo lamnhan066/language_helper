@@ -23,8 +23,8 @@ void main() {
       delegate = LanguageDelegate(languageHelper);
     });
 
-    tearDown(() {
-      languageHelper.dispose();
+    tearDown(() async {
+      await languageHelper.dispose();
     });
 
     group('isSupported', () {
@@ -66,7 +66,7 @@ void main() {
         // Even with empty data, LanguageHelper creates a temporary en entry
         expect(emptyDelegate.isSupported(LanguageCodes.en.locale), isTrue);
 
-        emptyHelper.dispose();
+        await emptyHelper.dispose();
       });
 
       test('handles multiple languages correctly', () {
@@ -271,8 +271,8 @@ void main() {
           // old.languageHelper || locale != old.locale)
           expect(delegate2.shouldReload(delegate1), isTrue);
 
-          helper1.dispose();
-          helper2.dispose();
+          await helper1.dispose();
+          await helper2.dispose();
         },
       );
 
@@ -300,8 +300,8 @@ void main() {
           // shouldReload should return true because locales are different
           expect(newDelegate.shouldReload(oldDelegate), isTrue);
 
-          helper1.dispose();
-          helper2.dispose();
+          await helper1.dispose();
+          await helper2.dispose();
         },
       );
 
@@ -337,7 +337,9 @@ void main() {
       ) async {
         // Create a new helper instance for this test
         final testHelper = LanguageHelper('WidgetTest1');
-        addTearDown(testHelper.dispose);
+        addTearDown(() async {
+          await testHelper.dispose();
+        });
 
         await testHelper.initial(
           data: dataList,
@@ -411,7 +413,9 @@ void main() {
         (tester) async {
           // Create main helper for this test
           final mainHelper = LanguageHelper('WidgetTest2');
-          addTearDown(mainHelper.dispose);
+          addTearDown(() async {
+            await mainHelper.dispose();
+          });
 
           await mainHelper.initial(
             data: dataList,
@@ -421,7 +425,9 @@ void main() {
 
           // Create separate helper for a widget
           final separateHelper = LanguageHelper('SeparateWidget');
-          addTearDown(separateHelper.dispose);
+          addTearDown(() async {
+            await separateHelper.dispose();
+          });
 
           await separateHelper.initial(
             data: dataList,
@@ -521,7 +527,9 @@ void main() {
         (tester) async {
           // Create main helper for this test
           final mainHelper = LanguageHelper('WidgetTest3');
-          addTearDown(mainHelper.dispose);
+          addTearDown(() async {
+            await mainHelper.dispose();
+          });
 
           await mainHelper.initial(
             data: dataList,
@@ -531,7 +539,9 @@ void main() {
 
           // Create separate helper
           final separateHelper = LanguageHelper('SeparateWidget');
-          addTearDown(separateHelper.dispose);
+          addTearDown(() async {
+            await separateHelper.dispose();
+          });
 
           await separateHelper.initial(
             data: dataList,
@@ -586,7 +596,9 @@ void main() {
         tester,
       ) async {
         final testHelper = LanguageHelper('WidgetTest4');
-        addTearDown(testHelper.dispose);
+        addTearDown(() async {
+          await testHelper.dispose();
+        });
 
         await testHelper.initial(
           data: dataList,
@@ -616,7 +628,9 @@ void main() {
         tester,
       ) async {
         final testHelper = LanguageHelper('WidgetTest5');
-        addTearDown(testHelper.dispose);
+        addTearDown(() async {
+          await testHelper.dispose();
+        });
 
         await testHelper.initial(
           data: dataList,
@@ -680,7 +694,9 @@ void main() {
         tester,
       ) async {
         final testHelper = LanguageHelper('WidgetTest6');
-        addTearDown(testHelper.dispose);
+        addTearDown(() async {
+          await testHelper.dispose();
+        });
 
         await testHelper.initial(
           data: dataList,
@@ -733,7 +749,9 @@ void main() {
         // delegate that has a different current locale. Let's create a helper
         // with a different locale
         final helper2 = LanguageHelper('Helper2');
-        addTearDown(helper2.dispose);
+        addTearDown(() async {
+          await helper2.dispose();
+        });
 
         await helper2.initial(
           data: dataList,

@@ -40,7 +40,7 @@ void main() {
       expect(find.text('Xin Chào'), findsOneWidget);
       expect(find.text('Hello'), findsNothing);
 
-      scopedHelper.dispose();
+      await scopedHelper.dispose();
     });
 
     testWidgets('LanguageHelper.of falls back to instance when no scope', (
@@ -102,7 +102,7 @@ void main() {
       expect(retrievedHelper, equals(scopedHelper));
       expect(find.text('Xin Chào'), findsOneWidget);
 
-      scopedHelper.dispose();
+      await scopedHelper.dispose();
     });
 
     testWidgets('LanguageHelper.of falls back to instance when no scope', (
@@ -178,8 +178,8 @@ void main() {
       expect(childRetrieved, equals(childHelper));
       expect(find.text('Xin Chào'), findsOneWidget); // Child scope is used
 
-      parentHelper.dispose();
-      childHelper.dispose();
+      await parentHelper.dispose();
+      await childHelper.dispose();
     });
 
     testWidgets('LanguageBuilder inherits from LanguageScope', (tester) async {
@@ -211,7 +211,7 @@ void main() {
       expect(find.text('Hello'), findsOneWidget);
       expect(find.text('Xin Chào'), findsNothing);
 
-      scopedHelper.dispose();
+      await scopedHelper.dispose();
     });
 
     testWidgets(
@@ -250,8 +250,8 @@ void main() {
         expect(find.text('Hello'), findsOneWidget);
         expect(find.text('Xin Chào'), findsNothing);
 
-        explicitHelper.dispose();
-        scopedHelper.dispose();
+        await explicitHelper.dispose();
+        await scopedHelper.dispose();
       },
     );
 
@@ -277,7 +277,7 @@ void main() {
       expect(find.text('Xin Chào'), findsOneWidget);
       expect(find.text('Hello'), findsNothing);
 
-      scopedHelper.dispose();
+      await scopedHelper.dispose();
     });
 
     testWidgets(
@@ -316,7 +316,7 @@ void main() {
         expect(find.text('Hello'), findsNothing);
         expect(find.text('You have 100 dollars'), findsNothing);
 
-        scopedHelper.dispose();
+        await scopedHelper.dispose();
       },
     );
 
@@ -353,7 +353,7 @@ void main() {
       expect(find.text('Hello'), findsOneWidget);
       expect(find.text('Xin Chào'), findsOneWidget);
 
-      scopedHelper.dispose();
+      await scopedHelper.dispose();
     });
 
     testWidgets('Extension methods trF uses scoped helper in LanguageBuilder', (
@@ -387,7 +387,7 @@ void main() {
       expect(find.text('You have 200 dollars'), findsOneWidget);
       expect(find.text('Bạn có 200 đô-la'), findsNothing);
 
-      scopedHelper.dispose();
+      await scopedHelper.dispose();
     });
 
     testWidgets('Nested LanguageBuilder with LanguageScope', (tester) async {
@@ -426,8 +426,8 @@ void main() {
       expect(find.text('Hello'), findsOneWidget); // Outer scope
       expect(find.text('Xin Chào'), findsOneWidget); // Inner scope
 
-      outerHelper.dispose();
-      innerHelper.dispose();
+      await outerHelper.dispose();
+      await innerHelper.dispose();
     });
 
     testWidgets('LanguageScope updates when helper changes', (tester) async {
@@ -473,8 +473,8 @@ void main() {
       expect(find.text('Xin Chào'), findsOneWidget);
       expect(find.text('Hello'), findsNothing);
 
-      helper1.dispose();
-      helper2.dispose();
+      await helper1.dispose();
+      await helper2.dispose();
     });
 
     testWidgets('updateShouldNotify returns true when helper changes', (
@@ -499,8 +499,8 @@ void main() {
       // updateShouldNotify should return true when helpers are different
       expect(scope1.updateShouldNotify(scope2), isTrue);
 
-      helper1.dispose();
-      helper2.dispose();
+      await helper1.dispose();
+      await helper2.dispose();
     });
 
     testWidgets('updateShouldNotify returns false when helper is same', (
@@ -524,7 +524,7 @@ void main() {
       // instance
       expect(scope1.updateShouldNotify(scope2), isFalse);
 
-      helper.dispose();
+      await helper.dispose();
     });
 
     testWidgets('LanguageBuilder updates when scope helper changes', (
@@ -586,8 +586,8 @@ void main() {
       expect(find.text('Xin Chào'), findsOneWidget);
       expect(buildCount, greaterThan(1)); // Should have rebuilt
 
-      helper1.dispose();
-      helper2.dispose();
+      await helper1.dispose();
+      await helper2.dispose();
     });
 
     testWidgets(
@@ -648,7 +648,7 @@ void main() {
         // Widget should still render correctly
         expect(find.text('Hello'), findsOneWidget);
 
-        helper.dispose();
+        await helper.dispose();
       },
     );
 
@@ -736,7 +736,7 @@ void main() {
 
       expect(retrievedHelper, equals(scopedHelper));
 
-      scopedHelper.dispose();
+      await scopedHelper.dispose();
     });
 
     testWidgets('of finds scoped helper in deeply nested structure', (
@@ -780,7 +780,7 @@ void main() {
 
       expect(retrievedHelper, equals(scopedHelper));
 
-      scopedHelper.dispose();
+      await scopedHelper.dispose();
     });
 
     testWidgets(
@@ -846,7 +846,7 @@ void main() {
       // Same instance should not notify
       expect(newScope.updateShouldNotify(oldScope), isFalse);
 
-      helper.dispose();
+      await helper.dispose();
     });
 
     testWidgets('Nested of returns child scope, not parent scope', (
@@ -890,8 +890,8 @@ void main() {
       expect(parentRetrieved, equals(parentHelper));
       expect(childRetrieved, equals(childHelper));
 
-      parentHelper.dispose();
-      childHelper.dispose();
+      await parentHelper.dispose();
+      await childHelper.dispose();
     });
 
     testWidgets(
@@ -963,7 +963,7 @@ void main() {
         expect(languageHelper1, equals(languageHelper2));
         expect(languageHelper2, equals(scopedHelper));
 
-        scopedHelper.dispose();
+        await scopedHelper.dispose();
       },
     );
 
@@ -1041,7 +1041,7 @@ void main() {
         expect(languageHelper1, equals(languageHelper2));
         expect(languageHelper2, equals(scopedHelper));
 
-        scopedHelper.dispose();
+        await scopedHelper.dispose();
       },
     );
 
@@ -1129,7 +1129,7 @@ void main() {
         expect(languageHelper2, isNot(equals(scopedHelper)));
         expect(languageHelper2, equals(LanguageHelper.instance));
 
-        scopedHelper.dispose();
+        await scopedHelper.dispose();
       },
     );
 
@@ -1224,7 +1224,7 @@ void main() {
       expect(retrievedHelper, equals(scopedHelper));
       expect(retrievedHelper, isNot(equals(LanguageHelper.instance)));
 
-      scopedHelper.dispose();
+      await scopedHelper.dispose();
     });
 
     testWidgets('LanguageHelper.of logs only once per context identity', (
@@ -1368,7 +1368,7 @@ void main() {
         expect(completedHelper, equals(scopedHelper));
         expect(find.text('Xin Chào'), findsOneWidget);
 
-        scopedHelper.dispose();
+        await scopedHelper.dispose();
       },
     );
 
@@ -1448,7 +1448,7 @@ void main() {
         expect(find.text('data'), findsOneWidget);
         expect(find.byType(CircularProgressIndicator), findsNothing);
 
-        scopedHelper.dispose();
+        await scopedHelper.dispose();
       },
     );
 
@@ -1535,7 +1535,7 @@ void main() {
         expect(find.text('data'), findsOneWidget);
         expect(find.byType(CircularProgressIndicator), findsNothing);
 
-        scopedHelper.dispose();
+        await scopedHelper.dispose();
       },
     );
   });

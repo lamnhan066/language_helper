@@ -384,10 +384,10 @@ class LanguageHelper {
   ///
   /// After calling [dispose], the helper should not be used anymore.
   /// Any attempts to use it may result in errors.
-  void dispose() {
+  Future<void> dispose() async {
     // StreamController.close() returns a Future but we don't need to await
     // it since we're disposing the controller and won't use it anymore.
-    unawaited(_streamController.close());
+    await _streamController.close();
   }
 
   /// Adds a provider dynamically at runtime. If [activate] is true (default),
