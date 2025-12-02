@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:language_code/language_code.dart';
 import 'package:language_helper/language_helper.dart';
-import 'package:language_helper/src/language_helper.dart' show LanguageHelper;
 import 'package:language_helper/src/mixins/update_language.dart';
 import 'package:lite_logger/lite_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,14 +31,14 @@ part 'widgets/language_builder.dart';
 ///
 /// See also: [LanguageDataProvider], [LanguageBuilder], [LanguageScope]
 class LanguageHelper {
-
   /// Creates a custom helper instance. Prefer [LanguageHelper.instance] when
   /// possible to enable extension methods (`tr`, `trP`, etc.) throughout
   /// your app.
   ///
   /// Custom instances can be used with:
   /// - `.trC(helper)` extension method (always available)
-  /// - [LanguageBuilder] or [LanguageScope] (enables `tr`, `trP`, etc. within scope)
+  /// - [LanguageBuilder] or [LanguageScope] (enables `tr`, `trP`, etc.
+  ///   within scope)
   /// - Direct `translate()` calls
   ///
   LanguageHelper(this.prefix);
@@ -59,7 +58,8 @@ class LanguageHelper {
   /// Pushes a helper onto the stack. Called by [LanguageBuilder] during build.
   static void _push(LanguageHelper helper) => _stack.add(helper);
 
-  /// Pops a helper from the stack. Called by [LanguageBuilder] after build completes.
+  /// Pops a helper from the stack. Called by [LanguageBuilder] after build
+  /// completes.
   static void _pop() {
     if (_stack.isNotEmpty) _stack.removeLast();
   }
@@ -132,7 +132,8 @@ class LanguageHelper {
   /// [useInitialCodeWhenUnavailable] is true.
   LanguageCodes? _initialCode;
 
-  /// Whether to fall back to [initialCode] when an unavailable language is requested.
+  /// Whether to fall back to [initialCode] when an unavailable language is
+  /// requested.
   bool _useInitialCodeWhenUnavailable = false;
 
   /// Whether to automatically save/restore the language code to/from
@@ -147,7 +148,8 @@ class LanguageHelper {
   /// (false, better performance).
   bool _forceRebuild = true;
 
-  /// Callback called when the language changes. Set via `onChanged` in [initial].
+  /// Callback called when the language changes. Set via `onChanged` in
+  /// [initial].
   void Function(LanguageCodes code)? _onChanged;
 
   /// Stream that emits the new language code whenever [change] is called
@@ -165,12 +167,14 @@ class LanguageHelper {
   /// based on [isDebug].
   LiteLogger? _logger;
 
-  /// The SharedPreferences key for the saved language code. Format: `$prefix.AutoSaveCode`
+  /// The SharedPreferences key for the saved language code.
+  /// Format: `$prefix.AutoSaveCode`
   @visibleForTesting
   String get codeKey => _autoSaveCodeKey;
   String get _autoSaveCodeKey => '$prefix.AutoSaveCode';
 
-  /// The SharedPreferences key for the device language code. Format: `$prefix.DeviceCode`
+  /// The SharedPreferences key for the device language code.
+  /// Format: `$prefix.DeviceCode`
   @visibleForTesting
   String get deviceCodeKey => _deviceCodeKey;
   String get _deviceCodeKey => '$prefix.DeviceCode';
@@ -188,7 +192,8 @@ class LanguageHelper {
   Future<void> get ensureInitialized => _ensureInitialized.future;
   final _ensureInitialized = Completer<void>();
 
-  /// Initializes the helper with language data. Must be called before using the helper.
+  /// Initializes the helper with language data. Must be called before using
+  /// the helper.
   ///
   /// **Initial Language Priority:**
   /// 1. [initialCode] (if provided and available)
@@ -201,7 +206,8 @@ class LanguageHelper {
   /// when full locale (e.g., `zh_CN`) is unavailable. Safe to call multiple
   /// times.
   Future<void> initial({
-    /// Language data providers. If empty, a temporary English provider is added.
+    /// Language data providers. If empty, a temporary English provider is
+    /// added.
     required Iterable<LanguageDataProvider> data,
 
     /// Initial language code. Falls back to device language or first provider
@@ -220,7 +226,8 @@ class LanguageHelper {
     /// Update app language when device language changes.
     bool syncWithDevice = true,
 
-    /// Fall back to language code only when full locale (e.g., `zh_CN`) is unavailable.
+    /// Fall back to language code only when full locale (e.g., `zh_CN`) is
+    /// unavailable.
     bool isOptionalCountryCode = true,
 
     /// Callback invoked when language changes.
@@ -358,6 +365,14 @@ class LanguageHelper {
 
   /// Disposes resources and closes the [stream] controller. Only call when the
   /// helper will no longer be used. Do not dispose [LanguageHelper.instance].
+  ///
+  /// **Important:** This method should only be called on custom
+  /// [LanguageHelper] instances that are no longer needed. Never call this
+  /// on [LanguageHelper.instance] as it is a singleton used throughout
+  /// the app lifecycle.
+  ///
+  /// After calling [dispose], the helper should not be used anymore.
+  /// Any attempts to use it may result in errors.
   void dispose() {
     _streamController.close();
   }
@@ -548,6 +563,15 @@ class LanguageHelper {
 
   /// Sets whether to fall back to [initialCode] when changing to unavailable
   /// languages.
+  ///
+  /// Parameters:
+  /// - [newValue]: If `true`, when [change] is called with an unavailable
+  ///   language code, the helper will fall back to [initialCode] (if it's
+  ///   available). If `false`, [change] will fail silently when an
+  ///   unavailable language is requested.
+  ///
+  /// This setting can also be configured during [initial] via the
+  /// `useInitialCodeWhenUnavailable` parameter.
   void setUseInitialCodeWhenUnavailable(bool newValue) {
     _useInitialCodeWhenUnavailable = newValue;
   }

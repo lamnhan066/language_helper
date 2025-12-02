@@ -20,8 +20,25 @@ part of '../language_helper.dart';
 /// ```
 class LanguageBuilder extends StatefulWidget {
   /// Creates a builder that rebuilds when the language changes.
+  ///
+  /// Parameters:
+  /// - [builder]: Function that builds the widget tree. Called during build
+  ///   and whenever the language changes. Extension methods (`tr`, `trP`,
+  ///   etc.) work within this builder.
+  /// - [forceRebuild]: Controls rebuild behavior. If `true`, always rebuilds
+  ///   this widget and all descendants. If `false`, only the root widget
+  ///   rebuilds (better performance). If `null`, uses
+  ///   [LanguageHelper.forceRebuild] setting.
+  /// - [languageHelper]: Explicit [LanguageHelper] instance to use. Takes
+  ///   priority over [LanguageScope]. If `null`, uses [LanguageScope] or
+  ///   [LanguageHelper.instance].
+  /// - [refreshTree]: If `true`, completely refreshes the widget tree using
+  ///   [KeyedSubtree] when language changes. Expensive but may be necessary
+  ///   for widgets that don't properly handle language changes. Defaults
+  ///   to `false`.
   const LanguageBuilder({
-    required this.builder, super.key,
+    required this.builder,
+    super.key,
     this.forceRebuild,
     this.languageHelper,
     this.refreshTree = false,
@@ -74,7 +91,8 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
     return root;
   }
 
-  /// Gets the helper to use: explicit parameter > [LanguageScope] > [LanguageHelper.instance]
+  /// Gets the helper to use: explicit parameter > [LanguageScope] >
+  /// [LanguageHelper.instance]
   LanguageHelper _getLanguageHelper() {
     return widget.languageHelper ?? LanguageHelper.of(context);
   }
@@ -162,6 +180,20 @@ class Tr extends StatelessWidget {
   /// The [builder] function will be called to build the widget whenever the
   /// language changes. Extension methods (`tr`, `trP`, etc.) will work
   /// within this builder.
+  ///
+  /// Parameters:
+  /// - [builder]: Function that builds the widget. Called during build and
+  ///   whenever the language changes. Extension methods (`tr`, `trP`, etc.)
+  ///   work within this builder.
+  /// - [forceRebuild]: Controls rebuild behavior. If `true`, always rebuilds
+  ///   this widget and all descendants. If `false`, only the root widget
+  ///   rebuilds (better performance). If `null`, uses
+  ///   [LanguageHelper.forceRebuild] setting.
+  /// - [languageHelper]: Explicit [LanguageHelper] instance to use. Takes
+  ///   priority over [LanguageScope]. If `null`, uses [LanguageScope] or
+  ///   [LanguageHelper.instance].
+  /// - [refreshTree]: If `true`, completely refreshes the widget tree using
+  ///   [KeyedSubtree] when language changes. Defaults to `false`.
   const Tr(
     this.builder, {
     super.key,

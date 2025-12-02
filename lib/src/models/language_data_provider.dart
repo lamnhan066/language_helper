@@ -30,7 +30,6 @@ import 'package:lite_logger/lite_logger.dart';
 /// ]);
 /// ```
 class LanguageDataProvider {
-
   /// Internal constructor for creating a provider with custom getter functions.
   const LanguageDataProvider._(
     this._getData,
@@ -48,6 +47,12 @@ class LanguageDataProvider {
   /// `[parentPath]/data/[code].json`. Add assets to `pubspec.yaml`. Missing
   /// files return empty data without exceptions. Asset loading is async but
   /// fast since files are bundled with the app.
+  ///
+  /// Parameters:
+  /// - [parentPath]: The base path to the language assets directory
+  ///   (e.g., 'assets/languages'). Should not include trailing slashes.
+  /// - [override]: Whether this provider overwrites existing translations
+  ///   with matching keys. Defaults to `true`.
   ///
   /// Example:
   /// ```dart
@@ -89,6 +94,18 @@ class LanguageDataProvider {
   /// `[parentUrl]/data/[code].json`. Data loads on-demand when a language is
   /// first accessed. Failed requests return empty data. Use [client] for
   /// custom timeouts/retries and [headers] for authentication.
+  ///
+  /// Parameters:
+  /// - [parentUrl]: The base URL for language data
+  ///   (e.g., 'https://api.example.com/languages'). Should not include
+  ///   trailing slashes.
+  /// - [client]: Optional HTTP client for custom configuration
+  ///   (timeouts, retries, interceptors). If not provided, a default
+  ///   client is used.
+  /// - [headers]: Optional HTTP headers to include in requests
+  ///   (e.g., authentication tokens).
+  /// - [override]: Whether this provider overwrites existing translations
+  ///   with matching keys. Defaults to `true`.
   ///
   /// Example:
   /// ```dart
@@ -134,6 +151,12 @@ class LanguageDataProvider {
   /// generated data, or pre-loaded maps. When [getData] is called, returns
   /// the entire [data] map (not just the requested language).
   ///
+  /// Parameters:
+  /// - [data]: The [LanguageData] map containing translations for all
+  ///   supported languages.
+  /// - [override]: Whether this provider overwrites existing translations
+  ///   with matching keys. Defaults to `true`.
+  ///
   /// Example:
   /// ```dart
   /// final languageData = {
@@ -161,6 +184,13 @@ class LanguageDataProvider {
   /// memory-constrained environments. Keep functions lightweight; results
   /// are cached by [LanguageHelper] internally.
   ///
+  /// Parameters:
+  /// - [data]: The [LazyLanguageData] map where each language code maps
+  ///   to a function that returns translation data. Functions are called
+  ///   on-demand.
+  /// - [override]: Whether this provider overwrites existing translations
+  ///   with matching keys. Defaults to `true`.
+  ///
   /// Example:
   /// ```dart
   /// final lazyData = {
@@ -184,7 +214,9 @@ class LanguageDataProvider {
       override,
     );
   }
-  /// Loads an asset file from Flutter's asset bundle. Returns empty string if not found.
+
+  /// Loads an asset file from Flutter's asset bundle. Returns empty string
+  /// if not found.
   /// Internal method used by [asset] providers.
   static Future<String> _loadAsset(String path) async {
     try {
@@ -213,7 +245,8 @@ class LanguageDataProvider {
   final Future<Set<LanguageCodes>> Function()? _getSupportedCodes;
 
   /// Whether this provider overwrites existing translations with matching keys.
-  /// If true (default), overwrites; if false, only adds new keys. Order matters.
+  /// If true (default), overwrites; if false, only adds new keys.
+  /// Order matters.
   final bool override;
 
   /// Returns true if this is an empty provider (no data source). Useful for
