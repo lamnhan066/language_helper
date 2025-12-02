@@ -1025,82 +1025,33 @@ class LanguageHelper {
     return _replaceParams(translated, stringParams);
   }
 
-  /// Reloads all [LanguageBuilder] widgets to apply updated translation data.
+  /// Reloads all [LanguageBuilder] widgets to apply updated translation data
+  /// without changing the language.
   ///
-  /// This is a convenience method that calls [change] with the current [code].
-  /// Use this after modifying translation data (e.g., via [addProvider]) to refresh
-  /// all visible text in the app without changing the language.
+  /// It will be the same as:
   ///
-  /// All [LanguageBuilder] widgets in the widget tree will be notified to
-  /// rebuild with the updated translations.
-  ///
-  /// **When to use:**
-  /// - After adding new translation data with [addProvider] when `activate: false`
-  /// - After manually modifying the [data] map
-  /// - When you want to force a refresh of all translations without changing language
-  ///
-  /// Example:
   /// ```dart
-  /// // Add data without immediate activation
-  /// await languageHelper.addData(newDataProvider, activate: false);
-  /// // ... do other operations ...
-  /// await languageHelper.reload(); // Refresh all visible translations now
+  /// await languageHelper.change(languageHelper.code, force: true);
   /// ```
-  Future<void> reload() => change(code);
+  Future<void> reload() => change(code, force: true);
 
-  /// Changes the application language to [toCode].
+  /// Switches the app language to [toCode].
   ///
-  /// This method updates the current language code and triggers all
-  /// [LanguageBuilder] widgets to rebuild with new translations. The change
-  /// will be persisted to local storage if [isAutoSave] was enabled during
-  /// [initial].
+  /// Reloads all translation providers and updates [LanguageBuilder] widgets
+  /// if [toCode] is different from the current language.
   ///
-  /// **Process:**
-  /// 1. Validates that [toCode] exists in [codes] (or handles fallback)
-  /// 2. Always reloads translation data for the new language from all providers
-  ///    (for lazy/network providers, this may involve async operations)
-  ///    **Note:** Data is reloaded even if it was previously loaded, ensuring
-  ///    fresh data on every language change.
-  /// 3. Updates all [LanguageBuilder] widgets to reflect the new language
-  /// 4. Saves the new language code to SharedPreferences (if [isAutoSave] is enabled)
-  /// 5. Emits events via [stream] and calls [onChanged] callback
+  /// If [force] is `true`, the language will be changed even if it is the same
+  /// as the current language.
   ///
-  /// **Behavior when [toCode] is unavailable:**
-  /// - If [useInitialCodeWhenUnavailable] is `false` (default): The change is ignored
-  ///   and the current language remains unchanged. A warning is logged.
-  /// - If [useInitialCodeWhenUnavailable] is `true`: Falls back to [initialCode]
-  ///   if it's available in the data. If [initialCode] is also unavailable, the
-  ///   change is ignored.
+  /// If [toCode] is missing:
+  /// - If [useInitialCodeWhenUnavailable] is `true`, falls back to [initialCode] if available.
+  /// - Otherwise, does nothing and logs a warning.
   ///
-  /// **Performance:**
-  /// - For [LanguageDataProvider.data]: Fast (synchronous, data already in memory)
-  /// - For [LanguageDataProvider.lazyData]: Fast (synchronous function calls, but functions
-  ///   are called on every language change to ensure fresh data)
-  /// - For [LanguageDataProvider.asset]: Medium (async I/O, files are read on every change)
-  /// - For [LanguageDataProvider.network]: Slow (async network request on every change,
-  ///   depends on connection)
-  ///
-  /// **Widget Rebuilds:**
-  /// By default, all [LanguageBuilder] widgets rebuild. If [forceRebuild] was set
-  /// to `false` during [initial], only the root [LanguageBuilder] widgets rebuild
-  /// (better performance for large widget trees).
-  ///
-  /// Returns a [Future] that completes when all updates are finished, including
-  /// any async data loading operations.
+  /// Returns a [Future] that completes after all translations reload.
   ///
   /// Example:
   /// ```dart
-  /// // Change to Vietnamese
-  /// await languageHelper.change(LanguageCodes.vi);
-  ///
-  /// // All widgets will automatically update to show Vietnamese text
-  ///
-  /// // Handle unavailable language
-  /// try {
-  ///   await languageHelper.change(LanguageCodes.zh);
-  /// } catch (e) {
-  ///   // Language not available, current language unchanged
-  /// }
+  /// await languageHelper.change(LanguageCodes.vi); // switch to Vietnamese
   /// ```
   Future<void> change(LanguageCodes toCode, {bool force = false}) async {
     if (toCode == _currentCode && !force) {
