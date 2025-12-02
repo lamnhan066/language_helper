@@ -11,126 +11,52 @@ import 'mixins/update_language.dart';
 part 'extensions/language_helper_extension.dart';
 part 'widgets/language_builder.dart';
 
-/// A helper class for managing multiple languages and translations in Flutter apps.
+/// Manages translations and language switching in Flutter apps.
 ///
-/// [LanguageHelper] provides a centralized way to:
-/// - Load translations from multiple sources (Dart maps, JSON assets, network)
-/// - Switch between languages dynamically
-/// - Translate text with parameter substitution
-/// - Handle plural forms and conditional translations
-/// - Persist language preferences
-/// - Sync with device language settings
-/// - Automatically rebuild widgets when language changes
+/// Supports multiple data sources (Dart maps, JSON assets, network),
+/// parameter substitution, plural forms, persistence, and device language
+/// sync.
 ///
 /// **Basic Usage:**
 /// ```dart
-/// // Initialize with translation data
 /// await LanguageHelper.instance.initial(
-///   data: [
-///     LanguageDataProvider.data(myLanguageData),
-///   ],
+///   data: [LanguageDataProvider.data(myLanguageData)],
 /// );
-///
-/// // Translate text
 /// final text = LanguageHelper.instance.translate('Hello');
-///
-/// // Change language
 /// await LanguageHelper.instance.change(LanguageCodes.vi);
 /// ```
 ///
-/// **Using Extension Methods:**
-/// ```dart
-/// // Within LanguageBuilder widgets
-/// LanguageBuilder(
-///   builder: (context) {
-///     return Text('Hello'.tr); // Automatic translation
-///   },
-/// )
-/// ```
+/// Prefer [LanguageHelper.instance] to enable extension methods (`tr`,
+/// `trP`, etc.) throughout your app. Custom instances require explicit
+/// passing or [LanguageBuilder].
 ///
-/// **Multiple Instances:**
-/// You can create custom instances for different parts of your app:
-/// ```dart
-/// final packageHelper = LanguageHelper('PackageHelper');
-/// await packageHelper.initial(data: [packageData]);
-/// ```
-///
-/// However, prefer using [LanguageHelper.instance] when possible, as it
-/// enables extension methods (`tr`, `trP`, etc.) throughout your app without
-/// needing to pass the instance explicitly.
-///
-/// See also:
-/// - [LanguageDataProvider] - For loading translations from various sources
-/// - [LanguageBuilder] - Widget that rebuilds when language changes
-/// - [LanguageScope] - Provides a helper to descendant widgets
+/// See also: [LanguageDataProvider], [LanguageBuilder], [LanguageScope]
 class LanguageHelper {
   // Get the LanguageHelper instance
   static final LanguageHelper instance = LanguageHelper('LanguageHelper');
 
-  /// Stack of [LanguageHelper] instances, with the most recent one on top.
-  ///
-  /// This stack is used by [LanguageBuilder] to make helpers available to extension
-  /// methods (`tr`, `trP`, etc.) during the build phase. Since extension methods
-  /// don't have [BuildContext], they rely on this stack to find the current helper.
-  ///
-  /// The helper pushed onto the stack comes from [LanguageBuilder], which may be:
-  /// - An explicit `languageHelper` parameter
-  /// - A helper from [LanguageScope] (via [of])
-  /// - [LanguageHelper.instance] (fallback)
-  ///
-  /// The stack allows nested [LanguageBuilder] widgets to work correctly, with each
-  /// builder pushing its helper during build and popping it after.
+  /// Stack of [LanguageHelper] instances used by [LanguageBuilder] to make
+  /// helpers available to extension methods during build. The most recent
+  /// builder's helper is on top.
   static final List<LanguageHelper> _stack = [];
 
-  /// Gets the current scoped [LanguageHelper] from the stack, or [LanguageHelper.instance]
-  /// if none is active.
-  ///
-  /// This is used by extension methods to find which helper to use. The helper at the
-  /// top of the stack is the one from the most recently built [LanguageBuilder].
+  /// Gets the current helper from the stack, or [LanguageHelper.instance] if
+  /// none is active.
   static LanguageHelper get _current =>
       _stack.lastOrNull ?? LanguageHelper.instance;
 
-  /// Pushes a [LanguageHelper] onto the stack.
-  ///
-  /// Called by [LanguageBuilder] during its build method to make the helper available
-  /// to extension methods during the synchronous build phase.
+  /// Pushes a helper onto the stack. Called by [LanguageBuilder] during build.
   static void _push(LanguageHelper helper) => _stack.add(helper);
 
-  /// Pops a [LanguageHelper] from the stack.
-  ///
-  /// Called by [LanguageBuilder] after its build completes to clean up the stack.
+  /// Pops a helper from the stack. Called by [LanguageBuilder] after build completes.
   static void _pop() {
     if (_stack.isNotEmpty) _stack.removeLast();
   }
 
-  /// Returns the [LanguageHelper] from the nearest [LanguageScope] ancestor,
-  /// or [LanguageHelper.instance] if no scope is found.
-  ///
-  /// This method does not register a dependency on the [LanguageScope], which means
-  /// the widget will not automatically rebuild when the scope changes. This is intentional
-  /// because [LanguageBuilder] widgets handle rebuilds through their own mechanism when
-  /// the helper's language changes via the [change] method.
-  ///
-  /// Since [LanguageHelper.instance] is always available, this method always returns
-  /// a valid helper (either from scope or the default instance).
-  ///
-  /// **Note**: If you need to automatically rebuild when the scope changes (i.e., when
-  /// a different helper instance is provided), wrap your widget in a [LanguageBuilder]
-  /// instead of using this method directly.
-  ///
-  /// When no [LanguageScope] is found in the widget tree, this method logs an informational
-  /// message (if debug logging is enabled) to help developers understand that the default
-  /// [LanguageHelper.instance] is being used.
-  ///
-  /// Example:
-  /// ```dart
-  /// Builder(
-  ///   builder: (context) {
-  ///     final helper = LanguageHelper.of(context);
-  ///     return Text(helper.translate('Hello'));
-  ///   },
-  /// )
-  /// ```
+  /// Returns the helper from the nearest [LanguageScope] ancestor, or
+  /// [LanguageHelper.instance] if none is found. Does not register a
+  /// dependency, so widgets won't rebuild when the scope changes. Use
+  /// [LanguageBuilder] if you need automatic rebuilds.
   static LanguageHelper of(BuildContext context) {
     final scope = context.getInheritedWidgetOfExactType<LanguageScope>();
     if (scope == null) {
@@ -156,8 +82,7 @@ class LanguageHelper {
     return scope.languageHelper;
   }
 
-  /// Tracks contexts where we've already logged the "no scope" message.
-  /// Uses context identity hash codes to prevent duplicate logs.
+  /// Tracks contexts where "no scope" message was logged to prevent duplicates.
   static final Set<int> _noScopeLoggedContexts = {};
 
   /// To control [LanguageBuilder]
@@ -166,59 +91,14 @@ class LanguageHelper {
   @visibleForTesting
   Set<UpdateLanguage> get states => _states;
 
-  /// Prefer using the built-in instance of `LanguageHelper` when possible instead of creating a custom one.
-  /// Utilizing the built-in instance allows access to all extension methods (such as `tr`, `trP`, `trT`, `trF`)
-  /// and builder widgets (like `LanguageBuilder` and `Tr`) without the need to pass the instance explicitly to each.
-  /// This approach simplifies usage and ensures consistency across your application.
+  /// Creates a custom helper instance. Prefer [LanguageHelper.instance] when
+  /// possible to enable extension methods (`tr`, `trP`, etc.) throughout
+  /// your app.
   ///
-  /// When creating a custom instance of `LanguageHelper`, you can use it in several ways:
-  ///
-  /// 1. **With `.trC()` extension method** (always available):
-  /// ```dart
-  /// final helper = LanguageHelper('CustomLanguageHelper');
-  /// await helper.initial(data: myData);
-  ///
-  /// // String
-  /// final translated = 'Translate this text'.trC(helper);
-  ///
-  /// // Widget
-  /// final text = Text('Translate this text'.trC(helper));
-  /// ```
-  ///
-  /// 2. **With `LanguageBuilder` or `LanguageScope`** (extension methods work):
-  /// When a custom helper is used with [LanguageBuilder] or [LanguageScope], the convenience
-  /// extensions (`tr`, `trP`, `trT`, `trF`) become available within that builder/scope:
-  /// ```dart
-  /// final helper = LanguageHelper('CustomLanguageHelper');
-  /// await helper.initial(data: myData);
-  ///
-  /// // Using LanguageBuilder with explicit helper
-  /// LanguageBuilder(
-  ///   languageHelper: helper,
-  ///   builder: (context) {
-  ///     return Text('Hello'.tr), // Works! Uses helper
-  ///   },
-  /// )
-  ///
-  /// // Using LanguageScope
-  /// LanguageScope(
-  ///   languageHelper: helper,
-  ///   child: LanguageBuilder(
-  ///     builder: (context) {
-  ///       return Text('Hello'.tr), // Works! Uses helper from scope
-  ///     },
-  ///   ),
-  /// )
-  /// ```
-  ///
-  /// 3. **Direct translation** (always available):
-  /// ```dart
-  /// final translated = helper.translate('Hello');
-  /// ```
-  ///
-  /// **Note**: Extension methods (`tr`, `trP`, etc.) only work with custom instances when called
-  /// within a [LanguageBuilder] that uses that instance (either explicitly or via [LanguageScope]).
-  /// Outside of [LanguageBuilder], extension methods fall back to [LanguageHelper.instance].
+  /// Custom instances can be used with:
+  /// - `.trC(helper)` extension method (always available)
+  /// - [LanguageBuilder] or [LanguageScope] (enables `tr`, `trP`, etc. within scope)
+  /// - Direct `translate()` calls
   ///
   LanguageHelper(this.prefix);
 
@@ -231,447 +111,129 @@ class LanguageHelper {
   /// Collection of data providers.
   Iterable<LanguageDataProvider> _dataProviders = [];
 
-  /// Gets the current language data as [LanguageData].
-  ///
-  /// This returns all translations for all languages currently loaded in memory.
-  /// The data is organized as a map where keys are [LanguageCodes] and values
-  /// are maps of translation keys to their translated values (strings or [LanguageConditions]).
-  ///
-  /// **Important Notes:**
-  /// - This only contains data that has been loaded so far. Languages that haven't
-  ///   been accessed yet may not be present until they're first used (for lazy/network providers).
-  /// - The returned map is the internal storage - modifications will affect the helper's state.
-  /// - Data is loaded on-demand for [LanguageDataProvider.lazyData] and [LanguageDataProvider.network]
-  ///   providers when a language is first accessed via [change] or [translate].
-  ///
-  /// **Use Cases:**
-  /// - Inspecting available translations
-  /// - Exporting translations to JSON
-  /// - Debugging translation issues
-  /// - Programmatically modifying translations (use with caution)
-  ///
-  /// Example:
-  /// ```dart
-  /// // Access all loaded translations
-  /// final allData = languageHelper.data;
-  /// final englishTranslations = allData[LanguageCodes.en];
-  /// print(englishTranslations?['Hello']); // Prints the English translation
-  ///
-  /// // Check if a language is loaded
-  /// if (allData.containsKey(LanguageCodes.vi)) {
-  ///   print('Vietnamese translations are loaded');
-  /// }
-  /// ```
+  /// All translations currently loaded in memory, organized by [LanguageCodes].
+  /// Only contains data that has been loaded so far (lazy/network providers
+  /// load on-demand). Modifying the returned map affects the helper's state.
   LanguageData get data => _data;
 
-  /// Gets the list of [LanguageCodes] from all data providers.
-  ///
-  /// This returns all language codes that are available across all registered
-  /// [LanguageDataProvider] instances. The codes are collected from all providers
-  /// and combined into a single set (duplicates are automatically removed).
-  ///
-  /// **Important:** You must call `await initial()` before using this getter,
-  /// otherwise it will return an empty set.
-  ///
-  /// **Use Cases:**
-  /// - Displaying a language picker with available options
-  /// - Validating if a language code is supported before changing
-  /// - Configuring Flutter's `supportedLocales`
-  ///
-  /// Example:
-  /// ```dart
-  /// // Get all supported language codes
-  /// final codes = languageHelper.codes;
-  /// print('Supported languages: $codes');
-  /// // Output: {LanguageCodes.en, LanguageCodes.vi, LanguageCodes.es}
-  ///
-  /// // Check if a language is available
-  /// if (languageHelper.codes.contains(LanguageCodes.vi)) {
-  ///   await languageHelper.change(LanguageCodes.vi);
-  /// }
-  ///
-  /// // Use in MaterialApp
-  /// MaterialApp(
-  ///   supportedLocales: languageHelper.locales,
-  ///   // ...
-  /// )
-  /// ```
+  /// All available language codes from all registered providers. Must call
+  /// `initial()` first.
   Set<LanguageCodes> get codes => _codes.toSet();
   var _codes = <LanguageCodes>{};
 
-  /// Gets the list of languages as [Locale].
-  ///
-  /// This returns all supported language codes converted to Flutter's [Locale]
-  /// format. This is useful for configuring [MaterialApp.supportedLocales] or
-  /// [CupertinoApp.supportedLocales].
-  ///
-  /// You must call `await initial()` before using this getter.
-  ///
-  /// Example:
-  /// ```dart
-  /// MaterialApp(
-  ///   supportedLocales: languageHelper.locales,
-  ///   locale: languageHelper.locale,
-  ///   // ...
-  /// )
-  /// ```
+  /// All supported language codes as Flutter [Locale] objects. Must call
+  /// `initial()` first.
   Set<Locale> get locales => codes.map((e) => e.locale).toSet();
 
-  /// Gets the current language as [LanguageCodes].
-  ///
-  /// This returns the language code that is currently active. All translations
-  /// via [translate] use this language by default.
-  ///
-  /// **Important:** You must call `await initial()` before using this getter,
-  /// otherwise it will throw a null check error.
-  ///
-  /// The current code is updated when:
-  /// - [initial] completes (sets the initial language)
-  /// - [change] is called (switches to a new language)
-  ///
-  /// Example:
-  /// ```dart
-  /// // Get current language
-  /// final currentLang = languageHelper.code;
-  /// print('Current language: $currentLang'); // e.g., LanguageCodes.en
-  ///
-  /// // Use in conditional logic
-  /// if (languageHelper.code == LanguageCodes.vi) {
-  ///   // Show Vietnamese-specific UI
-  /// }
-  /// ```
+  /// The currently active language code. Must call `initial()` first. Updated
+  /// by [initial] and [change].
   LanguageCodes get code => _currentCode!;
 
-  /// The current language code being used.
-  ///
-  /// This is set after [initial] is called and updated when [change] is called.
+  /// The current language code. Set by [initial] and updated by [change].
   LanguageCodes? _currentCode;
 
-  /// Gets the current language as [Locale].
-  ///
-  /// This returns the current language code converted to Flutter's [Locale] format.
-  /// This is useful for configuring [MaterialApp.locale] or [CupertinoApp.locale].
-  ///
-  /// **Important:** You must call `await initial()` before using this getter,
-  /// otherwise it will throw a null check error.
-  ///
-  /// Example:
-  /// ```dart
-  /// MaterialApp(
-  ///   locale: languageHelper.locale,
-  ///   supportedLocales: languageHelper.locales,
-  ///   // ...
-  /// )
-  /// ```
+  /// The current language as a Flutter [Locale]. Must call `initial()` first.
   Locale get locale => code.locale;
 
-  /// The initial language code specified during initialization.
-  ///
-  /// This is used as a fallback when [useInitialCodeWhenUnavailable] is `true`
-  /// and an unavailable language code is requested.
+  /// The initial language code, used as fallback when
+  /// [useInitialCodeWhenUnavailable] is true.
   LanguageCodes? _initialCode;
 
-  /// Whether to fall back to the initial code when an unavailable language is requested.
-  ///
-  /// When `true`, if [change] is called with a language code that's not in [codes],
-  /// the helper will change to [initialCode] instead of keeping the current language.
-  /// When `false`, the helper will keep using the current language if the requested
-  /// code is unavailable.
-  ///
-  /// This can be changed at runtime using [setUseInitialCodeWhenUnavailable].
+  /// Whether to fall back to [initialCode] when an unavailable language is requested.
   bool _useInitialCodeWhenUnavailable = false;
 
-  /// Whether to automatically save and restore the current language code.
-  ///
-  /// When `true`, the current language code is saved to `SharedPreferences` whenever
-  /// it changes, and restored when [initial] is called.
+  /// Whether to automatically save/restore the language code to/from
+  /// SharedPreferences.
   bool _isAutoSave = false;
 
-  /// Whether to sync with the device language when it changes.
-  ///
-  /// When `true`, the app language will automatically update when the device
-  /// language changes. When `false`, the app language remains independent of
-  /// the device language.
+  /// Whether to automatically update the app language when the device language
+  /// changes.
   bool _syncWithDevice = true;
 
-  /// Whether to force rebuild all [LanguageBuilder] widgets instead of only the root.
-  ///
-  /// When `true`, all [LanguageBuilder] widgets rebuild when the language changes.
-  /// When `false`, only the root [LanguageBuilder] rebuilds (better performance).
-  ///
-  /// You can override this per-widget using the `forceRebuild` parameter in
-  /// [LanguageBuilder] or [Tr].
+  /// Whether to rebuild all [LanguageBuilder] widgets (true) or only the root
+  /// (false, better performance).
   bool _forceRebuild = true;
 
-  /// Callback function called when the language changes.
-  ///
-  /// This is set via the `onChanged` parameter in [initial] and is called
-  /// whenever [change] successfully updates the language.
+  /// Callback called when the language changes. Set via `onChanged` in [initial].
   void Function(LanguageCodes code)? _onChanged;
 
-  /// Stream that emits events whenever the language changes.
-  ///
-  /// This stream emits a [LanguageCodes] value every time [change] is called
-  /// successfully. You can listen to this stream to react to language changes
-  /// outside of the widget tree.
-  ///
-  /// **Important:** Remember to cancel the stream subscription when you're done
-  /// to avoid memory leaks. Use `subscription.cancel()` or dispose the listener
-  /// in your widget's `dispose` method.
-  ///
-  /// **Note:** The stream emits the new language code after all [LanguageBuilder]
-  /// widgets have been notified to rebuild.
-  ///
-  /// Example:
-  /// ```dart
-  /// // Listen to language changes
-  /// final subscription = languageHelper.stream.listen((code) {
-  ///   print('Language changed to: $code');
-  ///   // Perform actions when language changes
-  /// });
-  ///
-  /// // In a StatefulWidget
-  /// @override
-  /// void initState() {
-  ///   super.initState();
-  ///   _subscription = languageHelper.stream.listen((code) {
-  ///     setState(() {
-  ///       // Update state based on language change
-  ///     });
-  ///   });
-  /// }
-  ///
-  /// @override
-  /// void dispose() {
-  ///   _subscription?.cancel(); // Important: cancel to avoid leaks
-  ///   super.dispose();
-  /// }
-  /// ```
+  /// Stream that emits the new language code whenever [change] is called
+  /// successfully. Remember to cancel subscriptions to avoid memory leaks.
   Stream<LanguageCodes> get stream => _streamController.stream;
   final StreamController<LanguageCodes> _streamController =
       StreamController.broadcast();
 
-  /// Whether debug logging is enabled.
-  ///
-  /// When `true`, the helper prints debug information about language changes,
-  /// translation lookups, and other operations to the console using [lite_logger].
-  ///
-  /// Debug logs include:
-  /// - Language initialization and changes
-  /// - Translation lookups and missing translations
-  /// - Data synchronization with device language
-  /// - Analysis results when enabled
-  ///
-  /// The logger is configured with colored output and timestamps for better
-  /// readability during development and debugging.
+  /// Whether debug logging is enabled. When true, logs language changes,
+  /// translation lookups, and other operations using [lite_logger].
   bool get isDebug => _isDebug;
   bool _isDebug = false;
 
-  /// Internal logger instance for debug logging.
-  ///
-  /// Uses [lite_logger] for formatted, colored debug output. The logger is
-  /// initialized when [initial] is called and is configured based on the
-  /// [isDebug] parameter. Logs are only emitted when [isDebug] is `true`.
-  ///
-  /// This logger instance is shared across all debug logging within this
-  /// [LanguageHelper] instance and respects the instance's [isDebug] setting.
+  /// Internal logger instance for debug logging. Initialized by [initial]
+  /// based on [isDebug].
   LiteLogger? _logger;
 
-  /// The SharedPreferences key used to store the saved language code.
-  ///
-  /// Visible for testing purposes.
+  /// The SharedPreferences key for the saved language code. Format: `$prefix.AutoSaveCode`
   @visibleForTesting
   String get codeKey => _autoSaveCodeKey;
-
-  /// The SharedPreferences key used to store the saved language code.
-  ///
-  /// Format: `$prefix.AutoSaveCode`
   String get _autoSaveCodeKey => '$prefix.AutoSaveCode';
 
-  /// The SharedPreferences key used to store the device language code.
-  ///
-  /// Visible for testing purposes.
+  /// The SharedPreferences key for the device language code. Format: `$prefix.DeviceCode`
   @visibleForTesting
   String get deviceCodeKey => _deviceCodeKey;
-
-  /// The SharedPreferences key used to store the device language code.
-  ///
-  /// Format: `$prefix.DeviceCode`
   String get _deviceCodeKey => '$prefix.DeviceCode';
 
   /// Whether the LanguageHelper is initializing.
   bool _isInitializing = false;
 
-  /// Returns `true` if the [initial] method has been completed.
-  ///
-  /// This is useful for checking whether the helper is ready to use before
-  /// accessing properties like [code], [data], or [codes].
-  ///
-  /// Example:
-  /// ```dart
-  /// if (languageHelper.isInitialized) {
-  ///   print('Current language: ${languageHelper.code}');
-  /// } else {
-  ///   print('Helper not initialized yet');
-  /// }
-  /// ```
+  /// Returns `true` if [initial] has completed. Check this before accessing
+  /// [code], [data], or [codes].
   bool get isInitialized => _ensureInitialized.isCompleted;
 
-  /// A [Future] that completes when the [initial] method finishes.
-  ///
-  /// You can await this future to ensure the helper is fully initialized
-  /// before using it. This is particularly useful when initialization happens
-  /// asynchronously and you need to wait for it to complete.
-  ///
-  /// **Note:** If [initial] has already completed, this future will complete
-  /// immediately. If [initial] hasn't been called yet, this future will
-  /// never complete (until [initial] is called).
-  ///
-  /// Example:
-  /// ```dart
-  /// // Wait for initialization
-  /// await languageHelper.ensureInitialized;
-  /// // Now safe to use languageHelper.code, languageHelper.translate, etc.
-  ///
-  /// // Or use in a widget
-  /// FutureBuilder(
-  ///   future: languageHelper.ensureInitialized,
-  ///   builder: (context, snapshot) {
-  ///     if (snapshot.connectionState == ConnectionState.done) {
-  ///       return Text(languageHelper.translate('Hello'));
-  ///     }
-  ///     return CircularProgressIndicator();
-  ///   },
-  /// )
-  /// ```
+  /// A [Future] that completes when [initial] finishes. Await this to
+  /// ensure the helper is ready. Completes immediately if already initialized,
+  /// or never if [initial] hasn't been called.
   Future<void> get ensureInitialized => _ensureInitialized.future;
   final _ensureInitialized = Completer<void>();
 
-  /// Initializes the helper with language data.
-  ///
-  /// This method must be called before using the helper. It sets up the language
-  /// data, determines the initial language, and configures various options.
-  ///
-  /// **Initialization Process:**
-  /// 1. Registers all [LanguageDataProvider] instances
-  /// 2. Loads supported language codes from all providers
-  /// 3. Determines the initial language code (see priority below)
-  /// 4. Loads translation data for the initial language
-  /// 5. Configures logging, persistence, and device sync
+  /// Initializes the helper with language data. Must be called before using the helper.
   ///
   /// **Initial Language Priority:**
-  /// The initial language is determined in this order:
-  /// 1. [initialCode] parameter (if provided and available in [data])
-  /// 2. Saved language from `SharedPreferences` (if [isAutoSave] is `true`)
-  /// 3. Device language (if [syncWithDevice] is `true` and has changed since last run)
-  /// 4. First language code from [data] providers
-  /// 5. [LanguageCodes.en] (if [data] is empty - temporary fallback for development)
+  /// 1. [initialCode] (if provided and available)
+  /// 2. Saved language from SharedPreferences (if [isAutoSave] is true)
+  /// 3. Device language (if [syncWithDevice] is true and changed)
+  /// 4. First language from providers
+  /// 5. [LanguageCodes.en] (fallback if data is empty)
   ///
-  /// **Country Code Handling:**
-  /// If [isOptionalCountryCode] is `true` (default), when a full locale code
-  /// (e.g., `zh_CN`) is not available, the helper will fall back to the language
-  /// code only (e.g., `zh`). This provides better compatibility with device locales.
-  ///
-  /// **Performance:**
-  /// After initialization, all [LanguageBuilder] widgets will rebuild when the
-  /// language changes by default. Set [forceRebuild] to `false` to only rebuild
-  /// the root widget for better performance in large widget trees.
-  ///
-  /// **Thread Safety:**
-  /// This method is safe to call multiple times - subsequent calls after the
-  /// first initialization will return immediately without re-initializing.
-  ///
-  /// **Error Handling:**
-  /// If [data] is empty, a temporary provider with empty English translations
-  /// will be added to allow development to continue. A warning will be logged.
-  ///
-  /// Example:
-  /// ```dart
-  /// // Basic initialization
-  /// await languageHelper.initial(
-  ///   data: [
-  ///     LanguageDataProvider.data(myLanguageData),
-  ///   ],
-  /// );
-  ///
-  /// // With all options
-  /// await languageHelper.initial(
-  ///   data: [
-  ///     LanguageDataProvider.asset('assets/languages'),
-  ///     LanguageDataProvider.network('https://api.example.com/translations'),
-  ///   ],
-  ///   initialCode: LanguageCodes.en,
-  ///   useInitialCodeWhenUnavailable: true,
-  ///   forceRebuild: false, // Better performance
-  ///   isAutoSave: true,
-  ///   syncWithDevice: true,
-  ///   isOptionalCountryCode: true,
-  ///   onChanged: (code) => print('Language changed to $code'),
-  ///   isDebug: !kReleaseMode,
-  /// );
-  /// ```
+  /// If [isOptionalCountryCode] is true, falls back to language code only
+  /// when full locale (e.g., `zh_CN`) is unavailable. Safe to call multiple
+  /// times.
   Future<void> initial({
-    /// Data of languages. If this value is empty, a temporary data ([LanguageDataProvider.data({LanguagesCode.en: {}})])
-    /// will be added to let make it easier to develop the app.
+    /// Language data providers. If empty, a temporary English provider is added.
     required Iterable<LanguageDataProvider> data,
 
-    /// Firstly, the app will try to use this [initialCode]. If [initialCode] is null,
-    /// the plugin will try to get the current device language. If both of them are
-    /// null, the plugin will use the first language in the [data].
+    /// Initial language code. Falls back to device language or first provider
+    /// language if null.
     LanguageCodes? initialCode,
 
-    /// If this value is `true`, the plugin will use the [initialCode] if you [change]
-    /// to the language that is not in the [data], otherwise it will do nothing
-    /// (keeps the last language).
+    /// Use [initialCode] as fallback when changing to unavailable languages.
     bool useInitialCodeWhenUnavailable = false,
 
-    /// Use this value as default for all [LanguageBuilder].
+    /// Default [forceRebuild] value for all [LanguageBuilder] widgets.
     bool forceRebuild = true,
 
-    /// Auto save the current change of the language. The app will use the new
-    /// language in the next open instead of [initialCode].
+    /// Automatically save/restore language preference to SharedPreferences.
     bool isAutoSave = true,
 
-    /// TODO(lamnhan066): Make sure (add test) the caching feature this feature worked before publishing
-    ///
-    /// Caches the valid data for later use. Useful when using data from `network`.
-    // bool cachesData = true,
-
-    /// Apply the device language when it's changed.
-    /// If this value is `true`, update the app language when the device language changes.
-    /// Otherwise, keep the current app language even if the device language changes.
+    /// Update app language when device language changes.
     bool syncWithDevice = true,
 
-    /// Attempts to handle Locale codes with optional country specification.
-    /// When a full Locale code (including country code) is not available in the data,
-    /// this method will fallback to using just the language code.
-    ///
-    /// For example, if 'zh_CN' (Chinese, China) is not available,
-    /// it will try using 'zh' (Chinese) to set the language.
-    /// Set 'isOptionalCountryCode' to true to enable this behavior.
+    /// Fall back to language code only when full locale (e.g., `zh_CN`) is unavailable.
     bool isOptionalCountryCode = true,
 
-    /// Callback on language changed.
+    /// Callback invoked when language changes.
     void Function(LanguageCodes code)? onChanged,
 
-    /// Enable debug logging.
-    ///
-    /// When `true`, debug information is printed to the console using [lite_logger]
-    /// with colored output and timestamps. Debug logs include:
-    /// - Language initialization and code changes
-    /// - Translation lookups and missing text warnings
-    /// - Device language synchronization events
-    /// - Data provider operations
-    ///
-    /// Defaults to `false` to avoid console noise in production.
-    ///
-    /// Example:
-    /// ```dart
-    /// await languageHelper.initial(
-    ///   data: [myData],
-    ///   isDebug: !kReleaseMode, // Enable in debug builds only
-    /// );
-    /// ```
+    /// Enable debug logging. Defaults to false.
     bool isDebug = false,
   }) async {
     if (isInitialized) return;
@@ -802,63 +364,16 @@ class LanguageHelper {
     }
   }
 
-  /// Disposes all resources used by this [LanguageHelper] instance.
-  ///
-  /// Closes the [stream] controller, which will cancel all active stream
-  /// subscriptions. After calling this method, the helper should not be used
-  /// for language changes or translations.
-  ///
-  /// **Important**: Only call this method when you're certain the helper
-  /// instance will no longer be used, typically when the app is shutting down
-  /// or when removing a scoped helper that's no longer needed.
-  ///
-  /// Example:
-  /// ```dart
-  /// // Only dispose custom instances, not LanguageHelper.instance
-  /// final helper = LanguageHelper('CustomHelper');
-  /// // ... use helper ...
-  /// helper.dispose();
-  /// ```
+  /// Disposes resources and closes the [stream] controller. Only call when the
+  /// helper will no longer be used. Do not dispose [LanguageHelper.instance].
   void dispose() {
     _streamController.close();
   }
 
-  /// Adds a new [LanguageDataProvider] to the list of data providers.
-  ///
-  /// This method allows you to dynamically add translation sources at runtime.
-  /// The provider will be used for all future language changes and translation lookups.
-  ///
-  /// The provider's [LanguageDataProvider.override] property controls whether its
-  /// translations overwrite existing ones:
-  /// - `true`: New translations will overwrite existing ones with the same keys
-  /// - `false`: Only new translation keys are added (existing keys preserved)
-  ///
-  /// The [activate] parameter controls whether widgets are updated immediately:
-  /// - `true` (default): All [LanguageBuilder] widgets will rebuild automatically
-  /// - `false`: Data is added but widgets won't update until [reload] or [change] is called
-  ///
-  /// **Warning**: When [activate] is `true`, be careful not to call this during widget
-  /// build as it may cause `setState` errors. Consider setting [activate] to `false`
-  /// and calling [reload] manually after the build completes.
-  ///
-  /// **Note**: The provider is added to the end of the providers list. If multiple
-  /// providers contain the same translation key, later providers (with `override: true`)
-  /// will overwrite earlier ones.
-  ///
-  /// Example:
-  /// ```dart
-  /// // Add a network provider for remote translations
-  /// final networkProvider = LanguageDataProvider.network('https://api.example.com/translations');
-  /// await languageHelper.addProvider(networkProvider);
-  ///
-  /// // Add a provider without immediate activation
-  /// await languageHelper.addProvider(
-  ///   additionalProvider,
-  ///   activate: false,
-  /// );
-  /// // ... do other operations ...
-  /// await languageHelper.reload(); // Activate now
-  /// ```
+  /// Adds a provider dynamically at runtime. If [activate] is true (default),
+  /// widgets rebuild immediately. Set to false during widget build to avoid
+  /// setState errors, then call [reload]. Provider's `override` property
+  /// controls whether translations overwrite existing keys.
   Future<void> addProvider(
     LanguageDataProvider provider, {
     bool activate = true,
@@ -889,35 +404,9 @@ class LanguageHelper {
     );
   }
 
-  /// Removes a [LanguageDataProvider] from the list of data providers.
-  ///
-  /// This method allows you to dynamically remove translation sources at runtime.
-  /// After removal, translations from this provider will no longer be available.
-  ///
-  /// The [activate] parameter controls whether widgets are updated immediately:
-  /// - `true` (default): All [LanguageBuilder] widgets will rebuild automatically
-  /// - `false`: Provider is removed but widgets won't update until [reload] or [change] is called
-  ///
-  /// **Warning**: When [activate] is `true`, be careful not to call this during widget
-  /// build as it may cause `setState` errors. Consider setting [activate] to `false`
-  /// and calling [reload] manually after the build completes.
-  ///
-  /// **Note**: Only the exact provider instance is removed. If the same provider
-  /// was added multiple times, only one instance is removed. Translations that were
-  /// already loaded from this provider remain in memory until the language is changed.
-  ///
-  /// Example:
-  /// ```dart
-  /// // Remove a provider
-  /// await languageHelper.removeProvider(networkProvider);
-  ///
-  /// // Remove without immediate activation
-  /// await languageHelper.removeProvider(
-  ///   oldProvider,
-  ///   activate: false,
-  /// );
-  /// await languageHelper.reload(); // Update widgets now
-  /// ```
+  /// Removes a provider from the list. If [activate] is true (default),
+  /// widgets rebuild immediately. Set to false during widget build to avoid
+  /// setState errors, then call [reload].
   Future<void> removeProvider(
     LanguageDataProvider provider, {
     bool activate = true,
@@ -939,64 +428,20 @@ class LanguageHelper {
     );
   }
 
-  /// Translates [text] to the current or specified language.
-  ///
-  /// This method looks up the translation for [text] in the current language
-  /// (or [toCode] if provided) and replaces any parameters in the translated
-  /// text using [params].
-  ///
-  /// The translation lookup follows this priority:
-  /// 1. [data] for the target language (searches all registered providers in order)
-  /// 2. Returns the original [text] with parameters replaced if no translation is found
-  ///
-  /// When multiple providers contain the same translation key, the first provider
-  /// in the list (or the one with `override: true`) takes precedence.
-  ///
-  /// If the translation is a [LanguageConditions], it will evaluate the condition
-  /// based on the parameter value and select the appropriate translation.
-  ///
-  /// Parameter replacement supports two formats:
-  /// - `@{paramName}` - Recommended format (e.g., "Hello @{name}")
-  /// - `@paramName` - Legacy format (must be followed by space, end of line, or newline)
-  ///
-  /// Returns the translated text with parameters replaced, or the original
-  /// text if no translation is found.
-  ///
-  /// Example:
-  /// ```dart
-  /// // Simple translation
-  /// final text = languageHelper.translate('Hello');
-  ///
-  /// // Translation with parameters
-  /// final text = languageHelper.translate(
-  ///   'Hello @{name}',
-  ///   params: {'name': 'John'},
-  /// );
-  ///
-  /// // Translation to specific language
-  /// final text = languageHelper.translate(
-  ///   'Hello',
-  ///   toCode: LanguageCodes.vi,
-  /// );
-  /// ```
+  /// Translates [text] to the current language (or [toCode] if provided) and
+  /// replaces parameters using [params]. Supports `@{paramName}` (recommended)
+  /// and `@paramName` formats. Returns original text with params replaced if
+  /// translation not found. [LanguageConditions] are evaluated based on
+  /// parameter values.
   String translate(
-    /// Text that you want to translate
+    /// Text to translate
     String text, {
 
-    /// Translate with parameters
-    ///
-    /// Ex: Your translated text is "Current number is @currentNumber"
-    ///
-    /// Your params = {'currentNumber' : '3'}
-    ///
-    /// => Result: "Current number is 3"
+    /// Parameters to replace in the translated text (e.g., `{'name': 'John'}`)
     Map<String, dynamic> params = const {},
 
-    /// Translate to a specific [LanguageCodes] instead of the current [code].
-    ///
-    /// **Note:** This only works reliably when using `LanguageData`.
-    /// If you are using `LazyLanguageData`, the data for [toCode] may not yet be loaded,
-    /// so the translation may not be available unless it has already been fetched.
+    /// Target language code. Only works reliably with `LanguageData`;
+    /// `LazyLanguageData` may not be loaded yet.
     LanguageCodes? toCode,
   }) {
     toCode ??= _currentCode;
@@ -1026,33 +471,12 @@ class LanguageHelper {
   }
 
   /// Reloads all [LanguageBuilder] widgets to apply updated translation data
-  /// without changing the language.
-  ///
-  /// It will be the same as:
-  ///
-  /// ```dart
-  /// await languageHelper.change(languageHelper.code, force: true);
-  /// ```
+  /// without changing language. Equivalent to `change(code, force: true)`.
   Future<void> reload() => change(code, force: true);
 
-  /// Switches the app language to [toCode].
-  ///
-  /// Reloads all translation providers and updates [LanguageBuilder] widgets
-  /// if [toCode] is different from the current language.
-  ///
-  /// If [force] is `true`, the language will be changed even if it is the same
-  /// as the current language.
-  ///
-  /// If [toCode] is missing:
-  /// - If [useInitialCodeWhenUnavailable] is `true`, falls back to [initialCode] if available.
-  /// - Otherwise, does nothing and logs a warning.
-  ///
-  /// Returns a [Future] that completes after all translations reload.
-  ///
-  /// Example:
-  /// ```dart
-  /// await languageHelper.change(LanguageCodes.vi); // switch to Vietnamese
-  /// ```
+  /// Switches to [toCode] and reloads translations. If [force] is true,
+  /// changes even if same. Falls back to [initialCode] if [toCode] is
+  /// unavailable and [useInitialCodeWhenUnavailable] is true.
   Future<void> change(LanguageCodes toCode, {bool force = false}) async {
     if (toCode == _currentCode && !force) {
       _logger?.debug(() => 'The language is already $toCode');
@@ -1130,47 +554,14 @@ class LanguageHelper {
     _logger?.step(() => 'Changing completed!');
   }
 
-  /// Updates whether to use [initialCode] when an unavailable language is requested.
-  ///
-  /// When [newValue] is `true`, calling [change] with a language code that
-  /// doesn't exist in [codes] will fall back to [initialCode]
-  /// if it's available.
-  ///
-  /// When `false` (default), requests to change to unavailable languages are
-  /// ignored and the current language remains unchanged.
-  ///
-  /// This can be changed at runtime to provide more or less strict language
-  /// switching behavior.
-  ///
-  /// Example:
-  /// ```dart
-  /// // Allow fallback to initial code
-  /// languageHelper.setUseInitialCodeWhenUnavailable(true);
-  ///
-  /// // User tries to change to unavailable language
-  /// await languageHelper.change(LanguageCodes.zh);
-  /// // Falls back to initialCode (e.g., LanguageCodes.en) if available
-  ///
-  /// // Disable fallback
-  /// languageHelper.setUseInitialCodeWhenUnavailable(false);
-  /// await languageHelper.change(LanguageCodes.zh);
-  /// // Change is ignored, current language unchanged
-  /// ```
+  /// Sets whether to fall back to [initialCode] when changing to unavailable
+  /// languages.
   void setUseInitialCodeWhenUnavailable(bool newValue) {
     _useInitialCodeWhenUnavailable = newValue;
   }
 
-  /// Replaces parameter placeholders in [input] with values from [params].
-  ///
-  /// Supports two placeholder formats:
-  /// - `@{paramName}` - Recommended format (e.g., "Hello @{name}" → "Hello John")
-  /// - `@paramName` - Legacy format (must be followed by space, end of line, or newline)
-  ///
-  /// This is an internal method used by [translate] to process parameterized
-  /// translation strings.
-  ///
-  /// Returns [input] as a string with all matching parameters replaced, or
-  /// the original string if [params] is empty.
+  /// Replaces parameter placeholders (`@{paramName}` or `@paramName`) in
+  /// [input] with [params]. Internal method used by [translate].
   String _replaceParams(dynamic input, Map<String, dynamic> params) {
     if (params.isEmpty) return '$input';
 
@@ -1183,17 +574,9 @@ class LanguageHelper {
     return input as String;
   }
 
-  /// Evaluates [LanguageConditions] and replaces parameters in the selected translation.
-  ///
-  /// This internal method handles translations that use conditional logic based
-  /// on parameter values. It:
-  /// 1. Extracts the condition parameter value from [params]
-  /// 2. Looks up the matching condition in [translateCondition.conditions]
-  /// 3. Falls back to 'default' or '_' if the exact value isn't found
-  /// 4. Replaces all parameters in the selected translation string
-  /// 5. Returns [fallback] with parameters replaced if no condition matches
-  ///
-  /// Used internally by [translate] when processing [LanguageConditions] translations.
+  /// Evaluates [LanguageConditions] based on [params] and replaces parameters
+  /// in the selected translation. Falls back to 'default' or '_' if exact
+  /// value not found. Internal method used by [translate].
   String _replaceParamsCondition(
     LanguageConditions translateCondition,
     Map<String, dynamic> params,
@@ -1223,12 +606,7 @@ class LanguageHelper {
     return _replaceParams(translated, params);
   }
 
-  /// Loads codes from all providers and returns the codes.
-  ///
-  /// This internal method iterates through all [dataProviders] and returns the codes
-  /// from the first provider that has codes for the given [code].
-  ///
-  /// Returns an empty [Set<LanguageCodes>] if no provider has codes.
+  /// Loads language codes from all providers. Returns empty set if none found.
   Future<Set<LanguageCodes>> _loadCodesFromProviders(
     Iterable<LanguageDataProvider> providers,
   ) async {
@@ -1238,26 +616,9 @@ class LanguageHelper {
     return results.expand((codeSet) => codeSet).toSet();
   }
 
-  /// Loads translation data from all given [providers] for the specified [code].
-  ///
-  /// This method aggregates translation data for the requested [LanguageCodes] [code]
-  /// from all [LanguageDataProvider] sources in [providers], in order. If multiple
-  /// providers supply translations for the same key, providers with `override: true`
-  /// will overwrite keys from previous providers; if `override: false`, only
-  /// new keys are added and existing ones are preserved.
-  ///
-  /// Returns a [LanguageData] map containing all keys and their translations for [code]
-  /// across all providers. If no provider has data for the code, returns an empty map.
-  ///
-  /// Example return structure for [LanguageCodes.en]:
-  /// ```
-  /// {
-  ///   LanguageCodes.en: {
-  ///     'Hello': 'Hello',
-  ///     'Goodbye': 'Goodbye',
-  ///   }
-  /// }
-  /// ```
+  /// Loads translation data for [code] from all [providers]. Providers with
+  /// `override: true` overwrite existing keys; `override: false` only adds
+  /// new keys. Returns empty map if no data found.
   Future<LanguageData> _loadDataFromProviders(
     LanguageCodes code,
     Iterable<LanguageDataProvider> providers,

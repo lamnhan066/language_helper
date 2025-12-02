@@ -2,58 +2,25 @@ import 'package:flutter/material.dart';
 
 import '../../language_helper.dart';
 
-/// A widget that provides a scoped [LanguageHelper] instance to its descendants.
-///
-/// [LanguageScope] is an [InheritedWidget] that makes a [LanguageHelper] instance
-/// available to descendants via the widget tree. This allows you to use different
-/// language helpers in different parts of your app without explicitly passing them
-/// to every widget.
-///
-/// When a [LanguageScope] is present in the widget tree:
-/// - [LanguageBuilder] and [Tr] widgets automatically inherit the scoped helper
-///   (unless an explicit `languageHelper` parameter is provided)
-/// - Extension methods (`tr`, `trP`, `trT`, `trF`) use the scoped helper when
-///   called within a [LanguageBuilder]
-/// - You can access the scoped helper directly via [LanguageHelper.of]
-///
-/// Priority order when resolving which helper to use:
-/// 1. Explicit `languageHelper` parameter (in [LanguageBuilder] or [Tr])
-/// 2. [LanguageScope] from widget tree (via [LanguageHelper.of])
-/// 3. [LanguageHelper.instance] (fallback - always available)
+/// [InheritedWidget] that provides a [LanguageHelper] to descendants.
+/// Allows different helpers in different parts of the app. Helper priority:
+/// explicit parameter > [LanguageScope] > [LanguageHelper.instance]. Child
+/// scopes override parent scopes for their subtree.
 ///
 /// Example:
 /// ```dart
 /// final customHelper = LanguageHelper('CustomHelper');
-/// await customHelper.initial(
-///   data: customLanguageData,
-///   initialCode: LanguageCodes.es,
-/// );
+/// await customHelper.initial(data: customLanguageData);
 ///
 /// LanguageScope(
 ///   languageHelper: customHelper,
 ///   child: LanguageBuilder(
-///     builder: (context) => Column(
-///       children: [
-///         Text('Hello'.tr), // Uses customHelper via stack
-///         // Access helper directly
-///         Builder(
-///           builder: (context) {
-///             final helper = LanguageHelper.of(context);
-///             return Text(helper.translate('World'));
-///           },
-///         ),
-///       ],
-///     ),
+///     builder: (context) => Text('Hello'.tr), // Uses customHelper
 ///   ),
 /// )
 /// ```
-///
-/// You can nest [LanguageScope] widgets - a child scope will override the parent
-/// scope for its subtree.
 class LanguageScope extends InheritedWidget {
-  /// Creates a [LanguageScope] that provides a [LanguageHelper] to its descendants.
-  ///
-  /// The [languageHelper] must not be null.
+  /// Creates a scope that provides [languageHelper] to descendants.
   const LanguageScope({
     required this.languageHelper,
     required super.child,

@@ -2,49 +2,24 @@ part of '../language_helper.dart';
 
 /// @Source https://hillel.dev/2018/08/15/flutter-how-to-rebuild-the-entire-app-to-change-the-theme-or-locale/
 
-/// A widget that rebuilds when the language changes.
-///
-/// [LanguageBuilder] is a [StatefulWidget] that manages rebuilds when the
-/// associated [LanguageHelper] instance changes its language. It also provides
-/// the helper to extension methods (`tr`, `trP`, etc.) via a stack mechanism
-/// during the build phase.
-///
-/// The [LanguageHelper] used by this widget is determined by the following
-/// priority order:
-/// 1. Explicit `languageHelper` parameter
-/// 2. [LanguageScope] from the widget tree (via [LanguageHelper.of])
-/// 3. [LanguageHelper.instance] (fallback)
-///
-/// When building, [LanguageBuilder] pushes its helper onto a stack so that
-/// extension methods can access it. This allows extension methods to work
-/// with scoped helpers from [LanguageScope] without needing [BuildContext].
+/// Widget that rebuilds when the language changes. Provides helper to
+/// extension methods (`tr`, `trP`, etc.) via a stack mechanism during build.
+/// Helper priority: explicit parameter > [LanguageScope] >
+/// [LanguageHelper.instance].
 ///
 /// Example:
 /// ```dart
 /// LanguageBuilder(
 ///   builder: (context) => Column(
 ///     children: [
-///       Text('Hello'.tr), // Uses the helper from LanguageScope or instance
+///       Text('Hello'.tr),
 ///       Text('World'.trP({'count': 42})),
 ///     ],
 ///   ),
 /// )
 /// ```
-///
-/// With [LanguageScope]:
-/// ```dart
-/// LanguageScope(
-///   languageHelper: myCustomHelper,
-///   child: LanguageBuilder(
-///     builder: (context) => Text('Hello'.tr), // Uses myCustomHelper
-///   ),
-/// )
-/// ```
 class LanguageBuilder extends StatefulWidget {
-  /// Creates a [LanguageBuilder] that rebuilds when the language changes.
-  ///
-  /// The [builder] function will be called to build the widget tree whenever
-  /// the associated [LanguageHelper] changes its language.
+  /// Creates a builder that rebuilds when the language changes.
   const LanguageBuilder({
     super.key,
     required this.builder,
@@ -53,38 +28,21 @@ class LanguageBuilder extends StatefulWidget {
     this.refreshTree = false,
   });
 
-  /// The builder function that creates the widget tree.
-  ///
-  /// This function is called during build and whenever the language changes.
-  /// Extension methods (`tr`, `trP`, etc.) called within this builder will
-  /// use the helper associated with this [LanguageBuilder].
+  /// Builder function called during build and when language changes. Extension
+  /// methods use this builder's helper.
   final Widget Function(BuildContext context) builder;
 
-  /// Controls when this widget rebuilds on language change.
-  ///
-  /// When you have multiple [LanguageBuilder] widgets in your tree, only the
-  /// root widget typically rebuilds by default.
-  ///
-  /// - `true`  → always rebuild this widget when the language is changed.
-  /// - `false` → only rebuild the root widget (default behavior).
-  /// - `null`  → fallback to [LanguageHelper.forceRebuild] default.
+  /// Controls rebuild behavior: `true` = always rebuild, `false` = only root
+  /// rebuilds (default), `null` = use [LanguageHelper.forceRebuild].
   final bool? forceRebuild;
 
-  /// If `true`, the widget will be completely refreshed when the language changes.
-  ///
-  /// When enabled, the entire widget tree will be destroyed and recreated using
-  /// [KeyedSubtree]. This can be expensive but may be necessary for widgets that
-  /// don't properly handle language changes.
-  ///
-  /// Use this only when you specifically need to reset widget state or when dealing
-  /// with widgets that don't properly handle language changes.
+  /// If true, completely refreshes the widget tree using [KeyedSubtree] when
+  /// language changes. Expensive but may be necessary for widgets that don't
+  /// properly handle language changes.
   final bool refreshTree;
 
-  /// An explicit [LanguageHelper] instance to use.
-  ///
-  /// If provided, this takes priority over any [LanguageScope] in the widget tree.
-  /// If `null`, the widget will look for a [LanguageScope] ancestor, and if none
-  /// is found, it will fall back to [LanguageHelper.instance].
+  /// Explicit helper instance. Takes priority over [LanguageScope]. If null,
+  /// uses [LanguageScope] or [LanguageHelper.instance].
   final LanguageHelper? languageHelper;
 
   @override
@@ -96,7 +54,7 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   bool get _forceRebuild =>
       widget.forceRebuild ?? _languageHelper._forceRebuild;
 
-  /// Update the language
+  /// Updates the language
   @override
   void updateLanguage() {
     if (mounted) {
@@ -106,7 +64,7 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
     }
   }
 
-  /// Gets the root state from the widget tree.
+  /// Gets the root state from the widget tree
   _LanguageBuilderState? _of() {
     final root = context.findRootAncestorStateOfType<_LanguageBuilderState>();
     if (root == null ||
@@ -117,11 +75,7 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
     return root;
   }
 
-  /// Gets the [LanguageHelper] to use based on priority:
-  ///
-  /// 1. Explicit `languageHelper` parameter (if provided)
-  /// 2. [LanguageScope] from widget tree (via [LanguageHelper.of])
-  /// 3. [LanguageHelper.instance] (fallback - always available)
+  /// Gets the helper to use: explicit parameter > [LanguageScope] > [LanguageHelper.instance]
   LanguageHelper _getLanguageHelper() {
     return widget.languageHelper ?? LanguageHelper.of(context);
   }
@@ -190,43 +144,17 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   }
 }
 
-/// A shorthand widget for simple translation-based widgets.
-///
-/// [Tr] is a convenience wrapper around [LanguageBuilder] that provides a
-/// simpler API for widgets that only need to translate text. It's useful
-/// for quick translations without wrapping in a full [LanguageBuilder].
-///
-/// **Behavior:**
-/// - Automatically rebuilds when the language changes (unless [forceRebuild] is set)
-/// - Uses [LanguageScope] if available, otherwise falls back to [LanguageHelper.instance]
-/// - Respects [refreshTree] to completely refresh the widget tree when needed
-///
-/// **When to use:**
-/// - For simple text translations that don't need a full [LanguageBuilder]
-/// - When you want a concise API for translation widgets
-/// - For inline translations within larger widget trees
-///
-/// **When not to use:**
-/// - When you need to access [LanguageHelper] directly in the builder
-/// - For complex widget trees that need multiple language-aware widgets
-/// - When you need to pass the helper instance explicitly
+/// Convenience wrapper around [LanguageBuilder] for simple translation
+/// widgets. Use for quick translations; use [LanguageBuilder] when you need
+/// direct helper access.
 ///
 /// Example:
 /// ```dart
-/// // Simple translation
 /// Tr((_) => Text('Hello'.tr)),
 ///
-/// // With force rebuild
 /// Tr(
 ///   (_) => Text('Hello'.tr),
 ///   forceRebuild: true,
-/// ),
-///
-/// // With custom helper
-/// final customHelper = LanguageHelper('Custom');
-/// Tr(
-///   (_) => Text('Hello'.tr),
-///   languageHelper: customHelper,
 /// ),
 /// ```
 class Tr extends StatelessWidget {
@@ -243,37 +171,20 @@ class Tr extends StatelessWidget {
     this.refreshTree = false,
   });
 
-  /// The builder function that creates the widget tree.
-  ///
-  /// This function is called during build and whenever the language changes.
-  /// Extension methods (`tr`, `trP`, etc.) called within this builder will
-  /// use the helper associated with this [Tr] widget.
+  /// Builder function called during build and when language changes. Extension
+  /// methods use this widget's helper.
   final Widget Function(BuildContext _) builder;
 
-  /// Controls when this widget rebuilds on language change.
-  ///
-  /// When you have multiple [LanguageBuilder] or [Tr] widgets in your tree,
-  /// only the root widget typically rebuilds by default.
-  ///
-  /// - `true`  → always rebuild this widget when the language is changed
-  /// - `false` → only rebuild the root widget (default behavior)
-  /// - `null`  → fallback to [LanguageHelper.forceRebuild] default
+  /// Controls rebuild behavior: `true` = always rebuild, `false` = only root
+  /// rebuilds (default), `null` = use [LanguageHelper.forceRebuild].
   final bool? forceRebuild;
 
-  /// If `true`, the widget tree will be completely refreshed when the language changes.
-  ///
-  /// When enabled, the entire widget tree will be destroyed and recreated using
-  /// [KeyedSubtree]. This can be expensive but may be necessary for widgets that
-  /// don't properly handle language changes or need to reset their state.
-  ///
-  /// Defaults to `false`. Use only when specifically needed.
+  /// If true, completely refreshes the widget tree using [KeyedSubtree] when
+  /// language changes. Defaults to false.
   final bool refreshTree;
 
-  /// An explicit [LanguageHelper] instance to use for this widget.
-  ///
-  /// If provided, this takes priority over any [LanguageScope] in the widget tree.
-  /// If `null`, the widget will look for a [LanguageScope] ancestor, and if none
-  /// is found, it will fall back to [LanguageHelper.instance].
+  /// Explicit helper instance. Takes priority over [LanguageScope]. If null,
+  /// uses [LanguageScope] or [LanguageHelper.instance].
   final LanguageHelper? languageHelper;
 
   @override

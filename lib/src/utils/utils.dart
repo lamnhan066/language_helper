@@ -3,21 +3,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:lite_logger/lite_logger.dart';
 
-/// Utility functions for path manipulation and network operations.
+/// Utility functions for path manipulation and network operations
 class Utils {
-  /// Removes trailing slashes from [path].
-  ///
-  /// This utility normalizes paths by removing all trailing `/` characters,
-  /// ensuring consistent path formatting for asset and network URLs.
-  ///
-  /// Returns the normalized path without trailing slashes.
-  ///
-  /// Example:
-  /// ```dart
-  /// Utils.removeLastSlash('assets/languages/'); // 'assets/languages'
-  /// Utils.removeLastSlash('https://api.com/');  // 'https://api.com'
-  /// Utils.removeLastSlash('path');              // 'path'
-  /// ```
+  /// Removes trailing slashes from [path]. Normalizes paths for asset and network URLs.
   static String removeLastSlash(String path) {
     while (path.endsWith('/')) {
       path = path.substring(0, path.length - 1);
@@ -26,38 +14,9 @@ class Utils {
     return path;
   }
 
-  /// Fetches content from a network URL using HTTP GET request.
-  ///
-  /// This utility method retrieves content (typically JSON) from a remote URL
-  /// with optional headers and a custom HTTP client.
-  ///
-  /// **Parameters:**
-  /// - [uri] - The URI to fetch content from
-  /// - [headers] - Optional HTTP headers (e.g., `{'Authorization': 'Bearer token'}`)
-  /// - [client] - Optional custom HTTP client for advanced configuration (timeouts, interceptors, etc.)
-  ///               If not provided, creates a new default client
-  ///
-  /// **Returns:**
-  /// - UTF-8 decoded string content if the request succeeds (status code 200)
-  /// - Empty string if the request fails, returns non-200 status, or throws an exception
-  ///
-  /// **Error handling:** Errors are logged but not thrown. Returns empty string on any failure.
-  ///
-  /// Example:
-  /// ```dart
-  /// final uri = Uri.parse('https://api.example.com/data.json');
-  /// final content = await Utils.getUrl(uri);
-  ///
-  /// // With custom headers
-  /// final content = await Utils.getUrl(
-  ///   uri,
-  ///   headers: {'Authorization': 'Bearer token'},
-  /// );
-  ///
-  /// // With custom client (for timeouts, etc.)
-  /// final client = http.Client();
-  /// final content = await Utils.getUrl(uri, client: client);
-  /// ```
+  /// Fetches content from a network URL using HTTP GET. Returns UTF-8 decoded
+  /// string on success (200), empty string on failure. Errors are logged but
+  /// not thrown. Use [client] for custom timeouts/interceptors.
   static Future<String> getUrl(
     Uri uri, {
     Map<String, String>? headers,

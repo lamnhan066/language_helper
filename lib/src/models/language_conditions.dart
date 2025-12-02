@@ -9,38 +9,29 @@ class LanguageConditions {
   /// Map of conditions
   final Map<String, dynamic> conditions;
 
-  /// Conditions of the language that you want to translate into.
-  ///
-  /// You have to specify the [param] that matches the parameter in the text
-  /// (which is specified by the @ or @{}).
-  ///
-  /// [conditions] is a Map of key and value that you want to apply for each
-  /// condition. There are two keys for the default return value when there is
-  /// no matched condition:
-  /// - `'default'` - Legacy key for backward compatibility
-  /// - `'_'` - Recommended key for the default case
+  /// Conditional translations based on parameter values. [param] must match
+  /// the parameter in the text (specified by @ or @{}). Use `'_'` (recommended)
+  /// or `'default'` (legacy) for fallback.
   ///
   /// Example:
   /// ```dart
   /// LanguageData data = {
-  ///   LanguageCodes.en : {
-  ///     'You have @{count} item' : LanguageConditions(
+  ///   LanguageCodes.en: {
+  ///     'You have @{count} item': LanguageConditions(
   ///       param: 'count',
   ///       conditions: {
-  ///         '0' : 'You have 0 items',
-  ///         '1' : 'You have one item',
-  ///         '_' : 'You have @{count} items', // Default case
-  ///       }
+  ///         '0': 'You have 0 items',
+  ///         '1': 'You have one item',
+  ///         '_': 'You have @{count} items',
+  ///       },
   ///     ),
-  ///   }
+  ///   },
   /// };
   /// ```
   const LanguageConditions({required this.param, required this.conditions});
 
-  /// Converts this [LanguageConditions] to a serializable map.
-  ///
-  /// Returns a map with `param` and `conditions` keys, suitable for JSON
-  /// serialization or storage.
+  /// Converts to a serializable map with `param` and `conditions` keys. Used
+  /// for JSON serialization.
   ///
   /// Example:
   /// ```dart
@@ -55,13 +46,8 @@ class LanguageConditions {
     return {'param': param, 'conditions': conditions};
   }
 
-  /// Creates a [LanguageConditions] instance from a map structure.
-  ///
-  /// This factory method deserializes a map (typically from JSON) back into
-  /// a [LanguageConditions] object. The map must contain `param` and `conditions`
-  /// keys.
-  ///
-  /// If `param` is missing from the map, it defaults to an empty string.
+  /// Creates from a map (typically from JSON). Map must contain `param` and
+  /// `conditions` keys. Defaults to empty string if `param` is missing.
   ///
   /// Example:
   /// ```dart
@@ -75,38 +61,16 @@ class LanguageConditions {
     );
   }
 
-  /// Converts this [LanguageConditions] to a JSON string.
-  ///
-  /// Serializes the condition to a JSON string representation. This is the
-  /// inverse operation of [fromJson].
-  ///
-  /// Example:
-  /// ```dart
-  /// final condition = LanguageConditions(param: 'count', conditions: {'1': 'one'});
-  /// final json = condition.toJson();
-  /// // json = '{"param":"count","conditions":{"1":"one"}}'
-  /// ```
+  /// Converts to a JSON string. Inverse of [fromJson].
   String toJson() => json.encode(toMap());
 
-  /// Creates a [LanguageConditions] instance from a JSON string.
-  ///
-  /// Parses a JSON string and converts it to [LanguageConditions]. This is
-  /// the inverse operation of [toJson].
-  ///
-  /// **JSON format:**
-  /// ```json
-  /// {
-  ///   "param": "count",
-  ///   "conditions": {
-  ///     "1": "one",
-  ///     "_": "many"
-  ///   }
-  /// }
-  /// ```
+  /// Creates from a JSON string. Inverse of [toJson]. JSON must contain
+  /// `param` and `conditions` keys.
   ///
   /// Example:
   /// ```dart
-  /// final jsonString = '{"param":"count","conditions":{"1":"one","_":"many"}}';
+  /// final jsonString =
+  ///     '{"param":"count","conditions":{"1":"one","_":"many"}}';
   /// final condition = LanguageConditions.fromJson(jsonString);
   /// ```
   factory LanguageConditions.fromJson(String source) =>

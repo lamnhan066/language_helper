@@ -1,12 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:language_helper/language_helper.dart';
 
-/// A [LocalizationsDelegate] that provides [LanguageHelper] instances to Flutter's
-/// localization system.
-///
-/// This delegate integrates [LanguageHelper] with Flutter's built-in localization
-/// infrastructure, allowing it to be used with [MaterialApp] or [CupertinoApp]
-/// through the `localizationsDelegates` parameter.
+/// A [LocalizationsDelegate] that integrates [LanguageHelper] with Flutter's
+/// localization system. Use with [MaterialApp] or [CupertinoApp] via
+/// `localizationsDelegates`.
 ///
 /// Example:
 /// ```dart
@@ -16,46 +13,34 @@ import 'package:language_helper/language_helper.dart';
 /// MaterialApp(
 ///   localizationsDelegates: [
 ///     LanguageDelegate(languageHelper),
-///     // ... other delegates
+///     ...languageHelper.delegates,
 ///   ],
 ///   supportedLocales: languageHelper.locales,
 ///   locale: languageHelper.locale,
 /// )
 /// ```
 class LanguageDelegate extends LocalizationsDelegate<LanguageHelper> {
-  /// Creates a [LanguageDelegate] for the given [languageHelper].
-  ///
-  /// The [languageHelper] instance will be used to provide translations and
-  /// manage locale changes.
+  /// Creates a delegate for the given [languageHelper].
   LanguageDelegate(this.languageHelper);
 
   /// The [LanguageHelper] instance managed by this delegate.
   final LanguageHelper languageHelper;
 
-  /// Checks if the given [locale] is supported by the [languageHelper].
-  ///
-  /// Returns `true` if [locale] is in the list of supported locales,
-  /// `false` otherwise.
+  /// Returns true if [locale] is supported by [languageHelper].
   @override
   bool isSupported(Locale locale) {
     return languageHelper.locales.contains(locale);
   }
 
-  /// Loads translations for the given [locale].
-  ///
-  /// Changes the [languageHelper] to use the specified [locale] and returns
-  /// the helper instance. This method is called by Flutter's localization
-  /// system when a locale change is requested.
+  /// Changes [languageHelper] to use [locale] and returns the helper. Called
+  /// by Flutter's localization system.
   @override
   Future<LanguageHelper> load(Locale locale) async {
     await languageHelper.change(LanguageCodes.fromLocale(locale));
     return languageHelper;
   }
 
-  /// Determines if the delegate should reload when the widget tree rebuilds.
-  ///
-  /// Returns `true` if the [languageHelper] instance has changed or if the
-  /// current locale has changed, indicating that a reload is necessary.
+  /// Returns true if [languageHelper] instance or current locale has changed.
   @override
   bool shouldReload(covariant LanguageDelegate old) {
     return languageHelper != old.languageHelper ||

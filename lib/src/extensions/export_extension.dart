@@ -6,10 +6,12 @@ import 'package:language_helper/src/utils/serializer.dart';
 import 'package:lite_logger/lite_logger.dart';
 
 extension ExportLanguageData on LanguageData {
-  /// Export to json files for `LanguageDataProvider`. Default `path` is set to './assets/languages'.
+  /// Export to json files for `LanguageDataProvider`. Default `path` is set
+  /// to './assets/languages'.
   ///
   /// We need a little trick to run this script to get the expected result:
-  /// - Create a `export_json.dart` file in your `bin` folder (the same level with the `lib`).
+  /// - Create a `export_json.dart` file in your `bin` folder (the same level
+  ///   with the `lib`).
   /// - Add the below code:
   ///
   /// ```dart
@@ -36,52 +38,16 @@ extension ExportLanguageData on LanguageData {
 }
 
 extension ExportLazyLanguageData on LazyLanguageData {
-  /// Export to json files for `LanguageDataProvider`. Default `path` is set to './assets/languages'.
-  ///
-  /// We need a little trick to run this script to get the expected result:
-  /// - Create a `export_json.dart` file in your `bin` folder (the same level with the `lib`).
-  /// - Add the below code:
-  ///
-  /// ```dart
-  /// void main() {
-  ///   test('', () {
-  ///     languageData.exportJson('./assets/languages');
-  ///   });
-  /// }
-  /// ```
-  /// - Add the missed `import`.
-  /// - Run `flutter test ./bin/export_json.dart`.
-  ///
-  /// Generated path:
-  /// [path]
-  ///  |  |- language_helper
-  ///  |  |  |- codes.json
-  ///  |  |  |  |- languages
-  ///  |  |  |  |  |- en.json
-  ///  |  |  |  |  |- vi.json
-  ///  |  |  |  |  |- ...
+  /// Exports to JSON files for [LanguageDataProvider]. Default path:
+  /// './assets/languages'. Creates `codes.json` and `data/[code].json` files.
+  /// Run via `flutter test` script in `bin` folder.
   void exportJson([String path = './assets/languages']) {
     return _exportJson(map((k, v) => MapEntry(k, v())), path);
   }
 }
 
-/// Exports [LanguageData] to JSON files in the specified directory structure.
-///
-/// This internal function handles the actual export operation, creating:
-/// - `[path]/codes.json` - List of all supported language codes
-/// - `[path]/data/[code].json` - Translation files for each language code
-///
-/// The generated structure matches what [LanguageDataProvider.asset] expects
-/// when loading translations.
-///
-/// Example output structure:
-/// ```
-/// assets/languages/
-///   ├── codes.json          → ["en", "vi"]
-///   └── data/
-///       ├── en.json         → {"Hello": "Hello", ...}
-///       └── vi.json         → {"Hello": "Xin chào", ...}
-/// ```
+/// Exports [LanguageData] to JSON files. Creates `codes.json` and
+/// `data/[code].json` files matching [LanguageDataProvider.asset] structure.
 void _exportJson(LanguageData data, String path) {
   final logger = LiteLogger(
     name: 'ExportJson',
@@ -101,13 +67,8 @@ void _exportJson(LanguageData data, String path) {
   );
 }
 
-/// Exports the list of supported language codes to `codes.json`.
-///
-/// This internal function creates `[path]/codes.json` containing an array
-/// of language code strings (e.g., `["en", "vi", "es"]`).
-///
-/// The file is created with proper directory structure and formatted JSON
-/// with 2-space indentation for readability.
+/// Exports language codes to `codes.json`. Creates array of language code
+/// strings with formatted JSON.
 void _exportJsonCodes(LanguageData data, String path) {
   final logger = LiteLogger(
     name: 'ExportJsonCodes',
@@ -127,14 +88,8 @@ void _exportJsonCodes(LanguageData data, String path) {
   logger.step(() => 'Created codes.json');
 }
 
-/// Exports translation data for each language to individual JSON files.
-///
-/// This internal function creates `[path]/data/[code].json` files for each
-/// language code in [data]. Each file contains the translations for that
-/// specific language, including [LanguageConditions] converted to map format.
-///
-/// Files are created with proper directory structure and formatted JSON
-/// with 2-space indentation for readability.
+/// Exports translation data for each language to `data/[code].json` files.
+/// Converts [LanguageConditions] to map format.
 void _exportJsonLanguages(LanguageData data, String path) {
   final logger = LiteLogger(
     name: 'ExportJsonLanguages',

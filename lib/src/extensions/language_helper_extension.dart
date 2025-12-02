@@ -1,32 +1,21 @@
 part of '../language_helper.dart';
 
 extension LanguageHelperEx on String {
-  /// Translates the current text with default parameters.
-  ///
-  /// This extension method uses the helper from the current build context:
-  /// - If called within a [LanguageBuilder], it uses the helper associated with
-  ///   that builder (which may come from a [LanguageScope]).
-  /// - Otherwise, falls back to [LanguageHelper.instance].
-  ///
-  /// Note: Extension methods only work with scoped helpers when called within a
-  /// [LanguageBuilder], because that's when the helper is pushed onto the stack.
+  /// Translates text using the helper from current build context. Uses scoped
+  /// helper within [LanguageBuilder], otherwise [LanguageHelper.instance].
   ///
   /// Example:
   /// ```dart
   /// LanguageBuilder(
-  ///   builder: (context) => Text('Hello'.tr), // Uses scoped or instance helper
+  ///   builder: (context) => Text('Hello'.tr),
   /// )
   /// ```
   String get tr {
     return LanguageHelper._current.translate(this);
   }
 
-  /// Translates with only the [params] parameter.
-  ///
-  /// This extension method uses the helper from the current build context:
-  /// - If called within a [LanguageBuilder], it uses the helper associated with
-  ///   that builder (which may come from a [LanguageScope]).
-  /// - Otherwise, falls back to [LanguageHelper.instance].
+  /// Translates with parameters. Uses scoped helper within [LanguageBuilder],
+  /// otherwise [LanguageHelper.instance].
   ///
   /// Example:
   /// ```dart
@@ -37,16 +26,10 @@ extension LanguageHelperEx on String {
     return LanguageHelper._current.translate(this, params: params);
   }
 
-  /// Translates to a specific [LanguageCodes] instead of the current language.
-  ///
-  /// This extension method uses the helper from the current build context:
-  /// - If called within a [LanguageBuilder], it uses the helper associated with
-  ///   that builder (which may come from a [LanguageScope]).
-  /// - Otherwise, falls back to [LanguageHelper.instance].
-  ///
-  /// **Note:** The [toCode] parameter only works reliably when using `LanguageData`.
-  /// If you are using `LazyLanguageData`, the data for [toCode] may not yet be loaded,
-  /// so the translation may not be available unless it has already been fetched.
+  /// Translates to [toCode] instead of current language. Uses scoped helper
+  /// within [LanguageBuilder], otherwise [LanguageHelper.instance]. Only
+  /// works reliably with `LanguageData`; `LazyLanguageData` may not be loaded
+  /// yet.
   ///
   /// Example:
   /// ```dart
@@ -56,12 +39,8 @@ extension LanguageHelperEx on String {
     return LanguageHelper._current.translate(this, toCode: toCode);
   }
 
-  /// Full version of the translation with all parameters.
-  ///
-  /// This extension method uses the helper from the current build context:
-  /// - If called within a [LanguageBuilder], it uses the helper associated with
-  ///   that builder (which may come from a [LanguageScope]).
-  /// - Otherwise, falls back to [LanguageHelper.instance].
+  /// Full translation with all parameters. Uses scoped helper within
+  /// [LanguageBuilder], otherwise [LanguageHelper.instance].
   ///
   /// Example:
   /// ```dart
@@ -78,31 +57,14 @@ extension LanguageHelperEx on String {
     );
   }
 
-  /// Translates with a custom instance of [LanguageHelper].
-  ///
-  /// Unlike other extension methods (`tr`, `trP`, etc.), this method requires you to
-  /// explicitly pass a [LanguageHelper] instance. This is useful when you want to use
-  /// a specific helper outside of a [LanguageBuilder] context.
-  ///
-  /// This method is always available and does not rely on the helper stack or
-  /// [LanguageScope]. It uses the provided [helper] directly.
+  /// Translates with a custom [LanguageHelper] instance. Always available,
+  /// doesn't rely on helper stack or [LanguageScope].
   ///
   /// Example:
   /// ```dart
   /// final customHelper = LanguageHelper('CustomHelper');
   /// await customHelper.initial(data: myData);
-  ///
-  /// // Use trC outside of LanguageBuilder
   /// final text = 'Hello'.trC(customHelper);
-  ///
-  /// // With parameters
-  /// final text2 = 'Welcome @{name}'.trC(
-  ///   customHelper,
-  ///   params: {'name': 'John'},
-  /// );
-  ///
-  /// // Translate to specific language
-  /// final text3 = 'Hello'.trC(customHelper, toCode: LanguageCodes.es);
   /// ```
   String trC(
     LanguageHelper helper, {
