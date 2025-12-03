@@ -21,8 +21,8 @@ jobs:
       - name: Install and set Flutter version
         uses: subosito/flutter-action@v2
         with:
-          channel: "stable"
-          flutter-version: 3.35.x
+          channel: "master"
+          flutter-version: 3.35.0
 
       - name: Restore packages
         run: flutter pub get
@@ -35,17 +35,6 @@ jobs:
 
       - name: Run tests
         run: flutter test --coverage
-
-      - name: Generate coverage report
-        run: dart run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --packages=.dart_tool/package_config.json --report-on=lib --check-ignore
-
-      - name: Convert to relative paths
-        if: runner.os == 'Linux' || runner.os == 'Windows'
-        run: sed -i 's|SF:.*/lib|SF:lib|' coverage/lcov.info
-      
-      - name: Convert to relative paths (macOS)
-        if: runner.os == 'macOS'
-        run: sed -i '' 's|SF:.*/lib|SF:lib|' coverage/lcov.info
 
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v5
