@@ -7,8 +7,12 @@ on:
     branches: [main]
 
 jobs:
-  tests:
-    runs-on: ubuntu-latest
+  test:
+    name: Test language_helper on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - name: Checkout the code
@@ -23,13 +27,27 @@ jobs:
       - name: Restore packages
         run: flutter pub get
 
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
       - name: Analyze
-        run: flutter analyze
+        run: flutter analyze --fatal-infos
 
       - name: Run tests
         run: flutter test --coverage
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Generate coverage report
+        run: dart run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --packages=.dart_tool/package_config.json --report-on=lib --check-ignore
+
+      - name: Convert to relative paths
+        if: runner.os == 'Linux' || runner.os == 'Windows'
+        run: sed -i 's|SF:.*/lib|SF:lib|' coverage/lcov.info
+      
+      - name: Convert to relative paths (macOS)
+        if: runner.os == 'macOS'
+        run: sed -i '' 's|SF:.*/lib|SF:lib|' coverage/lcov.info
+
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
