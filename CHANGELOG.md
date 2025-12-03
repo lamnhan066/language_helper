@@ -1,3 +1,12 @@
+## 0.13.0-rc.13
+
+* Change `LanguageHelper.dispose` to future.
+* Fix race condition in `change()` method by using `_states.toList()` to create a snapshot before iteration, preventing `ConcurrentModificationError` when widgets are added/removed during language changes.
+* Fix memory leak by removing unbounded `_noScopeLoggedContexts` Set and replacing with `assert()` block that only runs in debug mode.
+* Fix async operation by properly awaiting `SharedPreferences.setString()` in `change()` method to ensure language preference is saved before method completes.
+* Fix error handling by replacing `assert()` statement with proper error handling and early return when language codes are empty.
+* Update docs.
+
 ## 0.13.0-rc.12
 
 * **BREAKING CHANGE** Change the behavior of the `initial.data` from loading the first successful provider to loading all providers and decide to override the translations by setting `override` parameter of each provider. The providers will be loaded from top to bottom.
