@@ -21,8 +21,8 @@ jobs:
       - name: Install and set Flutter version
         uses: subosito/flutter-action@v2
         with:
-          channel: "master"
-          flutter-version: 3.35.0
+          channel: "stable"
+          flutter-version: 3.35.x
 
       - name: Restore packages
         run: flutter pub get
