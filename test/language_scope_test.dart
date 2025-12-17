@@ -15,7 +15,9 @@ void main() {
       SharedPreferences.setMockInitialValues({});
 
       final scopedHelper = LanguageHelper('ScopedHelper');
-      await scopedHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await scopedHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       LanguageHelper? retrievedHelper;
 
@@ -50,8 +52,10 @@ void main() {
 
       final languageHelper = LanguageHelper.instance;
       await languageHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.en,
+        LanguageConfig(
+          data: dataList,
+          initialCode: LanguageCodes.en,
+        ),
       );
 
       LanguageHelper? retrievedHelper;
@@ -78,7 +82,9 @@ void main() {
       SharedPreferences.setMockInitialValues({});
 
       final scopedHelper = LanguageHelper('ScopedHelper');
-      await scopedHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await scopedHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       LanguageHelper? retrievedHelper;
 
@@ -112,8 +118,10 @@ void main() {
 
       final languageHelper = LanguageHelper.instance;
       await languageHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.en,
+        LanguageConfig(
+          data: dataList,
+          initialCode: LanguageCodes.en,
+        ),
       );
 
       LanguageHelper? retrievedHelper;
@@ -143,8 +151,12 @@ void main() {
 
       final parentHelper = LanguageHelper('ParentHelper');
       final childHelper = LanguageHelper('ChildHelper');
-      await parentHelper.initial(data: dataList, initialCode: LanguageCodes.en);
-      await childHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await parentHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+      );
+      await childHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       LanguageHelper? parentRetrieved;
       LanguageHelper? childRetrieved;
@@ -186,7 +198,9 @@ void main() {
       SharedPreferences.setMockInitialValues({});
 
       final scopedHelper = LanguageHelper('ScopedHelper');
-      await scopedHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await scopedHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -222,12 +236,16 @@ void main() {
         final explicitHelper = LanguageHelper('ExplicitHelper');
         final scopedHelper = LanguageHelper('ScopedHelper');
         await explicitHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.en,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.en,
+          ),
         );
         await scopedHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.vi,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.vi,
+          ),
         );
 
         await tester.pumpWidget(
@@ -259,7 +277,9 @@ void main() {
       SharedPreferences.setMockInitialValues({});
 
       final scopedHelper = LanguageHelper('ScopedHelper');
-      await scopedHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await scopedHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -287,8 +307,10 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.vi,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.vi,
+          ),
         );
 
         await tester.pumpWidget(
@@ -326,7 +348,9 @@ void main() {
       SharedPreferences.setMockInitialValues({});
 
       final scopedHelper = LanguageHelper('ScopedHelper');
-      await scopedHelper.initial(data: dataList, initialCode: LanguageCodes.en);
+      await scopedHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+      );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -362,7 +386,9 @@ void main() {
       SharedPreferences.setMockInitialValues({});
 
       final scopedHelper = LanguageHelper('ScopedHelper');
-      await scopedHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await scopedHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -395,8 +421,12 @@ void main() {
 
       final outerHelper = LanguageHelper('OuterHelper');
       final innerHelper = LanguageHelper('InnerHelper');
-      await outerHelper.initial(data: dataList, initialCode: LanguageCodes.en);
-      await innerHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await outerHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+      );
+      await innerHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -435,8 +465,12 @@ void main() {
 
       final helper1 = LanguageHelper('Helper1');
       final helper2 = LanguageHelper('Helper2');
-      await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
-      await helper2.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await helper1.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+      );
+      await helper2.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -484,8 +518,12 @@ void main() {
 
       final helper1 = LanguageHelper('Helper1');
       final helper2 = LanguageHelper('Helper2');
-      await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
-      await helper2.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await helper1.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+      );
+      await helper2.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       final scope1 = LanguageScope(
         languageHelper: helper1,
@@ -509,7 +547,9 @@ void main() {
       SharedPreferences.setMockInitialValues({});
 
       final helper = LanguageHelper('Helper');
-      await helper.initial(data: dataList, initialCode: LanguageCodes.en);
+      await helper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+      );
 
       final scope1 = LanguageScope(
         languageHelper: helper,
@@ -534,8 +574,12 @@ void main() {
 
       final helper1 = LanguageHelper('Helper1');
       final helper2 = LanguageHelper('Helper2');
-      await helper1.initial(data: dataList, initialCode: LanguageCodes.en);
-      await helper2.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await helper1.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+      );
+      await helper2.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       var buildCount = 0;
 
@@ -596,7 +640,9 @@ void main() {
         SharedPreferences.setMockInitialValues({});
 
         final helper = LanguageHelper('Helper');
-        await helper.initial(data: dataList, initialCode: LanguageCodes.en);
+        await helper.initial(
+          LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        );
 
         final oldScope = LanguageScope(
           languageHelper: helper,
@@ -659,8 +705,10 @@ void main() {
 
         final languageHelper = LanguageHelper.instance;
         await languageHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.en,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.en,
+          ),
         );
 
         LanguageHelper? retrievedHelper;
@@ -701,7 +749,9 @@ void main() {
       SharedPreferences.setMockInitialValues({});
 
       final scopedHelper = LanguageHelper('DeepScopedHelper');
-      await scopedHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await scopedHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       LanguageHelper? retrievedHelper;
 
@@ -745,7 +795,9 @@ void main() {
       SharedPreferences.setMockInitialValues({});
 
       final scopedHelper = LanguageHelper('DeepScopedHelper');
-      await scopedHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await scopedHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       LanguageHelper? retrievedHelper;
 
@@ -790,8 +842,10 @@ void main() {
 
         final languageHelper = LanguageHelper.instance;
         await languageHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.en,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.en,
+          ),
         );
 
         LanguageHelper? retrievedHelper;
@@ -832,7 +886,9 @@ void main() {
       SharedPreferences.setMockInitialValues({});
 
       final helper = LanguageHelper('SameHelper');
-      await helper.initial(data: dataList, initialCode: LanguageCodes.en);
+      await helper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+      );
 
       final oldScope = LanguageScope(
         languageHelper: helper,
@@ -856,8 +912,12 @@ void main() {
 
       final parentHelper = LanguageHelper('ParentHelper');
       final childHelper = LanguageHelper('ChildHelper');
-      await parentHelper.initial(data: dataList, initialCode: LanguageCodes.en);
-      await childHelper.initial(data: dataList, initialCode: LanguageCodes.vi);
+      await parentHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+      );
+      await childHelper.initial(
+        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+      );
 
       LanguageHelper? parentRetrieved;
       LanguageHelper? childRetrieved;
@@ -902,8 +962,10 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.vi,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.vi,
+          ),
         );
 
         LanguageHelper? languageHelper1;
@@ -975,8 +1037,10 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.vi,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.vi,
+          ),
         );
 
         LanguageHelper? languageHelper1;
@@ -1053,8 +1117,10 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.vi,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.vi,
+          ),
         );
 
         LanguageHelper? languageHelper1;
@@ -1140,9 +1206,11 @@ void main() {
 
         final languageHelper = LanguageHelper.instance;
         await languageHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.en,
-          isDebug: true, // Enable debug to see logging
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.en,
+            isDebug: true, // Enable debug to see logging
+          ),
         );
 
         // Capture logs by monitoring console output
@@ -1196,9 +1264,11 @@ void main() {
 
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.vi,
-        isDebug: true,
+        LanguageConfig(
+          data: dataList,
+          initialCode: LanguageCodes.vi,
+          isDebug: true,
+        ),
       );
 
       LanguageHelper? retrievedHelper;
@@ -1234,9 +1304,11 @@ void main() {
 
       final languageHelper = LanguageHelper.instance;
       await languageHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.en,
-        isDebug: true,
+        LanguageConfig(
+          data: dataList,
+          initialCode: LanguageCodes.en,
+          isDebug: true,
+        ),
       );
 
       LanguageHelper? helper1;
@@ -1269,9 +1341,11 @@ void main() {
 
         final languageHelper = LanguageHelper.instance;
         await languageHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.en,
-          isDebug: true,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.en,
+            isDebug: true,
+          ),
         );
 
         LanguageHelper? retrievedHelper;
@@ -1306,8 +1380,10 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.vi,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.vi,
+          ),
         );
 
         LanguageHelper? loadingHelper;
@@ -1380,8 +1456,10 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.vi,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.vi,
+          ),
         );
 
         LanguageHelper? loadingHelper;
@@ -1460,8 +1538,10 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.vi,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.vi,
+          ),
         );
 
         LanguageHelper? loadingHelper;

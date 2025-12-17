@@ -94,12 +94,14 @@ void main() {
 
       // Initialize with test data
       await languageHelper.initial(
-        data: [
-          LanguageDataProvider.lazyData({
-            LanguageCodes.en: () => {'Hello': 'Hello'},
-            LanguageCodes.vi: () => {'Hello': 'Xin chào'},
-          }),
-        ],
+        LanguageConfig(
+          data: [
+            LanguageDataProvider.lazyData({
+              LanguageCodes.en: () => {'Hello': 'Hello'},
+              LanguageCodes.vi: () => {'Hello': 'Xin chào'},
+            }),
+          ],
+        ),
       );
 
       expect(languageHelper.isInitialized, true);
@@ -111,21 +113,23 @@ void main() {
       final languageHelper = LanguageHelper('TestHelper');
 
       await languageHelper.initial(
-        data: [
-          LanguageDataProvider.lazyData({
-            LanguageCodes.en: () => {
-              'Hello @{name}': 'Hello @{name}',
-              'You have @{count} item': const LanguageConditions(
-                param: 'count',
-                conditions: {
-                  '0': 'You have no items',
-                  '1': 'You have one item',
-                  '_': 'You have @{count} items',
-                },
-              ),
-            },
-          }),
-        ],
+        LanguageConfig(
+          data: [
+            LanguageDataProvider.lazyData({
+              LanguageCodes.en: () => {
+                'Hello @{name}': 'Hello @{name}',
+                'You have @{count} item': const LanguageConditions(
+                  param: 'count',
+                  conditions: {
+                    '0': 'You have no items',
+                    '1': 'You have one item',
+                    '_': 'You have @{count} items',
+                  },
+                ),
+              },
+            }),
+          ],
+        ),
       );
 
       // Test simple parameter translation
@@ -153,12 +157,14 @@ void main() {
       final languageHelper = LanguageHelper('TestHelper');
 
       await languageHelper.initial(
-        data: [
-          LanguageDataProvider.lazyData({
-            LanguageCodes.en: () => {'Hello': 'Hello'},
-            LanguageCodes.vi: () => {'Hello': 'Xin chào'},
-          }),
-        ],
+        LanguageConfig(
+          data: [
+            LanguageDataProvider.lazyData({
+              LanguageCodes.en: () => {'Hello': 'Hello'},
+              LanguageCodes.vi: () => {'Hello': 'Xin chào'},
+            }),
+          ],
+        ),
       );
 
       // Test language change

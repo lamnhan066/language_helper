@@ -10,7 +10,9 @@ import 'package:language_helper/language_helper.dart';
 /// Example:
 /// ```dart
 /// final languageHelper = LanguageHelper.instance;
-/// await languageHelper.initial(data: []);
+/// await languageHelper.initial(
+///   LanguageConfig(data: []),
+/// );
 ///
 /// MaterialApp(
 ///   localizationsDelegates: [

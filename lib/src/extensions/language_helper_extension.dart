@@ -64,7 +64,11 @@ extension LanguageHelperEx on String {
   /// Example:
   /// ```dart
   /// final customHelper = LanguageHelper('CustomHelper');
-  /// await customHelper.initial(data: myData);
+  /// await customHelper.initial(
+  ///   LanguageConfig(
+  ///     data: myData,
+  ///   ),
+  /// );
   /// final text = 'Hello'.trC(customHelper);
   /// ```
   String trC(

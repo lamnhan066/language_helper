@@ -19,7 +19,9 @@ part 'widgets/language_builder.dart';
 /// **Basic Usage:**
 /// ```dart
 /// await LanguageHelper.instance.initial(
-///   data: [LanguageDataProvider.data(myLanguageData)],
+///   LanguageConfig(
+///     data: [LanguageDataProvider.data(myLanguageData)],
+///   ),
 /// );
 /// final text = LanguageHelper.instance.translate('Hello');
 /// await LanguageHelper.instance.change(LanguageCodes.vi);
@@ -195,69 +197,42 @@ class LanguageHelper {
   Future<void> get ensureInitialized => _ensureInitialized.future;
   final _ensureInitialized = Completer<void>();
 
-  /// Initializes the helper with language data. Must be called before using
-  /// the helper.
+  /// Initializes the helper with the provided [config]. Must be called before
+  /// using the helper.
   ///
   /// **Initial Language Priority:**
-  /// 1. [initialCode] (if provided and available)
-  /// 2. Saved language from SharedPreferences (if [isAutoSave] is true)
-  /// 3. Device language (if [syncWithDevice] is true and changed)
+  /// 1. [LanguageConfig.initialCode] when provided and available
+  /// 2. Saved language from SharedPreferences when
+  ///    [LanguageConfig.isAutoSave] is true
+  /// 3. Device language when [LanguageConfig.syncWithDevice] is true and
+  ///    the device language has changed
   /// 4. First language from providers
   /// 5. [LanguageCodes.en] (fallback if data is empty)
   ///
-  /// If [isOptionalCountryCode] is true, falls back to language code only
-  /// when full locale (e.g., `zh_CN`) is unavailable. Safe to call multiple
-  /// times.
-  Future<void> initial({
-    /// Language data providers. If empty, a temporary English provider is
-    /// added.
-    required Iterable<LanguageDataProvider> data,
-
-    /// Initial language code. Falls back to device language or first provider
-    /// language if null.
-    LanguageCodes? initialCode,
-
-    /// Use `initialCode` as fallback when changing to unavailable languages.
-    bool useInitialCodeWhenUnavailable = false,
-
-    /// Default `forceRebuild` value for all `LanguageBuilder` widgets.
-    bool forceRebuild = true,
-
-    /// Automatically save/restore language preference to SharedPreferences.
-    bool isAutoSave = true,
-
-    /// Update app language when device language changes.
-    bool syncWithDevice = true,
-
-    /// Fall back to language code only when full locale (e.g., `zh_CN`) is
-    /// unavailable.
-    bool isOptionalCountryCode = true,
-
-    /// Callback invoked when language changes.
-    void Function(LanguageCodes code)? onChanged,
-
-    /// Enable debug logging. Defaults to false.
-    bool isDebug = false,
-  }) async {
+  /// If [LanguageConfig.isOptionalCountryCode] is true, falls back to language
+  /// code only when the full locale (e.g., `zh_CN`) is unavailable. Safe to
+  /// call multiple times.
+  Future<void> initial(LanguageConfig config) async {
     if (isInitialized) return;
 
     if (_isInitializing) return ensureInitialized;
     _isInitializing = true;
 
     _data.clear();
-    _dataProviders = data;
-    _forceRebuild = forceRebuild;
-    _onChanged = onChanged;
-    _isDebug = isDebug;
-    _useInitialCodeWhenUnavailable = useInitialCodeWhenUnavailable;
-    _isAutoSave = isAutoSave;
-    _syncWithDevice = syncWithDevice;
-    _initialCode = initialCode;
+    _dataProviders = config.data;
+    _forceRebuild = config.forceRebuild;
+    _onChanged = config.onChanged;
+    _isDebug = config.isDebug;
+    _useInitialCodeWhenUnavailable = config.useInitialCodeWhenUnavailable;
+    _isAutoSave = config.isAutoSave;
+    _syncWithDevice = config.syncWithDevice;
+    _initialCode = config.initialCode;
     _logger ??= LiteLogger(
       name: prefix,
-      enabled: isDebug,
+      enabled: config.isDebug,
       minLevel: LogLevel.debug,
     );
+    final isOptionalCountryCode = config.isOptionalCountryCode;
 
     // When the `data` is empty, a temporary data will be added.
     if (_dataProviders.isEmpty) {

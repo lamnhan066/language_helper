@@ -20,8 +20,10 @@ class _JsonAssetPageState extends State<JsonAssetPage> {
 
   Future<void> _initializeLanguageHelper() async {
     await _languageHelper.initial(
-      data: [LanguageDataProvider.asset('assets/languages')],
-      isDebug: true,
+      LanguageConfig(
+        data: [LanguageDataProvider.asset('assets/languages')],
+        isDebug: true,
+      ),
     );
     setState(() {
       _isLoaded = true;
@@ -258,8 +260,10 @@ class _JsonAssetPageState extends State<JsonAssetPage> {
   final languageHelper = 
   LanguageHelper('JsonAssetHelper');
   await languageHelper.initial(
-  data: [LanguageDataProvider
-    .asset('assets/languages')],
+  LanguageConfig(
+    data: [LanguageDataProvider
+      .asset('assets/languages')],
+  ),
   );
   
   // Use in widgets

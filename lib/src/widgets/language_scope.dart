@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:language_helper/language_helper.dart';
 
 /// [InheritedWidget] that provides a [LanguageHelper] to descendants.
@@ -10,7 +9,9 @@ import 'package:language_helper/language_helper.dart';
 /// Example:
 /// ```dart
 /// final customHelper = LanguageHelper('CustomHelper');
-/// await customHelper.initial(data: customLanguageData);
+/// await customHelper.initial(
+///   LanguageConfig(data: customLanguageData),
+/// );
 ///
 /// LanguageScope(
 ///   languageHelper: customHelper,

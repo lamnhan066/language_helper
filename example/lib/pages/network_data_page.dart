@@ -71,7 +71,7 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
       };
 
       await _languageHelper.initial(
-        data: [LanguageDataProvider.lazyData(mockNetworkData)],
+        LanguageConfig(data: [LanguageDataProvider.lazyData(mockNetworkData)]),
       );
 
       setState(() {
@@ -426,8 +426,10 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
   final languageHelper = 
   LanguageHelper('NetworkHelper');
   await languageHelper.initial(
-  data: [LanguageDataProvider
-    .network('https://api.example.com/')],
+  LanguageConfig(
+    data: [LanguageDataProvider
+      .network('https://api.example.com/')],
+  ),
   );
   
   // Or use lazy data for mock responses

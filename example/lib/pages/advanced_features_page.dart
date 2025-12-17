@@ -106,7 +106,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
     };
 
     await _languageHelper.initial(
-      data: [LanguageDataProvider.lazyData(advancedData)],
+      LanguageConfig(data: [LanguageDataProvider.lazyData(advancedData)]),
     );
 
     // Listen to language changes

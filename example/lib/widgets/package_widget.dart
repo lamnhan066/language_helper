@@ -12,9 +12,11 @@ class PackageWidget extends StatefulWidget {
   // Package's own LanguageHelper instance
   static final LanguageHelper _packageLanguageHelper =
       LanguageHelper('PackageWidget')..initial(
-        data: [LanguageDataProvider.data(PackageWidget._packageLanguageData)],
-        initialCode: LanguageCodes.en,
-        isDebug: true,
+        LanguageConfig(
+          data: [LanguageDataProvider.data(PackageWidget._packageLanguageData)],
+          initialCode: LanguageCodes.en,
+          isDebug: true,
+        ),
       );
 
   // Static LanguageDelegate exposed for use in MaterialApp

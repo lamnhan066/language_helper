@@ -23,11 +23,15 @@ import 'package:lite_logger/lite_logger.dart';
 ///
 /// Example:
 /// ```dart
-/// await languageHelper.initial(data: [
-///   LanguageDataProvider.data(myLanguageData),
-///   LanguageDataProvider.asset('assets/languages'),
-///   LanguageDataProvider.network('https://api.example.com/languages'),
-/// ]);
+/// await languageHelper.initial(
+///   LanguageConfig(
+///     data: [
+///       LanguageDataProvider.data(myLanguageData),
+///       LanguageDataProvider.asset('assets/languages'),
+///       LanguageDataProvider.network('https://api.example.com/languages'),
+///     ],
+///   ),
+/// );
 /// ```
 class LanguageDataProvider {
   /// Internal constructor for creating a provider with custom getter functions.
@@ -57,7 +61,9 @@ class LanguageDataProvider {
   /// Example:
   /// ```dart
   /// final provider = LanguageDataProvider.asset('assets/languages');
-  /// await languageHelper.initial(data: [provider]);
+  /// await languageHelper.initial(
+  ///   LanguageConfig(data: [provider]),
+  /// );
   /// ```
   factory LanguageDataProvider.asset(
     String parentPath, {
@@ -113,7 +119,9 @@ class LanguageDataProvider {
   ///   'https://api.example.com/languages',
   ///   headers: {'Authorization': 'Bearer token'},
   /// );
-  /// await languageHelper.initial(data: [provider]);
+  /// await languageHelper.initial(
+  ///   LanguageConfig(data: [provider]),
+  /// );
   /// ```
   factory LanguageDataProvider.network(
     String parentUrl, {
@@ -164,7 +172,9 @@ class LanguageDataProvider {
   ///   LanguageCodes.vi: {'Hello': 'Xin chào', 'Goodbye': 'Tạm biệt'},
   /// };
   /// final provider = LanguageDataProvider.data(languageData);
-  /// await languageHelper.initial(data: [provider]);
+  /// await languageHelper.initial(
+  ///   LanguageConfig(data: [provider]),
+  /// );
   /// ```
   factory LanguageDataProvider.data(LanguageData data, {bool override = true}) {
     return LanguageDataProvider._(
@@ -198,7 +208,9 @@ class LanguageDataProvider {
   ///   LanguageCodes.vi: () => {'Hello': 'Xin chào', 'Goodbye': 'Tạm biệt'},
   /// };
   /// final provider = LanguageDataProvider.lazyData(lazyData);
-  /// await languageHelper.initial(data: [provider]);
+  /// await languageHelper.initial(
+  ///   LanguageConfig(data: [provider]),
+  /// );
   /// ```
   factory LanguageDataProvider.lazyData(
     LazyLanguageData data, {

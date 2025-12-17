@@ -16,9 +16,11 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       languageHelper = LanguageHelper('TestLanguageHelper');
       await languageHelper.initial(
-        data: dataList,
-        initialCode: LanguageCodes.en,
-        isAutoSave: false,
+        LanguageConfig(
+          data: dataList,
+          initialCode: LanguageCodes.en,
+          isAutoSave: false,
+        ),
       );
       delegate = LanguageDelegate(languageHelper);
     });
@@ -58,8 +60,10 @@ void main() {
       test('handles empty locales set', () async {
         final emptyHelper = LanguageHelper('EmptyHelper');
         await emptyHelper.initial(
-          data: [],
-          isAutoSave: false,
+          const LanguageConfig(
+            data: [],
+            isAutoSave: false,
+          ),
         );
         final emptyDelegate = LanguageDelegate(emptyHelper);
 
@@ -245,18 +249,22 @@ void main() {
           // Create first helper and delegate
           final helper1 = LanguageHelper('Helper1');
           await helper1.initial(
-            data: dataList,
-            initialCode: LanguageCodes.en,
-            isAutoSave: false,
+            LanguageConfig(
+              data: dataList,
+              initialCode: LanguageCodes.en,
+              isAutoSave: false,
+            ),
           );
           final delegate1 = LanguageDelegate(helper1);
 
           // Create second helper and delegate with different language
           final helper2 = LanguageHelper('Helper2');
           await helper2.initial(
-            data: dataList,
-            initialCode: LanguageCodes.vi,
-            isAutoSave: false,
+            LanguageConfig(
+              data: dataList,
+              initialCode: LanguageCodes.vi,
+              isAutoSave: false,
+            ),
           );
           final delegate2 = LanguageDelegate(helper2);
 
@@ -282,18 +290,22 @@ void main() {
           // Create first helper and delegate with English
           final helper1 = LanguageHelper('Helper1');
           await helper1.initial(
-            data: dataList,
-            initialCode: LanguageCodes.en,
-            isAutoSave: false,
+            LanguageConfig(
+              data: dataList,
+              initialCode: LanguageCodes.en,
+              isAutoSave: false,
+            ),
           );
           final oldDelegate = LanguageDelegate(helper1);
 
           // Create second helper and delegate with Vietnamese
           final helper2 = LanguageHelper('Helper2');
           await helper2.initial(
-            data: dataList,
-            initialCode: LanguageCodes.vi,
-            isAutoSave: false,
+            LanguageConfig(
+              data: dataList,
+              initialCode: LanguageCodes.vi,
+              isAutoSave: false,
+            ),
           );
           final newDelegate = LanguageDelegate(helper2);
 
@@ -342,9 +354,11 @@ void main() {
         });
 
         await testHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.en,
-          isAutoSave: false,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.en,
+            isAutoSave: false,
+          ),
         );
 
         await tester.pumpWidget(
@@ -418,9 +432,11 @@ void main() {
           });
 
           await mainHelper.initial(
-            data: dataList,
-            initialCode: LanguageCodes.en,
-            isAutoSave: false,
+            LanguageConfig(
+              data: dataList,
+              initialCode: LanguageCodes.en,
+              isAutoSave: false,
+            ),
           );
 
           // Create separate helper for a widget
@@ -430,9 +446,11 @@ void main() {
           });
 
           await separateHelper.initial(
-            data: dataList,
-            initialCode: LanguageCodes.en,
-            isAutoSave: false,
+            LanguageConfig(
+              data: dataList,
+              initialCode: LanguageCodes.en,
+              isAutoSave: false,
+            ),
           );
 
           // Create a widget that uses the separate helper
@@ -532,9 +550,11 @@ void main() {
           });
 
           await mainHelper.initial(
-            data: dataList,
-            initialCode: LanguageCodes.en,
-            isAutoSave: false,
+            LanguageConfig(
+              data: dataList,
+              initialCode: LanguageCodes.en,
+              isAutoSave: false,
+            ),
           );
 
           // Create separate helper
@@ -544,9 +564,11 @@ void main() {
           });
 
           await separateHelper.initial(
-            data: dataList,
-            initialCode: LanguageCodes.en,
-            isAutoSave: false,
+            LanguageConfig(
+              data: dataList,
+              initialCode: LanguageCodes.en,
+              isAutoSave: false,
+            ),
           );
 
           final separateWidget = _SeparateLanguageWidget(
@@ -601,9 +623,11 @@ void main() {
         });
 
         await testHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.en,
-          isAutoSave: false,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.en,
+            isAutoSave: false,
+          ),
         );
 
         final delegate = LanguageDelegate(testHelper);
@@ -633,9 +657,11 @@ void main() {
         });
 
         await testHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.en,
-          isAutoSave: false,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.en,
+            isAutoSave: false,
+          ),
         );
 
         // Track language changes
@@ -699,9 +725,11 @@ void main() {
         });
 
         await testHelper.initial(
-          data: dataList,
-          initialCode: LanguageCodes.en,
-          isAutoSave: false,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.en,
+            isAutoSave: false,
+          ),
         );
 
         final delegate1 = LanguageDelegate(testHelper);
@@ -754,9 +782,11 @@ void main() {
         });
 
         await helper2.initial(
-          data: dataList,
-          initialCode: LanguageCodes.en,
-          isAutoSave: false,
+          LanguageConfig(
+            data: dataList,
+            initialCode: LanguageCodes.en,
+            isAutoSave: false,
+          ),
         );
         final delegate2 = LanguageDelegate(helper2);
 

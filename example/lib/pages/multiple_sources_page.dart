@@ -49,10 +49,12 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
 
   Future<void> _initializeLanguageHelper() async {
     await _languageHelper.initial(
-      data: [
-        LanguageDataProvider.lazyData(languageData),
-        LanguageDataProvider.asset('assets/languages'),
-      ],
+      LanguageConfig(
+        data: [
+          LanguageDataProvider.lazyData(languageData),
+          LanguageDataProvider.asset('assets/languages'),
+        ],
+      ),
     );
 
     setState(() {
@@ -379,14 +381,16 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
                                 '''
   // Initialize with multiple sources
   await languageHelper.initial(
-  data: [
-    LanguageDataProvider.lazyData(
-      primaryData),    // 1st priority
-    LanguageDataProvider.lazyData(
-      secondaryData),  // 2nd priority
-    LanguageDataProvider.asset(
-      'assets/languages'), // 3rd priority
-  ],
+  LanguageConfig(
+    data: [
+      LanguageDataProvider.lazyData(
+        primaryData),    // 1st priority
+      LanguageDataProvider.lazyData(
+        secondaryData),  // 2nd priority
+      LanguageDataProvider.asset(
+        'assets/languages'), // 3rd priority
+    ],
+  ),
   );
   
   // Add data dynamically
