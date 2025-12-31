@@ -19,9 +19,13 @@ class PackageDelegatePage extends StatefulWidget {
 class _PackageDelegatePageState extends State<PackageDelegatePage> {
   // Main page's own LanguageHelper instance
   final LanguageHelper _mainLanguageHelper =
-      LanguageHelper('PackageDelegatePage')..initial([
-        LanguageDataProvider.data(_mainLanguageData),
-      ], config: LanguageConfig(initialCode: LanguageCodes.en, isDebug: true));
+      LanguageHelper('PackageDelegatePage')..initial(
+        [LanguageDataProvider.data(_mainLanguageData)],
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.en,
+          isDebug: true,
+        ),
+      );
 
   // Main page's language data
   static final Map<LanguageCodes, Map<String, dynamic>> _mainLanguageData = {

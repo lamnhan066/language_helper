@@ -51,7 +51,7 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
     await _languageHelper.initial([
       LanguageDataProvider.lazyData(languageData),
       LanguageDataProvider.asset('assets/languages'),
-    ], config: const LanguageConfig());
+    ]);
 
     setState(() {
       _isLoaded = true;

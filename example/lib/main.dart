@@ -16,7 +16,7 @@ void main() async {
   // Initialize LanguageHelper with Dart map data
   await LanguageHelper.instance.initial(
     [LanguageDataProvider.lazyData(languageData)],
-    config: LanguageConfig(
+    config: const LanguageConfig(
       initialCode: LanguageCodes.en,
       isDebug: !kReleaseMode,
     ),

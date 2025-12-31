@@ -72,7 +72,7 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
 
       await _languageHelper.initial([
         LanguageDataProvider.lazyData(mockNetworkData),
-      ], config: const LanguageConfig());
+      ]);
 
       setState(() {
         _isLoaded = true;

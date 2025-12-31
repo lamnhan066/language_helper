@@ -107,7 +107,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
 
     await _languageHelper.initial([
       LanguageDataProvider.lazyData(advancedData),
-    ], config: const LanguageConfig());
+    ]);
 
     // Listen to language changes
     _languageSubscription = _languageHelper.stream.listen((newCode) {

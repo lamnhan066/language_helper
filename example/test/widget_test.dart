@@ -98,7 +98,7 @@ void main() {
           LanguageCodes.en: () => {'Hello': 'Hello'},
           LanguageCodes.vi: () => {'Hello': 'Xin chào'},
         }),
-      ], config: const LanguageConfig());
+      ]);
 
       expect(languageHelper.isInitialized, true);
       expect(languageHelper.codes, contains(LanguageCodes.en));
@@ -122,7 +122,7 @@ void main() {
             ),
           },
         }),
-      ], config: const LanguageConfig());
+      ]);
 
       // Test simple parameter translation
       expect(
@@ -153,7 +153,7 @@ void main() {
           LanguageCodes.en: () => {'Hello': 'Hello'},
           LanguageCodes.vi: () => {'Hello': 'Xin chào'},
         }),
-      ], config: const LanguageConfig());
+      ]);
 
       // Test language change
       expect(languageHelper.code, LanguageCodes.en);
