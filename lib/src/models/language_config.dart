@@ -1,11 +1,9 @@
 import 'package:language_code/language_code.dart';
-import 'package:language_helper/src/models/language_data_provider.dart';
 
 /// Configuration used to initialize a LanguageHelper.
 class LanguageConfig {
   /// Creates a configuration for LanguageHelper.initial.
   const LanguageConfig({
-    required this.data,
     this.initialCode,
     this.useInitialCodeWhenUnavailable = false,
     this.forceRebuild = true,
@@ -15,9 +13,6 @@ class LanguageConfig {
     this.onChanged,
     this.isDebug = false,
   });
-
-  /// Language data providers. If empty, a temporary English provider is added.
-  final Iterable<LanguageDataProvider> data;
 
   /// Initial language code. Falls back to device language or first provider
   /// language if null.

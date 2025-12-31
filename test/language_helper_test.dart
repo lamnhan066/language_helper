@@ -27,8 +27,8 @@ void main() async {
 
   setUpAll(() async {
     await languageHelper.initial(
-      LanguageConfig(
-        data: dataList,
+      dataList,
+      config: LanguageConfig(
         initialCode: LanguageCodes.en,
         isDebug: true,
         onChanged: (value) {
@@ -50,7 +50,7 @@ void main() async {
   group('Test with empty data and use temporary testing data -', () {
     test('data = []', () async {
       await languageHelper.initial(
-        const LanguageConfig(data: []),
+        [],
       );
       expect(languageHelper.code, equals(LanguageCodes.en));
     });
@@ -60,7 +60,8 @@ void main() async {
       addTearDown(testHelper.dispose);
 
       await testHelper.initial(
-        const LanguageConfig(data: [], isDebug: true),
+        [],
+        config: const LanguageConfig(isDebug: true),
       );
       expect(testHelper.code, equals(LanguageCodes.en));
     });
@@ -73,8 +74,8 @@ void main() async {
 
         // Use empty providers that return empty codes (not empty provider list)
         await testHelper.initial(
-          const LanguageConfig(
-            data: [LanguageDataProvider.empty()],
+          [const LanguageDataProvider.empty()],
+          config: const LanguageConfig(
             isDebug: true,
           ),
         );
@@ -89,7 +90,7 @@ void main() async {
       final temp = LanguageHelper('TempLanguageHelper');
       expect(temp.isInitialized, equals(false));
       await temp.initial(
-        const LanguageConfig(data: []),
+        [],
       );
       expect(temp.isInitialized, equals(true));
     });
@@ -101,7 +102,7 @@ void main() async {
         }),
       );
       await temp.initial(
-        const LanguageConfig(data: []),
+        [],
       );
       await temp.ensureInitialized;
       expect(temp.isInitialized, equals(true));
@@ -121,8 +122,8 @@ void main() async {
         testHelper.codeKey: LanguageCodes.vi.code,
       });
       await testHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+        config: LanguageConfig(
           isDebug: true,
           onChanged: (value) {
             expect(value, isA<LanguageCodes>());
@@ -146,8 +147,8 @@ void main() async {
     });
     test('Get language from prefs and is available in LanguageData', () async {
       await languageHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+        config: LanguageConfig(
           isDebug: true,
           isAutoSave: false,
           onChanged: (value) {
@@ -162,8 +163,8 @@ void main() async {
       'Get language from prefs and is unavailable in LanguageData',
       () async {
         await languageHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: LanguageConfig(
             initialCode: LanguageCodes.cu,
             isAutoSave: false,
             isDebug: true,
@@ -182,8 +183,8 @@ void main() async {
       SharedPreferences.setMockInitialValues({});
       LanguageCode.setTestCode(LanguageCodes.cu);
       await languageHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+        config: LanguageConfig(
           syncWithDevice: false,
           isAutoSave: false,
           isDebug: true,
@@ -222,11 +223,11 @@ void main() async {
       };
 
       await testHelper.initial(
-        LanguageConfig(
-          data: [
-            LanguageDataProvider.data(data),
-            LanguageDataProvider.data(dataOverrides),
-          ],
+        [
+          LanguageDataProvider.data(data),
+          LanguageDataProvider.data(dataOverrides),
+        ],
+        config: LanguageConfig(
           isAutoSave: false,
           isDebug: true,
           onChanged: (value) {
@@ -252,11 +253,11 @@ void main() async {
       };
 
       await testHelper.initial(
-        LanguageConfig(
-          data: [
-            LanguageDataProvider.data(data),
-            LanguageDataProvider.data(dataOverrides),
-          ],
+        [
+          LanguageDataProvider.data(data),
+          LanguageDataProvider.data(dataOverrides),
+        ],
+        config: LanguageConfig(
           isAutoSave: false,
           isDebug: true,
           onChanged: (value) {
@@ -276,8 +277,8 @@ void main() async {
 
       SharedPreferences.setMockInitialValues({});
       await testHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+        config: LanguageConfig(
           initialCode: LanguageCodes.en,
           useInitialCodeWhenUnavailable: true,
           onChanged: (code) {},
@@ -296,8 +297,9 @@ void main() async {
 
       SharedPreferences.setMockInitialValues({});
       await testHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
         ),
       );
@@ -314,9 +316,7 @@ void main() async {
 
       SharedPreferences.setMockInitialValues({});
       await testHelper.initial(
-        LanguageConfig(
-          data: dataList,
-        ),
+        dataList,
       );
       await testHelper.change(LanguageCodes.vi);
       expect(testHelper.code, equals(LanguageCodes.vi));
@@ -334,8 +334,8 @@ void main() async {
 
         SharedPreferences.setMockInitialValues({});
         await testHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: LanguageConfig(
             initialCode: LanguageCodes.cu, // cu is not in dataList
             useInitialCodeWhenUnavailable: true,
             isDebug: true,
@@ -594,7 +594,7 @@ void main() async {
       addTearDown(testHelper.dispose);
 
       await testHelper.initial(
-        LanguageConfig(data: dataList),
+        dataList,
       );
       await testHelper.change(LanguageCodes.en);
 
@@ -609,7 +609,7 @@ void main() async {
       addTearDown(testHelper.dispose);
 
       await testHelper.initial(
-        LanguageConfig(data: [...dataList, ...dataOverrides]),
+        [...dataList, ...dataOverrides],
       );
       await testHelper.change(LanguageCodes.en);
 
@@ -720,8 +720,9 @@ void main() async {
       });
       LanguageCode.setTestCode(LanguageCodes.en);
       await testHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.vi,
           syncWithDevice: false,
         ),
@@ -737,8 +738,9 @@ void main() async {
       SharedPreferences.setMockInitialValues({});
       LanguageCode.setTestCode(LanguageCodes.en);
       await testHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.vi,
         ),
       );
@@ -757,7 +759,7 @@ void main() async {
         SharedPreferences.setMockInitialValues({});
         LanguageCode.setTestCode(LanguageCodes.zh_TW);
         await testHelper.initial(
-          LanguageConfig(data: dataAdds),
+          dataAdds,
         );
 
         expect(testHelper.code, equals(LanguageCodes.zh));
@@ -775,8 +777,9 @@ void main() async {
         SharedPreferences.setMockInitialValues({});
         LanguageCode.setTestCode(LanguageCodes.zh_TW);
         await testHelper.initial(
-          LanguageConfig(
-            data: dataAdds,
+          dataAdds,
+
+          config: const LanguageConfig(
             isOptionalCountryCode: false,
           ),
         );
@@ -794,8 +797,9 @@ void main() async {
       });
       LanguageCode.setTestCode(LanguageCodes.vi);
       await testHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.vi,
         ),
       );
@@ -812,8 +816,9 @@ void main() async {
       });
       LanguageCode.setTestCode(LanguageCodes.en);
       await testHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.vi,
         ),
       );
@@ -833,8 +838,9 @@ void main() async {
         });
         LanguageCode.setTestCode(LanguageCodes.vi);
         await testHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+
+          config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
             isDebug: true,
           ),
@@ -856,8 +862,9 @@ void main() async {
         });
         LanguageCode.setTestCode(LanguageCodes.en);
         await testHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+
+          config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
             isDebug: true,
           ),
@@ -930,7 +937,8 @@ void main() async {
       SharedPreferences.setMockInitialValues({});
       final helper = LanguageHelper('CustomLanguageHelper');
       await helper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       await tester.pumpWidget(CustomLanguageHelperWidget(helper: helper));
@@ -1175,10 +1183,12 @@ void main() async {
       final helper2 = LanguageHelper('WidgetTest2');
 
       await helper1.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       await helper2.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       await tester.pumpWidget(
@@ -1228,10 +1238,12 @@ void main() async {
       final helper2 = LanguageHelper('TrTest2');
 
       await helper1.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       await helper2.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       await tester.pumpWidget(
@@ -1277,7 +1289,8 @@ void main() async {
       final helper2 = LanguageHelper('SharedWidgetPrefix');
 
       await helper1.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       // Change language in helper1
@@ -1285,7 +1298,8 @@ void main() async {
 
       // Initialize helper2 - should load the saved language
       await helper2.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       await tester.pumpWidget(
@@ -1326,10 +1340,12 @@ void main() async {
       final helper2 = LanguageHelper('RebuildTest2');
 
       await helper1.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       await helper2.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       var buildCount1 = 0;
@@ -1394,10 +1410,12 @@ void main() async {
       final innerHelper = LanguageHelper('InnerPrefix');
 
       await outerHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       await innerHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       await tester.pumpWidget(
@@ -1450,7 +1468,8 @@ void main() async {
 
       final helper = LanguageHelper('ParameterTest');
       await helper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       await tester.pumpWidget(
@@ -1618,14 +1637,16 @@ void main() async {
         final helper2 = LanguageHelper('TestHelper2');
 
         await helper1.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
           ),
         );
         await helper2.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+
+          config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
           ),
         );
@@ -1701,8 +1722,8 @@ void main() async {
 
     test('Add data with overwrite is true', () async {
       await languageHelper.initial(
-        LanguageConfig(
-          data: [...dataList, ...dataOverrides],
+        [...dataList, ...dataOverrides],
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
         ),
       );
@@ -1724,8 +1745,9 @@ void main() async {
 
     test('Add data with overwrite is true to cover line 1179', () async {
       await languageHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
         ),
       );
@@ -1769,8 +1791,9 @@ void main() async {
       addTearDown(helper.dispose);
 
       await helper.initial(
-        LanguageConfig(
-          data: [LanguageDataProvider.lazyData(lazyData)],
+        [LanguageDataProvider.lazyData(lazyData)],
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
           syncWithDevice: false,
           isAutoSave: false,
@@ -1803,8 +1826,9 @@ void main() async {
       addTearDown(helper.dispose);
 
       await helper.initial(
-        LanguageConfig(
-          data: [LanguageDataProvider.lazyData(lazyData)],
+        [LanguageDataProvider.lazyData(lazyData)],
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
           syncWithDevice: false,
           isAutoSave: false,
@@ -1845,8 +1869,9 @@ void main() async {
         addTearDown(helper.dispose);
 
         await helper.initial(
-          LanguageConfig(
-            data: [LanguageDataProvider.lazyData(lazyData)],
+          [LanguageDataProvider.lazyData(lazyData)],
+
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
             syncWithDevice: false,
             isAutoSave: false,
@@ -1892,8 +1917,9 @@ void main() async {
       addTearDown(helper.dispose);
 
       await helper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
           syncWithDevice: false,
           isAutoSave: false,
@@ -1942,8 +1968,9 @@ void main() async {
         addTearDown(helper.dispose);
 
         await helper.initial(
-          LanguageConfig(
-            data: [LanguageDataProvider.lazyData(lazyData)],
+          [LanguageDataProvider.lazyData(lazyData)],
+
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
             syncWithDevice: false,
             isAutoSave: false,
@@ -1984,8 +2011,8 @@ void main() async {
       });
 
       await testHelper.initial(
-        LanguageConfig(
-          data: [provider1, provider2],
+        [provider1, provider2],
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
         ),
       );
@@ -2014,8 +2041,8 @@ void main() async {
       });
 
       await testHelper.initial(
-        LanguageConfig(
-          data: [provider1, provider2],
+        [provider1, provider2],
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
         ),
       );
@@ -2042,8 +2069,8 @@ void main() async {
       });
 
       await testHelper.initial(
-        LanguageConfig(
-          data: [provider1, provider2],
+        [provider1, provider2],
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
         ),
       );
@@ -2074,8 +2101,9 @@ void main() async {
       });
 
       await testHelper.initial(
-        LanguageConfig(
-          data: [provider1],
+        [provider1],
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
         ),
       );
@@ -2101,8 +2129,8 @@ void main() async {
         });
 
         await testHelper.initial(
-          LanguageConfig(
-            data: [provider1, provider2],
+          [provider1, provider2],
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
             isDebug: true,
           ),
@@ -2170,7 +2198,8 @@ void main() async {
 
       final helper = LanguageHelper('NetworkLanguageHelper');
       await helper.initial(
-        LanguageConfig(data: [data], initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       expect(helper.code, equals(LanguageCodes.en));
       await helper.change(LanguageCodes.vi);
@@ -2275,16 +2304,18 @@ void main() async {
 
       // Initialize both helpers with different initial languages
       await helper1.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
           syncWithDevice: false,
         ),
       );
 
       await helper2.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.vi,
           syncWithDevice: false,
         ),
@@ -2313,8 +2344,9 @@ void main() async {
 
         // Initialize first helper
         await helper1.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
             syncWithDevice: false,
           ),
@@ -2325,8 +2357,9 @@ void main() async {
 
         // Initialize second helper - should load the saved language
         await helper2.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
             syncWithDevice: false,
           ),
@@ -2367,7 +2400,7 @@ void main() async {
     test('LanguageHelper with empty data', () async {
       final helper = LanguageHelper('TestHelper');
       await helper.initial(
-        const LanguageConfig(data: []),
+        [],
       );
       // When data is empty, LanguageHelper creates a temporary data entry
       expect(helper.data, isNotEmpty);
@@ -2436,7 +2469,7 @@ void main() async {
       final helper = LanguageHelper('TestConditions');
       addTearDown(helper.dispose);
       await helper.initial(
-        LanguageConfig(data: [LanguageDataProvider.data(customData)]),
+        [LanguageDataProvider.data(customData)],
       );
 
       // Should return fallback text when no condition matches
@@ -2457,8 +2490,9 @@ void main() async {
     test('LanguageHelper with invalid initial code', () async {
       final helper = LanguageHelper('TestHelper');
       await helper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.cu, // Not in data
         ),
       );
@@ -2471,9 +2505,7 @@ void main() async {
     test('LanguageHelper with null initial code', () async {
       final helper = LanguageHelper('TestHelper');
       await helper.initial(
-        LanguageConfig(
-          data: dataList,
-        ),
+        dataList,
       );
       expect(
         helper.code,
@@ -2484,7 +2516,7 @@ void main() async {
     test('LanguageHelper reload with no data', () async {
       final helper = LanguageHelper('TestHelper');
       await helper.initial(
-        const LanguageConfig(data: []),
+        [],
       );
       await helper.reload();
       expect(helper.data, isNotEmpty);
@@ -2501,8 +2533,9 @@ void main() async {
       };
 
       await helper.initial(
-        LanguageConfig(
-          data: [LanguageDataProvider.lazyData(lazyData)],
+        [LanguageDataProvider.lazyData(lazyData)],
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
         ),
       );
@@ -2519,14 +2552,16 @@ void main() async {
 
       // Start multiple initializations concurrently
       final future1 = helper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
         ),
       );
       final future2 = helper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.vi,
         ),
       );
@@ -2542,7 +2577,7 @@ void main() async {
     test('LanguageHelper addData with null data', () async {
       final helper = LanguageHelper('TestHelper');
       await helper.initial(
-        LanguageConfig(data: dataList),
+        dataList,
       );
       await helper.addProvider(LanguageDataProvider.data({}));
       expect(helper.data, isNotEmpty);
@@ -2551,7 +2586,8 @@ void main() async {
     test('LanguageHelper stream subscription handling', () async {
       final helper = LanguageHelper('TestHelper');
       await helper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       var streamCount = 0;
@@ -2578,7 +2614,7 @@ void main() async {
 
       final helper = LanguageHelper('TestHelper');
       await helper.initial(
-        LanguageConfig(data: [LanguageDataProvider.data(malformedData)]),
+        [LanguageDataProvider.data(malformedData)],
       );
       expect(helper.translate('key1'), equals('value1'));
       expect(
@@ -2597,7 +2633,7 @@ void main() async {
 
       final helper = LanguageHelper('TestHelper');
       await helper.initial(
-        LanguageConfig(data: [LanguageDataProvider.data(circularData)]),
+        [LanguageDataProvider.data(circularData)],
       );
       expect(helper.translate('key1'), equals('value1'));
       expect(
@@ -2724,8 +2760,9 @@ void main() async {
 
       // Initialize with isDebug = true
       await helper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
           isDebug: true,
         ),
@@ -2735,8 +2772,9 @@ void main() async {
       // Create another helper with isDebug = false
       final helper2 = LanguageHelper('DebugTestHelper2');
       await helper2.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
         ),
       );
@@ -2758,15 +2796,17 @@ void main() async {
 
       // Initialize both with isDebug = true to ensure logger exists
       await helper1.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
           isDebug: true,
         ),
       );
       await helper2.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+
+        config: const LanguageConfig(
           initialCode: LanguageCodes.vi,
           isDebug: true,
         ),
@@ -2826,10 +2866,12 @@ void main() async {
       });
 
       await helper1.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       await helper2.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       // Create nested LanguageBuilders with different helpers
@@ -2861,7 +2903,8 @@ void main() async {
       final testHelper = LanguageHelper('TestRefreshTree');
       addTearDown(testHelper.dispose);
       await testHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       await tester.pumpWidget(
@@ -2897,7 +2940,8 @@ void main() async {
 
       final helper = LanguageHelper.instance;
       await helper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       // Get initial state count
@@ -2932,7 +2976,8 @@ void main() async {
         final testHelper = LanguageHelper('TestNestedSameHelper');
         addTearDown(testHelper.dispose);
         await testHelper.initial(
-          LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+          dataList,
+          config: const LanguageConfig(initialCode: LanguageCodes.en),
         );
 
         // Create nested LanguageBuilders with the same helper
@@ -2980,7 +3025,8 @@ void main() async {
         final testHelper = LanguageHelper('TestOfNotMounted');
         addTearDown(testHelper.dispose);
         await testHelper.initial(
-          LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+          dataList,
+          config: const LanguageConfig(initialCode: LanguageCodes.en),
         );
 
         // Create nested LanguageBuilders
@@ -3033,7 +3079,8 @@ void main() async {
         final helper2 = LanguageHelper('TestOfNotMounted2');
         addTearDown(helper2.dispose);
         await helper2.initial(
-          LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+          dataList,
+          config: const LanguageConfig(initialCode: LanguageCodes.en),
         );
 
         // Create nested builders

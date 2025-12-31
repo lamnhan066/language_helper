@@ -212,14 +212,22 @@ class LanguageHelper {
   /// If [LanguageConfig.isOptionalCountryCode] is true, falls back to language
   /// code only when the full locale (e.g., `zh_CN`) is unavailable. Safe to
   /// call multiple times.
-  Future<void> initial(LanguageConfig config) async {
+  Future<void> initial(
+    /// Language data providers. If empty, a temporary English provider is
+    /// added.
+    Iterable<LanguageDataProvider> data, {
+
+    /// Configuration for the LanguageHelper.
+    /// If not provided, a default configuration will be used.
+    LanguageConfig config = const LanguageConfig(),
+  }) async {
     if (isInitialized) return;
 
     if (_isInitializing) return ensureInitialized;
     _isInitializing = true;
 
     _data.clear();
-    _dataProviders = config.data;
+    _dataProviders = data;
     _forceRebuild = config.forceRebuild;
     _onChanged = config.onChanged;
     _isDebug = config.isDebug;
@@ -369,10 +377,20 @@ class LanguageHelper {
   /// widgets rebuild immediately. Set to false during widget build to avoid
   /// setState errors, then call [reload]. Provider's `override` property
   /// controls whether translations overwrite existing keys.
+  ///
+  /// If [config] is provided and the helper is not initialized, it will
+  /// automatically initialize the helper first. This is useful for package
+  /// usage.
   Future<void> addProvider(
     LanguageDataProvider provider, {
     bool activate = true,
+    LanguageConfig? config,
   }) async {
+    // Auto-initialize if config is provided and helper is not initialized
+    if (!isInitialized && config != null) {
+      await initial([provider], config: config);
+    }
+
     _dataProviders = [..._dataProviders, provider];
 
     final result = await Future.wait([

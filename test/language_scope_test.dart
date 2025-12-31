@@ -16,7 +16,8 @@ void main() {
 
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       LanguageHelper? retrievedHelper;
@@ -52,8 +53,8 @@ void main() {
 
       final languageHelper = LanguageHelper.instance;
       await languageHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
         ),
       );
@@ -83,7 +84,8 @@ void main() {
 
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       LanguageHelper? retrievedHelper;
@@ -118,8 +120,8 @@ void main() {
 
       final languageHelper = LanguageHelper.instance;
       await languageHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
         ),
       );
@@ -152,10 +154,12 @@ void main() {
       final parentHelper = LanguageHelper('ParentHelper');
       final childHelper = LanguageHelper('ChildHelper');
       await parentHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       await childHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       LanguageHelper? parentRetrieved;
@@ -199,7 +203,8 @@ void main() {
 
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       await tester.pumpWidget(
@@ -236,14 +241,14 @@ void main() {
         final explicitHelper = LanguageHelper('ExplicitHelper');
         final scopedHelper = LanguageHelper('ScopedHelper');
         await explicitHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
           ),
         );
         await scopedHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
           ),
         );
@@ -278,7 +283,8 @@ void main() {
 
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       await tester.pumpWidget(
@@ -307,8 +313,8 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
           ),
         );
@@ -349,7 +355,8 @@ void main() {
 
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       await tester.pumpWidget(
@@ -387,7 +394,8 @@ void main() {
 
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       await tester.pumpWidget(
@@ -422,10 +430,12 @@ void main() {
       final outerHelper = LanguageHelper('OuterHelper');
       final innerHelper = LanguageHelper('InnerHelper');
       await outerHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       await innerHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       await tester.pumpWidget(
@@ -466,10 +476,12 @@ void main() {
       final helper1 = LanguageHelper('Helper1');
       final helper2 = LanguageHelper('Helper2');
       await helper1.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       await helper2.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       await tester.pumpWidget(
@@ -519,10 +531,12 @@ void main() {
       final helper1 = LanguageHelper('Helper1');
       final helper2 = LanguageHelper('Helper2');
       await helper1.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       await helper2.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       final scope1 = LanguageScope(
@@ -548,7 +562,8 @@ void main() {
 
       final helper = LanguageHelper('Helper');
       await helper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       final scope1 = LanguageScope(
@@ -575,10 +590,12 @@ void main() {
       final helper1 = LanguageHelper('Helper1');
       final helper2 = LanguageHelper('Helper2');
       await helper1.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       await helper2.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       var buildCount = 0;
@@ -641,7 +658,8 @@ void main() {
 
         final helper = LanguageHelper('Helper');
         await helper.initial(
-          LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+          dataList,
+          config: const LanguageConfig(initialCode: LanguageCodes.en),
         );
 
         final oldScope = LanguageScope(
@@ -705,8 +723,8 @@ void main() {
 
         final languageHelper = LanguageHelper.instance;
         await languageHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
           ),
         );
@@ -750,7 +768,8 @@ void main() {
 
       final scopedHelper = LanguageHelper('DeepScopedHelper');
       await scopedHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       LanguageHelper? retrievedHelper;
@@ -796,7 +815,8 @@ void main() {
 
       final scopedHelper = LanguageHelper('DeepScopedHelper');
       await scopedHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       LanguageHelper? retrievedHelper;
@@ -842,8 +862,8 @@ void main() {
 
         final languageHelper = LanguageHelper.instance;
         await languageHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
           ),
         );
@@ -887,7 +907,8 @@ void main() {
 
       final helper = LanguageHelper('SameHelper');
       await helper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       final oldScope = LanguageScope(
@@ -913,10 +934,12 @@ void main() {
       final parentHelper = LanguageHelper('ParentHelper');
       final childHelper = LanguageHelper('ChildHelper');
       await parentHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.en),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       await childHelper.initial(
-        LanguageConfig(data: dataList, initialCode: LanguageCodes.vi),
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       LanguageHelper? parentRetrieved;
@@ -962,8 +985,8 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
           ),
         );
@@ -1037,8 +1060,8 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
           ),
         );
@@ -1117,8 +1140,8 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
           ),
         );
@@ -1206,8 +1229,8 @@ void main() {
 
         final languageHelper = LanguageHelper.instance;
         await languageHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
             isDebug: true, // Enable debug to see logging
           ),
@@ -1264,8 +1287,8 @@ void main() {
 
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+        config: const LanguageConfig(
           initialCode: LanguageCodes.vi,
           isDebug: true,
         ),
@@ -1304,8 +1327,8 @@ void main() {
 
       final languageHelper = LanguageHelper.instance;
       await languageHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
           isDebug: true,
         ),
@@ -1341,8 +1364,8 @@ void main() {
 
         final languageHelper = LanguageHelper.instance;
         await languageHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
             isDebug: true,
           ),
@@ -1380,8 +1403,8 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
           ),
         );
@@ -1456,8 +1479,8 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
           ),
         );
@@ -1538,8 +1561,8 @@ void main() {
 
         final scopedHelper = LanguageHelper('ScopedHelper');
         await scopedHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
           ),
         );

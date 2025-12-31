@@ -16,8 +16,8 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       languageHelper = LanguageHelper('TestLanguageHelper');
       await languageHelper.initial(
-        LanguageConfig(
-          data: dataList,
+        dataList,
+        config: const LanguageConfig(
           initialCode: LanguageCodes.en,
           isAutoSave: false,
         ),
@@ -60,8 +60,8 @@ void main() {
       test('handles empty locales set', () async {
         final emptyHelper = LanguageHelper('EmptyHelper');
         await emptyHelper.initial(
-          const LanguageConfig(
-            data: [],
+          [],
+          config: const LanguageConfig(
             isAutoSave: false,
           ),
         );
@@ -249,8 +249,8 @@ void main() {
           // Create first helper and delegate
           final helper1 = LanguageHelper('Helper1');
           await helper1.initial(
-            LanguageConfig(
-              data: dataList,
+            dataList,
+            config: const LanguageConfig(
               initialCode: LanguageCodes.en,
               isAutoSave: false,
             ),
@@ -260,8 +260,8 @@ void main() {
           // Create second helper and delegate with different language
           final helper2 = LanguageHelper('Helper2');
           await helper2.initial(
-            LanguageConfig(
-              data: dataList,
+            dataList,
+            config: const LanguageConfig(
               initialCode: LanguageCodes.vi,
               isAutoSave: false,
             ),
@@ -290,8 +290,8 @@ void main() {
           // Create first helper and delegate with English
           final helper1 = LanguageHelper('Helper1');
           await helper1.initial(
-            LanguageConfig(
-              data: dataList,
+            dataList,
+            config: const LanguageConfig(
               initialCode: LanguageCodes.en,
               isAutoSave: false,
             ),
@@ -301,8 +301,8 @@ void main() {
           // Create second helper and delegate with Vietnamese
           final helper2 = LanguageHelper('Helper2');
           await helper2.initial(
-            LanguageConfig(
-              data: dataList,
+            dataList,
+            config: const LanguageConfig(
               initialCode: LanguageCodes.vi,
               isAutoSave: false,
             ),
@@ -354,8 +354,8 @@ void main() {
         });
 
         await testHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
             isAutoSave: false,
           ),
@@ -432,8 +432,8 @@ void main() {
           });
 
           await mainHelper.initial(
-            LanguageConfig(
-              data: dataList,
+            dataList,
+            config: const LanguageConfig(
               initialCode: LanguageCodes.en,
               isAutoSave: false,
             ),
@@ -446,8 +446,8 @@ void main() {
           });
 
           await separateHelper.initial(
-            LanguageConfig(
-              data: dataList,
+            dataList,
+            config: const LanguageConfig(
               initialCode: LanguageCodes.en,
               isAutoSave: false,
             ),
@@ -550,8 +550,8 @@ void main() {
           });
 
           await mainHelper.initial(
-            LanguageConfig(
-              data: dataList,
+            dataList,
+            config: const LanguageConfig(
               initialCode: LanguageCodes.en,
               isAutoSave: false,
             ),
@@ -564,8 +564,8 @@ void main() {
           });
 
           await separateHelper.initial(
-            LanguageConfig(
-              data: dataList,
+            dataList,
+            config: const LanguageConfig(
               initialCode: LanguageCodes.en,
               isAutoSave: false,
             ),
@@ -623,8 +623,8 @@ void main() {
         });
 
         await testHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
             isAutoSave: false,
           ),
@@ -657,8 +657,8 @@ void main() {
         });
 
         await testHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
             isAutoSave: false,
           ),
@@ -725,8 +725,8 @@ void main() {
         });
 
         await testHelper.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
             isAutoSave: false,
           ),
@@ -782,8 +782,8 @@ void main() {
         });
 
         await helper2.initial(
-          LanguageConfig(
-            data: dataList,
+          dataList,
+          config: const LanguageConfig(
             initialCode: LanguageCodes.en,
             isAutoSave: false,
           ),

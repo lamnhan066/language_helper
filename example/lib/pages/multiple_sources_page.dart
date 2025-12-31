@@ -48,14 +48,10 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
   }
 
   Future<void> _initializeLanguageHelper() async {
-    await _languageHelper.initial(
-      LanguageConfig(
-        data: [
-          LanguageDataProvider.lazyData(languageData),
-          LanguageDataProvider.asset('assets/languages'),
-        ],
-      ),
-    );
+    await _languageHelper.initial([
+      LanguageDataProvider.lazyData(languageData),
+      LanguageDataProvider.asset('assets/languages'),
+    ], config: const LanguageConfig());
 
     setState(() {
       _isLoaded = true;

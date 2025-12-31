@@ -93,16 +93,12 @@ void main() {
       expect(languageHelper.isInitialized, false);
 
       // Initialize with test data
-      await languageHelper.initial(
-        LanguageConfig(
-          data: [
-            LanguageDataProvider.lazyData({
-              LanguageCodes.en: () => {'Hello': 'Hello'},
-              LanguageCodes.vi: () => {'Hello': 'Xin chào'},
-            }),
-          ],
-        ),
-      );
+      await languageHelper.initial([
+        LanguageDataProvider.lazyData({
+          LanguageCodes.en: () => {'Hello': 'Hello'},
+          LanguageCodes.vi: () => {'Hello': 'Xin chào'},
+        }),
+      ], config: const LanguageConfig());
 
       expect(languageHelper.isInitialized, true);
       expect(languageHelper.codes, contains(LanguageCodes.en));
@@ -112,25 +108,21 @@ void main() {
     testWidgets('Translation should work with parameters', (tester) async {
       final languageHelper = LanguageHelper('TestHelper');
 
-      await languageHelper.initial(
-        LanguageConfig(
-          data: [
-            LanguageDataProvider.lazyData({
-              LanguageCodes.en: () => {
-                'Hello @{name}': 'Hello @{name}',
-                'You have @{count} item': const LanguageConditions(
-                  param: 'count',
-                  conditions: {
-                    '0': 'You have no items',
-                    '1': 'You have one item',
-                    '_': 'You have @{count} items',
-                  },
-                ),
+      await languageHelper.initial([
+        LanguageDataProvider.lazyData({
+          LanguageCodes.en: () => {
+            'Hello @{name}': 'Hello @{name}',
+            'You have @{count} item': const LanguageConditions(
+              param: 'count',
+              conditions: {
+                '0': 'You have no items',
+                '1': 'You have one item',
+                '_': 'You have @{count} items',
               },
-            }),
-          ],
-        ),
-      );
+            ),
+          },
+        }),
+      ], config: const LanguageConfig());
 
       // Test simple parameter translation
       expect(
@@ -156,16 +148,12 @@ void main() {
     testWidgets('Language change should trigger rebuilds', (tester) async {
       final languageHelper = LanguageHelper('TestHelper');
 
-      await languageHelper.initial(
-        LanguageConfig(
-          data: [
-            LanguageDataProvider.lazyData({
-              LanguageCodes.en: () => {'Hello': 'Hello'},
-              LanguageCodes.vi: () => {'Hello': 'Xin chào'},
-            }),
-          ],
-        ),
-      );
+      await languageHelper.initial([
+        LanguageDataProvider.lazyData({
+          LanguageCodes.en: () => {'Hello': 'Hello'},
+          LanguageCodes.vi: () => {'Hello': 'Xin chào'},
+        }),
+      ], config: const LanguageConfig());
 
       // Test language change
       expect(languageHelper.code, LanguageCodes.en);

@@ -19,12 +19,9 @@ class _JsonAssetPageState extends State<JsonAssetPage> {
   }
 
   Future<void> _initializeLanguageHelper() async {
-    await _languageHelper.initial(
-      LanguageConfig(
-        data: [LanguageDataProvider.asset('assets/languages')],
-        isDebug: true,
-      ),
-    );
+    await _languageHelper.initial([
+      LanguageDataProvider.asset('assets/languages'),
+    ], config: const LanguageConfig(isDebug: true));
     setState(() {
       _isLoaded = true;
     });
