@@ -1768,6 +1768,51 @@ void main() async {
       expect(addedData['Hello'], equals('HelloOverwrite'));
       expect(addedData['Hello'], isNot(equals('Hello')));
     });
+
+    test('Add provider with mergeCodes is false (default)', () async {
+      await languageHelper.initial(
+        dataList,
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.en,
+        ),
+      );
+
+      final originalCodes = languageHelper.codes.toSet();
+
+      final dataToAdd = {
+        LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'},
+        LanguageCodes.zh: {'Hello': '你好'},
+      };
+      final provider = LanguageDataProvider.data(dataToAdd);
+
+      await languageHelper.addProvider(provider);
+
+      // Codes should not be merged by default
+      expect(languageHelper.codes.toSet(), equals(originalCodes));
+    });
+
+    test('Add provider with mergeCodes is true', () async {
+      await languageHelper.initial(
+        dataList,
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.en,
+        ),
+      );
+
+      final originalCodes = languageHelper.codes.toSet();
+
+      final dataToAdd = {
+        LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'},
+        LanguageCodes.zh: {'Hello': '你好'},
+      };
+      final provider = LanguageDataProvider.data(dataToAdd);
+
+      await languageHelper.addProvider(provider, mergeCodes: true);
+
+      // Codes should be merged when mergeCodes is true
+      expect(languageHelper.codes.length, greaterThan(originalCodes.length));
+      expect(languageHelper.codes, contains(LanguageCodes.zh));
+    });
   });
 
   group('Lazy data provider', () {

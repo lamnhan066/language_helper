@@ -378,12 +378,16 @@ class LanguageHelper {
   /// setState errors, then call [reload]. Provider's `override` property
   /// controls whether translations overwrite existing keys.
   ///
+  /// If [mergeCodes] is true, the provider's supported language codes are
+  /// added to the helper's available codes. Defaults to false.
+  ///
   /// If [config] is provided and the helper is not initialized, it will
   /// automatically initialize the helper first. This is useful for package
   /// usage.
   Future<void> addProvider(
     LanguageDataProvider provider, {
     bool activate = true,
+    bool mergeCodes = false,
     LanguageConfig? config,
   }) async {
     // Auto-initialize if config is provided and helper is not initialized
@@ -398,7 +402,9 @@ class LanguageHelper {
       _loadDataFromProviders(_currentCode!, [provider]),
     ]);
 
-    _codes.addAll(result[0] as Iterable<LanguageCodes>);
+    if (mergeCodes) {
+      _codes.addAll(result[0] as Iterable<LanguageCodes>);
+    }
     final data = result[1] as LanguageData;
 
     if (data.isNotEmpty && data.containsKey(_currentCode)) {
@@ -414,7 +420,7 @@ class LanguageHelper {
     _logger?.info(
       () =>
           'The new `provider` is added and activated with override is '
-          '${provider.override}',
+          '${provider.override} and mergeCodes is $mergeCodes',
     );
   }
 
