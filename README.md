@@ -399,6 +399,12 @@ await languageHelper.change(LanguageCodes.vi);
 final newProvider = LanguageDataProvider.data(newTranslations);
 await languageHelper.addProvider(newProvider);
 
+// Add provider with code merging enabled
+await languageHelper.addProvider(
+  LanguageDataProvider.data(additionalTranslations),
+  mergeCodes: true,
+);
+
 // Add provider without immediate activation
 await languageHelper.addProvider(
   LanguageDataProvider.lazyData(newLanguageData),
@@ -421,6 +427,7 @@ await languageHelper.reload(); // Update widgets now
 **Note:**
 
 - The `override` property of the provider controls whether new translations overwrite existing ones. Use `LanguageDataProvider.data(translations, override: true)` to overwrite existing translations.
+- The `mergeCodes` parameter controls whether the provider's supported language codes are added to the helper's available codes. Defaults to `false`.
 - Providers are added to the end of the providers list. Later providers with `override: true` will overwrite earlier ones.
 - When `activate: false`, data is added/removed but widgets won't update until `reload()` or `change()` is called.
 - Be careful not to call `addProvider` or `removeProvider` with `activate: true` during widget build, as it may cause `setState` errors.
