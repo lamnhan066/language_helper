@@ -1,3 +1,8 @@
+## 0.13.0-rc.14
+
+* **BREAKING CHANGE** Add `LanguageConfig` to store the configurations when using `LanguageHelper.initial` (except the `data` parameter).
+* **BREAKING CHANGE** Add `mergeCodes` parameter to `addProvider` method to control whether the provider's supported language codes are merged into the helper's available codes. Defaults to `false` for backward compatibility.
+
 ## 0.13.0-rc.13
 
 * Change `LanguageHelper.dispose` to future.
