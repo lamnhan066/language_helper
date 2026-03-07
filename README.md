@@ -507,7 +507,11 @@ return MaterialApp(
     ...mainHelper.delegates,
 
     // Language delegate for the package/widget tree
-    LanguageDelegate(packageHelper),
+    LanguageDelegate(
+      packageHelper,
+      // Optional: Define supported codes to avoid async loading issues
+      supportedCodes: {LanguageCodes.en, LanguageCodes.vi},
+    ),
 
     // Optionally, you can add more delegates here
   ],
