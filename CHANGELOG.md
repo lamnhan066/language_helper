@@ -1,3 +1,9 @@
+## 0.13.0
+
+* Add `supportedCodes` parameter to `LanguageDelegate` to allow explicit definition of supported locales.
+* Update example project and migrate to `very_good_analysis`.
+* Release to stable.
+
 ## 0.13.0-rc.14
 
 * **BREAKING CHANGE** Add `LanguageConfig` to store the configurations when using `LanguageHelper.initial` (except the `data` parameter).
