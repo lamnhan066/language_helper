@@ -998,6 +998,7 @@ void main() {
           LanguageScope(
             languageHelper: scopedHelper,
             child: MaterialApp(
+              theme: ThemeData(useMaterial3: false),
               home: Scaffold(
                 body: Builder(
                   builder: (context) {
@@ -1076,7 +1077,9 @@ void main() {
           LanguageScope(
             languageHelper: scopedHelper,
             child: MaterialApp(
+              theme: ThemeData(useMaterial3: false),
               home: MaterialApp(
+                theme: ThemeData(useMaterial3: false),
                 home: Scaffold(
                   body: LanguageBuilder(
                     builder: (context) {
@@ -1156,9 +1159,11 @@ void main() {
         // Solution: Wrap the outermost MaterialApp with LanguageScope.
         await tester.pumpWidget(
           MaterialApp(
+            theme: ThemeData(useMaterial3: false),
             home: LanguageScope(
               languageHelper: scopedHelper,
               child: MaterialApp(
+                theme: ThemeData(useMaterial3: false),
                 home: Scaffold(
                   body: LanguageBuilder(
                     builder: (context) {
