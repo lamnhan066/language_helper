@@ -10,6 +10,7 @@
 
 import 'package:language_helper/language_helper.dart';
 
+/// French language data.
 const frLanguageData = <String, dynamic>{
   ///===========================================================================
   /// Path: main.dart

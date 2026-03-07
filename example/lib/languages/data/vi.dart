@@ -10,6 +10,7 @@
 
 import 'package:language_helper/language_helper.dart';
 
+/// Vietnamese language data.
 const viLanguageData = <String, dynamic>{
   ///===========================================================================
   /// Path: main.dart

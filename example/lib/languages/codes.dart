@@ -14,6 +14,7 @@ import 'data/es.dart';
 import 'data/fr.dart';
 import 'data/vi.dart';
 
+/// The language data that maps [LanguageCodes] to their providers.
 final LazyLanguageData languageData = {
   LanguageCodes.en: () => enLanguageData,
   LanguageCodes.es: () => esLanguageData,

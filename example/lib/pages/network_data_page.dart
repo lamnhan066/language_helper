@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 
+/// A page that demonstrates using LanguageHelper with network data.
 class NetworkDataPage extends StatefulWidget {
+  /// A page that demonstrates using LanguageHelper with network data.
   const NetworkDataPage({super.key});
 
   @override
@@ -499,7 +501,7 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
         return 'Spanish'.tr;
       case LanguageCodes.fr:
         return 'French'.tr;
-      default:
+      case _:
         return code.name;
     }
   }

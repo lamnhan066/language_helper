@@ -3,12 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 
-/// A widget that represents a package component with its own LanguageHelper.
-///
-/// This demonstrates how a package can have its own LanguageHelper instance
-/// and expose a LanguageDelegate for use in MaterialApp's
-/// localizationsDelegates.
+/// A widget that demonstrates using LanguageHelper within a package.
 class PackageWidget extends StatefulWidget {
+  /// A widget that demonstrates using LanguageHelper within a package.
   const PackageWidget({super.key});
 
   // Package's own LanguageHelper instance
@@ -21,7 +18,7 @@ class PackageWidget extends StatefulWidget {
         ),
       );
 
-  // Static LanguageDelegate exposed for use in MaterialApp
+  /// Static LanguageDelegate exposed for use in MaterialApp
   static LanguageDelegate get delegate =>
       LanguageDelegate(_packageLanguageHelper);
 

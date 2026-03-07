@@ -24,7 +24,9 @@ void main() async {
   runApp(const LanguageHelperDemoApp());
 }
 
+/// The main entry point for the Language Helper Demo.
 class LanguageHelperDemoApp extends StatelessWidget {
+  /// The main entry point for the Language Helper Demo.
   const LanguageHelperDemoApp({super.key});
 
   @override
@@ -71,7 +73,9 @@ class LanguageHelperDemoApp extends StatelessWidget {
   }
 }
 
+/// The home page of the demo application.
 class HomePage extends StatefulWidget {
+  /// The home page of the demo application.
   const HomePage({super.key});
 
   @override
@@ -180,13 +184,15 @@ class _HomePageState extends State<HomePage> {
         return 'Spanish'.tr;
       case LanguageCodes.fr:
         return 'French'.tr;
-      default:
+      case _:
         return code.name;
     }
   }
 }
 
+/// The main content of the home page.
 class HomeContent extends StatelessWidget {
+  /// The main content of the home page.
   const HomeContent({super.key});
 
   @override
@@ -462,7 +468,7 @@ class HomeContent extends StatelessWidget {
         return 'Spanish'.tr;
       case LanguageCodes.fr:
         return 'French'.tr;
-      default:
+      case _:
         return code.name;
     }
   }

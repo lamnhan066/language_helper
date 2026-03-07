@@ -7,10 +7,9 @@ import 'package:language_helper_example/widgets/package_widget.dart';
 /// A page that demonstrates using a package widget's LanguageDelegate
 /// in MaterialApp's localizationsDelegates.
 ///
-/// This page has its own LanguageHelper instance and uses the PackageWidget's
-/// LanguageDelegate in the MaterialApp to demonstrate how packages can
-/// provide their own localization delegates.
+/// A page that demonstrates using LanguageHelper with a package delegate.
 class PackageDelegatePage extends StatefulWidget {
+  /// A page that demonstrates using LanguageHelper with a package delegate.
   const PackageDelegatePage({super.key});
 
   @override

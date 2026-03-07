@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 
+/// A page that demonstrates using LanguageHelper with a Dart map.
 class DartMapPage extends StatelessWidget {
+  /// A page that demonstrates using LanguageHelper with a Dart map.
   const DartMapPage({super.key});
 
   @override

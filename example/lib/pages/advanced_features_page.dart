@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 
+/// A page that demonstrates advanced features of LanguageHelper.
 class AdvancedFeaturesPage extends StatefulWidget {
+  /// A page that demonstrates advanced features of LanguageHelper.
   const AdvancedFeaturesPage({super.key});
 
   @override
@@ -606,7 +608,7 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
         return 'Spanish'.tr;
       case LanguageCodes.fr:
         return 'French'.tr;
-      default:
+      case _:
         return code.name;
     }
   }

@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 
+/// A page that demonstrates using LanguageHelper with JSON assets.
 class JsonAssetPage extends StatefulWidget {
+  /// A page that demonstrates using LanguageHelper with JSON assets.
   const JsonAssetPage({super.key});
 
   @override
@@ -330,7 +332,7 @@ class _JsonAssetPageState extends State<JsonAssetPage> {
         return 'Spanish'.tr;
       case LanguageCodes.fr:
         return 'French'.tr;
-      default:
+      case _:
         return code.name;
     }
   }

@@ -10,6 +10,7 @@
 
 import 'package:language_helper/language_helper.dart';
 
+/// English language data.
 const enLanguageData = <String, dynamic>{
   ///===========================================================================
   /// Path: main.dart

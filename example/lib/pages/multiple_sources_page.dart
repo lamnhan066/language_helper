@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper_example/languages/codes.dart';
 
+/// A page that demonstrates using LanguageHelper with multiple data sources.
 class MultipleSourcesPage extends StatefulWidget {
+  /// A page that demonstrates using LanguageHelper with multiple data sources.
   const MultipleSourcesPage({super.key});
 
   @override
@@ -499,7 +501,7 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
         return 'Spanish'.tr;
       case LanguageCodes.fr:
         return 'French'.tr;
-      default:
+      case _:
         return code.name;
     }
   }
