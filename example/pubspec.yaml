@@ -20,10 +20,9 @@ dependency_overrides:
     path: ../
 
 dev_dependencies:
-  flutter_lints: ^2.0.0
-
   flutter_test:
     sdk: flutter
+  very_good_analysis: ^10.0.0
 
 flutter:
   uses-material-design: true

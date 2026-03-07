@@ -19,12 +19,12 @@ class _AdvancedFeaturesPageState extends State<AdvancedFeaturesPage> {
   @override
   void initState() {
     super.initState();
-    _initializeLanguageHelper();
+    unawaited(_initializeLanguageHelper());
   }
 
   @override
   void dispose() {
-    _languageSubscription?.cancel();
+    unawaited(_languageSubscription?.cancel());
     super.dispose();
   }
 

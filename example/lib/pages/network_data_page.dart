@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 
@@ -17,7 +19,7 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
   @override
   void initState() {
     super.initState();
-    _initializeLanguageHelper();
+    unawaited(_initializeLanguageHelper());
   }
 
   Future<void> _initializeLanguageHelper() async {
@@ -28,7 +30,7 @@ class _NetworkDataPageState extends State<NetworkDataPage> {
 
     try {
       // Simulate network data loading
-      await Future.delayed(const Duration(seconds: 2));
+      await Future<void>.delayed(const Duration(seconds: 2));
 
       // Create mock network data
       final mockNetworkData = {

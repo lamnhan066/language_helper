@@ -98,7 +98,7 @@ void _exportJsonLanguages(LanguageData data, String path) {
 
   final desPath = '$path/data/';
   final map = languageDataToMap(data);
-  for (final MapEntry(key: String key, value: dynamic value) in map.entries) {
+  for (final MapEntry(:String key, :dynamic value) in map.entries) {
     final desFile = File('$desPath$key.json')..createSync(recursive: true);
     final data = encoder.convert(value);
     desFile.writeAsStringSync(data);

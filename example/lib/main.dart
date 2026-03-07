@@ -1,14 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
-
-import 'languages/codes.dart';
-import 'pages/advanced_features_page.dart';
-import 'pages/dart_map_page.dart';
-import 'pages/json_asset_page.dart';
-import 'pages/multiple_sources_page.dart';
-import 'pages/network_data_page.dart';
-import 'pages/package_delegate_page.dart';
+import 'package:language_helper_example/languages/codes.dart';
+import 'package:language_helper_example/pages/advanced_features_page.dart';
+import 'package:language_helper_example/pages/dart_map_page.dart';
+import 'package:language_helper_example/pages/json_asset_page.dart';
+import 'package:language_helper_example/pages/multiple_sources_page.dart';
+import 'package:language_helper_example/pages/network_data_page.dart';
+import 'package:language_helper_example/pages/package_delegate_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

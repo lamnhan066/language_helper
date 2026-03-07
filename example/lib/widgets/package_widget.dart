@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 
@@ -187,8 +189,10 @@ class _PackageWidgetState extends State<PackageWidget> {
                             .map((code) {
                               return ElevatedButton(
                                 onPressed: () {
-                                  PackageWidget._packageLanguageHelper.change(
-                                    code,
+                                  unawaited(
+                                    PackageWidget._packageLanguageHelper.change(
+                                      code,
+                                    ),
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(

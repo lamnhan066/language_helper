@@ -11,7 +11,7 @@ import 'package:language_helper/language_helper.dart';
 /// values.
 Map<String, dynamic> languageDataToMap(LanguageData data) {
   return data.map((key, value) {
-    value = value.map((key, value) {
+    final effectiveValue = value.map((key, value) {
       if (value is LanguageConditions) {
         return MapEntry(key, value.toMap());
       }
@@ -19,7 +19,7 @@ Map<String, dynamic> languageDataToMap(LanguageData data) {
       return MapEntry(key, value);
     });
 
-    return MapEntry(key.code, value);
+    return MapEntry(key.code, effectiveValue);
   });
 }
 
@@ -36,8 +36,13 @@ Map<String, dynamic> languageDataToMap(LanguageData data) {
 LanguageData languageDataFromMap(Map<String, dynamic> map) {
   return map.map((key, value) {
     // Reorganize the `value` back to String and LanguageCondition
-    value = languageDataValuesFromMap(value as Map<String, dynamic>);
-    return MapEntry(LanguageCodes.fromCode(key), value.cast<String, dynamic>());
+    final effectiveValue = languageDataValuesFromMap(
+      value as Map<String, dynamic>,
+    );
+    return MapEntry(
+      LanguageCodes.fromCode(key),
+      effectiveValue.cast<String, dynamic>(),
+    );
   });
 }
 

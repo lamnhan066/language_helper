@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
-
-import '../widgets/package_widget.dart';
+import 'package:language_helper_example/widgets/package_widget.dart';
 
 /// A page that demonstrates using a package widget's LanguageDelegate
 /// in MaterialApp's localizationsDelegates.
@@ -342,7 +343,9 @@ class _PackageDelegatePageState extends State<PackageDelegatePage> {
                                   ) {
                                     return ElevatedButton(
                                       onPressed: () {
-                                        _mainLanguageHelper.change(code);
+                                        unawaited(
+                                          _mainLanguageHelper.change(code),
+                                        );
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 
@@ -15,7 +17,7 @@ class _JsonAssetPageState extends State<JsonAssetPage> {
   @override
   void initState() {
     super.initState();
-    _initializeLanguageHelper();
+    unawaited(_initializeLanguageHelper());
   }
 
   Future<void> _initializeLanguageHelper() async {

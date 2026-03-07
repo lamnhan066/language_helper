@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
-
-import '../languages/codes.dart';
+import 'package:language_helper_example/languages/codes.dart';
 
 class MultipleSourcesPage extends StatefulWidget {
   const MultipleSourcesPage({super.key});
@@ -11,7 +12,7 @@ class MultipleSourcesPage extends StatefulWidget {
 }
 
 class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
-  final additionalData = {
+  final LanguageData additionalData = {
     LanguageCodes.en: {
       'This text was added dynamically': 'This text was added dynamically',
       'This text will be removed': 'This text will be removed',
@@ -44,7 +45,7 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
   @override
   void initState() {
     super.initState();
-    _initializeLanguageHelper();
+    unawaited(_initializeLanguageHelper());
   }
 
   Future<void> _initializeLanguageHelper() async {
@@ -474,7 +475,9 @@ class _MultipleSourcesPageState extends State<MultipleSourcesPage> {
   );
 
   void _addDynamicData() {
-    _languageHelper.addProvider(LanguageDataProvider.data(additionalData));
+    unawaited(
+      _languageHelper.addProvider(LanguageDataProvider.data(additionalData)),
+    );
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

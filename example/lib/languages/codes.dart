@@ -5,7 +5,7 @@
 //==============================================================================
 
 // Keeps format for the parser
-// ignore_for_file: always_use_package_imports, lines_longer_than_80_chars
+// ignore_for_file: always_use_package_imports
 
 import 'package:language_helper/language_helper.dart';
 
