@@ -19,8 +19,10 @@ class PackageWidget extends StatefulWidget {
       );
 
   /// Static LanguageDelegate exposed for use in MaterialApp
-  static LanguageDelegate get delegate =>
-      LanguageDelegate(_packageLanguageHelper);
+  static LanguageDelegate get delegate => LanguageDelegate(
+    _packageLanguageHelper,
+    supportedCodes: _packageLanguageData.keys.toSet(),
+  );
 
   // Package-specific language data
   static final LanguageData _packageLanguageData = {

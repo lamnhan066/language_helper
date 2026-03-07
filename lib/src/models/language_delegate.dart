@@ -25,15 +25,30 @@ import 'package:language_helper/language_helper.dart';
 /// ```
 class LanguageDelegate extends LocalizationsDelegate<LanguageHelper> {
   /// Creates a delegate for the given [languageHelper].
-  LanguageDelegate(this.languageHelper);
+  LanguageDelegate(this.languageHelper, {this.supportedCodes});
 
   /// The [LanguageHelper] instance managed by this delegate.
   final LanguageHelper languageHelper;
 
+  /// The list of supported locales.
+  ///
+  /// If null, the supported locales will default to those supported by
+  /// [languageHelper]. The [supportedCodes] should be set because the
+  /// locales from [languageHelper] are loaded asynchronously and may not
+  /// be available when the delegate is created.
+  final Set<LanguageCodes>? supportedCodes;
+
   /// Returns true if [locale] is supported by [languageHelper].
   @override
   bool isSupported(Locale locale) {
-    return languageHelper.locales.contains(locale);
+    try {
+      return supportedCodes?.contains(LanguageCodes.fromLocale(locale)) ??
+          languageHelper.locales.contains(locale);
+      // Unsupported locale will throw an exception or error
+      // ignore: avoid_catches_without_on_clauses
+    } catch (_) {
+      return false;
+    }
   }
 
   /// Changes [languageHelper] to use [locale] and returns the helper. Called

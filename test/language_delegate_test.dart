@@ -82,6 +82,44 @@ void main() {
         expect(delegate.isSupported(LanguageCodes.zh.locale), isFalse);
         expect(delegate.isSupported(LanguageCodes.fr.locale), isFalse);
       });
+
+      test(
+        'overrides languageHelper.locales when supportedCodes is provided',
+        () {
+          final customDelegate = LanguageDelegate(
+            languageHelper,
+            supportedCodes: {LanguageCodes.en, LanguageCodes.zh},
+          );
+
+          // en is in both, so it should be true
+          expect(customDelegate.isSupported(LanguageCodes.en.locale), isTrue);
+          // vi is in languageHelper but NOT in supportedCodes, should be false
+          expect(customDelegate.isSupported(LanguageCodes.vi.locale), isFalse);
+          // zh is NOT in languageHelper but IS in supportedCodes,
+          // should be true
+          expect(customDelegate.isSupported(LanguageCodes.zh.locale), isTrue);
+        },
+      );
+
+      test(
+        'falls back to languageHelper.locales when supportedCodes is null',
+        () {
+          final fallbackDelegate = LanguageDelegate(languageHelper);
+          expect(fallbackDelegate.supportedCodes, isNull);
+
+          expect(fallbackDelegate.isSupported(LanguageCodes.en.locale), isTrue);
+          expect(fallbackDelegate.isSupported(LanguageCodes.vi.locale), isTrue);
+          expect(
+            fallbackDelegate.isSupported(LanguageCodes.zh.locale),
+            isFalse,
+          );
+        },
+      );
+
+      test('handles invalid locale in isSupported with a catch block', () {
+        const invalidLocale = Locale('invalid', 'locale');
+        expect(delegate.isSupported(invalidLocale), isFalse);
+      });
     });
 
     group('load', () {

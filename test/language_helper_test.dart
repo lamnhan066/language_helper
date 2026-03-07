@@ -694,7 +694,7 @@ void main() async {
           "param": "count",
           "conditions": {
             "1": "one",
-            "_": "many"
+            "default": "many"
           }
         }
       }
@@ -702,6 +702,43 @@ void main() async {
       final result = LanguageDataSerializer.valuesFromJson(json);
       expect(result['Hello'], equals('Hello'));
       expect(result['Count'], isA<LanguageConditions>());
+      expect((result['Count'] as LanguageConditions).param, equals('count'));
+    });
+
+    test('LanguageDataSerializer fromMap with nested LanguageConditions', () {
+      final map = {
+        'en': {
+          'Hello': 'Hello',
+          'Count': {
+            'param': 'count',
+            'conditions': {
+              '1': 'one',
+              'default': 'many',
+            },
+          },
+        },
+      };
+      final result = LanguageDataSerializer.fromMap(map);
+      expect(result[LanguageCodes.en]!['Hello'], equals('Hello'));
+      expect(result[LanguageCodes.en]!['Count'], isA<LanguageConditions>());
+    });
+
+    test('LanguageDataSerializer toMap with LanguageConditions', () {
+      final data = {
+        LanguageCodes.en: {
+          'Count': const LanguageConditions(
+            param: 'count',
+            conditions: {'1': 'one', 'default': 'many'},
+          ),
+        },
+      };
+      final result = data.toMap();
+      final enData = result['en'] as Map<String, dynamic>;
+      expect(enData['Count'], isA<Map<String, dynamic>>());
+      expect(
+        (enData['Count'] as Map<String, dynamic>)['param'],
+        equals('count'),
+      );
     });
 
     test('LanguageDataSerializer with empty JSON', () {
