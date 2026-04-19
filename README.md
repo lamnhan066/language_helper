@@ -849,17 +849,17 @@ final en = {
 
   10. Try to keep translated text length similar to the original for layout/UX consistency (preferred, not mandatory).
   11. Produce natural, context-appropriate translations — prefer idiomatic phrasing over literal word-for-word translation when context suggests it.
-  12. Double-check grammar, punctuation, interpolation markers (e.g., `@{count}`), and escape sequences so the resulting Dart file stays valid.
+  12. Preserve the original uppercase/lowercase intent of each source string in the translated value (e.g., ALL CAPS stays ALL CAPS, Title Case stays Title Case, lowercase stays lowercase), unless the target language has a clear grammatical exception.
+  13. Double-check grammar, punctuation, interpolation markers (e.g., `@{count}`), escape sequences, and casing consistency so the resulting Dart file stays valid.
 
   ## Automation / workflow rules
 
-  13. Do not prompt the user for permission or confirmation; perform the translation using best effort. Do not stop prematurely — continue translating until every `TODO` value in the input file has been translated and all corresponding `TODO` markers have been removed. If you encounter transient errors or rate limits, retry and resume work until the translation pass is fully complete.
-  14. After finishing the translation pass, include a short summary note that describes:
-
+  14. Do not prompt the user for permission or confirmation; perform the translation using best effort. Do not stop prematurely — continue translating until every `TODO` value in the input file has been translated and all corresponding `TODO` markers have been removed. If you encounter transient errors or rate limits, retry and resume work until the translation pass is fully complete.
+  15. After finishing the translation pass, include a short summary note that describes:
       * Any ambiguous entries and the choices you made.
       * Where plural handling was applied and why.
       * Any entries left unchanged (and the reason).
-  15. Run a final syntactic check to ensure the map remains valid Dart and that all TODO markers for translated values were removed.
+  16. Run a final syntactic check to ensure the map remains valid Dart and that all TODO markers for translated values were removed.
 
   ---
 
@@ -896,6 +896,7 @@ final en = {
   * [ ] All `TODO` markers removed for translated entries.
   * [ ] Plural forms converted to `LanguageConditions` when needed.
   * [ ] Interpolations (e.g., `@{count}`) preserved correctly.
+  * [ ] Uppercase/lowercase intent of original strings preserved in translated values.
   * [ ] Short summary note added describing ambiguous choices and plural handling.
   * [ ] File compiles / is syntactically valid Dart (basic check).
   </details>
