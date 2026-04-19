@@ -157,12 +157,12 @@ JSON files do not support TODO markers. To identify untranslated or new strings,
 
 ### Generator Options
 
-| Option | Description | Example |
-|--------|-------------|---------|
-| `--languages` | Language codes to generate | `--languages=en,vi,es` |
-| `--ignore-todo` | Skip TODO markers for specific languages | `--ignore-todo=en` |
-| `--path` | Custom output directory | `--path=./lib/languages` |
-| `--json` | Generate JSON files instead of Dart | `--json` |
+| Option          | Description                              | Example                  |
+| --------------- | ---------------------------------------- | ------------------------ |
+| `--languages`   | Language codes to generate               | `--languages=en,vi,es`   |
+| `--ignore-todo` | Skip TODO markers for specific languages | `--ignore-todo=en`       |
+| `--path`        | Custom output directory                  | `--path=./lib/languages` |
+| `--json`        | Generate JSON files instead of Dart      | `--json`                 |
 
 ### Common Examples
 
@@ -815,12 +815,9 @@ final en = {
 
   <details>
   <summary>Show</summary>
-
-  ````md
-  # Translation procedure for `language_helper` (Dart `Map<String, dynamic>`)
-
-  **Goal:** translate only the *values* in a `Map<String, dynamic>` used for localization. Do **not** change keys, structure, or comments.
-
+  ---
+  name: translate-language-helper
+  description: translate only the *values* in a `Map<String, dynamic>` used for localization. Do **not** change keys, structure, or comments.
   ---
 
   ## Preflight
@@ -856,7 +853,7 @@ final en = {
 
   ## Automation / workflow rules
 
-  13. Do not prompt the user for permission or confirmation; perform the translation using best effort.
+  13. Do not prompt the user for permission or confirmation; perform the translation using best effort. Do not stop prematurely — continue translating until every `TODO` value in the input file has been translated and all corresponding `TODO` markers have been removed. If you encounter transient errors or rate limits, retry and resume work until the translation pass is fully complete.
   14. After finishing the translation pass, include a short summary note that describes:
 
       * Any ambiguous entries and the choices you made.
@@ -901,9 +898,7 @@ final en = {
   * [ ] Interpolations (e.g., `@{count}`) preserved correctly.
   * [ ] Short summary note added describing ambiguous choices and plural handling.
   * [ ] File compiles / is syntactically valid Dart (basic check).
-  ````
-
-</details>
+  </details>
 
 - Open the AI Agent tab and input `Translate <path/to/languages/data>`.
 - Review the results.
