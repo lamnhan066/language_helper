@@ -890,7 +890,6 @@ final en = {
   ---
 
   ## Quick checklist (use at the end of each file)
-
   * [ ] Only values with `TODO` were translated.
   * [ ] Keys, structure, and comments unchanged.
   * [ ] All `TODO` markers removed for translated entries.
