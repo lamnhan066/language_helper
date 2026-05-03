@@ -184,6 +184,42 @@ dart run language_helper:generate --path=./lib/languages --languages=en,vi
 dart run language_helper:generate --languages=en,vi,es,fr --ignore-todo=en
 ```
 
+### Config via `pubspec.yaml`
+
+*Available in `language_helper_generator` since `v0.8.3`*
+
+You can configure `language_helper_generator` using a top-level `language_helper`
+node in your project's `pubspec.yaml`. CLI arguments take precedence over
+values in `pubspec.yaml` (CLI > pubspec > defaults). The generator reads
+`pubspec.yaml` from the current working directory when you run
+`dart run language_helper_generator`.
+
+Example `pubspec.yaml` snippet:
+
+```yaml
+language_helper:
+  path: ./lib  # Path to scan for source files (defaults to "./lib")
+  output: ./lib/languages # Output folder for generated files (Dart default: ./lib/languages)
+  languages: # Languages to generate (can be string or list)
+    - en
+    - vi
+  ignore-todo: # Languages to skip TODO comments for
+    - en
+  json: false # Export JSON instead of Dart files
+  lazy: true # Enable lazy loading (true by default)
+  dart-format: true # Run dart format on generated files
+  dart-fix: true # Run dart fix on generated files
+  fvm: false # Use fvm when running dart commands
+  include-invalid: false  # Include commented invalid/duplicate entries in outputs
+  keep-deprecated: false # Keep deprecated translations instead of removing them
+```
+
+Notes:
+- Keys may use either hyphen or underscore forms for `ignore-todo` (example: `ignore_todo`).
+- For `languages` and `ignore-todo`, you may supply a comma-separated string instead of a list.
+- If `pubspec.yaml` contains invalid types for any key, the generator will print a warning and fall back to defaults or CLI-provided values.
+
+
 ## Using Generated Data
 
 ### Dart Map
