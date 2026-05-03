@@ -1,3 +1,7 @@
+## 0.13.1
+
+* Update the README to note that configuration is supported via `pubspec.yaml`.
+
 ## 0.13.0
 
 * Add `supportedCodes` parameter to `LanguageDelegate` to allow explicit definition of supported locales.
