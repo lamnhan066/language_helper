@@ -510,7 +510,15 @@ class LanguageHelper {
     if (!codes.contains(toCode)) {
       _logger?.warning(() => '$toCode is not available in `data`');
 
-      if (!_useInitialCodeWhenUnavailable) {
+      final languageCode = LanguageCodes.fromCode(toCode.locale.languageCode);
+      if (codes.contains(languageCode)) {
+        _logger?.step(
+          () =>
+              'The `languageCode` only $languageCode is available in `data` => '
+              'Change the language to $languageCode',
+        );
+        _currentCode = languageCode;
+      } else if (!_useInitialCodeWhenUnavailable) {
         _logger?.info(
           () =>
               'Does not allow using the initial code => '
