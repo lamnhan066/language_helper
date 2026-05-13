@@ -65,7 +65,8 @@ class LanguageBuilder extends StatefulWidget {
   State<LanguageBuilder> createState() => _LanguageBuilderState();
 }
 
-class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
+class _LanguageBuilderState extends State<LanguageBuilder>
+    with UpdateLanguage, WidgetsBindingObserver {
   late LanguageHelper _languageHelper;
   bool get _forceRebuild =>
       widget.forceRebuild ?? _languageHelper._forceRebuild;
@@ -102,6 +103,10 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
     super.initState();
     // Initialize with fallback, will be updated in didChangeDependencies
     _languageHelper = widget.languageHelper ?? LanguageHelper.instance;
+
+    if (_languageHelper._syncWithDevice) {
+      WidgetsBinding.instance.addObserver(this);
+    }
   }
 
   @override
@@ -131,8 +136,38 @@ class _LanguageBuilderState extends State<LanguageBuilder> with UpdateLanguage {
   @override
   void dispose() {
     _languageHelper._logger?.debug(() => 'Removed $this from the states');
+    if (_languageHelper._syncWithDevice) {
+      WidgetsBinding.instance.removeObserver(this);
+    }
     _languageHelper._states.remove(this);
     super.dispose();
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state != AppLifecycleState.resumed) return;
+
+    // Only attempt to sync when the helper is configured to follow device
+    // language changes.
+    try {
+      if (!_languageHelper._syncWithDevice) return;
+
+      final deviceCode = LanguageCode.code;
+      if (_languageHelper.code == deviceCode) return;
+
+      _languageHelper._logger?.step(
+        () => 'Device language changed, syncing to $deviceCode',
+      );
+      await _languageHelper.change(deviceCode);
+
+      // Update stored device code so subsequent checks don't re-trigger.
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_languageHelper.deviceCodeKey, deviceCode.code);
+    } on Exception catch (e) {
+      _languageHelper._logger?.error(
+        () => 'Failed to sync device language on resume: $e',
+      );
+    }
   }
 
   @override
