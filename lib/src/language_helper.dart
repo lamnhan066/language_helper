@@ -510,14 +510,27 @@ class LanguageHelper {
     if (!codes.contains(toCode)) {
       _logger?.warning(() => '$toCode is not available in `data`');
 
-      final languageCode = LanguageCodes.fromCode(toCode.locale.languageCode);
-      if (codes.contains(languageCode)) {
+      final languageCode = toCode.locale.languageCode;
+      final languageCodeAsLanguageCodes = LanguageCodes.fromCode(languageCode);
+      if (codes.contains(languageCodeAsLanguageCodes)) {
         _logger?.step(
           () =>
               'The `languageCode` only $languageCode is available in `data` => '
               'Change the language to $languageCode',
         );
-        _currentCode = languageCode;
+        _currentCode = languageCodeAsLanguageCodes;
+      } else if (codes.any(
+        (code) => code.locale.languageCode == languageCode,
+      )) {
+        final matchedCode = codes.firstWhere(
+          (code) => code.locale.languageCode == languageCode,
+        );
+        _logger?.step(
+          () =>
+              'A code with the same `languageCode` $matchedCode is '
+              'available in `data` => Change the language to $matchedCode',
+        );
+        _currentCode = matchedCode;
       } else if (!_useInitialCodeWhenUnavailable) {
         _logger?.info(
           () =>
