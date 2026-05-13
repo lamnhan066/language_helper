@@ -323,11 +323,27 @@ class LanguageHelper {
         try {
           tempCode = LanguageCodes.fromCode(finalCode.locale.languageCode);
           if (!codes.contains(tempCode)) {
-            tempCode = null;
+            final matchedCode = codes.firstWhere(
+              (code) =>
+                  code.locale.languageCode == finalCode.locale.languageCode,
+            );
+            _logger?.step(
+              () =>
+                  'A code with the same `languageCode` $matchedCode is '
+                  'available in `data` => Change the language to $matchedCode',
+            );
+            tempCode = matchedCode;
           }
           // Catch the error when the language code is not valid.
           // ignore: avoid_catches_without_on_clauses
-        } catch (_) {}
+        } catch (_) {
+          _logger?.info(
+            () =>
+                'The `languageCode` only is not valid or not found in `data` => '
+                'Cannot use the `languageCode` only.',
+          );
+          tempCode = null;
+        }
       }
 
       if (tempCode == null) {
