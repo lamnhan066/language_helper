@@ -149,6 +149,10 @@ class LanguageHelper {
   /// changes.
   bool _syncWithDevice = true;
 
+  /// Whether to fall back to language code only when the full locale (e.g.,
+  /// `zh_CN`) is unavailable. Safe to call multiple times.
+  bool _isOptionalCountryCode = true;
+
   /// Whether to rebuild all [LanguageBuilder] widgets (true) or only the root
   /// (false, better performance).
   bool _forceRebuild = true;
@@ -240,7 +244,7 @@ class LanguageHelper {
       enabled: config.isDebug,
       minLevel: LogLevel.debug,
     );
-    final isOptionalCountryCode = config.isOptionalCountryCode;
+    _isOptionalCountryCode = config.isOptionalCountryCode;
 
     // When the `data` is empty, a temporary data will be added.
     if (_dataProviders.isEmpty) {
@@ -312,7 +316,7 @@ class LanguageHelper {
 
     if (!codes.contains(finalCode)) {
       LanguageCodes? tempCode;
-      if (isOptionalCountryCode && finalCode.locale.countryCode != null) {
+      if (_isOptionalCountryCode) {
         // Try to use the `languageCode` only if the
         // `languageCode_countryCode` is not available
         _logger?.info(
@@ -528,16 +532,18 @@ class LanguageHelper {
 
       final languageCode = toCode.locale.languageCode;
       final languageCodeAsLanguageCodes = LanguageCodes.fromCode(languageCode);
-      if (codes.contains(languageCodeAsLanguageCodes)) {
+      if (_isOptionalCountryCode &&
+          codes.contains(languageCodeAsLanguageCodes)) {
         _logger?.step(
           () =>
               'The `languageCode` only $languageCode is available in `data` => '
               'Change the language to $languageCode',
         );
         _currentCode = languageCodeAsLanguageCodes;
-      } else if (codes.any(
-        (code) => code.locale.languageCode == languageCode,
-      )) {
+      } else if (_isOptionalCountryCode &&
+          codes.any(
+            (code) => code.locale.languageCode == languageCode,
+          )) {
         final matchedCode = codes.firstWhere(
           (code) => code.locale.languageCode == languageCode,
         );
