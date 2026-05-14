@@ -298,31 +298,22 @@ class LanguageHelper {
       final prefDeviceCode = prefs.getString(_deviceCodeKey);
       final currentCode = LanguageCode.code;
 
-      if (prefDeviceCode == null) {
-        // Sync with device only track the changing of the device language,
-        // so it will not use the device language for the app at the first
-        // time.
+      // We only consider to change the app language when the device
+      // language is changed. So it will not affect the app language that
+      // is set by the user.
+      final prefCode = prefDeviceCode == null
+          ? currentCode.code
+          : LanguageCodes.fromCode(prefDeviceCode);
+      if (currentCode != prefCode) {
+        finalCode = currentCode;
         await prefs.setString(_deviceCodeKey, currentCode.code);
-        _logger?.info(
-          () =>
-              'Sync with device saved the current language to local database.',
+        _logger?.step(
+          () => 'Sync with device applied the new device language',
         );
       } else {
-        // We only consider to change the app language when the device
-        // language is changed. So it will not affect the app language that
-        // is set by the user.
-        final prefCode = LanguageCodes.fromCode(prefDeviceCode);
-        if (currentCode != prefCode) {
-          finalCode = currentCode;
-          await prefs.setString(_deviceCodeKey, currentCode.code);
-          _logger?.step(
-            () => 'Sync with device applied the new device language',
-          );
-        } else {
-          _logger?.debug(
-            () => 'Sync with device used the current app language',
-          );
-        }
+        _logger?.debug(
+          () => 'Sync with device used the current app language',
+        );
       }
     }
 
