@@ -9,6 +9,12 @@ LanguageCodes? defaultFallbackCodeResolver(
   final requestedLocale = requested.locale;
   final codes = helper.codes;
 
+  helper._logger?.info(
+    () =>
+        'Trying to resolve fallback for $requested using only the language '
+        'part of the code.',
+  );
+
   // 1) Prefer an exact match on language + country or script.
   for (final code in codes) {
     final locale = code.locale;
