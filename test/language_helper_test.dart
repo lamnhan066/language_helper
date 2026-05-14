@@ -80,7 +80,12 @@ void main() async {
           ),
         );
 
-        expect(testHelper.isInitialized, equals(false));
+        expect(testHelper.codes, isEmpty);
+        expect(testHelper.isInitialized, isTrue);
+        await expectLater(
+          testHelper.ensureInitialized,
+          throwsA(isA<StateError>()),
+        );
       },
     );
   });
