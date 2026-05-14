@@ -1,3 +1,9 @@
+## 0.14.0
+
+* Improve the `defaultFallbackCodeResolver` by enhancing fallback language code resolution.
+* **[BREAKING CHANGE]:** On first app open, when `syncWithDevice: true` the helper now respects the device language. Apps that relied on the previous behavior should set `syncWithDevice: false` or opt out.
+* Bump `language_code` to `v0.7.0` to resolve the get current device language code issue.
+
 ## 0.13.2
 
 * Add `LanguageConfig.resolveFallbackCode` and create a `defaultFallbackCodeResolver` helper to resolve the chosen language when there is no available requested `toCode`. The behavior is when changing to the unavailable `toCode`, the `languageCode` from the `toCode` will be used to compare. After that, if it's still not available, the `languageCode` from both current `codes` (supported locale codes) and `toCode` will be used to compare. It still respects the `isOptionalCountryCode` parameter.
