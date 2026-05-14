@@ -889,6 +889,66 @@ void main() async {
     );
 
     test(
+      'resolveLanguageCodeFallback prefers a country-specific code over the '
+      'language-only code when both are available',
+      () async {
+        final testHelper = LanguageHelper('TestResolveFallback3');
+        addTearDown(testHelper.dispose);
+
+        await testHelper.initial(
+          [
+            LanguageDataProvider.data({
+              LanguageCodes.zh: {'Hello': '你好'},
+              LanguageCodes.zh_TW: {'Hello': '你好（台灣）'},
+            }),
+          ],
+          config: const LanguageConfig(
+            initialCode: LanguageCodes.en,
+            syncWithDevice: false,
+            isAutoSave: false,
+          ),
+        );
+
+        final resolved = defaultFallbackCodeResolver(
+          testHelper,
+          LanguageCodes.zh_TW,
+        );
+
+        expect(resolved, equals(LanguageCodes.zh_TW));
+      },
+    );
+
+    test(
+      'resolveLanguageCodeFallback returns null when there is no matching '
+      'language in available codes',
+      () async {
+        final testHelper = LanguageHelper('TestResolveFallback4');
+        addTearDown(testHelper.dispose);
+
+        await testHelper.initial(
+          [
+            LanguageDataProvider.data({
+              LanguageCodes.en: {'Hello': 'Hello'},
+              LanguageCodes.vi: {'Hello': 'Xin chào'},
+            }),
+          ],
+          config: const LanguageConfig(
+            initialCode: LanguageCodes.en,
+            syncWithDevice: false,
+            isAutoSave: false,
+          ),
+        );
+
+        final resolved = defaultFallbackCodeResolver(
+          testHelper,
+          LanguageCodes.zh_TW,
+        );
+
+        expect(resolved, isNull);
+      },
+    );
+
+    test(
       'change uses the exact language-only code when it exists',
       () async {
         final testHelper = LanguageHelper('TestSyncDevice7');
