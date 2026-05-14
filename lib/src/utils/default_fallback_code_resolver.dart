@@ -2,112 +2,81 @@ part of '../language_helper.dart';
 
 /// Resolves a fallback language code using only the language part of
 /// [requested], when possible.
+///
+/// Resolution order:
+/// 1. Same language + (same country or same script)
+/// 2. Language-only code (e.g. `en` when `en_US` is requested)
+/// 3. First available code sharing the same language
 LanguageCodes? defaultFallbackCodeResolver(
   LanguageHelper helper,
   LanguageCodes requested,
 ) {
   final requestedLocale = requested.locale;
+  final requestedLanguageCode = requestedLocale.languageCode.toLowerCase();
   final codes = helper.codes;
 
   helper._logger?.info(
     () =>
-        'Trying to resolve fallback for $requested using only the language '
-        'part of the code.',
+        'Trying to resolve fallback for $requested using only the '
+        'language part of the code.',
   );
 
-  // 1) Prefer an exact match on language + country or script.
-  for (final code in codes) {
-    final locale = code.locale;
-    final isSameLanguage =
-        locale.languageCode.toLowerCase() ==
-        requestedLocale.languageCode.toLowerCase();
-    final isSameCountry =
-        locale.countryCode != null &&
-        requestedLocale.countryCode != null &&
-        locale.countryCode!.toLowerCase() ==
-            requestedLocale.countryCode!.toLowerCase();
-    final isSameScript =
-        locale.scriptCode != null &&
-        requestedLocale.scriptCode != null &&
-        locale.scriptCode!.toLowerCase() ==
-            requestedLocale.scriptCode!.toLowerCase();
-
-    if (isSameLanguage && (isSameScript || isSameCountry)) {
-      helper._logger?.step(
-        () =>
-            'A code with the same `languageCode` and either the same '
-            '`countryCode` or `scriptCode` $code is available in `data` '
-            '=> Change the language to $code',
-      );
-      return code;
-    }
-  }
-
-  // 2) Try a language-only fallback.
-  final requestedLanguageCode = requestedLocale.languageCode;
   if (requestedLanguageCode.isEmpty) {
     helper._logger?.info(() => 'Requested language is empty; no fallback.');
     return null;
   }
 
-  helper._logger?.info(
-    () =>
-        'Trying language-only fallback for $requested => '
-        'searching for $requestedLanguageCode',
-  );
+  final lang = requestedLocale.languageCode.toLowerCase();
+  final country = requestedLocale.countryCode?.toLowerCase();
+  final script = requestedLocale.scriptCode?.toLowerCase();
 
-  try {
-    final languageOnlyCode = LanguageCodes.fromCode(requestedLanguageCode);
+  // First look for a code with the same language and script.
+  for (final code in codes) {
+    final locale = code.locale;
+    if (locale.languageCode.toLowerCase() != lang) continue;
 
-    if (codes.contains(languageOnlyCode)) {
-      helper._logger?.step(
+    final sameScript =
+        script != null && locale.scriptCode?.toLowerCase() == script;
+
+    if (sameScript) {
+      helper._logger?.info(
         () =>
-            'The `languageCode` only $languageOnlyCode is available in `data` '
-            '=> Change the language to $languageOnlyCode',
+            'Found fallback with same language and script: $code. '
+            'This is preferred over a language-only code.',
       );
-      return languageOnlyCode;
+      return code;
     }
-  } on FormatException catch (_) {
-    helper._logger?.info(
-      () => 'The `languageCode` only is not a valid code => Cannot use it.',
-    );
-    return null;
-    // This can happen if the `languageCode` is not a valid ISO 639 code, or if
-    // it contains invalid characters. In this case, we cannot use it as
-    // a fallback.
-    // ignore: avoid_catching_errors
-  } on StateError catch (_) {
-    helper._logger?.info(
-      () => 'The `languageCode` only is not a valid code => Cannot use it.',
-    );
-    return null;
-    // This can happen if the `languageCode` only is not a valid code in the
-    // `LanguageCodes` enum. In this case, we cannot use it as a fallback.
-    // ignore: avoid_catches_without_on_clauses
-  } catch (e, st) {
-    helper._logger?.warning(
-      () => 'Unexpected error while resolving fallback: $e\n$st',
-    );
-    return null;
   }
 
-  // 3) Fallback to the first available code with the same language.
+  // If none found, look for a code with the same language and country.
   for (final code in codes) {
-    if (code.locale.languageCode == requestedLanguageCode) {
-      helper._logger?.step(
-        () =>
-            'A code with the same `languageCode` $code is available in `data` '
-            '=> Change the language to $code',
+    final locale = code.locale;
+    if (locale.languageCode.toLowerCase() != lang) continue;
+
+    final sameCountry =
+        country != null && locale.countryCode?.toLowerCase() == country;
+
+    if (sameCountry) {
+      helper._logger?.info(
+        () => 'Found fallback with same language and country: $code.',
+      );
+      return code;
+    }
+  }
+
+  // If none found, look for a code with the same language.
+  for (final code in codes) {
+    final locale = code.locale;
+    if (locale.languageCode.toLowerCase() == lang) {
+      helper._logger?.info(
+        () => 'Found fallback with same language: $code.',
       );
       return code;
     }
   }
 
   helper._logger?.info(
-    () =>
-        'No suitable language-only fallback found in `data` => Cannot '
-        'use the `languageCode` only.',
+    () => 'No suitable fallback found for "$requestedLanguageCode".',
   );
-
   return null;
 }
