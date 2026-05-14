@@ -28,7 +28,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   http: ^1.0.0
-  language_code: ^0.6.0
+  language_code: ^0.7.0
   lite_logger: ^0.2.0
   shared_preferences: ^2.0.0
 
