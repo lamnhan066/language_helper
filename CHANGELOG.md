@@ -1,3 +1,8 @@
+## 0.13.2
+
+* Add `LanguageConfig.resolveFallbackCode` and create a `defaultFallbackCodeResolver` helper to resolve the chosen language when there is no available requested `toCode`. The behavior is when changing to the unavailable `toCode`, the `languageCode` from the `toCode` will be used to compare. After that, if it's still not available, the `languageCode` from both current `codes` (supported locale codes) and `toCode` will be used to compare. It still respects the `isOptionalCountryCode` parameter.
+* The `LanguageConfig.onChanged` and `LanguageHelper.stream` will receive the right code (the language code that is contained in the `LanguageHelper.codes` set) instead of receiving the `toCode` (which may be unavailable in the `LanguageHelper.codes` set).
+
 ## 0.13.1
 
 * Update the README to note that configuration is supported via `pubspec.yaml`.

@@ -1,7 +1,7 @@
 name: language_helper
 description: A Flutter package for easy multi-language app localization with
   automatic text extraction and translation support.
-version: 0.13.1
+version: 0.13.2
 homepage: https://github.com/lamnhan066/language_helper
 topics:
   - localization
