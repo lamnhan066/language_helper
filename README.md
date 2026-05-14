@@ -54,6 +54,7 @@ main() async {
 - `syncWithDevice`: Sync with device language changes (default: `true`)
 - `forceRebuild`: Rebuild all widgets on language change (default: `true`, set to `false` for better performance)
 - `isDebug`: Enable debug logging (default: `false`)
+- `resolveFallbackCode`: Customize how an unavailable requested code is resolved before falling back to the current or initial language. The default implementation is `defaultFallbackCodeResolver`.
 
 ### 3. Add translations to your strings
 
@@ -416,6 +417,7 @@ await languageHelper.change(LanguageCodes.vi);
 - If the requested language is not available:
   - By default: The change is ignored and the current language remains unchanged
   - If `useInitialCodeWhenUnavailable: true`: Falls back to the initial code if available
+  - If a fallback resolver is configured: It can resolve the requested code to a supported locale before the final fallback check. The built-in default is `defaultFallbackCodeResolver`.
 
 **Performance:**
 
@@ -496,6 +498,8 @@ void dispose() {
 ```
 
 **Note:** The stream emits the new language code after all `LanguageBuilder` widgets have been notified to rebuild. Remember to cancel subscriptions to avoid memory leaks.
+
+**Note:** When `change()` falls back from an unavailable requested code, `LanguageHelper.stream` and `LanguageConfig.onChanged` receive the resolved supported code instead of the unavailable request.
 
 ### Get Supported Languages
 

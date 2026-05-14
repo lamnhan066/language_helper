@@ -8,7 +8,7 @@ import 'package:lite_logger/lite_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'extensions/language_helper_extension.dart';
-part 'utils/resolve_language_code_fallback.dart';
+part 'utils/default_fallback_code_resolver.dart';
 part 'widgets/language_builder.dart';
 
 /// Manages translations and language switching in Flutter apps.

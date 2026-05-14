@@ -850,7 +850,7 @@ void main() async {
           ),
         );
 
-        final resolved = resolveLanguageCodeFallback(
+        final resolved = defaultFallbackCodeResolver(
           testHelper,
           LanguageCodes.zh_TW,
         );
@@ -879,7 +879,7 @@ void main() async {
           ),
         );
 
-        final resolved = resolveLanguageCodeFallback(
+        final resolved = defaultFallbackCodeResolver(
           testHelper,
           LanguageCodes.zh_CN,
         );

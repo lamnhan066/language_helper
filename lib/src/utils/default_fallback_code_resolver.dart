@@ -2,7 +2,7 @@ part of '../language_helper.dart';
 
 /// Resolves a fallback language code using only the language part of
 /// [requested], when possible.
-LanguageCodes? resolveLanguageCodeFallback(
+LanguageCodes? defaultFallbackCodeResolver(
   LanguageHelper helper,
   LanguageCodes requested,
 ) {
