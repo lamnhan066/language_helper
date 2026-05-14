@@ -18,17 +18,21 @@ LanguageCodes? defaultFallbackCodeResolver(
   // 1) Prefer an exact match on language + country or script.
   for (final code in codes) {
     final locale = code.locale;
-    final isSameLanguage = locale.languageCode == requestedLocale.languageCode;
+    final isSameLanguage =
+        locale.languageCode.toLowerCase() ==
+        requestedLocale.languageCode.toLowerCase();
     final isSameCountry =
         locale.countryCode != null &&
         requestedLocale.countryCode != null &&
-        locale.countryCode == requestedLocale.countryCode;
+        locale.countryCode!.toLowerCase() ==
+            requestedLocale.countryCode!.toLowerCase();
     final isSameScript =
         locale.scriptCode != null &&
         requestedLocale.scriptCode != null &&
-        locale.scriptCode == requestedLocale.scriptCode;
+        locale.scriptCode!.toLowerCase() ==
+            requestedLocale.scriptCode!.toLowerCase();
 
-    if (isSameLanguage && (isSameCountry || isSameScript)) {
+    if (isSameLanguage && (isSameScript || isSameCountry)) {
       helper._logger?.step(
         () =>
             'A code with the same `languageCode` and either the same '
