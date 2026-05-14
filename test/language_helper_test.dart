@@ -831,6 +831,64 @@ void main() async {
     );
 
     test(
+      'resolveLanguageCodeFallback returns the exact language-only code when it'
+      ' exists',
+      () async {
+        final testHelper = LanguageHelper('TestResolveFallback1');
+        addTearDown(testHelper.dispose);
+
+        await testHelper.initial(
+          [
+            LanguageDataProvider.data({
+              LanguageCodes.zh: {'Hello': '你好'},
+            }),
+          ],
+          config: const LanguageConfig(
+            initialCode: LanguageCodes.en,
+            syncWithDevice: false,
+            isAutoSave: false,
+          ),
+        );
+
+        final resolved = resolveLanguageCodeFallback(
+          testHelper,
+          LanguageCodes.zh_TW,
+        );
+
+        expect(resolved, equals(LanguageCodes.zh));
+      },
+    );
+
+    test(
+      'resolveLanguageCodeFallback scans for a matching language when the exact'
+      ' language-only code is missing',
+      () async {
+        final testHelper = LanguageHelper('TestResolveFallback2');
+        addTearDown(testHelper.dispose);
+
+        await testHelper.initial(
+          [
+            LanguageDataProvider.data({
+              LanguageCodes.zh_TW: {'Hello': '你好'},
+            }),
+          ],
+          config: const LanguageConfig(
+            initialCode: LanguageCodes.en,
+            syncWithDevice: false,
+            isAutoSave: false,
+          ),
+        );
+
+        final resolved = resolveLanguageCodeFallback(
+          testHelper,
+          LanguageCodes.zh_CN,
+        );
+
+        expect(resolved, equals(LanguageCodes.zh_TW));
+      },
+    );
+
+    test(
       'change uses the exact language-only code when it exists',
       () async {
         final testHelper = LanguageHelper('TestSyncDevice7');

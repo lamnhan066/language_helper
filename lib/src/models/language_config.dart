@@ -1,4 +1,4 @@
-import 'package:language_code/language_code.dart';
+import 'package:language_helper/language_helper.dart';
 
 /// Configuration used to initialize a LanguageHelper.
 class LanguageConfig {
@@ -11,6 +11,7 @@ class LanguageConfig {
     this.syncWithDevice = true,
     this.isOptionalCountryCode = true,
     this.onChanged,
+    this.resolveFallbackCode,
     this.isDebug = false,
   });
 
@@ -36,6 +37,11 @@ class LanguageConfig {
 
   /// Callback invoked when language changes.
   final void Function(LanguageCodes code)? onChanged;
+
+  /// When change fails due to unavailable language, callback receives the code
+  /// that was attempted. Can be used for error handling or fallback logic.
+  final LanguageCodes? Function(LanguageHelper helper, LanguageCodes code)?
+  resolveFallbackCode;
 
   /// Enable debug logging. Defaults to false.
   final bool isDebug;

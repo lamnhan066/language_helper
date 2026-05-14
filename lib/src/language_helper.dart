@@ -8,6 +8,7 @@ import 'package:lite_logger/lite_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'extensions/language_helper_extension.dart';
+part 'utils/resolve_language_code_fallback.dart';
 part 'widgets/language_builder.dart';
 
 /// Manages translations and language switching in Flutter apps.
@@ -137,6 +138,11 @@ class LanguageHelper {
   /// `useInitialCodeWhenUnavailable` is true.
   LanguageCodes? _initialCode;
 
+  /// Callback invoked when a language change fails due to an unavailable
+  /// language.
+  LanguageCodes? Function(LanguageHelper helper, LanguageCodes code)?
+  _fallbackCode;
+
   /// Whether to fall back to `_initialCode` when an unavailable language is
   /// requested.
   bool _useInitialCodeWhenUnavailable = false;
@@ -223,7 +229,9 @@ class LanguageHelper {
 
     /// Configuration for the LanguageHelper.
     /// If not provided, a default configuration will be used.
-    LanguageConfig config = const LanguageConfig(),
+    LanguageConfig config = const LanguageConfig(
+      resolveFallbackCode: resolveLanguageCodeFallback,
+    ),
   }) async {
     if (isInitialized) return;
 
@@ -239,6 +247,9 @@ class LanguageHelper {
     _isAutoSave = config.isAutoSave;
     _syncWithDevice = config.syncWithDevice;
     _initialCode = config.initialCode;
+    // Use the provided fallback code resolver or the default one if
+    // not provided. So we will not have a breaking change.
+    _fallbackCode = config.resolveFallbackCode ?? resolveLanguageCodeFallback;
     _logger ??= LiteLogger(
       name: prefix,
       enabled: config.isDebug,
@@ -322,7 +333,7 @@ class LanguageHelper {
     if (!codes.contains(finalCode)) {
       LanguageCodes? tempCode;
       if (_isOptionalCountryCode) {
-        tempCode = _resolveLanguageCodeFallback(finalCode);
+        tempCode = _fallbackCode?.call(this, finalCode);
       }
 
       if (tempCode == null) {
@@ -350,62 +361,6 @@ class LanguageHelper {
     if (!_ensureInitialized.isCompleted) {
       _ensureInitialized.complete();
     }
-  }
-
-  /// Resolves a fallback language code using only the language part of
-  /// [requested], when possible.
-  LanguageCodes? _resolveLanguageCodeFallback(LanguageCodes requested) {
-    try {
-      final requestedLanguageCode = requested.locale.languageCode;
-
-      _logger?.info(
-        () =>
-            'Trying language-only fallback for $requested => '
-            'searching for $requestedLanguageCode',
-      );
-
-      final languageOnlyCode = LanguageCodes.fromCode(
-        requestedLanguageCode,
-      );
-
-      if (codes.contains(languageOnlyCode)) {
-        _logger?.step(
-          () =>
-              'The `languageCode` only $languageOnlyCode is available in '
-              '`data` => Change the language to $languageOnlyCode',
-        );
-        return languageOnlyCode;
-      }
-
-      for (final code in codes) {
-        if (code.locale.languageCode == requestedLanguageCode) {
-          _logger?.step(
-            () =>
-                'A code with the same `languageCode` $code is available in '
-                '`data` => Change the language to $code',
-          );
-          return code;
-        }
-      }
-
-      _logger?.info(
-        () =>
-            'The `languageCode` only is not valid or not found in `data` => '
-            'Cannot use the `languageCode` only.',
-      );
-
-      // Catch the error when the language code is not valid.
-      // ignore: avoid_catches_without_on_clauses
-    } catch (_) {
-      _logger?.info(
-        () =>
-            'The `languageCode` only is not valid or not found in `data` => '
-            'Cannot use the `languageCode` only.',
-      );
-      return null;
-    }
-
-    return null;
   }
 
   /// Disposes resources and closes the [stream] controller. Only call when the
@@ -562,7 +517,7 @@ class LanguageHelper {
       _logger?.warning(() => '$toCode is not available in `data`');
 
       final resolvedCode = _isOptionalCountryCode
-          ? _resolveLanguageCodeFallback(toCode)
+          ? _fallbackCode?.call(this, toCode)
           : null;
 
       if (resolvedCode != null) {
