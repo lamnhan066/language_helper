@@ -579,14 +579,14 @@ class LanguageHelper {
       state.updateLanguage();
     }
 
-    _streamController.sink.add(toCode);
-    _onChanged?.call(toCode);
+    _streamController.sink.add(_currentCode!);
+    _onChanged?.call(_currentCode!);
 
     // Save to local memory
     if (_isAutoSave) {
-      _logger?.debug(() => 'Save this $toCode to local memory');
+      _logger?.debug(() => 'Save this $_currentCode to local memory');
       final pref = await SharedPreferences.getInstance();
-      await pref.setString(_autoSaveCodeKey, toCode.code);
+      await pref.setString(_autoSaveCodeKey, _currentCode!.code);
     }
 
     _logger?.step(() => 'Changing completed!');
