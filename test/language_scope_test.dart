@@ -17,7 +17,10 @@ void main() {
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       LanguageHelper? retrievedHelper;
@@ -85,7 +88,10 @@ void main() {
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       LanguageHelper? retrievedHelper;
@@ -159,7 +165,10 @@ void main() {
       );
       await childHelper.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       LanguageHelper? parentRetrieved;
@@ -204,7 +213,10 @@ void main() {
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       await tester.pumpWidget(
@@ -250,6 +262,7 @@ void main() {
           dataList,
           config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
+            syncWithDevice: false,
           ),
         );
 
@@ -284,7 +297,10 @@ void main() {
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       await tester.pumpWidget(
@@ -316,6 +332,7 @@ void main() {
           dataList,
           config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
+            syncWithDevice: false,
           ),
         );
 
@@ -395,7 +412,10 @@ void main() {
       final scopedHelper = LanguageHelper('ScopedHelper');
       await scopedHelper.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       await tester.pumpWidget(
@@ -435,7 +455,10 @@ void main() {
       );
       await innerHelper.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       await tester.pumpWidget(
@@ -481,7 +504,10 @@ void main() {
       );
       await helper2.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       await tester.pumpWidget(
@@ -536,7 +562,10 @@ void main() {
       );
       await helper2.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       final scope1 = LanguageScope(
@@ -595,7 +624,10 @@ void main() {
       );
       await helper2.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       var buildCount = 0;
@@ -769,7 +801,10 @@ void main() {
       final scopedHelper = LanguageHelper('DeepScopedHelper');
       await scopedHelper.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       LanguageHelper? retrievedHelper;
@@ -816,7 +851,10 @@ void main() {
       final scopedHelper = LanguageHelper('DeepScopedHelper');
       await scopedHelper.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       LanguageHelper? retrievedHelper;
@@ -939,7 +977,10 @@ void main() {
       );
       await childHelper.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       LanguageHelper? parentRetrieved;
@@ -988,6 +1029,7 @@ void main() {
           dataList,
           config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
+            syncWithDevice: false,
           ),
         );
 
@@ -1064,6 +1106,7 @@ void main() {
           dataList,
           config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
+            syncWithDevice: false,
           ),
         );
 
@@ -1146,6 +1189,7 @@ void main() {
           dataList,
           config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
+            syncWithDevice: false,
           ),
         );
 
@@ -1411,6 +1455,7 @@ void main() {
           dataList,
           config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
+            syncWithDevice: false,
           ),
         );
 
@@ -1487,6 +1532,7 @@ void main() {
           dataList,
           config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
+            syncWithDevice: false,
           ),
         );
 
@@ -1569,6 +1615,7 @@ void main() {
           dataList,
           config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
+            syncWithDevice: false,
           ),
         );
 

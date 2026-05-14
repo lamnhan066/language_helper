@@ -130,6 +130,7 @@ void main() async {
         dataList,
         config: LanguageConfig(
           isDebug: true,
+          syncWithDevice: false,
           onChanged: (value) {
             expect(value, isA<LanguageCodes>());
           },
@@ -773,7 +774,7 @@ void main() async {
       expect(testHelper.code, equals(LanguageCodes.vi));
     });
 
-    test("true and haven't local database", () async {
+    test("true and haven't local database, applies device language", () async {
       final testHelper = LanguageHelper('TestSyncDevice2');
       addTearDown(testHelper.dispose);
 
@@ -787,7 +788,7 @@ void main() async {
         ),
       );
 
-      expect(testHelper.code, equals(LanguageCodes.vi));
+      expect(testHelper.code, equals(LanguageCodes.en));
     });
 
     test(
@@ -975,7 +976,8 @@ void main() async {
     );
 
     test(
-      'change scans for a matching language when the exact language-only code is missing',
+      'change scans for a matching language when the exact '
+      'language-only code is missing',
       () async {
         final testHelper = LanguageHelper('TestSyncDevice8');
         addTearDown(testHelper.dispose);
@@ -1001,7 +1003,8 @@ void main() async {
     );
 
     test(
-      'change maps a country-specific locale to the language-only code when available',
+      'change maps a country-specific locale to the language-only code '
+      'when available',
       () async {
         final testHelper = LanguageHelper('TestSyncDevice7');
         addTearDown(testHelper.dispose);
@@ -1422,7 +1425,10 @@ void main() async {
       );
       await helper2.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       await tester.pumpWidget(
@@ -1477,7 +1483,10 @@ void main() async {
       );
       await helper2.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       await tester.pumpWidget(
@@ -1649,7 +1658,10 @@ void main() async {
       );
       await innerHelper.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       await tester.pumpWidget(
@@ -1882,6 +1894,7 @@ void main() async {
 
           config: const LanguageConfig(
             initialCode: LanguageCodes.vi,
+            syncWithDevice: false,
           ),
         );
 
@@ -3087,6 +3100,7 @@ void main() async {
 
         config: const LanguageConfig(
           initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
           isDebug: true,
         ),
       );
@@ -3150,7 +3164,10 @@ void main() async {
       );
       await helper2.initial(
         dataList,
-        config: const LanguageConfig(initialCode: LanguageCodes.vi),
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          syncWithDevice: false,
+        ),
       );
 
       // Create nested LanguageBuilders with different helpers
