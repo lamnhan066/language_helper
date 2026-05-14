@@ -302,7 +302,7 @@ class LanguageHelper {
       // language is changed. So it will not affect the app language that
       // is set by the user.
       final prefCode = prefDeviceCode == null
-          ? currentCode.code
+          ? currentCode
           : LanguageCodes.fromCode(prefDeviceCode);
       if (currentCode != prefCode) {
         finalCode = currentCode;
