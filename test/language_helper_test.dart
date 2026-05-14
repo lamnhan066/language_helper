@@ -782,7 +782,6 @@ void main() async {
       LanguageCode.setTestCode(LanguageCodes.en);
       await testHelper.initial(
         dataList,
-
         config: const LanguageConfig(
           initialCode: LanguageCodes.vi,
         ),

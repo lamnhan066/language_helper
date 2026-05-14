@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:language_code/language_code.dart';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper/src/mixins/update_language.dart';
+import 'package:language_helper/src/utils/debouncer.dart';
 import 'package:lite_logger/lite_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -293,28 +294,9 @@ class LanguageHelper {
     }
 
     // Try to get the device language code if `syncWithDevice` is `true`
-    if (_syncWithDevice) {
-      final prefs = await SharedPreferences.getInstance();
-      final prefDeviceCode = prefs.getString(_deviceCodeKey);
-      final currentCode = LanguageCode.code;
-
-      // We only consider to change the app language when the device
-      // language is changed. So it will not affect the app language that
-      // is set by the user.
-      final prefCode = prefDeviceCode == null
-          ? currentCode
-          : LanguageCodes.fromCode(prefDeviceCode);
-      if (currentCode != prefCode) {
-        finalCode = currentCode;
-        await prefs.setString(_deviceCodeKey, currentCode.code);
-        _logger?.step(
-          () => 'Sync with device applied the new device language',
-        );
-      } else {
-        _logger?.debug(
-          () => 'Sync with device used the current app language',
-        );
-      }
+    final deviceCode = await _resolveDeviceCode();
+    if (deviceCode != null) {
+      finalCode = deviceCode;
     }
 
     if (!codes.contains(finalCode)) {
@@ -682,6 +664,43 @@ class LanguageHelper {
     }
 
     return data;
+  }
+
+  Future<LanguageCodes?> _resolveDeviceCode() async {
+    if (!_syncWithDevice) return null;
+
+    final currentCode = LanguageCode.code;
+    if (currentCode == _currentCode) {
+      _logger?.debug(
+        () =>
+            'Device language $currentCode is the same as current app '
+            'language => No need to sync with device',
+      );
+      return null;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final prefDeviceCode = prefs.getString(_deviceCodeKey);
+
+    // We only consider to change the app language when the device
+    // language is changed. So it will not affect the app language that
+    // is set by the user.
+    final prefCode = prefDeviceCode == null
+        ? null
+        : LanguageCodes.fromCode(prefDeviceCode);
+    if (currentCode != prefCode) {
+      await prefs.setString(_deviceCodeKey, currentCode.code);
+      _logger?.step(
+        () => 'Sync with device applied the new device language',
+      );
+      return currentCode;
+    } else {
+      _logger?.debug(
+        () => 'Sync with device used the current app language',
+      );
+    }
+
+    return null;
   }
 
   @override
