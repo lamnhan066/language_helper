@@ -70,6 +70,7 @@ class _LanguageBuilderState extends State<LanguageBuilder>
   late LanguageHelper _languageHelper;
   bool get _forceRebuild =>
       widget.forceRebuild ?? _languageHelper._forceRebuild;
+  static final _debouncer = Debouncer();
 
   /// Updates the language
   @override
@@ -147,27 +148,18 @@ class _LanguageBuilderState extends State<LanguageBuilder>
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state != AppLifecycleState.resumed) return;
 
-    // Only attempt to sync when the helper is configured to follow device
-    // language changes.
-    try {
-      if (!_languageHelper._syncWithDevice) return;
-
-      final deviceCode = LanguageCode.code;
-      if (_languageHelper.code == deviceCode) return;
-
-      _languageHelper._logger?.step(
-        () => 'Device language changed, syncing to $deviceCode',
-      );
-      await _languageHelper.change(deviceCode);
-
-      // Update stored device code so subsequent checks don't re-trigger.
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_languageHelper.deviceCodeKey, deviceCode.code);
-    } on Exception catch (e) {
-      _languageHelper._logger?.error(
-        () => 'Failed to sync device language on resume: $e',
-      );
-    }
+    _debouncer.run(() async {
+      try {
+        final resolvedDeviceCode = await _languageHelper._resolveDeviceCode();
+        if (resolvedDeviceCode != null) {
+          await _languageHelper.change(resolvedDeviceCode);
+        }
+      } on Exception catch (e) {
+        _languageHelper._logger?.error(
+          () => 'Failed to sync device language on resume: $e',
+        );
+      }
+    });
   }
 
   @override
