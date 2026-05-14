@@ -229,9 +229,7 @@ class LanguageHelper {
 
     /// Configuration for the LanguageHelper.
     /// If not provided, a default configuration will be used.
-    LanguageConfig config = const LanguageConfig(
-      resolveFallbackCode: resolveLanguageCodeFallback,
-    ),
+    LanguageConfig config = const LanguageConfig(),
   }) async {
     if (isInitialized) return;
 
@@ -247,9 +245,7 @@ class LanguageHelper {
     _isAutoSave = config.isAutoSave;
     _syncWithDevice = config.syncWithDevice;
     _initialCode = config.initialCode;
-    // Use the provided fallback code resolver or the default one if
-    // not provided. So we will not have a breaking change.
-    _fallbackCode = config.resolveFallbackCode ?? resolveLanguageCodeFallback;
+    _fallbackCode = config.resolveFallbackCode;
     _logger ??= LiteLogger(
       name: prefix,
       enabled: config.isDebug,

@@ -11,7 +11,7 @@ class LanguageConfig {
     this.syncWithDevice = true,
     this.isOptionalCountryCode = true,
     this.onChanged,
-    this.resolveFallbackCode,
+    this.resolveFallbackCode = resolveLanguageCodeFallback,
     this.isDebug = false,
   });
 
