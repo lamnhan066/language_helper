@@ -1,7 +1,8 @@
-## 0.14.0
+## 0.14.1
 
 * Improve the `defaultFallbackCodeResolver` by enhancing fallback language code resolution.
 * **[BREAKING CHANGE]:** On first app open, when `syncWithDevice: true` the helper now respects the device language. Apps that relied on the previous behavior should set `syncWithDevice: false` or opt out.
+* The `syncWithDevice: true` will work correctly on app resume.
 * Bump `language_code` to `v0.7.0` to resolve the get current device language code issue.
 
 ## 0.13.2
