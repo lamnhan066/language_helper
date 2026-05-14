@@ -825,6 +825,80 @@ void main() async {
       },
     );
 
+    test(
+      'change uses the exact language-only code when it exists',
+      () async {
+        final testHelper = LanguageHelper('TestSyncDevice7');
+        addTearDown(testHelper.dispose);
+
+        SharedPreferences.setMockInitialValues({});
+        await testHelper.initial(
+          [
+            LanguageDataProvider.data({
+              LanguageCodes.zh: {'Hello': '你好'},
+            }),
+          ],
+          config: const LanguageConfig(
+            initialCode: LanguageCodes.en,
+            syncWithDevice: false,
+            isAutoSave: false,
+          ),
+        );
+
+        await testHelper.change(LanguageCodes.zh_TW);
+
+        expect(testHelper.code, equals(LanguageCodes.zh));
+      },
+    );
+
+    test(
+      'change scans for a matching language when the exact language-only code is missing',
+      () async {
+        final testHelper = LanguageHelper('TestSyncDevice8');
+        addTearDown(testHelper.dispose);
+
+        SharedPreferences.setMockInitialValues({});
+        await testHelper.initial(
+          [
+            LanguageDataProvider.data({
+              LanguageCodes.zh_TW: {'Hello': '你好'},
+            }),
+          ],
+          config: const LanguageConfig(
+            initialCode: LanguageCodes.en,
+            syncWithDevice: false,
+            isAutoSave: false,
+          ),
+        );
+
+        await testHelper.change(LanguageCodes.zh_CN);
+
+        expect(testHelper.code, equals(LanguageCodes.zh_TW));
+      },
+    );
+
+    test(
+      'change maps a country-specific locale to the language-only code when available',
+      () async {
+        final testHelper = LanguageHelper('TestSyncDevice7');
+        addTearDown(testHelper.dispose);
+
+        SharedPreferences.setMockInitialValues({});
+        LanguageCode.setTestCode(LanguageCodes.en);
+        await testHelper.initial(
+          dataAdds,
+          config: const LanguageConfig(
+            syncWithDevice: false,
+            isAutoSave: false,
+          ),
+        );
+
+        await testHelper.change(LanguageCodes.zh_TW);
+
+        expect(testHelper.code, equals(LanguageCodes.zh));
+      },
+    );
+
     test('true and have local database but with no changed code', () async {
       final testHelper = LanguageHelper('TestSyncDevice5');
       addTearDown(testHelper.dispose);

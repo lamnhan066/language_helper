@@ -264,6 +264,11 @@ class LanguageHelper {
 
     if (_codes.isEmpty) {
       _logger?.error(() => 'The LanguageData in the `data` is empty');
+      if (!_ensureInitialized.isCompleted) {
+        _ensureInitialized.completeError(
+          StateError('The LanguageData in the `data` is empty'),
+        );
+      }
       return;
     }
 
@@ -283,10 +288,10 @@ class LanguageHelper {
     // Try to get the device language code if `syncWithDevice` is `true`
     if (_syncWithDevice) {
       final prefs = await SharedPreferences.getInstance();
-      final prefCodeCode = prefs.getString(_deviceCodeKey);
+      final prefDeviceCode = prefs.getString(_deviceCodeKey);
       final currentCode = LanguageCode.code;
 
-      if (prefCodeCode == null) {
+      if (prefDeviceCode == null) {
         // Sync with device only track the changing of the device language,
         // so it will not use the device language for the app at the first
         // time.
@@ -299,7 +304,7 @@ class LanguageHelper {
         // We only consider to change the app language when the device
         // language is changed. So it will not affect the app language that
         // is set by the user.
-        final prefCode = LanguageCodes.fromCode(prefCodeCode);
+        final prefCode = LanguageCodes.fromCode(prefDeviceCode);
         if (currentCode != prefCode) {
           finalCode = currentCode;
           await prefs.setString(_deviceCodeKey, currentCode.code);
@@ -317,37 +322,7 @@ class LanguageHelper {
     if (!codes.contains(finalCode)) {
       LanguageCodes? tempCode;
       if (_isOptionalCountryCode) {
-        // Try to use the `languageCode` only if the
-        // `languageCode_countryCode` is not available
-        _logger?.info(
-          () =>
-              'language does not contain the $finalCode => '
-              'Try to use the `languageCode` only..',
-        );
-        try {
-          tempCode = LanguageCodes.fromCode(finalCode.locale.languageCode);
-          if (!codes.contains(tempCode)) {
-            final matchedCode = codes.firstWhere(
-              (code) =>
-                  code.locale.languageCode == finalCode.locale.languageCode,
-            );
-            _logger?.step(
-              () =>
-                  'A code with the same `languageCode` $matchedCode is '
-                  'available in `data` => Change the language to $matchedCode',
-            );
-            tempCode = matchedCode;
-          }
-          // Catch the error when the language code is not valid.
-          // ignore: avoid_catches_without_on_clauses
-        } catch (_) {
-          _logger?.info(
-            () =>
-                'The `languageCode` only is not valid or not found in `data` => '
-                'Cannot use the `languageCode` only.',
-          );
-          tempCode = null;
-        }
+        tempCode = _resolveLanguageCodeFallback(finalCode);
       }
 
       if (tempCode == null) {
@@ -375,6 +350,35 @@ class LanguageHelper {
     if (!_ensureInitialized.isCompleted) {
       _ensureInitialized.complete();
     }
+  }
+
+  /// Resolves a fallback language code using only the language part of
+  /// [requested], when possible.
+  LanguageCodes? _resolveLanguageCodeFallback(LanguageCodes requested) {
+    try {
+      final requestedLanguageCode = requested.locale.languageCode;
+
+      final languageOnlyCode = LanguageCodes.fromCode(
+        requestedLanguageCode,
+      );
+
+      if (codes.contains(languageOnlyCode)) {
+        return languageOnlyCode;
+      }
+
+      for (final code in codes) {
+        if (code.locale.languageCode == requestedLanguageCode) {
+          return code;
+        }
+      }
+
+      // Catch the error when the language code is not valid.
+      // ignore: avoid_catches_without_on_clauses
+    } catch (_) {
+      return null;
+    }
+
+    return null;
   }
 
   /// Disposes resources and closes the [stream] controller. Only call when the
@@ -530,29 +534,17 @@ class LanguageHelper {
     if (!codes.contains(toCode)) {
       _logger?.warning(() => '$toCode is not available in `data`');
 
-      final languageCode = toCode.locale.languageCode;
-      final languageCodeAsLanguageCodes = LanguageCodes.fromCode(languageCode);
-      if (_isOptionalCountryCode &&
-          codes.contains(languageCodeAsLanguageCodes)) {
+      final resolvedCode = _isOptionalCountryCode
+          ? _resolveLanguageCodeFallback(toCode)
+          : null;
+
+      if (resolvedCode != null) {
         _logger?.step(
           () =>
-              'The `languageCode` only $languageCode is available in `data` => '
-              'Change the language to $languageCode',
+              'A code with the same `languageCode` $resolvedCode is '
+              'available in `data` => Change the language to $resolvedCode',
         );
-        _currentCode = languageCodeAsLanguageCodes;
-      } else if (_isOptionalCountryCode &&
-          codes.any(
-            (code) => code.locale.languageCode == languageCode,
-          )) {
-        final matchedCode = codes.firstWhere(
-          (code) => code.locale.languageCode == languageCode,
-        );
-        _logger?.step(
-          () =>
-              'A code with the same `languageCode` $matchedCode is '
-              'available in `data` => Change the language to $matchedCode',
-        );
-        _currentCode = matchedCode;
+        _currentCode = resolvedCode;
       } else if (!_useInitialCodeWhenUnavailable) {
         _logger?.info(
           () =>
