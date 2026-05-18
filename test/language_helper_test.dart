@@ -286,7 +286,6 @@ void main() async {
         dataList,
         config: LanguageConfig(
           initialCode: LanguageCodes.en,
-          useInitialCodeWhenUnavailable: true,
           onChanged: (code) {},
         ),
       );
@@ -304,9 +303,9 @@ void main() async {
       SharedPreferences.setMockInitialValues({});
       await testHelper.initial(
         dataList,
-
         config: const LanguageConfig(
           initialCode: LanguageCodes.en,
+          useInitialCodeWhenUnavailable: false,
         ),
       );
       await testHelper.change(LanguageCodes.vi);
@@ -343,7 +342,6 @@ void main() async {
           dataList,
           config: LanguageConfig(
             initialCode: LanguageCodes.cu, // cu is not in dataList
-            useInitialCodeWhenUnavailable: true,
             isDebug: true,
             onChanged: (code) {},
           ),

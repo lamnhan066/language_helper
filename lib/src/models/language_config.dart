@@ -5,7 +5,7 @@ class LanguageConfig {
   /// Creates a configuration for LanguageHelper.initial.
   const LanguageConfig({
     this.initialCode,
-    this.useInitialCodeWhenUnavailable = false,
+    this.useInitialCodeWhenUnavailable = true,
     this.forceRebuild = true,
     this.isAutoSave = true,
     this.syncWithDevice = true,
