@@ -1,3 +1,7 @@
+## 0.15.0-rc
+
+* **[BREAKING CHANGE]:** `LanguageConfig.useInitialCodeWhenUnavailable` is changed to `true` by default.
+
 ## 0.14.1
 
 * Improve the `defaultFallbackCodeResolver` by enhancing fallback language code resolution.
