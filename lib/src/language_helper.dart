@@ -650,6 +650,9 @@ class LanguageHelper {
     final data = <LanguageCodes, Map<String, dynamic>>{};
 
     for (final provider in providers) {
+      final supportedCodes = await provider.getSupportedCodes();
+      if (!supportedCodes.contains(code)) continue;
+
       final providerData = await provider.getData(code);
       for (final entry in providerData.entries) {
         data.putIfAbsent(entry.key, () => {});
