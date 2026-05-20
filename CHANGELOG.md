@@ -1,3 +1,8 @@
+## 0.15.0-rc.1
+
+* **[BREAKING CHANGE]:** `LanguageHelper.addProvider` will execute `LanguageHelper.initial` automatically when the helper is not initialized. In previous behavior, it only execute the `LanguageHelper.initial` when there is no `config` provided.
+* Avoid loading a provider that doesn't support the chosen language.
+
 ## 0.15.0-rc
 
 * **[BREAKING CHANGE]:** `LanguageConfig.useInitialCodeWhenUnavailable` is changed to `true` by default.

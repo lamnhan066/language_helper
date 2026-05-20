@@ -121,17 +121,17 @@ packages:
     dependency: transitive
     description:
       name: language_code
-      sha256: b9110f05112cb40648b04da0f8eead57d70b6cd5cd3e9b17e968a34770097bf5
+      sha256: "43eddc2fe2f8d1189b4eeffd10dffcc456ccb754623a2c3b4c753adf4b7c4993"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.0"
+    version: "0.7.0"
   language_helper:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.13.0-rc.14"
+    version: "0.15.0-rc"
   leak_tracker:
     dependency: transitive
     description:
