@@ -356,17 +356,17 @@ class LanguageHelper {
   /// If [mergeCodes] is true, the provider's supported language codes are
   /// added to the helper's available codes. Defaults to false.
   ///
-  /// If [config] is provided and the helper is not initialized, it will
+  /// If the helper is not initialized, the [config] will be used to
   /// automatically initialize the helper first. This is useful for package
   /// usage.
   Future<void> addProvider(
     LanguageDataProvider provider, {
     bool activate = true,
     bool mergeCodes = false,
-    LanguageConfig? config,
+    LanguageConfig config = const LanguageConfig(),
   }) async {
-    // Auto-initialize if config is provided and helper is not initialized
-    if (!isInitialized && config != null) {
+    // Auto-initialize if the helper is not initialized
+    if (!isInitialized) {
       await initial([provider], config: config);
     }
 

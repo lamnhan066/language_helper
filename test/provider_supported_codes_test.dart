@@ -35,6 +35,7 @@ void main() {
         config: const LanguageConfig(
           initialCode: LanguageCodes.en,
           isDebug: true,
+          syncWithDevice: false,
         ),
       );
 
@@ -72,6 +73,7 @@ void main() {
       config: const LanguageConfig(
         initialCode: LanguageCodes.vi,
         isDebug: true,
+        syncWithDevice: false,
       ),
     );
 
