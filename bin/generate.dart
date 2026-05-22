@@ -20,7 +20,7 @@ import 'package:lite_logger/lite_logger.dart';
 ///
 ///   111: Unknown error
 void main(List<String> args) async {
-  const logger = LiteLogger(name: 'LanguageHelper Generator');
+  const logger = LiteLogger(name: 'LanguageHelper Generator', usePrint: true);
   final isGeneratorInstalled = _isGeneratorInstalled();
   if (!isGeneratorInstalled) {
     if (args.contains('--add-generator')) {
