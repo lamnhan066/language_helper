@@ -112,9 +112,9 @@ example/
 ### Basic Setup
 ```dart
 // Initialize LanguageHelper
-await LanguageHelper.instance.initial(
-  data: [LanguageDataProvider.lazyData(languageData)],
-);
+await LanguageHelper.instance.initial([
+  LanguageDataProvider.lazyData(languageData),
+]);
 
 // Use in MaterialApp
 MaterialApp(
@@ -161,13 +161,11 @@ languageHelper.stream.listen((newCode) {
 
 ### Multiple Data Sources
 ```dart
-await languageHelper.initial(
-  data: [
-    LanguageDataProvider.lazyData(primaryData),
-    LanguageDataProvider.asset('assets/languages'),
-    LanguageDataProvider.network('https://api.example.com/translations'),
-  ],
-);
+await languageHelper.initial([
+  LanguageDataProvider.lazyData(primaryData),
+  LanguageDataProvider.asset('assets/languages'),
+  LanguageDataProvider.network('https://api.example.com/translations'),
+]);
 ```
 
 ## Testing

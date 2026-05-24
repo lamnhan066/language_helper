@@ -31,30 +31,35 @@ final languageHelper = LanguageHelper.instance;
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize with empty data (temporary English fallback for development)
-  await languageHelper.initial(data: []);
-  
-  // Or initialize with your translation data
-  // await languageHelper.initial(
-  //   data: [
-  //     LanguageDataProvider.data(myLanguageData),
-  //   ],
-  // );
-  
+
+  // Initialize with empty providers (temporary English fallback for development)
+  await languageHelper.initial([]);
+
+  // Or initialize with your translation providers
+  // await languageHelper.initial([
+  //   LanguageDataProvider.data(myLanguageData),
+  // ]);
+
   runApp(const MyApp());
 }
 ```
 
-**Initialization Options:**
+**Initialization Options (via `LanguageConfig`):**
 
-- `data`: List of `LanguageDataProvider` instances (required)
+- `data`: List of `LanguageDataProvider` instances (required positional parameter)
 - `initialCode`: Preferred initial language code
+- `useInitialCodeWhenUnavailable`: Fall back to `initialCode` when changing to unavailable languages (default: `true`)
 - `isAutoSave`: Automatically save and restore language preference (default: `true`)
 - `syncWithDevice`: Sync with device language changes (default: `true`)
-- `forceRebuild`: Rebuild all widgets on language change (default: `true`, set to `false` for better performance)
+- `forceRebuild`: Default behavior for `LanguageBuilder` widgets; when `true` all `LanguageBuilder` widgets rebuild on language change (default: `true`)
 - `isDebug`: Enable debug logging (default: `false`)
-- `resolveFallbackCode`: Customize how an unavailable requested code is resolved before falling back to the current or initial language. The default implementation is `defaultFallbackCodeResolver`.
+- `resolveFallbackCode`: Customize how an unavailable requested code is resolved. The default is `defaultFallbackCodeResolver`.
+
+Notes:
+- Call `await languageHelper.initial([...])` before using `tr`/`trP` extensions or `LanguageBuilder`.
+- Use `languageHelper.reload()` to refresh all `LanguageBuilder` widgets without changing the current language (useful after adding/removing providers with `activate: false`).
+- `Lhb` is available as a short alias for `LanguageBuilder` in widget examples.
+- `trP` and `trT` now require a `params` argument when used to replace parameters; `trT` is a convenience that accepts only a `toCode` parameter for one-off translations.
 
 ### 3. Add translations to your strings
 
@@ -239,7 +244,7 @@ final overrideProvider = LanguageDataProvider.data(
 );
 
 main() async {
-  await languageHelper.initial(data: [languageDataProvider]);
+  await languageHelper.initial([languageDataProvider]);
   runApp(const MyApp());
 }
 ```
@@ -264,7 +269,7 @@ final preserveProvider = LanguageDataProvider.asset(
 );
 
 main() async {
-  await languageHelper.initial(data: [languageDataProvider]);
+  await languageHelper.initial([languageDataProvider]);
   runApp(const MyApp());
 }
 ```
@@ -318,7 +323,7 @@ final customClientProvider = LanguageDataProvider.network(
 );
 
 main() async {
-  await languageHelper.initial(data: [languageDataProvider]);
+  await languageHelper.initial([languageDataProvider]);
   runApp(const MyApp());
 }
 ```
@@ -437,6 +442,11 @@ await languageHelper.change(LanguageCodes.vi);
 final newProvider = LanguageDataProvider.data(newTranslations);
 await languageHelper.addProvider(newProvider);
 
+// Add provider (helper must already be initialized)
+await languageHelper.addProvider(
+  LanguageDataProvider.data(additionalTranslations),
+);
+
 // Add provider with code merging enabled
 await languageHelper.addProvider(
   LanguageDataProvider.data(additionalTranslations),
@@ -468,7 +478,8 @@ await languageHelper.reload(); // Update widgets now
 - The `mergeCodes` parameter controls whether the provider's supported language codes are added to the helper's available codes. Defaults to `false`.
 - Providers are added to the end of the providers list. Later providers with `override: true` will overwrite earlier ones.
 - When `activate: false`, data is added/removed but widgets won't update until `reload()` or `change()` is called.
-- Be careful not to call `addProvider` or `removeProvider` with `activate: true` during widget build, as it may cause `setState` errors.
+ - Be careful not to call `addProvider` or `removeProvider` with `activate: true` during widget build, as it may cause `setState` errors.
+ - `addProvider` no longer accepts a `config` parameter and will not auto-initialize the helper. Make sure to call `await languageHelper.initial(...)` before adding providers. If you need to batch provider additions during app setup, call `addProvider(..., activate: false)` for each and call `await languageHelper.reload()` after initialization.
 
 ### Listen to Changes
 
@@ -731,8 +742,8 @@ LanguageScope(
 final adminHelper = LanguageHelper('AdminHelper');
 final userHelper = LanguageHelper('UserHelper');
 
-await adminHelper.initial(data: adminTranslations, initialCode: LanguageCodes.en);
-await userHelper.initial(data: userTranslations, initialCode: LanguageCodes.vi);
+await adminHelper.initial(adminTranslations, initialCode: LanguageCodes.en);
+await userHelper.initial(userTranslations, initialCode: LanguageCodes.vi);
 
 // Admin section uses admin translations
 LanguageScope(
