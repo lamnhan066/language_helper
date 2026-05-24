@@ -21,9 +21,8 @@ part 'widgets/language_builder.dart';
 /// **Basic Usage:**
 /// ```dart
 /// await LanguageHelper.instance.initial(
-///   LanguageConfig(
-///     data: [LanguageDataProvider.data(myLanguageData)],
-///   ),
+///   [LanguageDataProvider.data(myLanguageData)],
+///   config: LanguageConfig(), // optional configuration
 /// );
 /// final text = LanguageHelper.instance.translate('Hello');
 /// await LanguageHelper.instance.change(LanguageCodes.vi);
@@ -355,20 +354,12 @@ class LanguageHelper {
   ///
   /// If [mergeCodes] is true, the provider's supported language codes are
   /// added to the helper's available codes. Defaults to false.
-  ///
-  /// If the helper is not initialized, the [config] will be used to
-  /// automatically initialize the helper first. This is useful for package
-  /// usage.
   Future<void> addProvider(
     LanguageDataProvider provider, {
     bool activate = true,
     bool mergeCodes = false,
-    LanguageConfig config = const LanguageConfig(),
   }) async {
-    // Auto-initialize if the helper is not initialized
-    if (!isInitialized) {
-      await initial([provider], config: config);
-    }
+    await ensureInitialized;
 
     _dataProviders = [..._dataProviders, provider];
 
