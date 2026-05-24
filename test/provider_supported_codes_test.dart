@@ -39,7 +39,6 @@ void main() {
         ),
       );
 
-      // providerEnOnly should have been loaded, providerViOnly should be skipped
       expect(calledEn, greaterThan(0));
       expect(calledVi, equals(0));
     },
