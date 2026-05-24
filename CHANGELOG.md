@@ -1,3 +1,8 @@
+## 0.15.0-rc.2
+
+* **[BREAKING CHANGE]:** Remove the `config` parameter from `LanguageHelper.addProvider`. `addProvider` no longer auto-initializes the helper; callers must call `await languageHelper.initial(...)` before adding providers. When the helper is not initialized, `addProvider` will await `ensureInitialized` (it will not call `initial()` itself).
+* Improve docs.
+
 ## 0.15.0-rc.1
 
 * **[BREAKING CHANGE]:** `LanguageHelper.addProvider` will execute `LanguageHelper.initial` automatically when the helper is not initialized. In previous behavior, it only execute the `LanguageHelper.initial` when there is no `config` provided.
