@@ -126,7 +126,13 @@ class LanguageHelper {
 
   /// The currently active language code. Must call `initial()` first. Updated
   /// by [initial] and [change].
-  LanguageCodes get code => _currentCode!;
+  LanguageCodes get code {
+    if (_currentCode == null) {
+      _logger?.warning(() => 'Cannot access `code` before initialization');
+      throw StateError('LanguageHelper is not initialized');
+    }
+    return _currentCode!;
+  }
 
   /// The current language code. Set by [initial] and updated by [change].
   LanguageCodes? _currentCode;

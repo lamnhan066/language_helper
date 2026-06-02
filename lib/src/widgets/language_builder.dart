@@ -174,7 +174,7 @@ class _LanguageBuilderState extends State<LanguageBuilder>
     // widget.builder(context), they can safely access the stack.
     LanguageHelper._push(_languageHelper);
     try {
-      final result = widget.refreshTree
+      final result = widget.refreshTree && _languageHelper._currentCode != null
           ? KeyedSubtree(
               key: ValueKey(_languageHelper.locale),
               child: widget.builder(context),
