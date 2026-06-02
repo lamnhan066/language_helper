@@ -1,3 +1,7 @@
+## 0.15.0-rc.3
+
+* Simplify the `LanguageHelper.addProvider` and `LanguageHelper.removeProvider` to not depend on the `_currentCode` so we can call it freely inside a package.
+
 ## 0.15.0-rc.2
 
 * **[BREAKING CHANGE]:** Remove the `config` parameter from `LanguageHelper.addProvider`. `addProvider` no longer auto-initializes the helper; callers must call `await languageHelper.initial(...)` before adding providers. When the helper is not initialized, `addProvider` will await `ensureInitialized` (it will not call `initial()` itself).
