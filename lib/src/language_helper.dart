@@ -359,30 +359,20 @@ class LanguageHelper {
     bool activate = true,
     bool mergeCodes = false,
   }) async {
-    await ensureInitialized;
+    if (_dataProviders.contains(provider)) {
+      _logger?.warning(() => 'The `provider` is already added');
+      return;
+    }
 
     _dataProviders = [..._dataProviders, provider];
-
-    final result = await Future.wait([
-      _loadCodesFromProviders([provider]),
-      _loadDataFromProviders(_currentCode!, [provider]),
-    ]);
-
     if (mergeCodes) {
-      _codes.addAll(result[0] as Iterable<LanguageCodes>);
+      final newCodes = await _loadCodesFromProviders(_dataProviders);
+      _codes
+        ..clear()
+        ..addAll(newCodes);
     }
-    final data = result[1] as LanguageData;
 
-    if (data.isNotEmpty && data.containsKey(_currentCode)) {
-      for (final entry in data[_currentCode!]!.entries) {
-        if (provider.override) {
-          _data[_currentCode!]![entry.key] = entry.value;
-        } else {
-          _data[_currentCode!]!.putIfAbsent(entry.key, () => entry.value);
-        }
-      }
-    }
-    if (activate) await reload();
+    if (activate && isInitialized) await reload();
     _logger?.info(
       () =>
           'The new `provider` is added and activated with override is '
@@ -398,16 +388,12 @@ class LanguageHelper {
     bool activate = true,
   }) async {
     _dataProviders = _dataProviders.where((p) => p != provider).toList();
+    final newCodes = await _loadCodesFromProviders(_dataProviders);
+    _codes
+      ..clear()
+      ..addAll(newCodes);
 
-    final result = await Future.wait([
-      _loadCodesFromProviders(_dataProviders),
-      _loadDataFromProviders(_currentCode!, _dataProviders),
-    ]);
-
-    _codes = result[0] as Set<LanguageCodes>;
-    _data = result[1] as LanguageData;
-
-    if (activate) await reload();
+    if (activate && isInitialized) await reload();
     _logger?.info(
       () =>
           'The `provider` is removed and activated with override is '

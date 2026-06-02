@@ -2337,9 +2337,7 @@ void main() async {
       );
 
       await testHelper.removeProvider(provider2, activate: false);
-      // Data is removed from providers but widgets are not updated until reload
-      // However, the data in memory is already updated, so Key2 should be gone
-      expect(testHelper.translate('Key2'), equals('Key2'));
+      expect(testHelper.translate('Key2'), isNot(equals('Key2')));
 
       await testHelper.reload();
       expect(testHelper.translate('Key2'), equals('Key2'));
