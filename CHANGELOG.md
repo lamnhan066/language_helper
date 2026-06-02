@@ -1,3 +1,7 @@
+## 0.15.0-rc.4
+
+* Add initialization check for language code access and update refresh logic in `LanguageBuilder`.
+
 ## 0.15.0-rc.3
 
 * Simplify the `LanguageHelper.addProvider` and `LanguageHelper.removeProvider` to not depend on the `_currentCode` so we can call it freely inside a package.
