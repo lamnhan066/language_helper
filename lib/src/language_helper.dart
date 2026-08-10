@@ -273,6 +273,13 @@ class LanguageHelper {
 
     _codes = await _loadCodesFromProviders(_dataProviders);
 
+    if (_initialCode != null && !_codes.contains(_initialCode)) {
+      throw StateError(
+        'The initialCode $_initialCode is not available in the loaded codes: '
+        '${_codes.map((c) => c.code).toList()}',
+      );
+    }
+
     if (_codes.isEmpty) {
       _logger?.error(() => 'The LanguageData in the `data` is empty');
       if (!_ensureInitialized.isCompleted) {

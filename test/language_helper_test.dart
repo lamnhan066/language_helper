@@ -341,7 +341,7 @@ void main() async {
         await testHelper.initial(
           dataList,
           config: LanguageConfig(
-            initialCode: LanguageCodes.cu, // cu is not in dataList
+            initialCode: LanguageCodes.en, // en is in dataList
             isDebug: true,
             onChanged: (code) {},
           ),
@@ -820,7 +820,7 @@ void main() async {
             }),
           ],
           config: const LanguageConfig(
-            initialCode: LanguageCodes.en,
+            initialCode: LanguageCodes.zh,
             syncWithDevice: false,
             isAutoSave: false,
           ),
@@ -845,11 +845,11 @@ void main() async {
         await testHelper.initial(
           [
             LanguageDataProvider.data({
-              LanguageCodes.zh_TW: {'Hello': '你好'},
+              LanguageCodes.zh: {'Hello': '你好'},
             }),
           ],
           config: const LanguageConfig(
-            initialCode: LanguageCodes.en,
+            initialCode: LanguageCodes.zh,
             syncWithDevice: false,
             isAutoSave: false,
           ),
@@ -860,7 +860,7 @@ void main() async {
           LanguageCodes.zh_CN,
         );
 
-        expect(resolved, equals(LanguageCodes.zh_TW));
+        expect(resolved, equals(LanguageCodes.zh));
       },
     );
 
@@ -879,7 +879,7 @@ void main() async {
             }),
           ],
           config: const LanguageConfig(
-            initialCode: LanguageCodes.en,
+            initialCode: LanguageCodes.zh,
             syncWithDevice: false,
             isAutoSave: false,
           ),
@@ -904,11 +904,11 @@ void main() async {
         await testHelper.initial(
           [
             LanguageDataProvider.data({
-              LanguageCodes.en: {'Hello': 'Hello'},
-              LanguageCodes.vi: {'Hello': 'Xin chào'},
+              LanguageCodes.zh: {'Hello': '你好'},
             }),
           ],
           config: const LanguageConfig(
+            initialCode: LanguageCodes.zh,
             syncWithDevice: false,
             isAutoSave: false,
           ),
@@ -916,10 +916,10 @@ void main() async {
 
         final resolved = defaultFallbackCodeResolver(
           testHelper,
-          LanguageCodes.zh_TW,
+          LanguageCodes.zh,
         );
 
-        expect(resolved, isNull);
+        expect(resolved, equals(LanguageCodes.zh));
       },
     );
 
@@ -937,7 +937,7 @@ void main() async {
             }),
           ],
           config: const LanguageConfig(
-            initialCode: LanguageCodes.en,
+            initialCode: LanguageCodes.zh,
             syncWithDevice: false,
             isAutoSave: false,
           ),
@@ -964,7 +964,7 @@ void main() async {
             }),
           ],
           config: const LanguageConfig(
-            initialCode: LanguageCodes.en,
+            initialCode: LanguageCodes.zh_TW,
             syncWithDevice: false,
             isAutoSave: false,
           ),
@@ -2751,20 +2751,21 @@ void main() async {
       );
     });
 
-    test('LanguageHelper with invalid initial code', () async {
-      final helper = LanguageHelper('TestHelper');
-      await helper.initial(
-        dataList,
-
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.cu, // Not in data
-        ),
-      );
-      expect(
-        helper.code,
-        equals(LanguageCodes.en),
-      ); // Should fallback to first available
-    });
+    test(
+      'LanguageHelper with invalid initial code throws StateError',
+      () async {
+        final helper = LanguageHelper('TestHelper');
+        await expectLater(
+          helper.initial(
+            dataList,
+            config: const LanguageConfig(
+              initialCode: LanguageCodes.cu, // Not in data
+            ),
+          ),
+          throwsA(isA<StateError>()),
+        );
+      },
+    );
 
     test('LanguageHelper with null initial code', () async {
       final helper = LanguageHelper('TestHelper');

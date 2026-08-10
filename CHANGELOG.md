@@ -3,6 +3,7 @@
 * **[BREAKING CHANGES]**
   * Remove `LanguageConfig.isOptionalCountryCode` (was always `true`); use a custom `LanguageConfig.resolveFallbackCode` callback to customize fallback behavior.
   * Rename `LanguageConfig.useInitialCodeWhenUnavailable` to `LanguageConfig.fallbackToInitialCode`. When `true`, falls back to `initialCode` when changing to unavailable languages. When `false`, the change is silently ignored.
+  * Throw `StateError` if the `initialCode` is not in the `codes`.
 
 ## 0.15.0-rc.4
 
