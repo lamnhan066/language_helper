@@ -48,7 +48,7 @@ main() async {
 
 - `data`: List of `LanguageDataProvider` instances (required positional parameter)
 - `initialCode`: Preferred initial language code
-- `useInitialCodeWhenUnavailable`: Fall back to `initialCode` when changing to unavailable languages (default: `true`)
+- `fallbackToInitialCode`: When `true`, falls back to `initialCode` when changing to unavailable languages (default: `true`). When `false`, the change is silently ignored.
 - `isAutoSave`: Automatically save and restore language preference (default: `true`)
 - `syncWithDevice`: Sync with device language changes (default: `true`)
 - `forceRebuild`: Default behavior for `LanguageBuilder` widgets; when `true` all `LanguageBuilder` widgets rebuild on language change (default: `true`)
@@ -420,8 +420,8 @@ await languageHelper.change(LanguageCodes.vi);
 **Behavior:**
 
 - If the requested language is not available:
-  - By default: The change is ignored and the current language remains unchanged
-  - If `useInitialCodeWhenUnavailable: true`: Falls back to the initial code if available
+  - By default (`fallbackToInitialCode: true`): Falls back to `initialCode` if available
+  - If `fallbackToInitialCode: false`: The change is silently ignored and the current language remains unchanged
   - If a fallback resolver is configured: It can resolve the requested code to a supported locale before the final fallback check. The built-in default is `defaultFallbackCodeResolver`.
 
 **Performance:**
@@ -510,7 +510,7 @@ void dispose() {
 
 **Note:** The stream emits the new language code after all `LanguageBuilder` widgets have been notified to rebuild. Remember to cancel subscriptions to avoid memory leaks.
 
-**Note:** When `change()` falls back from an unavailable requested code, `LanguageHelper.stream` and `LanguageConfig.onChanged` receive the resolved supported code instead of the unavailable request.
+**Note:** When `change()` falls back from an unavailable requested code, `LanguageHelper.stream` and `LanguageConfig.onChanged` receive the resolved supported code instead of the unavailable request. When `fallbackToInitialCode` is `false` and no fallback is possible, the change is silently ignored and no events are emitted.
 
 ### Get Supported Languages
 
@@ -978,6 +978,9 @@ Add supported localizations to `Info.plist`:
   - Use `isInitialized` to check if `initial()` has been called
   - Use `ensureInitialized` to wait for initialization to complete
   - Always await `initial()` before accessing `code`, `data`, or `codes`
+- **Fallback Behavior**:
+  - Use `fallbackToInitialCode: false` to silently ignore unavailable language requests
+  - Use `resolveFallbackCode` to customize fallback logic (e.g., prefer language-only codes)
 - **Data sources**:
   - Assets are preferred over network data for faster loading
   - Network providers load data on every language change (not cached between changes)

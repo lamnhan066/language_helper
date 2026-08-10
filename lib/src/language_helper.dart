@@ -141,17 +141,19 @@ class LanguageHelper {
   Locale get locale => code.locale;
 
   /// The initial language code, used as fallback when
-  /// `useInitialCodeWhenUnavailable` is true.
+  /// `fallbackToInitialCode` is true.
   LanguageCodes? _initialCode;
 
   /// Callback invoked when a language change fails due to an unavailable
-  /// language.
+  /// language. Called with the requested code that failed. Can be used to
+  /// implement custom fallback logic.
   LanguageCodes? Function(LanguageHelper helper, LanguageCodes code)?
   _fallbackCode;
 
   /// Whether to fall back to `_initialCode` when an unavailable language is
-  /// requested.
-  bool _useInitialCodeWhenUnavailable = false;
+  /// requested. When `true`, falls back to `initialCode` if available. When
+  /// `false`, the change is silently ignored.
+  bool _fallbackToInitialCode = false;
 
   /// Whether to automatically save/restore the language code to/from
   /// SharedPreferences.
@@ -161,44 +163,33 @@ class LanguageHelper {
   /// changes.
   bool _syncWithDevice = true;
 
-  /// Whether to fall back to language code only when the full locale (e.g.,
-  /// `zh_CN`) is unavailable. Safe to call multiple times.
-  bool _isOptionalCountryCode = true;
-
   /// Whether to rebuild all [LanguageBuilder] widgets (true) or only the root
   /// (false, better performance).
   bool _forceRebuild = true;
 
   /// Callback called when the language changes. Set via `onChanged` in
-  /// [initial].
+  /// [initial]. Called with the resolved language code (not the unavailable
+  /// request).
   void Function(LanguageCodes code)? _onChanged;
 
   /// Stream that emits the new language code whenever [change] is called
-  /// successfully. Remember to cancel subscriptions to avoid memory leaks.
+  /// successfully. Emits the resolved language code (not the unavailable
+  /// request). When `fallbackToInitialCode` is `false` and no fallback is
+  /// possible, no event is emitted. Remember to cancel subscriptions to avoid
+  /// memory leaks.
   Stream<LanguageCodes> get stream => _streamController.stream;
   final StreamController<LanguageCodes> _streamController =
       StreamController.broadcast();
 
   /// Whether debug logging is enabled. When true, logs language changes,
-  /// translation lookups, and other operations using `lite_logger`.
+  /// translation lookups, fallback attempts, and other operations using
+  /// `lite_logger`.
   bool get isDebug => _isDebug;
   bool _isDebug = false;
 
   /// Internal logger instance for debug logging. Initialized by [initial]
   /// based on [isDebug].
   LiteLogger? _logger;
-
-  /// The SharedPreferences key for the saved language code.
-  /// Format: `$prefix.AutoSaveCode`
-  @visibleForTesting
-  String get codeKey => _autoSaveCodeKey;
-  String get _autoSaveCodeKey => '$prefix.AutoSaveCode';
-
-  /// The SharedPreferences key for the device language code.
-  /// Format: `$prefix.DeviceCode`
-  @visibleForTesting
-  String get deviceCodeKey => _deviceCodeKey;
-  String get _deviceCodeKey => '$prefix.DeviceCode';
 
   /// Whether the LanguageHelper is initializing.
   bool _isInitializing = false;
@@ -213,6 +204,18 @@ class LanguageHelper {
   Future<void> get ensureInitialized => _ensureInitialized.future;
   final _ensureInitialized = Completer<void>();
 
+  /// The SharedPreferences key for the saved language code.
+  /// Format: `$prefix.AutoSaveCode`
+  @visibleForTesting
+  String get codeKey => _autoSaveCodeKey;
+  String get _autoSaveCodeKey => '$prefix.AutoSaveCode';
+
+  /// The SharedPreferences key for the device language code.
+  /// Format: `$prefix.DeviceCode`
+  @visibleForTesting
+  String get deviceCodeKey => _deviceCodeKey;
+  String get _deviceCodeKey => '$prefix.DeviceCode';
+
   /// Initializes the helper with the provided [config]. Must be called before
   /// using the helper.
   ///
@@ -224,10 +227,6 @@ class LanguageHelper {
   ///    the device language has changed
   /// 4. First language from providers
   /// 5. [LanguageCodes.en] (fallback if data is empty)
-  ///
-  /// If [LanguageConfig.isOptionalCountryCode] is true, falls back to language
-  /// code only when the full locale (e.g., `zh_CN`) is unavailable. Safe to
-  /// call multiple times.
   Future<void> initial(
     /// Language data providers. If empty, a temporary English provider is
     /// added.
@@ -247,7 +246,7 @@ class LanguageHelper {
     _forceRebuild = config.forceRebuild;
     _onChanged = config.onChanged;
     _isDebug = config.isDebug;
-    _useInitialCodeWhenUnavailable = config.useInitialCodeWhenUnavailable;
+    _fallbackToInitialCode = config.fallbackToInitialCode;
     _isAutoSave = config.isAutoSave;
     _syncWithDevice = config.syncWithDevice;
     _initialCode = config.initialCode;
@@ -257,7 +256,6 @@ class LanguageHelper {
       enabled: config.isDebug,
       minLevel: LogLevel.debug,
     );
-    _isOptionalCountryCode = config.isOptionalCountryCode;
 
     // When the `data` is empty, a temporary data will be added.
     if (_dataProviders.isEmpty) {
@@ -305,26 +303,7 @@ class LanguageHelper {
     }
 
     if (!codes.contains(finalCode)) {
-      LanguageCodes? tempCode;
-      if (_isOptionalCountryCode) {
-        tempCode = _fallbackCode?.call(this, finalCode);
-      }
-
-      if (tempCode == null) {
-        _logger?.info(
-          () =>
-              'Unable to use the `languageCode` only => '
-              'Change the code to ${codes.first}',
-        );
-      } else {
-        _logger?.info(
-          () =>
-              'Able to use the `languageCode` only => '
-              'Change the code to $tempCode',
-        );
-      }
-
-      finalCode = tempCode ?? codes.first;
+      finalCode = _fallbackCode?.call(this, finalCode) ?? codes.first;
     }
 
     _logger?.step(() => 'Set `currentCode` to $finalCode');
@@ -456,7 +435,7 @@ class LanguageHelper {
 
   /// Switches to [toCode] and reloads translations. Falls back to
   /// `_initialCode` if [toCode] is unavailable and
-  /// `useInitialCodeWhenUnavailable` is true.
+  /// `fallbackToInitialCode` is true.
   ///
   /// **Note:** This method will always reload the translations from all
   /// providers even if the translations were previously loaded or `toCode`
@@ -465,49 +444,15 @@ class LanguageHelper {
   /// [reload] can be used instead of [change] as a shortcut of reloading the
   /// translations without changing the language.
   Future<void> change(LanguageCodes toCode) async {
-    if (!codes.contains(toCode)) {
-      _logger?.warning(() => '$toCode is not available in `data`');
-
-      final resolvedCode = _isOptionalCountryCode
-          ? _fallbackCode?.call(this, toCode)
-          : null;
-
-      if (resolvedCode != null) {
-        _logger?.step(
-          () =>
-              'A code with the same `languageCode` $resolvedCode is '
-              'available in `data` => Change the language to $resolvedCode',
-        );
-        _currentCode = resolvedCode;
-      } else if (!_useInitialCodeWhenUnavailable) {
-        _logger?.info(
-          () =>
-              'Does not allow using the initial code => '
-              'Cannot change the language.',
-        );
-        return;
-      } else {
-        if (codes.contains(_initialCode)) {
-          _logger?.step(
-            () =>
-                '`useInitialCodeWhenUnavailable` is true => '
-                'Change the language to $_initialCode',
-          );
-          _currentCode = _initialCode;
-        } else {
-          _logger?.warning(
-            () =>
-                '`useInitialCodeWhenUnavailable` is true but the '
-                '`initialCode` is not available in `data` => '
-                'Cannot change the language',
-          );
-          return;
-        }
-      }
-    } else {
-      _logger?.step(() => 'Set currentCode to $toCode');
-      _currentCode = toCode;
+    final resolvedCode = _fallbackCode?.call(this, toCode);
+    if (resolvedCode == null) {
+      _logger?.step(
+        () => 'Cannot resolve the code: $toCode, keeps the current code.',
+      );
+      return;
     }
+
+    _currentCode = resolvedCode;
 
     _data = await _loadDataFromProviders(_currentCode!, _dataProviders);
 
@@ -548,6 +493,7 @@ class LanguageHelper {
     _logger?.step(() => 'Changing completed!');
   }
 
+  @Deprecated('Use setFallbackToInitialCode instead.')
   /// Sets whether to fall back to `_initialCode` when changing to unavailable
   /// languages.
   ///
@@ -558,10 +504,26 @@ class LanguageHelper {
   ///   unavailable language is requested.
   ///
   /// This setting can also be configured during [initial] via the
-  /// `useInitialCodeWhenUnavailable` parameter.
-  // ignore: avoid_positional_boolean_parameters, use_setters_to_change_properties
+  /// `fallbackToInitialCode` parameter.
+  // ignore: avoid_positional_boolean_parameters
   void setUseInitialCodeWhenUnavailable(bool value) {
-    _useInitialCodeWhenUnavailable = value;
+    setFallbackToInitialCode(value);
+  }
+
+  /// Sets whether to fall back to `_initialCode` when changing to unavailable
+  /// languages.
+  ///
+  /// Parameters:
+  /// - [value]: If `true`, when [change] is called with an unavailable
+  ///   language code, the helper will fall back to `_initialCode` (if it's
+  ///   available). If `false`, [change] will fail silently when an
+  ///   unavailable language is requested.
+  ///
+  /// This setting can also be configured during [initial] via the
+  /// `fallbackToInitialCode` parameter.
+  // ignore: avoid_positional_boolean_parameters, use_setters_to_change_properties
+  void setFallbackToInitialCode(bool value) {
+    _fallbackToInitialCode = value;
   }
 
   /// Replaces parameter placeholders (`@{paramName}` or `@paramName`) in

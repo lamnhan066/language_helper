@@ -1,3 +1,9 @@
+## 0.15.0-rc.5
+
+* **[BREAKING CHANGES]**
+  * Remove `LanguageConfig.isOptionalCountryCode` (was always `true`); use a custom `LanguageConfig.resolveFallbackCode` callback to customize fallback behavior.
+  * Rename `LanguageConfig.useInitialCodeWhenUnavailable` to `LanguageConfig.fallbackToInitialCode`. When `true`, falls back to `initialCode` when changing to unavailable languages. When `false`, the change is silently ignored.
+
 ## 0.15.0-rc.4
 
 * Add initialization check for language code access and update refresh logic in `LanguageBuilder`.

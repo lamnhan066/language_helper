@@ -1,6 +1,10 @@
 part of '../language_helper.dart';
 
 /// Extension on [String] to translate text using the helper.
+///
+/// These extensions work within [LanguageBuilder] widgets via an internal
+/// stack mechanism. Outside of [LanguageBuilder], they fall back to
+/// [LanguageHelper.instance].
 extension LanguageHelperEx on String {
   /// Translates text using the helper from current build context. Uses scoped
   /// helper within [LanguageBuilder], otherwise [LanguageHelper.instance].
@@ -18,6 +22,8 @@ extension LanguageHelperEx on String {
   /// Translates with parameters. Uses scoped helper within [LanguageBuilder],
   /// otherwise [LanguageHelper.instance].
   ///
+  /// Parameters are replaced using `@{paramName}` format.
+  ///
   /// Example:
   /// ```dart
   /// final text = 'result is @{param}'.trP({'param': 'zero'});
@@ -32,6 +38,9 @@ extension LanguageHelperEx on String {
   /// works reliably with `LanguageData`; `LazyLanguageData` may not be loaded
   /// yet.
   ///
+  /// Note: This method bypasses the normal fallback logic. If [toCode] is
+  /// unavailable, it will throw an error.
+  ///
   /// Example:
   /// ```dart
   /// final text = 'Hello'.trT(LanguageCodes.en); // Translates to English
@@ -42,6 +51,8 @@ extension LanguageHelperEx on String {
 
   /// Full translation with all parameters. Uses scoped helper within
   /// [LanguageBuilder], otherwise [LanguageHelper.instance].
+  ///
+  /// Combines [trP] and [trT] functionality in one call.
   ///
   /// Example:
   /// ```dart
@@ -59,7 +70,8 @@ extension LanguageHelperEx on String {
   }
 
   /// Translates with a custom [LanguageHelper] instance. Always available,
-  /// doesn't rely on helper stack or [LanguageScope].
+  /// doesn't rely on helper stack or [LanguageScope]. Useful for translations
+  /// outside of [LanguageBuilder] or when you need a specific helper instance.
   ///
   /// Example:
   /// ```dart

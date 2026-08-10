@@ -305,7 +305,7 @@ void main() async {
         dataList,
         config: const LanguageConfig(
           initialCode: LanguageCodes.en,
-          useInitialCodeWhenUnavailable: false,
+          fallbackToInitialCode: false,
         ),
       );
       await testHelper.change(LanguageCodes.vi);
@@ -387,7 +387,7 @@ void main() async {
 
   group('Test base translation', () {
     setUp(() async {
-      languageHelper.setUseInitialCodeWhenUnavailable(false);
+      languageHelper.setFallbackToInitialCode(false);
       await languageHelper.change(LanguageCodes.en);
     });
 
@@ -425,10 +425,10 @@ void main() async {
     });
 
     test(
-      'Test with undefined language when useInitialCodeWhenUnavailable = false',
+      'Test with undefined language when fallbackToInitialCode = false',
       () async {
         await languageHelper.change(LanguageCodes.vi);
-        languageHelper.setUseInitialCodeWhenUnavailable(false);
+        languageHelper.setFallbackToInitialCode(false);
         await languageHelper.change(LanguageCodes.cu);
 
         expect('Hello'.tr, equals('Xin Chào'));
@@ -441,9 +441,9 @@ void main() async {
     );
 
     test(
-      'Test with undefined language when useInitialCodeWhenUnavailable = true',
+      'Test with undefined language when fallbackToInitialCode = true',
       () async {
-        languageHelper.setUseInitialCodeWhenUnavailable(true);
+        languageHelper.setFallbackToInitialCode(true);
         await languageHelper.change(LanguageCodes.cu);
 
         expect('Hello'.tr, equals('Hello'));
@@ -456,7 +456,7 @@ void main() async {
     );
 
     test('Translate with parameters in multiple cases of text', () async {
-      languageHelper.setUseInitialCodeWhenUnavailable(true);
+      languageHelper.setFallbackToInitialCode(true);
       await languageHelper.change(LanguageCodes.en);
 
       expect(
@@ -484,7 +484,7 @@ void main() async {
     });
 
     test('Translate with condition', () async {
-      languageHelper.setUseInitialCodeWhenUnavailable(true);
+      languageHelper.setFallbackToInitialCode(true);
       await languageHelper.change(LanguageCodes.en);
 
       expect(
@@ -629,7 +629,7 @@ void main() async {
     late String toJson;
     late LanguageData fromJson;
     setUp(() async {
-      languageHelper.setUseInitialCodeWhenUnavailable(true);
+      languageHelper.setFallbackToInitialCode(true);
       await languageHelper.change(LanguageCodes.en);
     });
 
@@ -807,28 +807,6 @@ void main() async {
     );
 
     test(
-      'true, the `languageCode_countryCode` not available in local '
-      'database but the `languageCode` only is available and '
-      'isOptionalCountryCode is false',
-      () async {
-        final testHelper = LanguageHelper('TestSyncDevice4');
-        addTearDown(testHelper.dispose);
-
-        SharedPreferences.setMockInitialValues({});
-        LanguageCode.setTestCode(LanguageCodes.zh_TW);
-        await testHelper.initial(
-          dataAdds,
-
-          config: const LanguageConfig(
-            isOptionalCountryCode: false,
-          ),
-        );
-
-        expect(testHelper.code, equals(LanguageCodes.en));
-      },
-    );
-
-    test(
       'resolveLanguageCodeFallback returns the exact language-only code when it'
       ' exists',
       () async {
@@ -931,7 +909,6 @@ void main() async {
             }),
           ],
           config: const LanguageConfig(
-            initialCode: LanguageCodes.en,
             syncWithDevice: false,
             isAutoSave: false,
           ),
@@ -2729,7 +2706,7 @@ void main() async {
     });
 
     test('translate with LanguageConditions missing param', () async {
-      languageHelper.setUseInitialCodeWhenUnavailable(true);
+      languageHelper.setFallbackToInitialCode(true);
       await languageHelper.change(LanguageCodes.en);
 
       // Test when param is missing from params map
@@ -2740,7 +2717,7 @@ void main() async {
     });
 
     test('translate with LanguageConditions no matching condition', () async {
-      languageHelper.setUseInitialCodeWhenUnavailable(true);
+      languageHelper.setFallbackToInitialCode(true);
       await languageHelper.change(LanguageCodes.en);
 
       // Test when condition value doesn't match any condition key

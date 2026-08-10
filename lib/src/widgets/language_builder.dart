@@ -7,6 +7,9 @@ part of '../language_helper.dart';
 /// Helper priority: explicit parameter > [LanguageScope] >
 /// [LanguageHelper.instance].
 ///
+/// The stack mechanism allows extension methods to access the correct helper
+/// instance during build, even though they don't have BuildContext.
+///
 /// Example:
 /// ```dart
 /// LanguageBuilder(
@@ -191,7 +194,7 @@ class _LanguageBuilderState extends State<LanguageBuilder>
 
 /// Convenience wrapper around [LanguageBuilder] for simple translation
 /// widgets. Use for quick translations; use [LanguageBuilder] when you need
-/// direct helper access.
+/// direct helper access or more control.
 ///
 /// Example:
 /// ```dart
@@ -218,10 +221,13 @@ class Tr extends StatelessWidget {
   ///   rebuilds (better performance). If `null`, uses the
   ///   `LanguageHelper.forceRebuild` setting.
   /// - [languageHelper]: Explicit [LanguageHelper] instance to use. Takes
-  ///   priority over [LanguageScope]. If `null`, uses [LanguageScope] or
+  ///   priority over [LanguageScope]. If null, uses [LanguageScope] or
   ///   [LanguageHelper.instance].
   /// - [refreshTree]: If `true`, completely refreshes the widget tree using
   ///   [KeyedSubtree] when language changes. Defaults to `false`.
+  ///
+  /// Note: [Tr] is a convenience widget. Use [LanguageBuilder] directly when
+  /// you need more control or to access the helper programmatically.
   const Tr(
     this.builder, {
     super.key,

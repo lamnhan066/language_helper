@@ -5,8 +5,13 @@ part of '../language_helper.dart';
 ///
 /// Resolution order:
 /// 1. Same language + (same country or same script)
-/// 2. Language-only code (e.g. `en` when `en_US` is requested)
-/// 3. First available code sharing the same language
+/// 2. Same language + country
+/// 3. Same language only
+/// 4. [LanguageConfig.initialCode] if `fallbackToInitialCode` is true
+/// 5. Returns null if no fallback is possible
+///
+/// This is the default fallback resolver used by [LanguageHelper]. You can
+/// provide a custom resolver via [LanguageConfig.resolveFallbackCode].
 LanguageCodes? defaultFallbackCodeResolver(
   LanguageHelper helper,
   LanguageCodes requested,
@@ -72,6 +77,16 @@ LanguageCodes? defaultFallbackCodeResolver(
         () => 'Found fallback with same language: $code.',
       );
       return code;
+    }
+  }
+
+  // If `fallbackToInitialCode` is set to true, return `initialCode`.
+  if (helper._fallbackToInitialCode) {
+    if (helper.codes.contains(helper._initialCode)) {
+      helper._logger?.info(
+        () => 'Fallback to initialCode: ${helper._initialCode}.',
+      );
+      return helper._initialCode;
     }
   }
 

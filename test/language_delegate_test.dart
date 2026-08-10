@@ -179,7 +179,7 @@ void main() {
         // Try to load an unsupported locale (e.g., Chinese)
         await delegate.load(LanguageCodes.zh.locale);
 
-        // Since useInitialCodeWhenUnavailable is false, the language should
+        // Since fallbackToInitialCode is false, the language should
         // not change
         // But the method should complete without throwing
         expect(languageHelper.code, equals(initialCode));
