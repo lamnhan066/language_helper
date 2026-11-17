@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:language_helper/src/utils/debouncer.dart';
 
 void main() {
-  testWidgets('Debouncer runs action after delay', (WidgetTester tester) async {
+  testWidgets('Debouncer runs action after delay', (tester) async {
     final debouncer = Debouncer();
     var called = 0;
 
@@ -16,7 +16,7 @@ void main() {
   });
 
   testWidgets('Debouncer cancels previous calls and only last runs', (
-    WidgetTester tester,
+    tester,
   ) async {
     final debouncer = Debouncer();
     var called = 0;
@@ -34,9 +34,7 @@ void main() {
     expect(called, 10);
   });
 
-  testWidgets('Debouncer default milliseconds is 100', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('Debouncer default milliseconds is 100', (tester) async {
     final debouncer = Debouncer();
     var called = 0;
 
