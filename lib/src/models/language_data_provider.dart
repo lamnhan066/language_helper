@@ -86,7 +86,7 @@ class LanguageDataProvider {
         if (json.isNotEmpty) {
           final decoded = (jsonDecode(json) as List).cast<String>();
           final set = decoded.map(LanguageCodes.fromCode).toSet();
-          return Future.value(set);
+          return set;
         }
         return {};
       },
@@ -146,7 +146,7 @@ class LanguageDataProvider {
         if (json.isNotEmpty) {
           final decoded = (jsonDecode(json) as List).cast<String>();
           final set = decoded.map(LanguageCodes.fromCode).toSet();
-          return Future.value(set);
+          return set;
         }
         return {};
       },
@@ -241,7 +241,7 @@ class LanguageDataProvider {
         minLevel: LogLevel.debug,
       ).warning(() => 'The $path does not exist in the assets');
     }
-    return Future.value('');
+    return '';
   }
 
   /// Retrieves translation data for a specific language code. Returns empty
