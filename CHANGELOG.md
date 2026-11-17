@@ -1,3 +1,10 @@
+## 0.15.0-rc.6
+
+* Fix concurrent `initial()` calls to properly await the in-progress initialization instead of returning early.
+* Bump `lite_logger` to `^0.3.3`.
+* Bump `very_good_analysis` to `^11.0.0`.
+* Clean up `LanguageDataProvider` async getters to return values directly instead of `Future.value`.
+
 ## 0.15.0-rc.5
 
 * **[BREAKING CHANGES]**
