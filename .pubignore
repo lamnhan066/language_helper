@@ -1,0 +1,43 @@
+# Files excluded from the pub.dev archive.
+# `dart pub publish` uses this file instead of `.gitignore` in this
+# directory, so build and tooling artifacts are repeated here.
+# `example/` is intentionally kept so the pub.dev Example tab works.
+
+# Version control, CI and editor tooling
+.github/
+.vscode/
+.idea/
+.cursor/
+.omo/
+.codegraph/
+.fvm/
+
+# Dart/Flutter build artifacts
+.dart_tool/
+**/.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/doc/api/
+**/generated_plugin_registrant.dart
+**/Pods/
+**/ephemeral/
+**/xcuserdata/
+coverage/
+.coverage
+*.log
+*.iml
+*.ipr
+*.iws
+.DS_Store
+pubspec.lock
+
+# Dev-only configs (kept in git, not needed by consumers)
+analysis_options.yaml
+codecov.yaml
+
+# Tests (kept in git, not needed by consumers)
+test/

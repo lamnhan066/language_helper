@@ -9,6 +9,9 @@
 .history
 .svn/
 migrate_working_dir/
+*.orig
+*.rej
+*~
 
 # IntelliJ related
 *.iml
@@ -16,25 +19,29 @@ migrate_working_dir/
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# Editors and assistants — keep local settings out of version control.
+# Note: .codegraph/ manages itself via .codegraph/.gitignore, so it is
+# intentionally not listed here (listing it would flag the tracked
+# .codegraph/.gitignore as "checked in while ignored").
+.vscode/
+.cursor/
+.omo/
 
 # Flutter/Dart/Pub related
 # Libraries should not include pubspec.lock, per https://dart.dev/guides/libraries/private-files#pubspeclock.
+# The leading slash keeps example/pubspec.lock (an app lockfile) tracked.
 /pubspec.lock
 **/doc/api/
-.dart_tool/
+**/.dart_tool/
 .packages
+.pub-cache/
+.pub/
 build/
 .flutter-plugins
 .flutter-plugins-dependencies
-
-coverage
+**/generated_plugin_registrant.dart
+coverage/
+.coverage
 
 # FVM Version Cache
 .fvm/
-
-.vscode/
-.omo/
