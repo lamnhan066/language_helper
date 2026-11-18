@@ -61,9 +61,7 @@ void main() {
         final emptyHelper = LanguageHelper('EmptyHelper');
         await emptyHelper.initial(
           [],
-          config: const LanguageConfig(
-            isAutoSave: false,
-          ),
+          config: const LanguageConfig(isAutoSave: false),
         );
         final emptyDelegate = LanguageDelegate(emptyHelper);
 

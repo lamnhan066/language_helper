@@ -40,10 +40,7 @@ class Utils {
     Map<String, String>? headers,
     http.Client? client,
   }) async {
-    const logger = LiteLogger(
-      name: 'GetUrl',
-      minLevel: LogLevel.debug,
-    );
+    const logger = LiteLogger(name: 'GetUrl', minLevel: LogLevel.debug);
     client ??= http.Client();
     try {
       final response = await client.get(uri, headers: headers);

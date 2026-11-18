@@ -49,9 +49,7 @@ void main() async {
 
   group('Test with empty data and use temporary testing data -', () {
     test('data = []', () async {
-      await languageHelper.initial(
-        [],
-      );
+      await languageHelper.initial([]);
       expect(languageHelper.code, equals(LanguageCodes.en));
     });
 
@@ -59,10 +57,7 @@ void main() async {
       final testHelper = LanguageHelper('TestEmptyDataLogger');
       addTearDown(testHelper.dispose);
 
-      await testHelper.initial(
-        [],
-        config: const LanguageConfig(isDebug: true),
-      );
+      await testHelper.initial([], config: const LanguageConfig(isDebug: true));
       expect(testHelper.code, equals(LanguageCodes.en));
     });
 
@@ -73,12 +68,9 @@ void main() async {
         addTearDown(testHelper.dispose);
 
         // Use empty providers that return empty codes (not empty provider list)
-        await testHelper.initial(
-          [const LanguageDataProvider.empty()],
-          config: const LanguageConfig(
-            isDebug: true,
-          ),
-        );
+        await testHelper.initial([
+          const LanguageDataProvider.empty(),
+        ], config: const LanguageConfig(isDebug: true));
 
         expect(testHelper.codes, isEmpty);
         expect(testHelper.isInitialized, isTrue);
@@ -94,9 +86,7 @@ void main() async {
     test('`isInitialized`', () async {
       final temp = LanguageHelper('TempLanguageHelper');
       expect(temp.isInitialized, equals(false));
-      await temp.initial(
-        [],
-      );
+      await temp.initial([]);
       expect(temp.isInitialized, equals(true));
     });
     test('`ensureInitialized`', () async {
@@ -106,9 +96,7 @@ void main() async {
           expect(temp.isInitialized, equals(true));
         }),
       );
-      await temp.initial(
-        [],
-      );
+      await temp.initial([]);
       await temp.ensureInitialized;
       expect(temp.isInitialized, equals(true));
     });
@@ -320,9 +308,7 @@ void main() async {
       addTearDown(testHelper.dispose);
 
       SharedPreferences.setMockInitialValues({});
-      await testHelper.initial(
-        dataList,
-      );
+      await testHelper.initial(dataList);
       await testHelper.change(LanguageCodes.vi);
       expect(testHelper.code, equals(LanguageCodes.vi));
 
@@ -330,31 +316,28 @@ void main() async {
       expect(testHelper.code, equals(LanguageCodes.vi));
     });
 
-    test(
-      'true but initial code is unavailable in data with isDebug: true '
-      'to cover logger warning callback',
-      () async {
-        final testHelper = LanguageHelper('TestUseInitial4');
-        addTearDown(testHelper.dispose);
+    test('true but initial code is unavailable in data with isDebug: true '
+        'to cover logger warning callback', () async {
+      final testHelper = LanguageHelper('TestUseInitial4');
+      addTearDown(testHelper.dispose);
 
-        SharedPreferences.setMockInitialValues({});
-        await testHelper.initial(
-          dataList,
-          config: LanguageConfig(
-            initialCode: LanguageCodes.en, // en is in dataList
-            isDebug: true,
-            onChanged: (code) {},
-          ),
-        );
-        // Try to change to an unavailable language
-        // This should trigger the warning at lines 877-878
-        // aa is also not in dataList
-        await testHelper.change(LanguageCodes.aa);
-        // Should remain at the current code since initialCode is also
-        // unavailable
-        expect(testHelper.code, isNot(equals(LanguageCodes.aa)));
-      },
-    );
+      SharedPreferences.setMockInitialValues({});
+      await testHelper.initial(
+        dataList,
+        config: LanguageConfig(
+          initialCode: LanguageCodes.en, // en is in dataList
+          isDebug: true,
+          onChanged: (code) {},
+        ),
+      );
+      // Try to change to an unavailable language
+      // This should trigger the warning at lines 877-878
+      // aa is also not in dataList
+      await testHelper.change(LanguageCodes.aa);
+      // Should remain at the current code since initialCode is also
+      // unavailable
+      expect(testHelper.code, isNot(equals(LanguageCodes.aa)));
+    });
   });
 
   group('Test for mixins', () {
@@ -583,10 +566,7 @@ void main() async {
     });
 
     test('empty conditions', () {
-      const emptyConditions = LanguageConditions(
-        param: 'test',
-        conditions: {},
-      );
+      const emptyConditions = LanguageConditions(param: 'test', conditions: {});
       expect(emptyConditions.conditions, isEmpty);
       expect(emptyConditions.toJson(), isA<String>());
     });
@@ -597,9 +577,7 @@ void main() async {
       final testHelper = LanguageHelper('TestDataOverrides1');
       addTearDown(testHelper.dispose);
 
-      await testHelper.initial(
-        dataList,
-      );
+      await testHelper.initial(dataList);
       await testHelper.change(LanguageCodes.en);
 
       final errorTranslated = 'You have @{number} dollar in your wallet'.trC(
@@ -612,9 +590,7 @@ void main() async {
       final testHelper = LanguageHelper('TestDataOverrides2');
       addTearDown(testHelper.dispose);
 
-      await testHelper.initial(
-        [...dataList, ...dataOverrides],
-      );
+      await testHelper.initial([...dataList, ...dataOverrides]);
       await testHelper.change(LanguageCodes.en);
 
       final translated = 'You have @{number} dollar in your wallet'.trC(
@@ -715,10 +691,7 @@ void main() async {
           'Hello': 'Hello',
           'Count': {
             'param': 'count',
-            'conditions': {
-              '1': 'one',
-              'default': 'many',
-            },
+            'conditions': {'1': 'one', 'default': 'many'},
           },
         },
       };
@@ -780,31 +753,24 @@ void main() async {
       LanguageCode.setTestCode(LanguageCodes.en);
       await testHelper.initial(
         dataList,
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.vi,
-        ),
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       expect(testHelper.code, equals(LanguageCodes.en));
     });
 
-    test(
-      'true, the `languageCode_countryCode` not available in local '
-      'database but the `languageCode` only is available and '
-      'isOptionalCountryCode is true',
-      () async {
-        final testHelper = LanguageHelper('TestSyncDevice3');
-        addTearDown(testHelper.dispose);
+    test('true, the `languageCode_countryCode` not available in local '
+        'database but the `languageCode` only is available and '
+        'isOptionalCountryCode is true', () async {
+      final testHelper = LanguageHelper('TestSyncDevice3');
+      addTearDown(testHelper.dispose);
 
-        SharedPreferences.setMockInitialValues({});
-        LanguageCode.setTestCode(LanguageCodes.zh_TW);
-        await testHelper.initial(
-          dataAdds,
-        );
+      SharedPreferences.setMockInitialValues({});
+      LanguageCode.setTestCode(LanguageCodes.zh_TW);
+      await testHelper.initial(dataAdds);
 
-        expect(testHelper.code, equals(LanguageCodes.zh));
-      },
-    );
+      expect(testHelper.code, equals(LanguageCodes.zh));
+    });
 
     test(
       'resolveLanguageCodeFallback returns the exact language-only code when it'
@@ -864,140 +830,122 @@ void main() async {
       },
     );
 
-    test(
-      'resolveLanguageCodeFallback prefers a country-specific code over the '
-      'language-only code when both are available',
-      () async {
-        final testHelper = LanguageHelper('TestResolveFallback3');
-        addTearDown(testHelper.dispose);
+    test('resolveLanguageCodeFallback prefers a country-specific code over the '
+        'language-only code when both are available', () async {
+      final testHelper = LanguageHelper('TestResolveFallback3');
+      addTearDown(testHelper.dispose);
 
-        await testHelper.initial(
-          [
-            LanguageDataProvider.data({
-              LanguageCodes.zh: {'Hello': '你好'},
-              LanguageCodes.zh_TW: {'Hello': '你好（台灣）'},
-            }),
-          ],
-          config: const LanguageConfig(
-            initialCode: LanguageCodes.zh,
-            syncWithDevice: false,
-            isAutoSave: false,
-          ),
-        );
+      await testHelper.initial(
+        [
+          LanguageDataProvider.data({
+            LanguageCodes.zh: {'Hello': '你好'},
+            LanguageCodes.zh_TW: {'Hello': '你好（台灣）'},
+          }),
+        ],
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.zh,
+          syncWithDevice: false,
+          isAutoSave: false,
+        ),
+      );
 
-        final resolved = defaultFallbackCodeResolver(
-          testHelper,
-          LanguageCodes.zh_TW,
-        );
+      final resolved = defaultFallbackCodeResolver(
+        testHelper,
+        LanguageCodes.zh_TW,
+      );
 
-        expect(resolved, equals(LanguageCodes.zh_TW));
-      },
-    );
+      expect(resolved, equals(LanguageCodes.zh_TW));
+    });
 
-    test(
-      'resolveLanguageCodeFallback returns null when there is no matching '
-      'language in available codes',
-      () async {
-        final testHelper = LanguageHelper('TestResolveFallback4');
-        addTearDown(testHelper.dispose);
+    test('resolveLanguageCodeFallback returns null when there is no matching '
+        'language in available codes', () async {
+      final testHelper = LanguageHelper('TestResolveFallback4');
+      addTearDown(testHelper.dispose);
 
-        await testHelper.initial(
-          [
-            LanguageDataProvider.data({
-              LanguageCodes.zh: {'Hello': '你好'},
-            }),
-          ],
-          config: const LanguageConfig(
-            initialCode: LanguageCodes.zh,
-            syncWithDevice: false,
-            isAutoSave: false,
-          ),
-        );
+      await testHelper.initial(
+        [
+          LanguageDataProvider.data({
+            LanguageCodes.zh: {'Hello': '你好'},
+          }),
+        ],
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.zh,
+          syncWithDevice: false,
+          isAutoSave: false,
+        ),
+      );
 
-        final resolved = defaultFallbackCodeResolver(
-          testHelper,
-          LanguageCodes.zh,
-        );
+      final resolved = defaultFallbackCodeResolver(
+        testHelper,
+        LanguageCodes.zh,
+      );
 
-        expect(resolved, equals(LanguageCodes.zh));
-      },
-    );
+      expect(resolved, equals(LanguageCodes.zh));
+    });
 
-    test(
-      'change uses the exact language-only code when it exists',
-      () async {
-        final testHelper = LanguageHelper('TestSyncDevice7');
-        addTearDown(testHelper.dispose);
+    test('change uses the exact language-only code when it exists', () async {
+      final testHelper = LanguageHelper('TestSyncDevice7');
+      addTearDown(testHelper.dispose);
 
-        SharedPreferences.setMockInitialValues({});
-        await testHelper.initial(
-          [
-            LanguageDataProvider.data({
-              LanguageCodes.zh: {'Hello': '你好'},
-            }),
-          ],
-          config: const LanguageConfig(
-            initialCode: LanguageCodes.zh,
-            syncWithDevice: false,
-            isAutoSave: false,
-          ),
-        );
+      SharedPreferences.setMockInitialValues({});
+      await testHelper.initial(
+        [
+          LanguageDataProvider.data({
+            LanguageCodes.zh: {'Hello': '你好'},
+          }),
+        ],
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.zh,
+          syncWithDevice: false,
+          isAutoSave: false,
+        ),
+      );
 
-        await testHelper.change(LanguageCodes.zh_TW);
+      await testHelper.change(LanguageCodes.zh_TW);
 
-        expect(testHelper.code, equals(LanguageCodes.zh));
-      },
-    );
+      expect(testHelper.code, equals(LanguageCodes.zh));
+    });
 
-    test(
-      'change scans for a matching language when the exact '
-      'language-only code is missing',
-      () async {
-        final testHelper = LanguageHelper('TestSyncDevice8');
-        addTearDown(testHelper.dispose);
+    test('change scans for a matching language when the exact '
+        'language-only code is missing', () async {
+      final testHelper = LanguageHelper('TestSyncDevice8');
+      addTearDown(testHelper.dispose);
 
-        SharedPreferences.setMockInitialValues({});
-        await testHelper.initial(
-          [
-            LanguageDataProvider.data({
-              LanguageCodes.zh_TW: {'Hello': '你好'},
-            }),
-          ],
-          config: const LanguageConfig(
-            initialCode: LanguageCodes.zh_TW,
-            syncWithDevice: false,
-            isAutoSave: false,
-          ),
-        );
+      SharedPreferences.setMockInitialValues({});
+      await testHelper.initial(
+        [
+          LanguageDataProvider.data({
+            LanguageCodes.zh_TW: {'Hello': '你好'},
+          }),
+        ],
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.zh_TW,
+          syncWithDevice: false,
+          isAutoSave: false,
+        ),
+      );
 
-        await testHelper.change(LanguageCodes.zh_CN);
+      await testHelper.change(LanguageCodes.zh_CN);
 
-        expect(testHelper.code, equals(LanguageCodes.zh_TW));
-      },
-    );
+      expect(testHelper.code, equals(LanguageCodes.zh_TW));
+    });
 
-    test(
-      'change maps a country-specific locale to the language-only code '
-      'when available',
-      () async {
-        final testHelper = LanguageHelper('TestSyncDevice7');
-        addTearDown(testHelper.dispose);
+    test('change maps a country-specific locale to the language-only code '
+        'when available', () async {
+      final testHelper = LanguageHelper('TestSyncDevice7');
+      addTearDown(testHelper.dispose);
 
-        SharedPreferences.setMockInitialValues({});
-        LanguageCode.setTestCode(LanguageCodes.en);
-        await testHelper.initial(
-          dataAdds,
-          config: const LanguageConfig(
-            syncWithDevice: false,
-            isAutoSave: false,
-          ),
-        );
+      SharedPreferences.setMockInitialValues({});
+      LanguageCode.setTestCode(LanguageCodes.en);
+      await testHelper.initial(
+        dataAdds,
+        config: const LanguageConfig(syncWithDevice: false, isAutoSave: false),
+      );
 
-        await testHelper.change(LanguageCodes.zh_TW);
+      await testHelper.change(LanguageCodes.zh_TW);
 
-        expect(testHelper.code, equals(LanguageCodes.zh));
-      },
-    );
+      expect(testHelper.code, equals(LanguageCodes.zh));
+    });
 
     test('true and have local database but with no changed code', () async {
       final testHelper = LanguageHelper('TestSyncDevice5');
@@ -1010,9 +958,7 @@ void main() async {
       await testHelper.initial(
         dataList,
 
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.vi,
-        ),
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       expect(testHelper.code, equals(LanguageCodes.vi));
@@ -1029,61 +975,53 @@ void main() async {
       await testHelper.initial(
         dataList,
 
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.vi,
-        ),
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       expect(testHelper.code, equals(LanguageCodes.en));
     });
 
-    test(
-      'true and have local database but with no changed code with '
-      'isDebug: true to cover logger debug callback',
-      () async {
-        final testHelper = LanguageHelper('TestSyncDevice7');
-        addTearDown(testHelper.dispose);
+    test('true and have local database but with no changed code with '
+        'isDebug: true to cover logger debug callback', () async {
+      final testHelper = LanguageHelper('TestSyncDevice7');
+      addTearDown(testHelper.dispose);
 
-        SharedPreferences.setMockInitialValues({
-          testHelper.deviceCodeKey: LanguageCodes.vi.code,
-        });
-        LanguageCode.setTestCode(LanguageCodes.vi);
-        await testHelper.initial(
-          dataList,
+      SharedPreferences.setMockInitialValues({
+        testHelper.deviceCodeKey: LanguageCodes.vi.code,
+      });
+      LanguageCode.setTestCode(LanguageCodes.vi);
+      await testHelper.initial(
+        dataList,
 
-          config: const LanguageConfig(
-            initialCode: LanguageCodes.vi,
-            isDebug: true,
-          ),
-        );
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          isDebug: true,
+        ),
+      );
 
-        expect(testHelper.code, equals(LanguageCodes.vi));
-      },
-    );
+      expect(testHelper.code, equals(LanguageCodes.vi));
+    });
 
-    test(
-      'true and have local database but with changed code with '
-      'isDebug: true to cover logger step callback',
-      () async {
-        final testHelper = LanguageHelper('TestSyncDevice8');
-        addTearDown(testHelper.dispose);
+    test('true and have local database but with changed code with '
+        'isDebug: true to cover logger step callback', () async {
+      final testHelper = LanguageHelper('TestSyncDevice8');
+      addTearDown(testHelper.dispose);
 
-        SharedPreferences.setMockInitialValues({
-          testHelper.deviceCodeKey: LanguageCodes.vi.code,
-        });
-        LanguageCode.setTestCode(LanguageCodes.en);
-        await testHelper.initial(
-          dataList,
+      SharedPreferences.setMockInitialValues({
+        testHelper.deviceCodeKey: LanguageCodes.vi.code,
+      });
+      LanguageCode.setTestCode(LanguageCodes.en);
+      await testHelper.initial(
+        dataList,
 
-          config: const LanguageConfig(
-            initialCode: LanguageCodes.vi,
-            isDebug: true,
-          ),
-        );
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.vi,
+          isDebug: true,
+        ),
+      );
 
-        expect(testHelper.code, equals(LanguageCodes.en));
-      },
-    );
+      expect(testHelper.code, equals(LanguageCodes.en));
+    });
   });
 
   group('Test widget', () {
@@ -1859,9 +1797,7 @@ void main() async {
         await helper1.initial(
           dataList,
 
-          config: const LanguageConfig(
-            initialCode: LanguageCodes.en,
-          ),
+          config: const LanguageConfig(initialCode: LanguageCodes.en),
         );
         await helper2.initial(
           dataList,
@@ -1942,19 +1878,15 @@ void main() async {
     });
 
     test('Add data with overwrite is true', () async {
-      await languageHelper.initial(
-        [...dataList, ...dataOverrides],
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.en,
-        ),
-      );
+      await languageHelper.initial([
+        ...dataList,
+        ...dataOverrides,
+      ], config: const LanguageConfig(initialCode: LanguageCodes.en));
       final dataToAdd = {
         LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'},
         LanguageCodes.zh: {'Hello': '你好'},
       };
-      final providerWithOverride = LanguageDataProvider.data(
-        dataToAdd,
-      );
+      final providerWithOverride = LanguageDataProvider.data(dataToAdd);
       await languageHelper.addProvider(providerWithOverride);
       await languageHelper.reload();
 
@@ -1968,18 +1900,14 @@ void main() async {
       await languageHelper.initial(
         dataList,
 
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.en,
-        ),
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       // Add data with override: true when key already exists
       final dataToAdd = {
         LanguageCodes.en: {'Hello': 'HelloOverwrite', 'Hello add': 'Hello Add'},
         LanguageCodes.zh: {'Hello': '你好'},
       };
-      final providerWithOverride = LanguageDataProvider.data(
-        dataToAdd,
-      );
+      final providerWithOverride = LanguageDataProvider.data(dataToAdd);
       await languageHelper.addProvider(providerWithOverride);
       await languageHelper.reload();
 
@@ -1993,9 +1921,7 @@ void main() async {
     test('Add provider with mergeCodes is false (default)', () async {
       await languageHelper.initial(
         dataList,
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.en,
-        ),
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       final originalCodes = languageHelper.codes.toSet();
@@ -2015,9 +1941,7 @@ void main() async {
     test('Add provider with mergeCodes is true', () async {
       await languageHelper.initial(
         dataList,
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.en,
-        ),
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
 
       final originalCodes = languageHelper.codes.toSet();
@@ -2112,69 +2036,60 @@ void main() async {
   });
 
   group('Test change() always reloads data', () {
-    test(
-      'change() reloads data even when switching back to previously used '
-      'language',
-      () async {
-        SharedPreferences.setMockInitialValues({});
+    test('change() reloads data even when switching back to previously used '
+        'language', () async {
+      SharedPreferences.setMockInitialValues({});
 
-        final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
+      final callCount = {LanguageCodes.en: 0, LanguageCodes.vi: 0};
 
-        final lazyData = <LanguageCodes, Map<String, dynamic> Function()>{
-          LanguageCodes.en: () {
-            callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
-            return Map<String, dynamic>.from(data[LanguageCodes.en]!);
-          },
-          LanguageCodes.vi: () {
-            callCount[LanguageCodes.vi] = callCount[LanguageCodes.vi]! + 1;
-            return Map<String, dynamic>.from(data[LanguageCodes.vi]!);
-          },
-        };
+      final lazyData = <LanguageCodes, Map<String, dynamic> Function()>{
+        LanguageCodes.en: () {
+          callCount[LanguageCodes.en] = callCount[LanguageCodes.en]! + 1;
+          return Map<String, dynamic>.from(data[LanguageCodes.en]!);
+        },
+        LanguageCodes.vi: () {
+          callCount[LanguageCodes.vi] = callCount[LanguageCodes.vi]! + 1;
+          return Map<String, dynamic>.from(data[LanguageCodes.vi]!);
+        },
+      };
 
-        final helper = LanguageHelper('TestChangeReloadsData');
-        addTearDown(helper.dispose);
+      final helper = LanguageHelper('TestChangeReloadsData');
+      addTearDown(helper.dispose);
 
-        await helper.initial(
-          [LanguageDataProvider.lazyData(lazyData)],
+      await helper.initial(
+        [LanguageDataProvider.lazyData(lazyData)],
 
-          config: const LanguageConfig(
-            initialCode: LanguageCodes.en,
-            syncWithDevice: false,
-            isAutoSave: false,
-          ),
-        );
+        config: const LanguageConfig(
+          initialCode: LanguageCodes.en,
+          syncWithDevice: false,
+          isAutoSave: false,
+        ),
+      );
 
-        // Initial load
-        expect(helper.translate('Hello'), equals('Hello'));
-        expect(callCount[LanguageCodes.en], equals(1));
-        expect(callCount[LanguageCodes.vi], equals(0));
+      // Initial load
+      expect(helper.translate('Hello'), equals('Hello'));
+      expect(callCount[LanguageCodes.en], equals(1));
+      expect(callCount[LanguageCodes.vi], equals(0));
 
-        // Change to Vietnamese - should load vi data
-        await helper.change(LanguageCodes.vi);
-        expect(helper.translate('Hello'), equals('Xin Chào'));
-        expect(callCount[LanguageCodes.en], equals(1));
-        expect(callCount[LanguageCodes.vi], equals(1));
+      // Change to Vietnamese - should load vi data
+      await helper.change(LanguageCodes.vi);
+      expect(helper.translate('Hello'), equals('Xin Chào'));
+      expect(callCount[LanguageCodes.en], equals(1));
+      expect(callCount[LanguageCodes.vi], equals(1));
 
-        // Change back to English - should reload en data (even though it
-        // was loaded before)
-        await helper.change(LanguageCodes.en);
-        expect(helper.translate('Hello'), equals('Hello'));
-        expect(
-          callCount[LanguageCodes.en],
-          equals(2),
-        ); // Should be called again
-        expect(callCount[LanguageCodes.vi], equals(1));
+      // Change back to English - should reload en data (even though it
+      // was loaded before)
+      await helper.change(LanguageCodes.en);
+      expect(helper.translate('Hello'), equals('Hello'));
+      expect(callCount[LanguageCodes.en], equals(2)); // Should be called again
+      expect(callCount[LanguageCodes.vi], equals(1));
 
-        // Change to Vietnamese again - should reload vi data again
-        await helper.change(LanguageCodes.vi);
-        expect(helper.translate('Hello'), equals('Xin Chào'));
-        expect(callCount[LanguageCodes.en], equals(2));
-        expect(
-          callCount[LanguageCodes.vi],
-          equals(2),
-        ); // Should be called again
-      },
-    );
+      // Change to Vietnamese again - should reload vi data again
+      await helper.change(LanguageCodes.vi);
+      expect(helper.translate('Hello'), equals('Xin Chào'));
+      expect(callCount[LanguageCodes.en], equals(2));
+      expect(callCount[LanguageCodes.vi], equals(2)); // Should be called again
+    });
 
     test('change() reloads data with LanguageData provider', () async {
       SharedPreferences.setMockInitialValues({});
@@ -2276,12 +2191,10 @@ void main() async {
         LanguageCodes.vi: {'Key2': 'Giá trị 2'},
       });
 
-      await testHelper.initial(
-        [provider1, provider2],
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.en,
-        ),
-      );
+      await testHelper.initial([
+        provider1,
+        provider2,
+      ], config: const LanguageConfig(initialCode: LanguageCodes.en));
 
       expect(testHelper.translate('Key1'), equals('Value1'));
       expect(testHelper.translate('Key2'), equals('Value2'));
@@ -2306,12 +2219,10 @@ void main() async {
         LanguageCodes.en: {'Key2': 'Value2'},
       });
 
-      await testHelper.initial(
-        [provider1, provider2],
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.en,
-        ),
-      );
+      await testHelper.initial([
+        provider1,
+        provider2,
+      ], config: const LanguageConfig(initialCode: LanguageCodes.en));
 
       await testHelper.removeProvider(provider2, activate: false);
       expect(testHelper.translate('Key2'), isNot(equals('Key2')));
@@ -2332,12 +2243,10 @@ void main() async {
         LanguageCodes.zh: {'Key2': 'Value2'},
       });
 
-      await testHelper.initial(
-        [provider1, provider2],
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.en,
-        ),
-      );
+      await testHelper.initial([
+        provider1,
+        provider2,
+      ], config: const LanguageConfig(initialCode: LanguageCodes.en));
 
       expect(
         testHelper.codes,
@@ -2364,13 +2273,9 @@ void main() async {
         LanguageCodes.en: {'Key2': 'Value2'},
       });
 
-      await testHelper.initial(
-        [provider1],
-
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.en,
-        ),
-      );
+      await testHelper.initial([
+        provider1,
+      ], config: const LanguageConfig(initialCode: LanguageCodes.en));
 
       // Try to remove a provider that was never added
       await testHelper.removeProvider(provider2);
@@ -2663,9 +2568,7 @@ void main() async {
   group('Test edge cases and error handling', () {
     test('LanguageHelper with empty data', () async {
       final helper = LanguageHelper('TestHelper');
-      await helper.initial(
-        [],
-      );
+      await helper.initial([]);
       // When data is empty, LanguageHelper creates a temporary data entry
       expect(helper.data, isNotEmpty);
       expect(helper.codes, isNotEmpty);
@@ -2732,9 +2635,7 @@ void main() async {
       };
       final helper = LanguageHelper('TestConditions');
       addTearDown(helper.dispose);
-      await helper.initial(
-        [LanguageDataProvider.data(customData)],
-      );
+      await helper.initial([LanguageDataProvider.data(customData)]);
 
       // Should return fallback text when no condition matches
       expect(helper.translate('Test', params: {'count': '3'}), equals('Test'));
@@ -2769,9 +2670,7 @@ void main() async {
 
     test('LanguageHelper with null initial code', () async {
       final helper = LanguageHelper('TestHelper');
-      await helper.initial(
-        dataList,
-      );
+      await helper.initial(dataList);
       expect(
         helper.code,
         equals(LanguageCodes.en),
@@ -2780,9 +2679,7 @@ void main() async {
 
     test('LanguageHelper reload with no data', () async {
       final helper = LanguageHelper('TestHelper');
-      await helper.initial(
-        [],
-      );
+      await helper.initial([]);
       await helper.reload();
       expect(helper.data, isNotEmpty);
     });
@@ -2797,13 +2694,9 @@ void main() async {
         LanguageCodes.vi: () => {'Hello': 'Xin Chào'},
       };
 
-      await helper.initial(
-        [LanguageDataProvider.lazyData(lazyData)],
-
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.en,
-        ),
-      );
+      await helper.initial([
+        LanguageDataProvider.lazyData(lazyData),
+      ], config: const LanguageConfig(initialCode: LanguageCodes.en));
 
       // Change to vi - should load data on demand
       await helper.change(LanguageCodes.vi);
@@ -2819,16 +2712,12 @@ void main() async {
       final future1 = helper.initial(
         dataList,
 
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.en,
-        ),
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       final future2 = helper.initial(
         dataList,
 
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.vi,
-        ),
+        config: const LanguageConfig(initialCode: LanguageCodes.vi),
       );
 
       // Both should complete without error
@@ -2841,9 +2730,7 @@ void main() async {
 
     test('LanguageHelper addData with null data', () async {
       final helper = LanguageHelper('TestHelper');
-      await helper.initial(
-        dataList,
-      );
+      await helper.initial(dataList);
       await helper.addProvider(LanguageDataProvider.data({}));
       expect(helper.data, isNotEmpty);
     });
@@ -2878,9 +2765,7 @@ void main() async {
       };
 
       final helper = LanguageHelper('TestHelper');
-      await helper.initial(
-        [LanguageDataProvider.data(malformedData)],
-      );
+      await helper.initial([LanguageDataProvider.data(malformedData)]);
       expect(helper.translate('key1'), equals('value1'));
       expect(
         helper.translate('key2'),
@@ -2897,9 +2782,7 @@ void main() async {
       };
 
       final helper = LanguageHelper('TestHelper');
-      await helper.initial(
-        [LanguageDataProvider.data(circularData)],
-      );
+      await helper.initial([LanguageDataProvider.data(circularData)]);
       expect(helper.translate('key1'), equals('value1'));
       expect(
         helper.translate('key2'),
@@ -3039,9 +2922,7 @@ void main() async {
       await helper2.initial(
         dataList,
 
-        config: const LanguageConfig(
-          initialCode: LanguageCodes.en,
-        ),
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
       );
       expect(helper2.isDebug, equals(false));
 
@@ -3236,55 +3117,52 @@ void main() async {
       expect(helper.states.length, lessThanOrEqualTo(initialStateCount + 1));
     });
 
-    testWidgets(
-      'Nested LanguageBuilders with same helper to cover root update '
-      '(line 1142)',
-      (tester) async {
-        SharedPreferences.setMockInitialValues({});
+    testWidgets('Nested LanguageBuilders with same helper to cover root update '
+        '(line 1142)', (tester) async {
+      SharedPreferences.setMockInitialValues({});
 
-        final testHelper = LanguageHelper('TestNestedSameHelper');
-        addTearDown(testHelper.dispose);
-        await testHelper.initial(
-          dataList,
-          config: const LanguageConfig(initialCode: LanguageCodes.en),
-        );
+      final testHelper = LanguageHelper('TestNestedSameHelper');
+      addTearDown(testHelper.dispose);
+      await testHelper.initial(
+        dataList,
+        config: const LanguageConfig(initialCode: LanguageCodes.en),
+      );
 
-        // Create nested LanguageBuilders with the same helper
-        // Both should have forceRebuild: false (default) so the inner one
-        // will find the root
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: LanguageBuilder(
+      // Create nested LanguageBuilders with the same helper
+      // Both should have forceRebuild: false (default) so the inner one
+      // will find the root
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LanguageBuilder(
+              languageHelper: testHelper,
+              forceRebuild: false, // Explicitly set to false
+              builder: (_) => LanguageBuilder(
                 languageHelper: testHelper,
                 forceRebuild: false, // Explicitly set to false
-                builder: (_) => LanguageBuilder(
-                  languageHelper: testHelper,
-                  forceRebuild: false, // Explicitly set to false
-                  builder: (_) => Text('Hello'.tr),
-                ),
+                builder: (_) => Text('Hello'.tr),
               ),
             ),
           ),
-        );
-        await tester.pumpAndSettle();
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        // Verify both builders are registered in states
-        expect(testHelper.states.length, equals(2));
+      // Verify both builders are registered in states
+      expect(testHelper.states.length, equals(2));
 
-        // Verify the widget shows English text
-        expect(find.text('Hello'), findsOneWidget);
+      // Verify the widget shows English text
+      expect(find.text('Hello'), findsOneWidget);
 
-        // Change language - this should trigger the root update path
-        // The inner builder's _of() should return the root, and root should
-        // be added to needToUpdate
-        await testHelper.change(LanguageCodes.vi);
-        await tester.pumpAndSettle();
+      // Change language - this should trigger the root update path
+      // The inner builder's _of() should return the root, and root should
+      // be added to needToUpdate
+      await testHelper.change(LanguageCodes.vi);
+      await tester.pumpAndSettle();
 
-        // Verify the widget shows Vietnamese text
-        expect(find.text('Xin Chào'), findsOneWidget);
-      },
-    );
+      // Verify the widget shows Vietnamese text
+      expect(find.text('Xin Chào'), findsOneWidget);
+    });
 
     testWidgets(
       'LanguageBuilder _of() returns null when root is not mounted ',

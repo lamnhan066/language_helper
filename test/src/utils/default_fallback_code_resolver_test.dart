@@ -9,15 +9,12 @@ void main() {
     test('returns null when requested language code is not in codes', () async {
       SharedPreferences.setMockInitialValues({});
       final helper = LanguageHelper('TestNotInCodes');
-      await helper.initial(
-        [
-          LanguageDataProvider.data({
-            LanguageCodes.en: {'Hello': 'Hello'},
-            LanguageCodes.vi: {'Hello': 'Xin chào'},
-          }),
-        ],
-        config: const LanguageConfig(isAutoSave: false),
-      );
+      await helper.initial([
+        LanguageDataProvider.data({
+          LanguageCodes.en: {'Hello': 'Hello'},
+          LanguageCodes.vi: {'Hello': 'Xin chào'},
+        }),
+      ], config: const LanguageConfig(isAutoSave: false));
 
       final result = defaultFallbackCodeResolver(
         helper,
@@ -31,20 +28,14 @@ void main() {
     test('returns code with same language when requested', () async {
       SharedPreferences.setMockInitialValues({});
       final helper = LanguageHelper('TestSameLanguage');
-      await helper.initial(
-        [
-          LanguageDataProvider.data({
-            LanguageCodes.en: {'Hello': 'Hello'},
-            LanguageCodes.vi: {'Hello': 'Xin chào'},
-          }),
-        ],
-        config: const LanguageConfig(isAutoSave: false),
-      );
+      await helper.initial([
+        LanguageDataProvider.data({
+          LanguageCodes.en: {'Hello': 'Hello'},
+          LanguageCodes.vi: {'Hello': 'Xin chào'},
+        }),
+      ], config: const LanguageConfig(isAutoSave: false));
 
-      final result = defaultFallbackCodeResolver(
-        helper,
-        LanguageCodes.en,
-      );
+      final result = defaultFallbackCodeResolver(helper, LanguageCodes.en);
 
       expect(result, equals(LanguageCodes.en));
       await helper.dispose();
@@ -96,10 +87,7 @@ void main() {
           ),
         );
 
-        final result = defaultFallbackCodeResolver(
-          helper,
-          LanguageCodes.fr,
-        );
+        final result = defaultFallbackCodeResolver(helper, LanguageCodes.fr);
 
         expect(result, equals(LanguageCodes.vi));
         await helper.dispose();
@@ -123,10 +111,7 @@ void main() {
         ),
       );
 
-      final result = defaultFallbackCodeResolver(
-        helper,
-        LanguageCodes.fr,
-      );
+      final result = defaultFallbackCodeResolver(helper, LanguageCodes.fr);
 
       expect(result, isNull);
       await helper.dispose();
@@ -135,15 +120,9 @@ void main() {
     test('handles empty codes list', () async {
       SharedPreferences.setMockInitialValues({});
       final helper = LanguageHelper('TestEmptyCodes');
-      await helper.initial(
-        [],
-        config: const LanguageConfig(isAutoSave: false),
-      );
+      await helper.initial([], config: const LanguageConfig(isAutoSave: false));
 
-      final result = defaultFallbackCodeResolver(
-        helper,
-        LanguageCodes.en,
-      );
+      final result = defaultFallbackCodeResolver(helper, LanguageCodes.en);
 
       // When codes list is empty (temporary provider added),
       // fallback to same language

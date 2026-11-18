@@ -73,9 +73,7 @@ LanguageCodes? defaultFallbackCodeResolver(
   for (final code in codes) {
     final locale = code.locale;
     if (locale.languageCode.toLowerCase() == lang) {
-      helper._logger?.info(
-        () => 'Found fallback with same language: $code.',
-      );
+      helper._logger?.info(() => 'Found fallback with same language: $code.');
       return code;
     }
   }

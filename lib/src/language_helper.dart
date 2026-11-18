@@ -645,14 +645,10 @@ class LanguageHelper {
         : LanguageCodes.fromCode(prefDeviceCode);
     if (currentCode != prefCode) {
       await prefs.setString(_deviceCodeKey, currentCode.code);
-      _logger?.step(
-        () => 'Sync with device applied the new device language',
-      );
+      _logger?.step(() => 'Sync with device applied the new device language');
       return currentCode;
     } else {
-      _logger?.debug(
-        () => 'Sync with device used the current app language',
-      );
+      _logger?.debug(() => 'Sync with device used the current app language');
     }
 
     return null;

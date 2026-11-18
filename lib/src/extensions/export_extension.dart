@@ -51,22 +51,14 @@ extension ExportLazyLanguageData on LazyLanguageData {
 /// Exports [LanguageData] to JSON files. Creates `codes.json` and
 /// `data/[code].json` files matching [LanguageDataProvider.asset] structure.
 void _exportJson(LanguageData data, String path) {
-  final logger =
-      const LiteLogger(
-          name: 'ExportJson',
-          minLevel: LogLevel.debug,
-        )
-        ..step(
-          () => '===========================================================',
-        )
-        ..step(() => 'Exporting Json...');
+  final logger = const LiteLogger(name: 'ExportJson', minLevel: LogLevel.debug)
+    ..step(() => '===========================================================')
+    ..step(() => 'Exporting Json...');
   _exportJsonCodes(data, path);
   _exportJsonLanguages(data, path);
   logger
     ..step(() => 'Exported Json')
-    ..step(
-      () => '===========================================================',
-    );
+    ..step(() => '===========================================================');
 }
 
 /// Exports language codes to `codes.json`. Creates array of language code
