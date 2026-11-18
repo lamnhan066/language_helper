@@ -5,22 +5,14 @@ class LanguageConfig {
   /// Creates a configuration for LanguageHelper.initial.
   const LanguageConfig({
     this.initialCode,
-    bool fallbackToInitialCode = true,
-    @Deprecated('Use fallbackToInitialCode instead.')
-    bool? useInitialCodeWhenUnavailable,
+    this.fallbackToInitialCode = true,
     this.forceRebuild = true,
     this.isAutoSave = true,
     this.syncWithDevice = true,
-    @Deprecated(
-      'isOptionalCountryCode is always true. If you want to change fallback '
-      'behavior, create a custom `resolveFallbackCode` callback instead.',
-    )
-    this.isOptionalCountryCode = true,
     this.onChanged,
     this.resolveFallbackCode = defaultFallbackCodeResolver,
     this.isDebug = false,
-  }) : fallbackToInitialCode =
-           useInitialCodeWhenUnavailable ?? fallbackToInitialCode;
+  });
 
   /// Initial language code. Falls back to device language or first provider
   /// language if null.
@@ -39,14 +31,6 @@ class LanguageConfig {
 
   /// Update app language when device language changes.
   final bool syncWithDevice;
-
-  @Deprecated(
-    'isOptionalCountryCode is always true. If you want to change fallback '
-    'behavior, create a custom `resolveFallbackCode` callback instead.',
-  )
-  /// Fall back to language code only when full locale (e.g., `zh_CN`) is
-  /// unavailable. This field is deprecated and always true.
-  final bool isOptionalCountryCode;
 
   /// Callback invoked when language changes.
   final void Function(LanguageCodes code)? onChanged;

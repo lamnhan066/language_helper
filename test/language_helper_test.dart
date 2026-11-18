@@ -760,8 +760,7 @@ void main() async {
     });
 
     test('true, the `languageCode_countryCode` not available in local '
-        'database but the `languageCode` only is available and '
-        'isOptionalCountryCode is true', () async {
+        'database but the `languageCode` only is available', () async {
       final testHelper = LanguageHelper('TestSyncDevice3');
       addTearDown(testHelper.dispose);
 

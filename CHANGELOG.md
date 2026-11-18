@@ -1,8 +1,22 @@
+## 0.15.0
+
+* **[BREAKING CHANGES]**
+  * `LanguageHelper.initial` now takes the providers list as a required positional parameter: `initial([...])` instead of `initial(data: [...])`.
+  * `LanguageHelper.addProvider` no longer accepts a `config` parameter and no longer auto-initializes the helper. Call `await languageHelper.initial(...)` before adding providers.
+  * Rename `LanguageConfig.useInitialCodeWhenUnavailable` to `LanguageConfig.fallbackToInitialCode` (defaults to `true`). When `false`, changing to an unavailable language is silently ignored with no stream/`onChanged` events.
+  * Remove `LanguageConfig.isOptionalCountryCode` and the deprecated `useInitialCodeWhenUnavailable` / `setUseInitialCodeWhenUnavailable` shims; use a custom `LanguageConfig.resolveFallbackCode` to customize fallback behavior.
+  * Throw `StateError` if the `initialCode` is not in the supported `codes`.
+* Add `LanguageConfig.resolveFallbackCode` (defaults to `defaultFallbackCodeResolver`) to resolve an unavailable requested code before falling back. `stream` and `onChanged` receive the resolved supported code.
+* Add `reload()` to refresh all `LanguageBuilder` widgets without changing the language (useful after `addProvider`/`removeProvider` with `activate: false`).
+* Fix concurrent `initial()` calls to properly await the in-progress initialization instead of returning early.
+* Avoid loading providers that don't support the chosen language and simplify provider add/remove logic.
+* Bump minimum SDK to Dart `^3.10.0` and Flutter `>=3.38.0`; bump `language_code` to `^0.7.0` and `lite_logger` to `^0.3.3`.
+
 ## 0.15.0-rc.6
 
 * Fix concurrent `initial()` calls to properly await the in-progress initialization instead of returning early.
 * Bump `lite_logger` to `^0.3.3`.
-* Bump `very_good_analysis` to `^11.0.0`.
+* Bump `very_good_analysis` to `^10.0.0`.
 * Clean up `LanguageDataProvider` async getters to return values directly instead of `Future.value`.
 
 ## 0.15.0-rc.5

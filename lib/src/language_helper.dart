@@ -500,23 +500,6 @@ class LanguageHelper {
     _logger?.step(() => 'Changing completed!');
   }
 
-  @Deprecated('Use setFallbackToInitialCode instead.')
-  /// Sets whether to fall back to `_initialCode` when changing to unavailable
-  /// languages.
-  ///
-  /// Parameters:
-  /// - [value]: If `true`, when [change] is called with an unavailable
-  ///   language code, the helper will fall back to `_initialCode` (if it's
-  ///   available). If `false`, [change] will fail silently when an
-  ///   unavailable language is requested.
-  ///
-  /// This setting can also be configured during [initial] via the
-  /// `fallbackToInitialCode` parameter.
-  // ignore: avoid_positional_boolean_parameters
-  void setUseInitialCodeWhenUnavailable(bool value) {
-    setFallbackToInitialCode(value);
-  }
-
   /// Sets whether to fall back to `_initialCode` when changing to unavailable
   /// languages.
   ///
