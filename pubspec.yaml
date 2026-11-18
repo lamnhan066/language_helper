@@ -12,7 +12,7 @@ topics:
 
 environment:
   sdk: ^3.10.0
-  flutter: ">=3.35.0"
+  flutter: ">=3.38.0"
 
 platforms:
   android:
