@@ -1,13 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:language_helper/src/language_helper.dart';
+import 'package:material_ui/material_ui.dart';
 
-/// Extension on [LanguageHelper] to get the standard Flutter localization
+/// Extension on [LanguageHelper] to get the standard localization
 /// delegates.
 extension LanguageLocalizations on LanguageHelper {
-  /// Standard Flutter localization delegates for Material, Cupertino, and
+  /// Standard localization delegates for Material, Cupertino, and
   /// Widgets. Use with [MaterialApp.localizationsDelegates] to enable
-  /// Flutter's built-in localizations.
+  /// the built-in localizations.
   ///
   /// Example:
   /// ```dart
@@ -20,9 +19,6 @@ extension LanguageLocalizations on LanguageHelper {
   ///   locale: languageHelper.locale,
   /// )
   /// ```
-  List<LocalizationsDelegate<dynamic>> get delegates => [
-    GlobalMaterialLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-  ];
+  List<LocalizationsDelegate<dynamic>> get delegates =>
+      GlobalMaterialLocalizations.delegates;
 }

@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:language_code/language_code.dart';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper/src/mixins/update_language.dart';
 import 'package:language_helper/src/utils/debouncer.dart';
 import 'package:lite_logger/lite_logger.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'extensions/language_helper_extension.dart';
@@ -511,7 +511,7 @@ class LanguageHelper {
   ///
   /// This setting can also be configured during [initial] via the
   /// `fallbackToInitialCode` parameter.
-  // ignore: avoid_positional_boolean_parameters, use_setters_to_change_properties
+  // ignore: use_setters_to_change_properties
   void setFallbackToInitialCode(bool value) {
     _fallbackToInitialCode = value;
   }

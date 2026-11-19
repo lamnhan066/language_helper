@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// [InheritedWidget] that provides a [LanguageHelper] to descendants.
 /// Allows different helpers in different parts of the app. Helper priority:

@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart' show CupertinoApp;
-import 'package:flutter/material.dart' show MaterialApp;
+import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoApp;
 import 'package:flutter/widgets.dart';
 import 'package:language_helper/language_helper.dart';
+import 'package:material_ui/material_ui.dart' show MaterialApp;
 
 /// A [LocalizationsDelegate] that integrates [LanguageHelper] with Flutter's
 /// localization system. Use with [MaterialApp] or [CupertinoApp] via

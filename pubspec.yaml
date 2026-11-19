@@ -11,8 +11,8 @@ topics:
   - l10n
 
 environment:
-  sdk: ^3.10.0
-  flutter: ">=3.38.0"
+  sdk: ^3.14.0
+  flutter: ">=3.50.0"
 
 platforms:
   android:
@@ -23,13 +23,13 @@ platforms:
   web:
 
 dependencies:
+  cupertino_ui: ^1.0.0
   flutter:
-    sdk: flutter
-  flutter_localizations:
     sdk: flutter
   http: ^1.0.0
   language_code: ^0.7.0
   lite_logger: ^0.3.3
+  material_ui: ^1.0.0
   shared_preferences: ^2.0.0
 
 dev_dependencies:
