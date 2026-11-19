@@ -76,8 +76,7 @@ const enLanguageData = <String, dynamic>{
       "Language changed from @{from} to @{to}",
   "Advanced Features": 'Advanced Features',
   "Advanced Language Features": "Advanced Language Features",
-  "Master complex conditions, dynamic parameters, and language change listeners.":
-      "Master complex conditions, dynamic parameters, and language change listeners.",
+  "Master complex conditions, dynamic parameters, and language change listeners.": "Master complex conditions, dynamic parameters, and language change listeners.",
   "Complex Conditional Translations": "Complex Conditional Translations",
   "Notifications": "Notifications",
   "You have @{count} notification": "You have @{count} notification",

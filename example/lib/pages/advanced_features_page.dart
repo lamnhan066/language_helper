@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A page that demonstrates advanced features of LanguageHelper.
 class AdvancedFeaturesPage extends StatefulWidget {

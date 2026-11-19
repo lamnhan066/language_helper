@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A widget that demonstrates using LanguageHelper within a package.
 class PackageWidget extends StatefulWidget {

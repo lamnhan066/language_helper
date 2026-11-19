@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper_example/widgets/package_widget.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A page that demonstrates using a package widget's LanguageDelegate
 /// in MaterialApp's localizationsDelegates.

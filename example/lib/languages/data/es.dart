@@ -76,8 +76,7 @@ const esLanguageData = <String, dynamic>{
       "Language changed from @{from} to @{to}",
   "Advanced Features": 'Características avanzadas',
   "Advanced Language Features": "Advanced Language Features",
-  "Master complex conditions, dynamic parameters, and language change listeners.":
-      "Master complex conditions, dynamic parameters, and language change listeners.",
+  "Master complex conditions, dynamic parameters, and language change listeners.": "Master complex conditions, dynamic parameters, and language change listeners.",
   "Complex Conditional Translations": "Complex Conditional Translations",
   "Notifications": "Notifications",
   "You have @{count} notification": "You have @{count} notification",
@@ -133,7 +132,6 @@ const esLanguageData = <String, dynamic>{
   "@path_pages/dart_map_page.dart": "",
   "Dart Map Example": "Dart Map Example",
   "Dart Map Data Source": 'Fuente de datos Dart Map',
-  "Define translations directly in Dart using maps and LanguageConditions.":
-      'Define traducciones directamente en Dart usando mapas y LanguageConditions.',
+  "Define translations directly in Dart using maps and LanguageConditions.": 'Define traducciones directamente en Dart usando mapas y LanguageConditions.',
   "Key Features": 'Características principales',
 };

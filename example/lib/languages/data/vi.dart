@@ -75,8 +75,7 @@ const viLanguageData = <String, dynamic>{
       "Language changed from @{from} to @{to}",
   "Advanced Features": 'Tính năng nâng cao',
   "Advanced Language Features": "Advanced Language Features",
-  "Master complex conditions, dynamic parameters, and language change listeners.":
-      "Master complex conditions, dynamic parameters, and language change listeners.",
+  "Master complex conditions, dynamic parameters, and language change listeners.": "Master complex conditions, dynamic parameters, and language change listeners.",
   "Complex Conditional Translations": "Complex Conditional Translations",
   "Notifications": "Notifications",
   "You have @{count} notification": "You have @{count} notification",
@@ -131,7 +130,6 @@ const viLanguageData = <String, dynamic>{
   "@path_pages/dart_map_page.dart": "",
   "Dart Map Example": "Dart Map Example",
   "Dart Map Data Source": 'Nguồn dữ liệu Dart Map',
-  "Define translations directly in Dart using maps and LanguageConditions.":
-      'Định nghĩa bản dịch trực tiếp trong Dart bằng cách sử dụng maps và LanguageConditions.',
+  "Define translations directly in Dart using maps and LanguageConditions.": 'Định nghĩa bản dịch trực tiếp trong Dart bằng cách sử dụng maps và LanguageConditions.',
   "Key Features": 'Tính năng chính',
 };

@@ -4,8 +4,8 @@ description: A comprehensive example demonstrating all features of the language_
 publish_to: "none"
 
 environment:
-  sdk: ^3.9.0
-  flutter: ">=3.35.0"
+  sdk: ^3.14.0
+  flutter: ">=3.50.0"
 
 dependencies:
   cupertino_icons: ^1.0.2
@@ -15,6 +15,7 @@ dependencies:
   language_helper:
     path: ../
 
+  material_ui: ^1.0.0
 dependency_overrides:
   language_helper:
     path: ../

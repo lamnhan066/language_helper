@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
 import 'package:language_helper_example/languages/codes.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A page that demonstrates using LanguageHelper with multiple data sources.
 class MultipleSourcesPage extends StatefulWidget {
