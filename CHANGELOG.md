@@ -1,3 +1,13 @@
+## 0.16.0
+
+* **[BREAKING CHANGES]**
+  * Migrate to the standalone `material_ui` and `cupertino_ui` packages (the in-SDK Material/Cupertino libraries are deprecated in Flutter 3.50).
+  * `languageHelper.delegates` now returns `GlobalMaterialLocalizations.delegates` from `material_ui`.
+  * Bump minimum SDK to Dart `^3.14.0` and Flutter `>=3.50.0`.
+* Add `material_ui: ^1.0.0`; remove the direct `flutter_localizations` dependency.
+
+* **MIGRATION**: run `dart fix --apply --code=migrate_design_widgets` (requires Flutter 3.50+) in your app, or replace `package:flutter/material.dart` and `package:flutter/cupertino.dart` imports manually. Do not mix old and new imports.
+
 ## 0.15.0
 
 * **[BREAKING CHANGES]**
