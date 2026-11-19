@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:language_helper/language_helper.dart';
+import 'package:material_ui/material_ui.dart';
 
 class LanguageHelperWidget extends StatelessWidget {
   const LanguageHelperWidget({super.key});

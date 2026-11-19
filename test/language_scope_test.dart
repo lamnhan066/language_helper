@@ -1,8 +1,6 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:language_helper/language_helper.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'language_data.dart';
@@ -1037,26 +1035,24 @@ void main() {
                     languageHelper1 = LanguageHelper.of(context);
                     return ElevatedButton(
                       onPressed: () {
-                        unawaited(
-                          showDialog<void>(
-                            context: context,
-                            builder: (dialogContext) {
-                              languageHelper2 = LanguageHelper.of(
-                                dialogContext,
-                              );
-                              return AlertDialog(
-                                title: Text('Hello'.tr),
-                                content: const Text('Test Dialog'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(dialogContext).pop(),
-                                    child: const Text('OK'),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
+                        showDialog<void>(
+                          context: context,
+                          builder: (dialogContext) {
+                            languageHelper2 = LanguageHelper.of(
+                              dialogContext,
+                            );
+                            return AlertDialog(
+                              title: Text('Hello'.tr),
+                              content: const Text('Test Dialog'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(dialogContext).pop(),
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
                         );
                       },
                       child: const Text('Open Dialog'),
@@ -1119,26 +1115,24 @@ void main() {
                       languageHelper1 = LanguageHelper.of(context);
                       return ElevatedButton(
                         onPressed: () {
-                          unawaited(
-                            showDialog<void>(
-                              context: context,
-                              builder: (dialogContext) {
-                                languageHelper2 = LanguageHelper.of(
-                                  dialogContext,
-                                );
-                                return AlertDialog(
-                                  title: Text('Hello'.tr),
-                                  content: const Text('Test Dialog'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(dialogContext).pop(),
-                                      child: const Text('OK'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
+                          showDialog<void>(
+                            context: context,
+                            builder: (dialogContext) {
+                              languageHelper2 = LanguageHelper.of(
+                                dialogContext,
+                              );
+                              return AlertDialog(
+                                title: Text('Hello'.tr),
+                                content: const Text('Test Dialog'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(dialogContext).pop(),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
                           );
                         },
                         child: const Text('Open Dialog'),
@@ -1204,29 +1198,27 @@ void main() {
                       languageHelper1 = LanguageHelper.of(context);
                       return ElevatedButton(
                         onPressed: () {
-                          unawaited(
-                            showDialog<void>(
-                              context: context,
-                              builder: (dialogContext) {
-                                // The dialog context cannot access
-                                // LanguageScope because it's shown in the outer
-                                // MaterialApp's overlay
-                                languageHelper2 = LanguageHelper.of(
-                                  dialogContext,
-                                );
-                                return AlertDialog(
-                                  title: const Text('Test Dialog'),
-                                  content: const Text('Dialog Content'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(dialogContext).pop(),
-                                      child: const Text('OK'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
+                          showDialog<void>(
+                            context: context,
+                            builder: (dialogContext) {
+                              // The dialog context cannot access
+                              // LanguageScope because it's shown in the outer
+                              // MaterialApp's overlay
+                              languageHelper2 = LanguageHelper.of(
+                                dialogContext,
+                              );
+                              return AlertDialog(
+                                title: const Text('Test Dialog'),
+                                content: const Text('Dialog Content'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(dialogContext).pop(),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
                           );
                         },
                         child: const Text('Open Dialog'),
